@@ -182,7 +182,7 @@
   height: 38px;
   border-radius: 50%;
   background: #1E293B;
-  border: 1px solid rgba(249, 115, 22, 0.45);
+  border: 1px solid rgba(70, 110, 153, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -348,12 +348,12 @@
 
 .ursa-msg.bot .ursa-msg-avatar {
   background: #1E293B;
-  border-color: rgba(249, 115, 22, 0.4);
+  border-color: rgba(70, 110, 153, 0.4);
 }
 
 .ursa-msg.user .ursa-msg-avatar {
   background: var(--bg-surface-raised, #161D25);
-  border: 1.5px solid rgba(249, 115, 22, 0.45);
+  border: 1.5px solid rgba(70, 110, 153, 0.45);
 }
 
 .user-initial-fallback {
@@ -375,8 +375,8 @@
 
 /* Refined User Bubble */
 .ursa-msg.user .ursa-bubble {
-  background: rgba(249, 115, 22, 0.14);
-  border: 1px solid rgba(249, 115, 22, 0.32);
+  background: rgba(70, 110, 153, 0.14);
+  border: 1px solid rgba(70, 110, 153, 0.32);
   color: var(--text-primary);
   border-radius: 14px 14px 2px 14px;
   padding: 0.6rem 0.95rem;
@@ -467,7 +467,7 @@
 
 /* Progress Track */
 .ursa-progress-track {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--surface-secondary);
   border-radius: 100px;
   height: 6px;
   overflow: hidden;
@@ -475,7 +475,7 @@
 }
 
 .ursa-progress-fill {
-  background: linear-gradient(90deg, #F97316, #22C55E);
+  background: var(--primary);
   height: 100%;
   border-radius: 100px;
   transition: width 0.4s ease;
@@ -490,7 +490,7 @@
 }
 
 .ursa-subject-item {
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--surface-secondary);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 0.5rem 0.65rem;
@@ -534,7 +534,7 @@
   font-size: 0.68rem;
   font-weight: 600;
   padding: 0.18rem 0.45rem;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-hover);
   color: var(--text-secondary);
   border-radius: 4px;
   border: 1px solid var(--border);
@@ -581,7 +581,7 @@
 .ursa-data-row.muted {
   color: var(--text-secondary);
   font-size: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border);
   margin-top: 0.35rem;
   padding-top: 0.35rem;
 }
@@ -613,7 +613,7 @@
   flex-wrap: wrap;
   gap: 0.45rem;
   margin-top: 0.85rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 1px solid var(--border);
   padding-top: 0.75rem;
 }
 
@@ -622,9 +622,9 @@
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.35rem 0.7rem;
-  background: rgba(249, 115, 22, 0.08);
+  background: rgba(70, 110, 153, 0.08);
   color: var(--primary-hover);
-  border: 1px solid rgba(249, 115, 22, 0.25);
+  border: 1px solid rgba(70, 110, 153, 0.25);
   border-radius: 100px;
   cursor: pointer;
   display: inline-flex;
@@ -691,7 +691,7 @@
 
 .ursa-tab-btn:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-secondary);
 }
 
 .ursa-tab-btn:hover iconify-icon {
@@ -734,7 +734,7 @@
   max-height: 212px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
   padding-right: 0.15rem;
   box-sizing: border-box;
 }
@@ -748,12 +748,12 @@
 }
 
 .ursa-prompts-grid::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--scrollbar-thumb);
   border-radius: 999px;
 }
 
 .ursa-prompts-grid::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Compact Single-Row Prompt Cards */
@@ -778,7 +778,7 @@
 }
 
 .ursa-prompt-card:hover {
-  border-color: rgba(249, 115, 22, 0.45);
+  border-color: rgba(70, 110, 153, 0.45);
   background: var(--surface-hover);
   transform: translateY(-1.5px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
@@ -807,7 +807,7 @@
   width: 28px;
   height: 28px;
   border-radius: 7px;
-  background: rgba(249, 115, 22, 0.1);
+  background: rgba(70, 110, 153, 0.1);
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -866,12 +866,12 @@
 
 /* Category Accent Styles */
 .ursa-cat-academic .ursa-prompt-icon {
-  background: rgba(249, 115, 22, 0.12);
+  background: rgba(70, 110, 153, 0.12);
   color: var(--primary);
 }
 
 .ursa-cat-academic:hover {
-  border-color: rgba(249, 115, 22, 0.45);
+  border-color: rgba(70, 110, 153, 0.45);
 }
 
 .ursa-cat-academic:hover .ursa-prompt-arrow {
@@ -909,8 +909,8 @@
    ============================================= */
 .grizz-dashboard-bar,
 .ursa-dashboard-widget {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm, 8px);
   padding: 0.32rem 0.75rem;
   margin-bottom: 1.15rem;
@@ -924,8 +924,8 @@
 
 .grizz-dashboard-bar:hover,
 .ursa-dashboard-widget:hover {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--border-hover);
+  background: var(--surface-secondary);
 }
 
 /* Identity Lockup (Avatar + Name) */
@@ -954,7 +954,7 @@
   height: 28px;
   border-radius: 50%;
   background: #1E293B;
-  border: 1px solid rgba(249, 115, 22, 0.4);
+  border: 1px solid rgba(70, 110, 153, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1040,8 +1040,8 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.28rem 0.65rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--surface-secondary);
+  border: 1px solid var(--border);
   border-radius: 100px;
   color: var(--text-secondary);
   font-family: var(--font-ui);
@@ -1065,7 +1065,7 @@
 .grizz-prompt-pill:hover,
 .ursa-dash-chip:hover {
   background: var(--surface-hover);
-  border-color: rgba(249, 115, 22, 0.45);
+  border-color: rgba(70, 110, 153, 0.45);
   color: #FFFFFF;
   transform: translateY(-1px);
 }
@@ -1160,8 +1160,8 @@
     padding: 0.28rem 0.55rem;
     margin-bottom: 0.85rem;
     min-height: 36px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--surface);
+    border: 1px solid var(--border);
   }
 
   .grizz-bar-identity,
@@ -1249,7 +1249,7 @@
 /* Chat Messages */
 [data-theme="light"] .ursa-msg.user .ursa-bubble {
   background: #FFF7ED;
-  border: 1px solid rgba(249, 115, 22, 0.3);
+  border: 1px solid rgba(70, 110, 153, 0.3);
   color: #0F172A;
 }
 

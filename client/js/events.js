@@ -128,7 +128,7 @@ const Events = (() => {
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
             ${UI.renderStatusBadge(ev.status)}
             <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-tertiary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
-              <iconify-icon icon="solar:vault-linear" style="font-size:12px;color:var(--accent-primary,#f97316)"></iconify-icon>
+              <iconify-icon icon="solar:vault-linear" style="font-size:12px;color:var(--brand-accent,#B23A0A)"></iconify-icon>
               ${ev.funding_source || 'General Fund'}
             </span>
           </div>
@@ -169,7 +169,7 @@ const Events = (() => {
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:0.4rem;">
             ${UI.renderStatusBadge(ev.status)}
             <span style="font-size:0.75rem;background:rgba(255,255,255,0.08);padding:3px 10px;border-radius:12px;color:var(--text-secondary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
-              <iconify-icon icon="solar:vault-linear" style="font-size:13px;color:var(--accent-primary,#f97316)"></iconify-icon>
+              <iconify-icon icon="solar:vault-linear" style="font-size:13px;color:var(--brand-accent,#B23A0A)"></iconify-icon>
               Source: ${ev.funding_source || 'General Fund'}
             </span>
           </div>

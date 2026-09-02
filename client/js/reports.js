@@ -261,8 +261,8 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Income',
           data: monthly.map(m => m.income),
-          backgroundColor: '#F97316',
-          hoverBackgroundColor: '#FB923C',
+          backgroundColor: isLight ? '#1F3A5F' : '#4E77AC',
+          hoverBackgroundColor: isLight ? '#2A4A73' : '#5F89BC',
           borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: 'bottom',
           maxBarThickness: 32,
@@ -360,7 +360,7 @@ function renderBreakdownChart(breakdown) {
     { key: 'expense',    label: 'Expenses',   color: '#EF4444' },
     { key: 'allocation', label: 'Allocation', color: '#64748B' },
     { key: 'donation',   label: 'Donations',  color: '#10B981' },
-    { key: 'collection', label: 'Collection', color: '#F97316' },
+    { key: 'collection', label: 'Collection', color: '#3E6393' },
   ];
 
   const active = typeMap.filter(t => (breakdown[t.key] || 0) > 0);

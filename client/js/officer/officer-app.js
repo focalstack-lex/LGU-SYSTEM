@@ -250,7 +250,7 @@ const OfficerApp = (() => {
   function bindTheme() {
     const toggleBtns = document.querySelectorAll('[data-theme-toggle]');
     const updateIcon = () => {
-      const currentTheme = localStorage.getItem('theme') || 'dark';
+      const currentTheme = localStorage.getItem('theme') || 'light';
       const icon = currentTheme === 'dark' ? 'solar:sun-linear' : 'solar:moon-linear';
       const title = currentTheme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme';
       toggleBtns.forEach(btn => {
@@ -262,7 +262,7 @@ const OfficerApp = (() => {
 
     toggleBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        const cur = localStorage.getItem('theme') || 'dark';
+        const cur = localStorage.getItem('theme') || 'light';
         const next = cur === 'dark' ? 'light' : 'dark';
         localStorage.setItem('theme', next);
         document.documentElement.setAttribute('data-theme', next);
