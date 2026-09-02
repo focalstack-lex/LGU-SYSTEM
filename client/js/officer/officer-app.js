@@ -502,6 +502,9 @@ const OfficerApp = (() => {
     });
     $(`of-view-${section}`).classList.add('active');
 
+    // Glide the liquid pill to the newly active icon
+    if (typeof UI !== 'undefined' && UI.moveNavIndicator) UI.moveNavIndicator($('of-bottom-nav'));
+
     // Remember view across page refreshes and keep URL hash in sync
     localStorage.setItem('officer_last_view', section);
     if (window.location.hash.slice(1) !== section) {

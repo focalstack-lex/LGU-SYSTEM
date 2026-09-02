@@ -557,6 +557,9 @@
       }
     });
 
+    // Glide the liquid pill to the newly active icon
+    UI.moveNavIndicator(document.getElementById('bottom-nav'));
+
     if (view === 'dashboard')    Dashboard.load();
     if (view === 'events')       Events.load();
     if (view === 'transactions') Transactions.load();

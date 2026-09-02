@@ -219,6 +219,55 @@ const UI = (() => {
     });
   }
 
+  // ---- Sliding Active Indicator (liquid pill that glides between icons) ----
+  // One absolutely-positioned pill per bottom nav; instead of each item
+  // painting its own background, the pill physically travels to the item
+  // that just became active.
+  const _navIndicatorPlaced = new WeakSet();
+  const _navIndicatorBound = new WeakSet();
+
+  function moveNavIndicator(nav) {
+    if (!nav) return;
+    let indicator = nav.querySelector(':scope > .nav-indicator');
+    if (!indicator) {
+      indicator = document.createElement('span');
+      indicator.className = 'nav-indicator ' +
+        (nav.id === 'of-bottom-nav' ? 'of-bottom-nav-indicator' : 'bottom-nav-indicator');
+      indicator.setAttribute('aria-hidden', 'true');
+      nav.prepend(indicator);
+      nav.classList.add('has-nav-indicator');
+    }
+    const target = Array.from(nav.children).find(el => el !== indicator && el.classList.contains('active'));
+    if (!target) return;
+    const x = target.offsetLeft;
+    const w = target.offsetWidth;
+    if (!w) return; // nav not laid out yet (hidden screen / desktop) — retry on next call
+    const firstPlacement = !_navIndicatorPlaced.has(nav);
+    if (firstPlacement) {
+      // Land instantly on the resting pill so the first reveal doesn't slide in from the edge
+      indicator.style.transition = 'none';
+    }
+    indicator.style.width = `${w}px`;
+    indicator.style.transform = `translateX(${x}px)`;
+    if (firstPlacement) {
+      void indicator.offsetWidth; // flush styles so the next move animates
+      indicator.style.transition = '';
+      _navIndicatorPlaced.add(nav);
+    }
+  }
+
+  function initNavIndicators() {
+    [document.getElementById('bottom-nav'), document.getElementById('of-bottom-nav')]
+      .filter(Boolean)
+      .forEach(nav => {
+        moveNavIndicator(nav);
+        if (!_navIndicatorBound.has(nav)) {
+          _navIndicatorBound.add(nav);
+          window.addEventListener('resize', () => moveNavIndicator(nav));
+        }
+      });
+  }
+
   // Keeps the browser/OS chrome color (PWA theme-color meta) in step with the theme
   function syncThemeColor(theme) {
     const meta = document.querySelector('meta[name="theme-color"]');
@@ -229,10 +278,12 @@ const UI = (() => {
   if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initAutoHideBottomNav);
+      document.addEventListener('DOMContentLoaded', initNavIndicators);
     } else {
       setTimeout(initAutoHideBottomNav, 100);
+      setTimeout(initNavIndicators, 100);
     }
   }
 
-  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav };
+  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators };
 })();
