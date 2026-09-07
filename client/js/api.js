@@ -183,6 +183,37 @@ const Api = (() => {
     create: (body)   => _request('POST', '/announcements', body),
   };
 
+  // Enrollment submissions (Phase B): student draft/submit flow.
+  const enrollment = {
+    my:        () => _request('GET', '/enrollment/submissions/my', null, false, 15000),
+    createTerm: (school_year, semester) => _request('POST', '/enrollment/submissions', { school_year, semester }),
+    addItem:   (id, subject_id, grizz_reason) => _request('POST', `/enrollment/submissions/${id}/items`,
+                  grizz_reason ? { subject_id, origin: 'grizz', grizz_reason } : { subject_id }),
+    removeItem:(id, itemId) => _request('DELETE', `/enrollment/submissions/${id}/items/${itemId}`),
+    submit:    (id) => _request('POST', `/enrollment/submissions/${id}/submit`),
+  };
+
+  // Faculty portal (Phase B): program-head evaluation + SA encoding queue.
+  const faculty = {
+    submissions: (status) => _request('GET', `/faculty/submissions${status ? '?status=' + encodeURIComponent(status) : ''}`, null, false, 15000),
+    detail:      (id) => _request('GET', `/faculty/submissions/${id}`, null, false, 0),
+    open:        (id) => _request('POST', `/faculty/submissions/${id}/open`),
+    addItem:     (id, subject_id, head_note) => _request('POST', `/faculty/submissions/${id}/items`, { subject_id, head_note }),
+    removeItem:  (id, itemId, head_note) => _request('PATCH', `/faculty/submissions/${id}/items/${itemId}`, { head_note }),
+    approve:     (id, notes) => _request('POST', `/faculty/submissions/${id}/approve`, notes ? { notes } : {}),
+    return:      (id, notes) => _request('POST', `/faculty/submissions/${id}/return`, { notes }),
+    reject:      (id, notes) => _request('POST', `/faculty/submissions/${id}/reject`, { notes }),
+    markEncoded: (id) => _request('POST', `/faculty/submissions/${id}/mark-encoded`),
+    exportBlob: async (id) => {
+      const token = await _getToken();
+      const res = await fetch(`${window.API_BASE}/api/faculty/submissions/${id}/export`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error('Export failed.');
+      return res.blob();
+    },
+  };
+
   // Curriculum management (Phase A). The route contract uses full /api/...
   // paths, but _request already prepends the /api prefix itself, so this
   // local shim strips it before delegating to the shared request helper.
@@ -609,6 +640,9 @@ const Api = (() => {
     admin,
     units,
     announcements,
+    // Load submission flows (Phase B): student enrollment + faculty evaluation.
+    enrollment,
+    faculty,
     // Curriculum management (Phase A): contract paths are full /api/... —
     // `request` (above) strips the prefix before delegating to _request.
     curriculum: {
