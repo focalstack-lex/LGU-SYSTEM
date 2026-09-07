@@ -72,14 +72,14 @@ CREATE POLICY "Only admins can delete prereqs"
 -- =============================================
 
 -- Split a legacy prerequisites string into candidate tokens.
--- '/' is treated as a separator too (e.g. '*240 hours / 4th Yr Standing').
+-- ',', '/', and ';' are all separators (e.g. "EMath 100, EMath 111").
 CREATE OR REPLACE FUNCTION public.split_prereq_tokens(raw TEXT)
 RETURNS SETOF TEXT
 LANGUAGE sql IMMUTABLE AS $$
   SELECT btrim(t)
   FROM unnest(
     string_to_array(
-      regexp_replace(COALESCE(raw, ''), '\s*/\s*', ';', 'g'),
+      regexp_replace(COALESCE(raw, ''), '\s*[,/]\s*', ';', 'g'),
       ';'
     )
   ) AS t
@@ -98,23 +98,23 @@ RETURNS TABLE (kind TEXT, depends_on_subject_id UUID, detail TEXT)
 LANGUAGE sql STABLE AS $$
   SELECT parsed.kind, parsed.depends_on_subject_id, parsed.detail FROM (
 
-    -- co-requisite: "Co-req CpE 223", "Co-requisite: EMath 121"
+    -- co-requisite: "Co-req CpE 223", "Co-requisite: EMath 121", "Co: ECE 211"
     -- (aliases here name the UNION's output columns)
     SELECT 'corequisite'::TEXT AS kind, dep.id AS depends_on_subject_id, NULL::TEXT AS detail
-    FROM (SELECT regexp_replace(p_token, '^.*co-?req(uisite)?\s*:?\s*', '', 'i') AS code) c
+    FROM (SELECT regexp_replace(p_token, '^(?:.*co-?req(uisite)?\s*:?\s*|co\s*:\s*)', '', 'i') AS code) c
     LEFT JOIN LATERAL (
       SELECT s2.id FROM public.subjects s2
       WHERE upper(btrim(s2.code)) = upper(btrim(c.code))
       ORDER BY (s2.program = p_subject.program) DESC, s2.id
       LIMIT 1
     ) dep ON true
-    WHERE p_token ~* 'co-?req'
+    WHERE p_token ~* '(co-?req|co\s*:)'
 
     UNION ALL
 
     -- year standing: "2nd Yr Standing"
     SELECT 'year_standing'::TEXT, NULL::UUID, btrim(p_token)
-    WHERE p_token !~* 'co-?req'
+    WHERE p_token !~* '(co-?req|co\s*:)'
       AND p_token ~* '\d+\s*Yr\s*Standing'
 
     UNION ALL
@@ -124,7 +124,7 @@ LANGUAGE sql STABLE AS $$
     FROM LATERAL (
       SELECT s2.id FROM public.subjects s2
       WHERE upper(btrim(s2.code)) = upper(btrim(p_token))
-        AND p_token !~* 'co-?req'
+        AND p_token !~* '(co-?req|co\s*:)'
         AND p_token !~* 'standing'
         AND p_token !~* '\d+\s*(hours|hrs)'
       ORDER BY (s2.program = p_subject.program) DESC, s2.id
@@ -136,7 +136,7 @@ LANGUAGE sql STABLE AS $$
 
     -- anything unresolvable lands as special (flagged in the report)
     SELECT 'special'::TEXT, NULL::UUID, btrim(p_token)
-    WHERE p_token !~* 'co-?req'
+    WHERE p_token !~* '(co-?req|co\s*:)'
       AND p_token !~* 'standing'
 
   ) parsed
