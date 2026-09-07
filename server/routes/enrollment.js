@@ -216,6 +216,9 @@ router.post('/submissions/:id/submit', async (req, res) => {
     for (const head of heads || []) {
       createNotification({
         userId: head.id,
+        // 'faculty' is outside every role broadcast filter, so delivery is
+        // user_id-only and other users never see this notification.
+        targetRole: 'faculty',
         type: 'units',
         category: 'units',
         title: 'New load for evaluation',

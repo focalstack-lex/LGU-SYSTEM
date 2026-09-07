@@ -195,6 +195,9 @@ async function notifyStudent(submission, status, extraChanges = []) {
     .concat(extraChanges);
   createNotification({
     userId: submission.student_id,
+    // 'faculty' is outside every role broadcast filter, so delivery is
+    // user_id-only and other students never see this notification.
+    targetRole: 'faculty',
     type: 'units',
     category: 'units',
     title: `Load ${status.charAt(0).toUpperCase()}${status.slice(1)}`,
