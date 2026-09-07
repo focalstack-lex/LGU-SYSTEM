@@ -258,3 +258,62 @@ visible to admins only (the console already role-gates sections).
   subject columns via the API path.
 - **Migration idempotency:** running 031 twice changes nothing the second
   time.
+
+---
+
+## Addendum (2026-09-08): Component-Level Outcomes — pass lab, fail lec (or vice versa)
+
+Approved decision: students can pass one component and fail the other; the
+passed component's units bank into progress immediately, and the failed
+component is the only thing to retake.
+
+### Data model (migration 033, additive only)
+
+```sql
+ALTER TABLE public.student_units
+  ADD COLUMN IF NOT EXISTS lec_grade NUMERIC(4,2),
+  ADD COLUMN IF NOT EXISTS lab_grade NUMERIC(4,2),
+  ADD COLUMN IF NOT EXISTS lec_status TEXT
+    CHECK (lec_status IN ('enrolled','passed','failed','dropped','incomplete')),
+  ADD COLUMN IF NOT EXISTS lab_status TEXT
+    CHECK (lab_status IN ('enrolled','passed','failed','dropped','incomplete'));
+```
+
+- One row per subject per term is retained. Component fields are NULL unless
+  the subject has a lab component (`subjects.lab_units > 0`), in which case
+  the log/edit UI records each component's status and optional grade.
+- Rows without component values behave exactly as today (backward compatible).
+
+### Semantics
+
+- **Full pass** = overall `passed`, or both components `passed`.
+- **Partial pass** = exactly one component `passed`. That component's units
+  (e.g., the 1-unit lab) count as earned units toward progress immediately.
+- **Prerequisite satisfaction (Grizz)**: only a full pass satisfies a
+  prerequisite. A partial pass surfaces a "Component Backlog" note
+  ("passed the lecture - retake the lab only") instead of the generic
+  backlog notice.
+- Retake-of-only-the-failed-component enrollment semantics are Phase D
+  scope; this addendum covers recording and credit math.
+
+### Touchpoints
+
+1. **Log/Edit modal** (`client/js/units.js`): subjects with `lab_units > 0`
+   show separate Lecture and Laboratory status/grade fields; one save writes
+   one row. Overall `status` is derived on save: both passed -> `passed`,
+   either failed -> `failed`, otherwise stays `enrolled`/`incomplete`.
+2. **Checklist badge**: partial records display e.g. `Lec: Passed · Lab: Failed`.
+3. **Progress math** (`renderProgress`): earned units per subject = full
+   `units` on full pass; otherwise the sum of `lec_units`/`lab_units` for
+   components passed; 0 otherwise. Curriculum totals unchanged.
+4. **Server** (`server/routes/units.js`): enroll/batch-enroll/update accept
+   and sanitize the four component fields; `/my` returns them; the standing
+   PDF prints component grades when present (e.g., `1.75 / 5.00`).
+5. **Grizz** (`client/js/ai-assistant.js`): `passedCodes` membership requires
+   a full pass; partial passes feed the Component Backlog note.
+
+### Testing
+
+Smoke tests cover: component-field sanitization, derived overall status,
+earned-units math (full/partial/none), Grizz full-pass gating, and
+standing-PDF rendering with component grades.
