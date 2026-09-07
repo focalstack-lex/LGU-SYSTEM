@@ -6,6 +6,7 @@ const Units = (() => {
 
   let requirements = []; // curriculum_requirements rows (all programs)
   let subjects     = []; // subjects for the current program
+  let prereqRows   = []; // structured subject_prerequisites rows (all programs)
   let myUnits      = []; // the student's enrollment records
   let program      = null;
   let selectedYear = 'all'; // 'all' | '1' | '2' | '3' | '4'
@@ -113,6 +114,7 @@ const Units = (() => {
       ]);
       requirements = checklists.requirements || [];
       subjects     = checklists.subjects || [];
+      prereqRows   = checklists.prerequisites || [];
       myUnits      = mine || [];
       renderProgress(profile);
       renderChecklist();
@@ -429,6 +431,20 @@ const Units = (() => {
     }
   }
 
+  // Structured prereq display: "Prerequisites: A, B · Co-requisites: C · 2nd Yr Standing · Notes: *240 hours"
+  function formatPrereqRows(rows) {
+    const codes   = rows.filter(r => r.kind === 'prerequisite').map(r => r.depends_code).filter(Boolean);
+    const coreqs  = rows.filter(r => r.kind === 'corequisite').map(r => r.depends_code).filter(Boolean);
+    const gates   = rows.filter(r => r.kind === 'year_standing').map(r => r.detail).filter(Boolean);
+    const special = rows.filter(r => r.kind === 'special').map(r => r.detail).filter(Boolean);
+    const parts = [];
+    if (codes.length)   parts.push(`Prerequisites: ${codes.join(', ')}`);
+    if (coreqs.length)  parts.push(`Co-requisites: ${coreqs.join(', ')}`);
+    if (gates.length)   parts.push(gates.join(', '));
+    if (special.length) parts.push(`Notes: ${special.join(', ')}`);
+    return parts.join(' · ');
+  }
+
   function subjectRow(s) {
     const rec = recordFor(s.id);
     const badge = rec
@@ -446,9 +462,16 @@ const Units = (() => {
         </div>`
       : `<button type="button" class="unit-log-btn" data-act="log" data-subject="${s.id}" title="Log subject grade or enrollment"><iconify-icon icon="solar:add-circle-linear"></iconify-icon><span>Log</span></button>`;
 
-    const prereq = s.prerequisites
-      ? `<div class="unit-prereq">Prerequisite: ${esc(s.prerequisites)}</div>`
-      : '';
+    const unitsBadge = Number(s.lab_units) > 0
+      ? `<span class="unit-units">${Number(s.lec_units)} lec / ${Number(s.lab_units)} lab</span>`
+      : `<span class="unit-units">${s.units} unit${s.units === 1 ? '' : 's'}</span>`;
+
+    const structuredPrereq = formatPrereqRows((prereqRows || []).filter(r => r.subject_id === s.id));
+    const prereq = structuredPrereq
+      ? `<div class="unit-prereq">${esc(structuredPrereq)}</div>`
+      : (s.prerequisites
+          ? `<div class="unit-prereq">Prerequisite: ${esc(s.prerequisites)}</div>`
+          : '');
 
     const checkCol = batchMode
       ? `<label class="unit-row-check-label"><input type="checkbox" class="unit-row-check" data-subject-id="${s.id}" data-year="${s.year_level}" data-sem="${s.semester}" ${selectedBatchSubjectIds.has(s.id) ? 'checked' : ''} /></label>`
@@ -461,7 +484,7 @@ const Units = (() => {
         ${checkCol}
         <span class="unit-code">${esc(s.code)}</span>
         <div class="unit-title">
-          <div>${esc(s.title)} <span class="unit-units">${s.units} unit${s.units === 1 ? '' : 's'}</span></div>
+          <div>${esc(s.title)} ${unitsBadge}</div>
           ${prereq}
         </div>
         ${badge}
