@@ -297,8 +297,12 @@ router.get('/standing', async (req, res) => {
     doc.moveDown(5);
 
     // ── Subject table ──
-    const cols = { code: 72, title: 126, units: 298, sy: 332, sem: 392, status: 442, grade: 504 };
-    const colW = { code: 52, title: 170, units: 32, sy: 58, sem: 48, status: 60, grade: 36 };
+    // LEC/LAB split column: title narrowed (170->136) and sem trimmed (48->46)
+    // to fund the 34pt split column so the table still spans exactly
+    // contentLeft(72)..contentRight(540) - the plan's raw geometry (grade
+    // ending at 574) overflowed the 1" right margin and the row bands.
+    const cols = { code: 72, title: 126, split: 264, units: 300, sy: 334, sem: 394, status: 442, grade: 504 };
+    const colW = { code: 52, title: 136, split: 34, units: 32, sy: 58, sem: 46, status: 60, grade: 36 };
 
     function tableHeader() {
       const y = doc.y;
@@ -307,6 +311,7 @@ router.get('/standing', async (req, res) => {
       doc.text('CODE',         cols.code,  y + 7, { width: colW.code });
       doc.text('SUBJECT TITLE', cols.title, y + 7, { width: colW.title });
       doc.text('UNITS',        cols.units, y + 7, { width: colW.units, align: 'right' });
+      doc.text('LEC/LAB',      cols.split, y + 7, { width: colW.split, align: 'right' });
       doc.text('SCHOOL YEAR',  cols.sy,    y + 7, { width: colW.sy });
       doc.text('SEM',          cols.sem,   y + 7, { width: colW.sem });
       doc.text('STATUS',       cols.status,y + 7, { width: colW.status });
@@ -364,6 +369,8 @@ router.get('/standing', async (req, res) => {
                .text(s.title, cols.title, rowY + 6, { width: colW.title, height: rowH - 8 });
             doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
                .text(String(s.units), cols.units, rowY + 6, { width: colW.units, align: 'right' });
+            const splitText = Number(s.lab_units) > 0 ? `${s.lec_units}+${s.lab_units}` : '—';
+            doc.text(splitText, cols.split, rowY + 6, { width: colW.split, align: 'right' });
             doc.text(rec?.school_year || '-', cols.sy, rowY + 6, { width: colW.sy });
             doc.text(SEM_SHORT[rec?.semester ?? s.semester] || '-', cols.sem, rowY + 6, { width: colW.sem });
             doc.fillColor(statusColors[status] || textMuted).font('Helvetica-Bold').fontSize(8)
