@@ -13,6 +13,7 @@ const adminRouter         = require("./routes/admin");
 const unitsRouter         = require("./routes/units");
 const curriculumRouter    = require("./routes/curriculum");
 const enrollmentRouter    = require("./routes/enrollment");
+const facultyRouter       = require("./routes/faculty");
 const { router: notificationsRouter } = require("./routes/notifications");
 const publicRouter        = require("./routes/public");
 const feedbackRouter      = require("./routes/feedback");
@@ -178,6 +179,7 @@ app.use("/api/admin",         authMiddleware, onlyWrites(writeLimiter), adminRou
 app.use("/api/units",         authMiddleware, onlyWrites(writeLimiter), unitsRouter);
 app.use("/api/curriculum",    authMiddleware, onlyWrites(writeLimiter), curriculumRouter);
 app.use("/api/enrollment",    authMiddleware, onlyWrites(writeLimiter), enrollmentRouter);
+app.use("/api/faculty",       authMiddleware, onlyWrites(writeLimiter), facultyRouter);
 app.use("/api/notifications", authMiddleware, onlyWrites(writeLimiter), notificationsRouter);
 app.use("/api/cv",            onlyWrites(writeLimiter), cvRouter);
 
