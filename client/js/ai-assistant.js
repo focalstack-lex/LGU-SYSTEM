@@ -9,6 +9,7 @@ const GrizzAI = (() => {
   let subjects = [];
   let myUnits = [];
   let requirements = [];
+  let prereqRows = [];
   let isOpen = false;
   let activeTab = 'academic';
   let isInitialized = false;
@@ -318,6 +319,7 @@ const GrizzAI = (() => {
       ]);
       subjects = checklistRes.subjects || [];
       requirements = checklistRes.requirements || [];
+      prereqRows = checklistRes.prerequisites || [];
       myUnits = unitsRes || [];
       updateInitialGreeting();
     } catch (err) {
@@ -765,6 +767,41 @@ const GrizzAI = (() => {
     }
   }
 
+  // Structured prerequisite evaluation (migration 031 rows).
+  // Legacy free-text fallback keeps the old regex path when the table is empty
+  // for a subject, so Grizz never regresses before the migration lands.
+  function evaluatePrereqs(subject, prereqsBySubject, passedCodes, enrolledCodes, currentYear) {
+    const rows = prereqsBySubject.get(subject.id) || [];
+    if (!rows.length) return null; // signal: caller falls back to legacy parsing
+
+    let satisfied = true;
+    const missing = [];
+    const notes = [];
+    for (const row of rows) {
+      const depCode = row.depends_code;
+      if ((row.kind === 'prerequisite' || row.kind === 'corequisite') && depCode) {
+        if (!passedCodes.has(depCode) && !enrolledCodes.has(depCode)) {
+          satisfied = false;
+          missing.push(depCode);
+        }
+      } else if (row.kind === 'year_standing' && row.detail) {
+        const requiredYr = Number((row.detail.match(/(\d+)/) || [])[1] || 0);
+        if (currentYear < requiredYr) {
+          satisfied = false;
+          missing.push(row.detail);
+        }
+      } else if (row.kind === 'special' && row.detail) {
+        notes.push(row.detail);
+      }
+    }
+    return { satisfied, missing, notes };
+  }
+
+  // Lecture/lab-aware unit label for recommendation cards ("3+1 units" when lab > 0).
+  function unitsLabel(s) {
+    return Number(s.lab_units) > 0 ? `${s.lec_units}+${s.lab_units} units` : `${s.units} units`;
+  }
+
   // 1. Next Semester Subject Recommendations
   function handleNextSemRecommendations() {
     const prog = profile?.course || 'BSCoE';
@@ -780,7 +817,14 @@ const GrizzAI = (() => {
     });
 
     const currentYear = Number(profile?.year_level) || 1;
-    
+
+    // Build once per recommendation run, from the checklists payload captured in loadData():
+    const prereqsBySubject = new Map();
+    for (const r of (prereqRows || [])) {
+      if (!prereqsBySubject.has(r.subject_id)) prereqsBySubject.set(r.subject_id, []);
+      prereqsBySubject.get(r.subject_id).push(r);
+    }
+
     // Find uncompleted subjects (exclude both PASSED and CURRENTLY ENROLLED subjects)
     const uncompleted = subjects.filter(s => {
       const c = s.code.trim().toUpperCase();
@@ -793,6 +837,17 @@ const GrizzAI = (() => {
     uncompleted.forEach(s => {
       const prereqStr = (s.prerequisites || '').trim();
 
+      const verdict = evaluatePrereqs(s, prereqsBySubject, passedCodes, enrolledCodes, currentYear);
+      if (verdict) {
+        if (verdict.satisfied) {
+          eligible.push({ ...s, missingPrereq: null, prereqNotes: verdict.notes });
+        } else {
+          blockedByPrereq.push({ ...s, reason: `Missing prerequisite: ${verdict.missing.join(', ')}` });
+        }
+        return;
+      }
+
+      // ---- legacy fallback (subjects with no structured rows yet) ----
       if (!prereqStr || prereqStr === 'None' || prereqStr === '-') {
         eligible.push({ ...s, missingPrereq: null });
         return;
@@ -854,12 +909,13 @@ const GrizzAI = (() => {
     const cardsHtml = recommended.map(s => `
       <div class="ursa-subject-item">
         <div class="ursa-subject-meta">
-          <span class="ursa-subject-code">${esc(s.code)} <span class="ursa-units-badge">${s.units} Units</span></span>
+          <span class="ursa-subject-code">${esc(s.code)} <span class="ursa-units-badge">${unitsLabel(s)}</span></span>
           <span class="ursa-subject-title" title="${esc(s.title)}">${esc(s.title)}</span>
         </div>
         <span class="ursa-subject-tag">
           Yr ${s.year_level} · Sem ${s.semester}
         </span>
+        ${(s.prereqNotes || []).length ? `<span class="ursa-subject-tag req">Note: ${esc(s.prereqNotes.join(', '))}</span>` : ''}
       </div>
     `).join('');
 
