@@ -139,24 +139,25 @@ router.post('/prerequisites', async (req, res) => {
 });
 
 // DELETE /api/curriculum/prerequisites/:id
+// subject_prerequisites.id is a BIGINT identity (unlike subjects.id, which is a UUID).
 router.delete('/prerequisites/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    if (!isValidUUID(id)) {
+    const prereqId = Number(req.params.id);
+    if (!Number.isInteger(prereqId) || prereqId <= 0) {
       return res.status(400).json({ error: 'Invalid prerequisite id.' });
     }
 
     const { data, error } = await supabase
       .from('subject_prerequisites')
       .delete()
-      .eq('id', id)
+      .eq('id', prereqId)
       .select('id')
       .single();
     if (error || !data) {
       return res.status(404).json({ error: 'Prerequisite row not found.' });
     }
 
-    logAudit(req.user.id, 'CURRICULUM_DELETE_PREREQ', { prereq_id: id });
+    logAudit(req.user.id, 'CURRICULUM_DELETE_PREREQ', { prereq_id: prereqId });
     res.json({ ok: true });
   } catch (err) {
     logError('curriculum/prereqs/delete', err);

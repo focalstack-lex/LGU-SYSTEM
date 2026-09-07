@@ -799,7 +799,7 @@ const GrizzAI = (() => {
 
   // Lecture/lab-aware unit label for recommendation cards ("3+1 units" when lab > 0).
   function unitsLabel(s) {
-    return Number(s.lab_units) > 0 ? `${s.lec_units}+${s.lab_units} units` : `${s.units} units`;
+    return Number(s.lab_units) > 0 ? `${s.lec_units}+${s.lab_units} units` : `${s.units} unit${s.units === 1 ? "" : "s"}`;
   }
 
   // 1. Next Semester Subject Recommendations
