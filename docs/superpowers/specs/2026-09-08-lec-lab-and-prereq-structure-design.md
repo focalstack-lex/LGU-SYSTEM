@@ -93,8 +93,8 @@ ALTER TABLE subjects
 ```sql
 CREATE TABLE subject_prerequisites (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  subject_id BIGINT NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
-  depends_on_subject_id BIGINT REFERENCES subjects(id) ON DELETE CASCADE,
+  subject_id UUID NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
+  depends_on_subject_id UUID REFERENCES subjects(id) ON DELETE CASCADE,
   kind TEXT NOT NULL CHECK (kind IN
     ('prerequisite','corequisite','year_standing','special')),
   detail TEXT,           -- required for year_standing ('2nd Yr Standing')
@@ -107,7 +107,7 @@ CREATE TABLE subject_prerequisites (
 CREATE UNIQUE INDEX subject_prerequisites_unique
   ON subject_prerequisites (
     subject_id, kind,
-    COALESCE(depends_on_subject_id, -1),
+    COALESCE(depends_on_subject_id, '00000000-0000-0000-0000-000000000000'::uuid),
     COALESCE(detail, '')
   );
 

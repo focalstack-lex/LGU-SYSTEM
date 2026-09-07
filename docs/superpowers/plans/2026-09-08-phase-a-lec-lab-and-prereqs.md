@@ -66,8 +66,8 @@ ALTER TABLE public.subjects
 -- =============================================
 CREATE TABLE IF NOT EXISTS public.subject_prerequisites (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  subject_id BIGINT NOT NULL REFERENCES public.subjects(id) ON DELETE CASCADE,
-  depends_on_subject_id BIGINT REFERENCES public.subjects(id) ON DELETE CASCADE,
+  subject_id UUID NOT NULL REFERENCES public.subjects(id) ON DELETE CASCADE,
+  depends_on_subject_id UUID REFERENCES public.subjects(id) ON DELETE CASCADE,
   kind TEXT NOT NULL CHECK (kind IN ('prerequisite','corequisite','year_standing','special')),
   detail TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS public.subject_prerequisites (
 CREATE UNIQUE INDEX IF NOT EXISTS subject_prerequisites_unique
   ON public.subject_prerequisites (
     subject_id, kind,
-    COALESCE(depends_on_subject_id, -1),
+    COALESCE(depends_on_subject_id, '00000000-0000-0000-0000-000000000000'::uuid),
     COALESCE(detail, '')
   );
 CREATE INDEX IF NOT EXISTS subject_prerequisites_subject_idx
@@ -130,7 +130,7 @@ CREATE OR REPLACE FUNCTION public.parse_prereq_token(
   p_subject public.subjects,
   p_token TEXT
 )
-RETURNS TABLE (kind TEXT, depends_on_subject_id BIGINT, detail TEXT)
+RETURNS TABLE (kind TEXT, depends_on_subject_id UUID, detail TEXT)
 LANGUAGE sql STABLE AS $$
   SELECT kind, depends_on_subject_id, detail FROM (
 
@@ -148,7 +148,7 @@ LANGUAGE sql STABLE AS $$
     UNION ALL
 
     -- year standing: "2nd Yr Standing"
-    SELECT 'year_standing'::TEXT, NULL::BIGINT, btrim(p_token)
+    SELECT 'year_standing'::TEXT, NULL::UUID, btrim(p_token)
     WHERE p_token !~* 'co-?req'
       AND p_token ~* '\d+\s*Yr\s*Standing'
 
@@ -170,7 +170,7 @@ LANGUAGE sql STABLE AS $$
     UNION ALL
 
     -- anything unresolvable lands as special (flagged in the report)
-    SELECT 'special'::TEXT, NULL::BIGINT, btrim(p_token)
+    SELECT 'special'::TEXT, NULL::UUID, btrim(p_token)
     WHERE p_token !~* 'co-?req'
       AND p_token !~* 'standing'
 
