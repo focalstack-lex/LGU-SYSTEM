@@ -74,7 +74,14 @@ router.get('/checklists', async (req, res) => {
       .order('code',       { ascending: true });
     if (program) subjQuery = subjQuery.eq('program', program);
 
-    const [reqRes, subjRes] = await Promise.all([reqQuery, subjQuery]);
+    const [reqRes, subjRes, prereqRes] = await Promise.all([
+      reqQuery,
+      subjQuery,
+      supabase
+        .from('subject_prerequisites')
+        .select('id, subject_id, depends_on_subject_id, kind, detail, depends_on_subject_id(code)')
+        .order('id', { ascending: true }),
+    ]);
     if (reqRes.error || subjRes.error) {
       if (isMissingRelation(reqRes.error || subjRes.error)) {
         return res.status(503).json({ error: 'The credit unit tracker is not set up yet. Please run the 005_credit_unit_tracker.sql migration in the Supabase SQL console.' });
@@ -83,7 +90,23 @@ router.get('/checklists', async (req, res) => {
       return res.status(500).json({ error: 'Failed to load the curriculum.' });
     }
 
-    res.json({ requirements: reqRes.data, subjects: subjRes.data });
+    // Graceful degradation: migration 031 not applied yet -> empty prereq list.
+    let prerequisites = [];
+    if (prereqRes.error) {
+      if (!isMissingRelation(prereqRes.error)) {
+        logError('units/checklists/prereqs', prereqRes.error);
+      }
+    } else {
+      prerequisites = (prereqRes.data || []).map(r => ({
+        id: r.id,
+        subject_id: r.subject_id,
+        kind: r.kind,
+        detail: r.detail,
+        depends_code: r.depends_on_subject_id?.code || null,
+      }));
+    }
+
+    res.json({ requirements: reqRes.data, subjects: subjRes.data, prerequisites: prerequisites });
   } catch (err) {
     logError('units/checklists', err);
     res.status(500).json({ error: 'Failed to load the curriculum.' });
@@ -96,7 +119,7 @@ router.get('/my', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('student_units')
-      .select('id, school_year, semester, grade, status, created_at, instructor, schedule, subjects(id, code, title, units, program, year_level, semester)')
+      .select('id, school_year, semester, grade, status, created_at, instructor, schedule, subjects(id, code, title, units, lec_units, lab_units, program, year_level, semester)')
       .eq('student_id', req.user.id)
       .order('created_at', { ascending: false });
 
