@@ -802,19 +802,44 @@ const GrizzAI = (() => {
     return Number(s.lab_units) > 0 ? `${s.lec_units}+${s.lab_units} units` : `${s.units} unit${s.units === 1 ? "" : "s"}`;
   }
 
+  // Component-aware pass classification (spec addendum 2026-09-08).
+  // Only a FULL pass - overall 'passed', or both lec+lab components
+  // 'passed' - satisfies a prerequisite. A record with exactly one passed
+  // component is a partial pass: the passed component's units bank, but the
+  // subject surfaces in the Component Backlog (retake the failed part only).
+  // Records are classified newest-first per subject code, so retakes never
+  // resurrect an older outcome.
+  function classifyPasses(records) {
+    const passedCodes = new Set();
+    const enrolledCodes = new Set();
+    const partialPasses = new Map(); // subject code -> passed component ('lecture' | 'laboratory')
+    const seen = new Set();
+    records.forEach(u => {
+      const code = (u.subjects?.code || '').trim().toUpperCase();
+      if (!code || seen.has(code)) return; // newest record per subject wins
+      seen.add(code);
+      const lecPassed = u.lec_status === 'passed';
+      const labPassed = u.lab_status === 'passed';
+      if (u.status === 'passed' || (lecPassed && labPassed)) {
+        passedCodes.add(code);
+      } else if (u.status !== 'enrolled' && lecPassed !== labPassed) {
+        // exactly one component passed on a settled (non-current-term) record
+        partialPasses.set(code, lecPassed ? 'lecture' : 'laboratory');
+      }
+      if (u.status === 'enrolled') enrolledCodes.add(code);
+    });
+    return { passedCodes, enrolledCodes, partialPasses };
+  }
+
   // 1. Next Semester Subject Recommendations
   function handleNextSemRecommendations() {
     const prog = profile?.course || 'BSCoE';
     const progTitle = PROGRAM_NAMES[prog] || prog;
 
-    const passedCodes = new Set();
-    const enrolledCodes = new Set();
-
-    myUnits.forEach(u => {
-      const code = u.subjects?.code || '';
-      if (u.status === 'passed') passedCodes.add(code.trim().toUpperCase());
-      if (u.status === 'enrolled') enrolledCodes.add(code.trim().toUpperCase());
-    });
+    // Partial-pass records do not satisfy prerequisites (handled inside
+    // classifyPasses); the Component Backlog note for them is rendered by
+    // the Academic Progress summary.
+    const { passedCodes, enrolledCodes } = classifyPasses(myUnits);
 
     const currentYear = Number(profile?.year_level) || 1;
 
@@ -1016,11 +1041,30 @@ const GrizzAI = (() => {
     const passedUnits = passed.reduce((acc, u) => acc + (Number(u.subjects?.units) || 0), 0);
     const pct = Math.min(100, Math.round((passedUnits / (req.total_units || 1)) * 100));
 
-    const failed = myUnits.filter(u => u.status === 'failed' || u.status === 'dropped');
+    const failedAll = myUnits.filter(u => u.status === 'failed' || u.status === 'dropped');
+
+    // Component Backlog (spec addendum 2026-09-08): a partial pass banks the
+    // passed component's units, but the subject is not done - Grizz points
+    // at the exact component to retake instead of the generic backlog line.
+    const { partialPasses } = classifyPasses(myUnits);
+    const partialCodes = new Set(partialPasses.keys());
+    const failed = failedAll.filter(u => !partialCodes.has((u.subjects?.code || '').trim().toUpperCase()));
 
     let backlogNote = '';
+    if (partialPasses.size > 0) {
+      const componentNotes = [...partialPasses.entries()].map(([code, component]) =>
+        component === 'lecture'
+          ? `You passed <strong>${esc(code)}</strong> lecture — retake the lab only.`
+          : `You passed <strong>${esc(code)}</strong> lab — retake the lecture only.`
+      );
+      backlogNote += `
+        <div class="ursa-alert-box">
+          <strong>Component Backlog:</strong> ${componentNotes.join(' ')}
+        </div>
+      `;
+    }
     if (failed.length > 0) {
-      backlogNote = `
+      backlogNote += `
         <div class="ursa-alert-box">
           <strong>Backlog Notice:</strong> You have ${failed.length} subject(s) marked as Failed or Dropped. Check your prerequisites to retake them.
         </div>

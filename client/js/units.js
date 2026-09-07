@@ -79,6 +79,43 @@ const Units = (() => {
     }
   }
 
+  // ---- Component outcome helpers (lec/lab split, spec addendum 2026-09-08) ----
+  // A record carries component values when the server stored per-component
+  // statuses/grades (only possible for subjects with lab_units > 0). Rows
+  // without them are legacy and keep the old overall-status behavior.
+
+  // Pure and self-contained (extracted by the smoke test): earned units a
+  // subject's NEWEST record contributes to graduation progress.
+  //   full pass (overall 'passed', or both components 'passed') -> full units
+  //   exactly one component 'passed' -> just that component's units
+  //   anything else (enrolled/failed/dropped/incomplete/legacy) -> 0
+  function earnedUnitsFor(record, subject) {
+    const total = Number(subject?.units || 0);
+    if (!record) return 0;
+    // Overall 'passed' is always a full pass, component values or not.
+    if (record.status === 'passed') return total;
+    const lecPassed = record.lec_status === 'passed';
+    const labPassed = record.lab_status === 'passed';
+    const hasComponents = record.lec_status != null || record.lab_status != null;
+    if (!hasComponents) return 0;
+    if (lecPassed && labPassed) return total;
+    if (lecPassed) return Number(subject?.lec_units || 0);
+    if (labPassed) return Number(subject?.lab_units || 0);
+    return 0;
+  }
+
+  // Pure (extracted by the smoke test): derived overall status when saving a
+  // lab subject's two components. Both passed -> 'passed'; either failed ->
+  // 'failed'; otherwise the record stays open - 'incomplete' when a component
+  // is incomplete, 'dropped' only when both are, else 'enrolled'.
+  function deriveOverallStatus(lecStatus, labStatus) {
+    if (lecStatus === 'passed' && labStatus === 'passed') return 'passed';
+    if (lecStatus === 'failed' || labStatus === 'failed') return 'failed';
+    if (lecStatus === 'incomplete' || labStatus === 'incomplete') return 'incomplete';
+    if (lecStatus === 'dropped' && labStatus === 'dropped') return 'dropped';
+    return 'enrolled';
+  }
+
   // ---- Load ----
   async function load() {
     const profile = await Auth.getProfile().catch(() => null);
@@ -133,13 +170,25 @@ const Units = (() => {
     const total = req ? Number(req.total_units) : 0;
 
     // Count units once per subject - a retake that is later passed
-    // never double-counts the same subject.
-    const passedSubjectIds = new Set(
-      myUnits.filter(u => u.status === 'passed' && u.subjects?.id).map(u => u.subjects.id)
-    );
-    const completed = subjects
-      .filter(s => passedSubjectIds.has(s.id))
-      .reduce((sum, s) => sum + Number(s.units || 0), 0);
+    // never double-counts the same subject. The API returns records
+    // newest first, so the first occurrence per subject is the newest.
+    const newestRecordBySubjectId = new Map();
+    for (const u of myUnits) {
+      if (u.subjects?.id && !newestRecordBySubjectId.has(u.subjects.id)) {
+        newestRecordBySubjectId.set(u.subjects.id, u);
+      }
+    }
+
+    // Earned units per subject (newest record only): a full pass banks the
+    // subject's full units; a partial lec/lab pass banks only the passed
+    // component's units without counting the subject as completed; a
+    // partially-passed subject still shows as needing attention in the
+    // checklist. Current-term enrolled rows earn 0 and render separately
+    // as the "in progress" segment below.
+    const completed = subjects.reduce((sum, s) => {
+      const rec = newestRecordBySubjectId.get(s.id);
+      return rec ? sum + earnedUnitsFor(rec, s) : sum;
+    }, 0);
 
     const pct = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
 
@@ -447,9 +496,23 @@ const Units = (() => {
 
   function subjectRow(s) {
     const rec = recordFor(s.id);
-    const badge = rec
-      ? `<span class="unit-badge unit-badge--${rec.status}">${STATUS_LABELS[rec.status]}${rec.grade != null ? ' · ' + rec.grade : ''}</span>`
-      : `<span class="unit-badge unit-badge--none">Not taken</span>`;
+    let badge;
+    if (!rec) {
+      badge = `<span class="unit-badge unit-badge--none">Not taken</span>`;
+    } else if (rec.lec_status != null || rec.lab_status != null) {
+      // Component-level record on a lab subject: one small badge per
+      // component, tinted with that component's status. Kept inside a single
+      // wrapper so the .unit-row grid still sees one badge element.
+      const compBadge = (label, st, grade) => `
+        <span class="unit-badge unit-badge--${esc(st || 'none')}" style="width:auto;max-width:none;" title="${esc(label)}: ${esc(STATUS_LABELS[st] || '—')}${grade != null ? ' · grade ' + esc(grade) : ''}">${esc(label)}: ${esc(STATUS_LABELS[st] || '—')}${grade != null ? ' · ' + esc(grade) : ''}</span>`;
+      badge = `
+        <span style="display:inline-flex;align-items:center;gap:0.4rem;">
+          ${compBadge('Lec', rec.lec_status, rec.lec_grade)}
+          ${compBadge('Lab', rec.lab_status, rec.lab_grade)}
+        </span>`;
+    } else {
+      badge = `<span class="unit-badge unit-badge--${rec.status}">${STATUS_LABELS[rec.status]}${rec.grade != null ? ' · ' + rec.grade : ''}</span>`;
+    }
 
     const actions = rec
       ? `
@@ -497,6 +560,38 @@ const Units = (() => {
   let modalSubject = null;
   let modalRecordId = null;
 
+  // Laboratory fields for the log/edit modal. The base markup lives in
+  // index.html; these two form-groups are injected right after the shared
+  // grade group so the whole component-outcomes feature stays in this
+  // module. When the logged subject has lab_units > 0, the existing
+  // Status/Grade inputs double as the LECTURE component and the overall
+  // status is derived on save (deriveOverallStatus).
+  const LAB_FIELDS_HTML = `
+        <div class="form-group hidden" id="units-lab-status-group">
+          <label>Laboratory Status</label>
+          <select id="units-lab-status">
+            <option value="enrolled">Enrolled</option>
+            <option value="passed">Passed</option>
+            <option value="failed">Failed</option>
+            <option value="dropped">Dropped</option>
+            <option value="incomplete">Incomplete</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="units-lab-grade-group">
+          <label>Laboratory Grade (1.0 – 5.0)</label>
+          <input type="number" id="units-lab-grade" min="1" max="5" step="0.25" placeholder="e.g. 1.5" />
+        </div>`;
+
+  function ensureLabModalFields() {
+    if (document.getElementById('units-lab-status')) return;
+    const gradeGroup = document.getElementById('units-grade')?.closest('.form-group');
+    if (gradeGroup) gradeGroup.insertAdjacentHTML('afterend', LAB_FIELDS_HTML);
+  }
+
+  function modalHasLab() {
+    return Number(modalSubject?.lab_units) > 0;
+  }
+
   function openModal(subject, record) {
     modalSubject = subject;
     modalRecordId = record?.id || null;
@@ -506,12 +601,36 @@ const Units = (() => {
     document.getElementById('units-modal-subject').textContent =
       `${subject.code} · ${subject.title} · ${subject.units} unit${subject.units === 1 ? '' : 's'}`;
 
+    ensureLabModalFields();
+
+    // Lab subjects: show the Laboratory fields and relabel the shared
+    // Status/Grade inputs as the Lecture component. Lab-less subjects keep
+    // the modal exactly as before.
+    const hasLab = modalHasLab();
+    document.getElementById('units-lab-status-group')?.classList.toggle('hidden', !hasLab);
+    document.getElementById('units-lab-grade-group')?.classList.toggle('hidden', !hasLab);
+    const statusLabel = document.getElementById('units-status')?.closest('.form-group')?.querySelector('label');
+    const gradeLabel  = document.getElementById('units-grade')?.closest('.form-group')?.querySelector('label');
+    if (statusLabel) statusLabel.textContent = hasLab ? 'Lecture Status' : 'Status';
+    if (gradeLabel)  gradeLabel.textContent  = hasLab ? 'Lecture Grade (1.0 – 5.0)' : 'Grade (1.0 – 5.0)';
+    if (hasLab) {
+      setDDValue(document.getElementById('units-lab-status'), record?.lab_status || 'enrolled');
+      document.getElementById('units-lab-grade').value = record?.lab_grade != null ? record.lab_grade : '';
+    }
+
     setDDValue(document.getElementById('units-sem'), String(record?.semester ?? currentSemester()));
     // New records default to the subject's prospectus school year (derived
     // from the student's enrollment year); edits keep their stored year.
     document.getElementById('units-sy').value = record?.school_year || prospectusSchoolYear(subject);
-    setDDValue(document.getElementById('units-status'), record?.status || 'enrolled');
-    document.getElementById('units-grade').value = record?.grade != null ? record.grade : '';
+    // On lab subjects the shared select/input hold the LECTURE component, so
+    // edits prefill from lec_status/lec_grade - not the derived overall status.
+    setDDValue(
+      document.getElementById('units-status'),
+      hasLab ? (record?.lec_status || 'enrolled') : (record?.status || 'enrolled')
+    );
+    document.getElementById('units-grade').value = hasLab
+      ? (record?.lec_grade != null ? record.lec_grade : '')
+      : (record?.grade != null ? record.grade : '');
     document.getElementById('units-schedule').value = record?.schedule || '';
     document.getElementById('units-instructor').value = record?.instructor || '';
 
@@ -580,6 +699,24 @@ const Units = (() => {
       schedule: schedule || null,
       instructor: instructor || null,
     };
+
+    // Lab subjects: the shared Status/Grade inputs carry the LECTURE
+    // component; read the Laboratory pair, derive the overall status
+    // (both passed -> passed, either failed -> failed, otherwise
+    // enrolled/incomplete), and send all four component fields.
+    if (modalHasLab()) {
+      const labGradeRaw = document.getElementById('units-lab-grade').value;
+      if (labGradeRaw !== '' && (Number(labGradeRaw) < 1 || Number(labGradeRaw) > 5)) {
+        errEl.textContent = 'Laboratory grade must be between 1.0 and 5.0.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      body.status = deriveOverallStatus(status, document.getElementById('units-lab-status').value);
+      body.lec_status = status;
+      body.lec_grade  = gradeRaw === '' ? null : Number(gradeRaw);
+      body.lab_status = document.getElementById('units-lab-status').value;
+      body.lab_grade  = labGradeRaw === '' ? null : Number(labGradeRaw);
+    }
 
     try {
       if (modalMode === 'edit') {
