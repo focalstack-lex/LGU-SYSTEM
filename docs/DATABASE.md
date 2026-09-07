@@ -24,6 +24,18 @@ Migrations are applied by hand in the **Supabase SQL console** (the project has 
 
 Pending as of 2026-08-22: `010_profiles_course_constraint.sql`, `011_events_archived_status.sql`.
 
+## Migration 031 (Phase A: lec/lab + structured prerequisites)
+
+Migration file: `supabase/migrations/031_lec_lab_and_structured_prereqs.sql`.
+
+- Additive only. Applied via SQL editor, then `node scripts/preview-prereq-parse.js`
+  for the parse report, then `node scripts/seed-lec-lab.js`, then
+  `ALTER TABLE public.subjects VALIDATE CONSTRAINT subjects_units_components_check;`
+- Tokens flagged `special` in the parse report are fixed up in the Officer
+  Console → Curriculum Manager (they stay in the report output until corrected).
+- `subjects.prerequisites` (free text) is legacy: kept for reference, not read
+  by application logic.
+
 ## Backups
 
 `.github/workflows/backup.yml` runs weekly (Monday 02:30 PHT) and produces three dump artifacts (roles, schema, data) retained 90 days.
