@@ -150,10 +150,10 @@ RETURNS TABLE (
   kind TEXT, depends_on_code TEXT, detail TEXT
 )
 LANGUAGE sql STABLE AS $$
-  SELECT s.code, s.program, t.token, p.kind, d.code, p.detail
+  SELECT s.code, s.program, t, p.kind, d.code, p.detail
   FROM public.subjects s
   CROSS JOIN LATERAL public.split_prereq_tokens(s.prerequisites) t
-  CROSS JOIN LATERAL public.parse_prereq_token(s, t.token) p
+  CROSS JOIN LATERAL public.parse_prereq_token(s, t) p
   LEFT JOIN public.subjects d ON d.id = p.depends_on_subject_id
   WHERE s.prerequisites IS NOT NULL AND btrim(s.prerequisites) <> ''
 $$;
@@ -168,7 +168,7 @@ BEGIN
   SELECT s.id, p.depends_on_subject_id, p.kind, p.detail
   FROM public.subjects s
   CROSS JOIN LATERAL public.split_prereq_tokens(s.prerequisites) t
-  CROSS JOIN LATERAL public.parse_prereq_token(s, t.token) p
+  CROSS JOIN LATERAL public.parse_prereq_token(s, t) p
   WHERE s.prerequisites IS NOT NULL AND btrim(s.prerequisites) <> ''
   ON CONFLICT DO NOTHING;
   GET DIAGNOSTICS inserted = ROW_COUNT;
