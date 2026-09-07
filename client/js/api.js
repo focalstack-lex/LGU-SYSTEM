@@ -183,6 +183,13 @@ const Api = (() => {
     create: (body)   => _request('POST', '/announcements', body),
   };
 
+  // Curriculum management (Phase A). The route contract uses full /api/...
+  // paths, but _request already prepends the /api prefix itself, so this
+  // local shim strips it before delegating to the shared request helper.
+  const request = (method, path, body) =>
+    _request(method, path.replace(/^\/api(?=\/)/, ''), body);
+
+
   // ---- Background Pre-fetch Queue (Paced & Idle-friendly) ----
   async function prefetchAll(role = 'student', program = 'BSCoE') {
     try {
@@ -602,6 +609,18 @@ const Api = (() => {
     admin,
     units,
     announcements,
+    // Curriculum management (Phase A): contract paths are full /api/... —
+    // `request` (above) strips the prefix before delegating to _request.
+    curriculum: {
+      subjects: (program) =>
+        request('GET', `/api/units/checklists?program=${encodeURIComponent(program)}`),
+      updateComponents: (id, lec_units, lab_units) =>
+        request('PATCH', `/api/curriculum/subjects/${id}`, { lec_units, lab_units }),
+      prerequisites: (subjectId) =>
+        request('GET', `/api/curriculum/subjects/${subjectId}/prerequisites`),
+      addPrereq: (payload) => request('POST', '/api/curriculum/prerequisites', payload),
+      deletePrereq: (id) => request('DELETE', `/api/curriculum/prerequisites/${id}`),
+    },
     roster,
     rosterRequests,
     profile,

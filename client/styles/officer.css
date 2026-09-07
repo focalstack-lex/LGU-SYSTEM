@@ -2033,3 +2033,195 @@ html, body {
     gap: 0.6rem;
   }
 }
+
+/* ---------- Curriculum Manager (admin-only, Phase A) ---------- */
+.curriculum-filters {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.of-select {
+  padding: 0.55rem 0.85rem;
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.of-select:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+.of-select option {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.curriculum-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.curriculum-table th {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  padding: 0.75rem 0.85rem;
+  background: var(--bg-surface-raised);
+  border-bottom: 1px solid var(--border-default);
+  white-space: nowrap;
+}
+
+.curriculum-table td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.curriculum-table tr:last-child td {
+  border-bottom: none;
+}
+
+.curriculum-table tr:hover td {
+  background: var(--surface-hover);
+}
+
+.mono {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
+
+.cur-input {
+  width: 62px;
+  padding: 0.35rem 0.5rem;
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  text-align: center;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.cur-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  border-radius: 6px;
+}
+
+.btn-sm.btn-primary {
+  padding: 0.42rem 0.9rem;
+  box-shadow: none;
+}
+
+.cur-prereq-summary {
+  display: inline-block;
+  max-width: 260px;
+  margin-right: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.cur-editor {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm, 6px);
+}
+
+.cur-editor h3 {
+  margin: 0 0 0.85rem;
+  font-size: 1rem;
+}
+
+.cur-prereq-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cur-prereq-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0.65rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  font-size: 0.82rem;
+}
+
+#cur-prereq-add {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+
+#cur-prereq-add select,
+#cur-prereq-add input {
+  padding: 0.45rem 0.65rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: var(--text-primary);
+}
+
+#cur-prereq-add input {
+  flex: 1;
+  min-width: 180px;
+}
+
+.cur-flash {
+  margin: 0 0 0.85rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--status-positive, #10B981);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.cur-flash--error {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--status-negative, #EF4444);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+@media (max-width: 768px) {
+  .curriculum-table {
+    font-size: 0.78rem;
+  }
+  .cur-prereq-summary {
+    max-width: 140px;
+  }
+}
