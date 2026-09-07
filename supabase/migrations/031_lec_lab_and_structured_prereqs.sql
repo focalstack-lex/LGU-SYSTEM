@@ -96,10 +96,11 @@ CREATE OR REPLACE FUNCTION public.parse_prereq_token(
 )
 RETURNS TABLE (kind TEXT, depends_on_subject_id UUID, detail TEXT)
 LANGUAGE sql STABLE AS $$
-  SELECT kind, depends_on_subject_id, detail FROM (
+  SELECT parsed.kind, parsed.depends_on_subject_id, parsed.detail FROM (
 
     -- co-requisite: "Co-req CpE 223", "Co-requisite: EMath 121"
-    SELECT 'corequisite'::TEXT, dep.id, NULL::TEXT
+    -- (aliases here name the UNION's output columns)
+    SELECT 'corequisite'::TEXT AS kind, dep.id AS depends_on_subject_id, NULL::TEXT AS detail
     FROM (SELECT regexp_replace(p_token, '^.*co-?req(uisite)?\s*:?\s*', '', 'i') AS code) c
     LEFT JOIN LATERAL (
       SELECT s2.id FROM public.subjects s2
