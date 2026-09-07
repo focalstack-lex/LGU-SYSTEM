@@ -271,4 +271,61 @@ async function sendAccountApprovalEmail(userEmail, userName = 'COE Member') {
   }
 }
 
-module.exports = { sendAnnouncementEmail, sendNewEventEmail, sendAccountApprovalEmail };
+/**
+ * Sends a load approval status email to a student via Brevo API (HTTP).
+ * status: 'approved' | 'returned' | 'rejected' | 'encoded'
+ */
+async function sendLoadStatusEmail({ to, name = 'COE Student', status, studentName, term, lines = [], changes = null }) {
+  try {
+    const apiInstance = getBrevoApi();
+    if (!apiInstance) return { sent: 0, reason: 'Brevo API key missing' };
+    if (!to) return { sent: 0, reason: 'No recipient email provided' };
+
+    const headlines = {
+      approved: 'Load Approved',
+      returned: 'Load Returned for Changes',
+      rejected: 'Load Rejected',
+      encoded:  'Load Encoded',
+    };
+    const changeHtml = changes
+      ? `<p style="margin:8px 0;"><strong>Changes by your Program Head:</strong></p>
+         <ul style="margin:8px 0;padding-left:20px;">${changes.map(c => `<li>${c}</li>`).join('')}</ul>`
+      : '';
+    const listHtml = lines.length
+      ? `<ul style="margin:8px 0;padding-left:20px;">${lines.map(l => `<li>${l}</li>`).join('')}</ul>`
+      : '';
+
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.subject = `${headlines[status] || 'Load Update'}: COE LGU Portal`;
+    sendSmtpEmail.htmlContent = buildEmailTemplate({
+      subject: headlines[status] || 'Load Update',
+      preheader: `${studentName} - load for ${term}`,
+      content: `
+        <div style="margin-bottom:18px;">
+          <span style="display:inline-block;background:#ffedd5;color:#c2410c;border:1px solid #fed7aa;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">${headlines[status] || 'Load Update'}</span>
+        </div>
+        <p style="margin:0 0 12px;color:#431407;font-size:14px;">Hi ${studentName},</p>
+        <p style="margin:0 0 12px;color:#431407;font-size:14px;line-height:1.6;">Your submitted load for <strong>${term}</strong> was <strong>${headlines[status] || status}</strong>.</p>
+        ${changeHtml}
+        ${listHtml}
+        <div style="margin-top:16px;">
+          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;box-shadow:0 3px 12px rgba(234, 88, 12, 0.25);">Open the portal</a>
+        </div>`
+    });
+
+    sendSmtpEmail.sender = {
+      name: "COE Financial Transparency System",
+      email: process.env.BREVO_SENDER_EMAIL || "coebudget@gmail.com"
+    };
+    sendSmtpEmail.to = [{ email: to, name }];
+
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`[Email] Load status email (${status}) sent to ${to} via Brevo: ${data.messageId}`);
+    return { sent: 1, messageId: data.messageId };
+  } catch (err) {
+    logError('Email Load Status Error', err);
+    return { sent: 0, error: err.message };
+  }
+}
+
+module.exports = { sendAnnouncementEmail, sendNewEventEmail, sendAccountApprovalEmail, sendLoadStatusEmail };

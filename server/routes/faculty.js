@@ -11,6 +11,9 @@ const { logError } = require('../lib/logger');
 const { logAudit } = require('../lib/audit');
 const { requireFaculty, requireProgramHead } = require('../middleware/roles');
 const { canHeadAct } = require('../lib/enrollment');
+const { createNotification } = require('./notifications');
+const { sendLoadStatusEmail } = require('../lib/email');
+const ExcelJS = require('exceljs');
 
 const router = express.Router();
 router.use(requireFaculty);
@@ -176,6 +179,223 @@ router.patch('/submissions/:id/items/:itemId', requireProgramHead, async (req, r
   } catch (err) {
     logError('faculty/remove-item', err);
     res.status(500).json({ error: 'Failed to remove the subject.' });
+  }
+});
+
+// ---- shared notification + email helpers ----
+function termLabel(s) { return `${s.school_year} Sem ${s.semester}`; }
+
+async function notifyStudent(submission, status, extraChanges = []) {
+  const lines = (submission.enrollment_submission_items || [])
+    .filter(i => i.item_state !== 'removed_by_head')
+    .map(i => `${i.subjects.code} - ${i.subjects.title}${i.item_state === 'added_by_head' ? ' (added by Program Head)' : ''}`);
+  const changes = (submission.enrollment_submission_items || [])
+    .filter(i => i.item_state !== 'submitted' && i.head_note)
+    .map(i => `${i.item_state === 'removed_by_head' ? 'Removed' : 'Added'} ${i.subjects.code}: ${i.head_note}`)
+    .concat(extraChanges);
+  createNotification({
+    userId: submission.student_id,
+    type: 'units',
+    category: 'units',
+    title: `Load ${status.charAt(0).toUpperCase()}${status.slice(1)}`,
+    message: `Your load for ${termLabel(submission)} was ${status}.`,
+    link: '/',
+  });
+  sendLoadStatusEmail({
+    to: submission.student?.email,
+    name: submission.student?.full_name || 'COE Student',
+    status, studentName: submission.student?.full_name || 'COE Student',
+    term: termLabel(submission), lines, changes: changes.length ? changes : null,
+  });
+}
+
+// POST /submissions/:id/approve - idempotent auto-enroll
+router.post('/submissions/:id/approve', requireProgramHead, async (req, res) => {
+  try {
+    const submission = await loadSubmissionFor(req, res, { forHead: true });
+    if (!submission) return;
+    if (submission.status === 'approved') {
+      return res.json({ ok: true, alreadyApproved: true }); // idempotent no-op
+    }
+    if (!canHeadAct(submission.status)) {
+      return res.status(400).json({ error: `Cannot approve a ${submission.status} load.` });
+    }
+
+    const active = (submission.enrollment_submission_items || []).filter(i => i.item_state !== 'removed_by_head');
+    if (!active.length) {
+      return res.status(400).json({ error: 'The load has no active subjects to approve.' });
+    }
+
+    // Idempotent auto-enroll: same shape + conflict target as /api/units/enroll.
+    const subjectIds = active.map(i => i.subject_id);
+    const { data: subjects } = await supabase
+      .from('subjects')
+      .select('id, units')
+      .in('id', subjectIds);
+    const unitsById = new Map((subjects || []).map(s => [s.id, s.units]));
+    for (const item of active) {
+      const { error } = await supabase
+        .from('student_units')
+        .upsert({
+          student_id: submission.student_id,
+          subject_id: item.subject_id,
+          school_year: submission.school_year,
+          semester: submission.semester,
+          status: 'enrolled',
+          grade: null,
+        }, { onConflict: 'student_id,subject_id,school_year,semester' });
+      if (error) {
+        logError('faculty/approve-enroll', error);
+        return res.status(500).json({ error: `Failed to enroll ${item.subjects.code}: ${error.message}` });
+      }
+    }
+
+    const { data: updated, error } = await supabase
+      .from('enrollment_submissions')
+      .update({
+        status: 'approved',
+        reviewed_by: req.user.id,
+        review_notes: req.body?.notes || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', submission.id)
+      .eq('status', submission.status) // guard against concurrent decision
+      .select(SUBMISSION_SELECT)
+      .single();
+    if (error) {
+      logError('faculty/approve-status', error);
+      return res.status(500).json({ error: 'Failed to record the approval.' });
+    }
+
+    logAudit(req.user.id, 'FACULTY_APPROVE', {
+      submission_id: submission.id, student_id: submission.student_id,
+      enrolled: active.length, term: termLabel(submission),
+    });
+    notifyStudent(updated, 'approved');
+    res.json({ ok: true, submission: updated });
+  } catch (err) {
+    logError('faculty/approve', err);
+    res.status(500).json({ error: 'Failed to approve the load.' });
+  }
+});
+
+// POST /submissions/:id/return - send back to the student for changes
+router.post('/submissions/:id/return', requireProgramHead, async (req, res) => {
+  try {
+    const submission = await loadSubmissionFor(req, res, { forHead: true });
+    if (!submission) return;
+    if (!canHeadAct(submission.status)) {
+      return res.status(400).json({ error: `Cannot return a ${submission.status} load.` });
+    }
+    const notes = String(req.body?.notes || '').trim();
+    if (!notes) return res.status(400).json({ error: 'Notes are required when returning a load.' });
+
+    const { data: updated, error } = await supabase
+      .from('enrollment_submissions')
+      .update({ status: 'returned', reviewed_by: req.user.id, review_notes: notes.slice(0, 500), updated_at: new Date().toISOString() })
+      .eq('id', submission.id)
+      .select(SUBMISSION_SELECT)
+      .single();
+    if (error) { logError('faculty/return', error); return res.status(500).json({ error: 'Failed to return the load.' }); }
+
+    logAudit(req.user.id, 'FACULTY_RETURN', { submission_id: submission.id, notes });
+    notifyStudent(updated, 'returned');
+    res.json({ ok: true, submission: updated });
+  } catch (err) {
+    logError('faculty/return', err);
+    res.status(500).json({ error: 'Failed to return the load.' });
+  }
+});
+
+// POST /submissions/:id/reject
+router.post('/submissions/:id/reject', requireProgramHead, async (req, res) => {
+  try {
+    const submission = await loadSubmissionFor(req, res, { forHead: true });
+    if (!submission) return;
+    if (!canHeadAct(submission.status)) {
+      return res.status(400).json({ error: `Cannot reject a ${submission.status} load.` });
+    }
+    const notes = String(req.body?.notes || '').trim();
+    if (!notes) return res.status(400).json({ error: 'Notes are required when rejecting a load.' });
+
+    const { data: updated, error } = await supabase
+      .from('enrollment_submissions')
+      .update({ status: 'rejected', reviewed_by: req.user.id, review_notes: notes.slice(0, 500), updated_at: new Date().toISOString() })
+      .eq('id', submission.id)
+      .select(SUBMISSION_SELECT)
+      .single();
+    if (error) { logError('faculty/reject', error); return res.status(500).json({ error: 'Failed to reject the load.' }); }
+
+    logAudit(req.user.id, 'FACULTY_REJECT', { submission_id: submission.id, notes });
+    notifyStudent(updated, 'rejected');
+    res.json({ ok: true, submission: updated });
+  } catch (err) {
+    logError('faculty/reject', err);
+    res.status(500).json({ error: 'Failed to reject the load.' });
+  }
+});
+
+// POST /submissions/:id/mark-encoded - any faculty role (SAs)
+router.post('/submissions/:id/mark-encoded', async (req, res) => {
+  try {
+    const submission = await loadSubmissionFor(req, res);
+    if (!submission) return;
+    if (submission.status !== 'approved') {
+      return res.status(400).json({ error: 'Only approved loads can be marked encoded.' });
+    }
+    if (submission.encoded_at) return res.json({ ok: true, alreadyEncoded: true });
+    const { error } = await supabase
+      .from('enrollment_submissions')
+      .update({ encoded_at: new Date().toISOString(), encoded_by: req.user.id, updated_at: new Date().toISOString() })
+      .eq('id', submission.id);
+    if (error) { logError('faculty/encoded', error); return res.status(500).json({ error: 'Failed to mark as encoded.' }); }
+    logAudit(req.user.id, 'FACULTY_MARK_ENCODED', { submission_id: submission.id });
+    notifyStudent(submission, 'encoded');
+    res.json({ ok: true });
+  } catch (err) {
+    logError('faculty/encoded', err);
+    res.status(500).json({ error: 'Failed to mark as encoded.' });
+  }
+});
+
+// GET /submissions/:id/export - Excel of the final load (SAs encode from this)
+router.get('/submissions/:id/export', async (req, res) => {
+  try {
+    const submission = await loadSubmissionFor(req, res);
+    if (!submission) return;
+    if (submission.status !== 'approved') {
+      return res.status(400).json({ error: 'Only approved loads can be exported.' });
+    }
+    const active = (submission.enrollment_submission_items || []).filter(i => i.item_state !== 'removed_by_head');
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'COE LGU System';
+    workbook.created = new Date();
+    const sheet = workbook.addWorksheet('Approved Load');
+    sheet.columns = [
+      { header: 'Code', key: 'code', width: 14 },
+      { header: 'Title', key: 'title', width: 46 },
+      { header: 'Lec', key: 'lec', width: 8 },
+      { header: 'Lab', key: 'lab', width: 8 },
+      { header: 'Units', key: 'units', width: 8 },
+      { header: 'Year', key: 'year', width: 8 },
+      { header: 'Sem', key: 'sem', width: 8 },
+    ];
+    sheet.getRow(1).font = { bold: true };
+    for (const i of active) {
+      sheet.addRow({
+        code: i.subjects.code, title: i.subjects.title,
+        lec: i.subjects.lec_units, lab: i.subjects.lab_units, units: i.subjects.units,
+        year: i.subjects.year_level, sem: i.subjects.semester,
+      });
+    }
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="approved-load-${submission.id}.xlsx"`);
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    logError('faculty/export', err);
+    res.status(500).json({ error: 'Failed to export the load.' });
   }
 });
 
