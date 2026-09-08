@@ -1866,7 +1866,7 @@ input[type="checkbox"]:checked::before {
   z-index: 1;
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: 1rem 1.15rem;
   display: flex;
   align-items: center;
@@ -2108,6 +2108,31 @@ input[type="checkbox"]:checked::before {
 .stat-card.stat-balance:hover .stat-icon { color: var(--primary); border-color: rgba(70, 110, 153, 0.3); }
 .stat-card.stat-donations:hover .stat-icon { color: var(--primary); border-color: rgba(70, 110, 153, 0.3); }
 
+/* ---- Offline Banner (token-tinted warning, mirrors status-badge tint pattern) ---- */
+.offline-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-sm);
+  color: var(--warning);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+}
+.offline-banner-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* ---- Dashboard Header Sub-note ---- */
+.view-sub-note {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
 /* =============================================
    DASHBOARD CARDS
    ============================================= */
@@ -2120,7 +2145,7 @@ input[type="checkbox"]:checked::before {
 .dashboard-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: 1.35rem 1.5rem;
   display: flex;
   flex-direction: column;
@@ -2155,6 +2180,7 @@ input[type="checkbox"]:checked::before {
   max-height: 500px;
   overflow: auto;
   padding-right: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 /* Custom Scrollbar */
@@ -3571,10 +3597,10 @@ iconify-icon {
 
   /* Layout Base Adjustments */
   body #app-screen { flex-direction: column !important; }
-  /* Scroll clearance shared with .of-main (officer.css): 58px nav + 10px float
-     gap + 18px breathing + full safe-area inset — keeps the gap above the
-     floating nav identical on both portals */
-  body .main-content { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important; }
+  /* Scroll clearance: 58px nav + 10px float gap + 44px Grizz launcher parked
+     above the nav (74px→118px zone) + breathing room + full safe-area inset —
+     content must clear both floating controls */
+  body .main-content { padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important; }
   body .view { padding: 0 0.75rem 0 !important; }
   body .view > *:last-child,
   body .dashboard-grid:last-child { margin-bottom: 0 !important; }
@@ -7031,10 +7057,11 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon {
 }
 
 
-/* Safe scroll clearance so scrolling stops cleanly right at the bottom of the card */
+/* Safe scroll clearance so scrolling stops cleanly right at the bottom of the card
+   (86px nav zone + 46px Grizz launcher zone above it) */
 @media (max-width: 768px) {
   .main-content {
-    padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 

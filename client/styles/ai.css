@@ -52,6 +52,12 @@
   opacity: 0.98;
 }
 
+/* Edge-snap release: settles against the nearest screen edge after a drag */
+.ursa-launcher.is-snapping,
+.grizz-launcher.is-snapping {
+  transition: left 0.28s cubic-bezier(0.16, 1, 0.3, 1), top 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
 .ursa-avatar-badge,
 .grizz-avatar-badge {
   display: flex;

@@ -216,6 +216,21 @@ const GrizzAI = (() => {
       }
     });
 
+    // Release behavior: settle the launcher against the nearest horizontal edge
+    // so it never rests over mid-screen content (stat cards, lists).
+    const snapToEdge = () => {
+      const rect = launcher.getBoundingClientRect();
+      const pad = 8;
+      const maxLeft = window.innerWidth - launcher.offsetWidth - pad;
+      const targetLeft = (rect.left + rect.width / 2) < (window.innerWidth / 2) ? pad : maxLeft;
+
+      launcher.classList.add('is-snapping');
+      launcher.style.left = `${targetLeft}px`;
+      launcher.style.right = 'auto';
+      launcher.style.bottom = 'auto';
+      setTimeout(() => launcher.classList.remove('is-snapping'), 300);
+    };
+
     const endDrag = (e) => {
       if (!isPointerDown) return;
       isPointerDown = false;
@@ -226,6 +241,7 @@ const GrizzAI = (() => {
       } catch (err) {}
 
       if (hasMoved) {
+        snapToEdge();
         setTimeout(() => {
           dragOccurred = false;
         }, 150);
