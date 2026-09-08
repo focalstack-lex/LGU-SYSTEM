@@ -3411,15 +3411,11 @@ iconify-icon {
     }
   }
 
-  /* Navigation Overrides - Floating Island Glass Pill */
+  /* Navigation Overrides - Flat Dark Charcoal Floating Pill Track */
   body .sidebar { display: none !important; }
   body .bottom-nav.visible {
     display: flex !important;
     position: fixed !important;
-    /* Floating-tab offset shared with .of-bottom-nav (officer.css) — both
-       portals identical. max() parks the pill directly on top of the iPhone
-       home-indicator zone in the standalone PWA (no extra gap below it) and
-       keeps the plain 10px float in browsers where the inset is 0 */
     bottom: max(env(safe-area-inset-bottom, 0px), 10px) !important;
     left: 10px !important;
     right: 10px !important;
@@ -3428,22 +3424,19 @@ iconify-icon {
     margin: 0 auto !important;
     z-index: 1000 !important;
     
-    /* Frosted Glassmorphism */
-    background: rgba(17, 24, 32, 0.9) !important;
-    backdrop-filter: blur(24px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 30px !important;
+    /* Flat Dark Charcoal Container - No Gradient, No Blur Glare */
+    background: #18181B !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
     
-    padding: 4px 4px !important;
+    padding: 5px 6px !important;
     justify-content: space-around !important;
     align-items: center !important;
-    gap: 2px !important;
+    gap: 4px !important;
     
     box-shadow: 
-      0 12px 36px -4px rgba(0, 0, 0, 0.5),
-      0 4px 14px rgba(0, 0, 0, 0.25),
-      inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+      0 12px 32px -4px rgba(0, 0, 0, 0.65),
+      0 4px 14px rgba(0, 0, 0, 0.3) !important;
     
     overflow-x: auto !important;
     overflow-y: hidden !important;
@@ -3466,15 +3459,11 @@ iconify-icon {
   }
 
   [data-theme="light"] body .bottom-nav.visible {
-    background: rgba(255, 255, 255, 0.92) !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: 
-      0 12px 36px -4px rgba(0, 0, 0, 0.12),
-      0 4px 12px rgba(0, 0, 0, 0.06),
-      inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+    background: #FFFFFF !important;
+    border: 1px solid #D5DBE2 !important;
+    box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.12) !important;
   }
 
-  /* Sliding Active Indicator removed - only the icon is orange */
   body .bottom-nav .bottom-nav-indicator {
     display: none !important;
   }
@@ -3487,17 +3476,22 @@ iconify-icon {
     flex: 1 1 0% !important;
     min-width: 44px !important;
     height: 48px !important;
-    padding: 3px 1px !important;
-    border-radius: 12px !important;
-    color: var(--text-tertiary) !important;
-    background: none !important;
+    padding: 4px 2px !important;
+    border-radius: 14px !important;
+    color: #8E8E96 !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
     text-decoration: none !important;
     position: relative !important;
-    transition: color 0.15s ease !important;
+    transition: all 0.18s ease !important;
     user-select: none !important;
     -webkit-tap-highlight-color: transparent !important;
     touch-action: manipulation !important;
     flex-shrink: 0 !important;
+  }
+
+  body .bottom-nav-item:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
   }
 
   body .bottom-nav-item .nav-icon {
@@ -3506,8 +3500,8 @@ iconify-icon {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    color: var(--text-tertiary) !important;
-    transition: color 0.15s ease !important;
+    color: #8E8E96 !important;
+    transition: color 0.18s ease, transform 0.18s ease !important;
   }
 
   body .bottom-nav-item span:not(.nav-icon) {
@@ -3521,8 +3515,8 @@ iconify-icon {
     text-overflow: ellipsis !important;
     max-width: 100% !important;
     display: block !important;
-    color: var(--text-tertiary) !important;
-    transition: color 0.15s ease !important;
+    color: #8E8E96 !important;
+    transition: color 0.18s ease !important;
   }
 
   body .bottom-nav-item.bottom-nav-more-trigger {
@@ -3532,7 +3526,7 @@ iconify-icon {
     font-family: var(--font-ui);
   }
 
-  /* Unread Notification Badge - brand accent, no glow */
+  /* Unread Notification Badge - Solid Coral-Orange Dot */
   body .bottom-nav-item.has-unread .nav-icon,
   body .sidebar-nav .nav-item.has-unread .nav-icon {
     position: relative !important;
@@ -3546,7 +3540,7 @@ iconify-icon {
     width: 8px !important;
     height: 8px !important;
     border-radius: 50% !important;
-    background: var(--brand-accent) !important;
+    background: #FF5533 !important;
   }
 
   @keyframes pulseNotifBadge {
@@ -3554,45 +3548,55 @@ iconify-icon {
     50% { transform: scale(1.4); opacity: 0.85; }
   }
 
-  /* Active State - ONLY the icon is orange, no orange background pill */
-  body .bottom-nav-item.active,
+  /* Active Item - Flat Raised Charcoal Pill Container with Solid Coral-Orange Icon */
+  body .bottom-nav-item.active {
+    background: #26262E !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  }
+
   [data-theme="light"] body .bottom-nav-item.active {
-    background: none !important;
+    background: #EAECEF !important;
+    border: 1px solid #D5DBE2 !important;
   }
 
   body .bottom-nav-item.active .nav-icon {
-    color: var(--primary) !important;
-    transform: none !important;
+    color: #FF5533 !important;
+    transform: scale(1.06) !important;
     filter: none !important;
   }
 
   body .bottom-nav-item.active span:not(.nav-icon) {
-    font-weight: 600 !important;
-    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+  }
+
+  [data-theme="light"] body .bottom-nav-item.active span:not(.nav-icon) {
+    color: #121417 !important;
   }
 
   /* Officer Executive Link Special Highlight */
   body .bottom-nav-item.officer-nav-link {
-    color: var(--text-tertiary) !important;
+    color: #8E8E96 !important;
   }
   body .bottom-nav-item.officer-nav-link .nav-icon {
-    color: var(--primary) !important;
+    color: #FF5533 !important;
   }
   body .bottom-nav-item.officer-nav-link.active {
-    background: none !important;
-    color: var(--text-primary) !important;
+    background: #26262E !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
   }
   body .bottom-nav-item.officer-nav-link.active .nav-icon {
-    color: var(--primary) !important;
+    color: #FF5533 !important;
   }
 
   [data-theme="light"] body .bottom-nav-item.officer-nav-link.active {
-    background: none !important;
+    background: #EAECEF !important;
   }
 
   /* Tap Interaction */
   body .bottom-nav-item:active {
-    transform: scale(0.96) !important;
+    transform: scale(0.95) !important;
   }
 
   /* Layout Base Adjustments */
