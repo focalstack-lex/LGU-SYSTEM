@@ -7157,7 +7157,11 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon {
   gap: 0.6rem;
   text-align: center;
   padding: 1.5rem;
-  color: var(--text-primary);
+}
+/* display:flex above defeats the `hidden` attribute's UA display:none */
+.faculty-gate[hidden],
+.faculty-app[hidden] {
+  display: none;
 }
 .faculty-gate h2 { margin: 0; }
 .faculty-gate p { margin: 0; color: var(--text-secondary); }

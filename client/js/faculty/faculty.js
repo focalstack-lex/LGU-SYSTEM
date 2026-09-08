@@ -56,6 +56,11 @@ const FacultyPortal = (() => {
 
   async function boot() {
     profile = await Auth.getProfile().catch(() => null);
+    if (!profile) {
+      // First-hit profile fetch can race the session restore - retry once.
+      await new Promise(r => setTimeout(r, 800));
+      profile = await Auth.getProfile().catch(() => null);
+    }
     if (!profile) return showGate('Please log in through the main system first.');
     if (!FACULTY_ROLES.includes(profile.role)) {
       return showGate('This portal is for program heads, faculty staff, and the dean only.');
