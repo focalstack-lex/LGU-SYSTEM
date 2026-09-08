@@ -15,10 +15,17 @@ Two pieces ship together behind one merge to `main`:
 
 ### Client
 
-`client/js/config.js` gains the single source of truth:
+`client/js/config.js` gains the single source of truth — the pilot account plus the five test accounts (they share the same Supabase project as production, so they exist on `main` too and let Lex run the full multi-role flow live):
 
 ```js
-window.ENROLLMENT_PILOT_EMAILS = ['lexmatondo@g.cjc.edu.ph'];
+window.ENROLLMENT_PILOT_EMAILS = [
+  'lexmatondo@g.cjc.edu.ph',   // admin / developer
+  'test.newuser@g.cjc.edu.ph', // student: Alex Rivera (BSCoE, Yr 2)
+  'bsce.test@g.cjc.edu.ph',    // student: Maria Santos (BSCE, seeded submitted load)
+  'head.test@g.cjc.edu.ph',    // program head (BSCoE)
+  'dean.test@g.cjc.edu.ph',    // dean
+  'sa.test@g.cjc.edu.ph',      // student assistant (faculty role)
+];
 window.isEnrollmentPilot = function (email) {
   const v = String(email || '').trim().toLowerCase();
   return (window.ENROLLMENT_PILOT_EMAILS || []).some(e => String(e).trim().toLowerCase() === v);
@@ -31,7 +38,7 @@ window.isEnrollmentPilot = function (email) {
 
 ### Server
 
-New middleware (`server/middleware/roles.js`): `pilotGate` — allowlist from `process.env.ENROLLMENT_PILOT_EMAILS` (comma-separated), defaulting to `['lexmatondo@g.cjc.edu.ph']`. Matches `req.user.email` (the auth middleware's `req.profile` select does not include email; `req.user` does). Non-pilot → `403 { error: 'This feature is still under development.' }`. Applied with `router.use(pilotGate)` at the top of `server/routes/enrollment.js` and `server/routes/faculty.js`, so the UI hiding is backed by a real API block.
+New middleware (`server/middleware/roles.js`): `pilotGate` — allowlist from `process.env.ENROLLMENT_PILOT_EMAILS` (comma-separated), defaulting to the same six addresses as the client list. Matches `req.user.email` (the auth middleware's `req.profile` select does not include email; `req.user` does). Non-pilot → `403 { error: 'This feature is still under development.' }`. Applied with `router.use(pilotGate)` at the top of `server/routes/enrollment.js` and `server/routes/faculty.js`, so the UI hiding is backed by a real API block.
 
 Widening access later = edit the `config.js` array (client) + set the Render env var (server). No code archaeology.
 
@@ -86,16 +93,17 @@ Fetch failures (session expired, server 400/403) surface as an inline error line
 
 ## Testing plan (local, before merge)
 
-1. **Non-pilot student** (`test.newuser@g.cjc.edu.ph`): Load Verification shows the under-development panel; no add buttons in Grizz cards.
-2. **Pilot student**: same account with the allowlist widened at runtime (Playwright `addInitScript` overriding `window.ENROLLMENT_PILOT_EMAILS` — the real admin's password is never touched). Verify: add-all and per-card adds land in the draft with the Grizz badge; "In your load ✓" dedupe; jump link switches views.
-3. **Locked state** (`bsce.test@g.cjc.edu.ph`, seeded submitted load): disabled buttons + correct reason (with the same runtime override).
-4. **Non-pilot program head** (`head.test@g.cjc.edu.ph`): redirected to `/faculty`, sees the under-development gate.
-5. **Server gate**: direct API call without pilot email returns 403 under-development error.
-6. Existing smoke suites still pass.
+The gate's negative case needs an account that is deliberately **not** allowlisted: the seed script creates one more throwaway, `gated.test@g.cjc.edu.ph` (student role, no seeded load, excluded from `ENROLLMENT_PILOT_EMAILS`).
+
+1. **Pilot student** (`test.newuser@g.cjc.edu.ph`): full flow — Load Verification loads, Grizz card shows add buttons, add-all and per-card adds land in the draft with the Grizz badge, "In your load ✓" dedupe, jump link switches views.
+2. **Pilot locked state** (`bsce.test@g.cjc.edu.ph`, seeded submitted load): disabled buttons + correct reason.
+3. **Pilot head** (`head.test@g.cjc.edu.ph`): redirected to `/faculty`, portal fully usable; `sa.test` sees Approved Loads; `dean.test` sees the overview.
+4. **Non-pilot student** (`gated.test@g.cjc.edu.ph`): Load Verification shows the under-development panel; Grizz cards render with no add UI; direct API call returns 403 under-development error.
+5. Existing smoke suites still pass.
 
 ## Deploy
 
-`git merge --no-ff testfeature/enrollment-automation` into `main`, push. Render (API) and Vercel (client) deploy automatically. Optionally set `ENROLLMENT_PILOT_EMAILS` on Render — the default already covers the pilot account.
+`git merge --no-ff testfeature/enrollment-automation` into `main`, push. Render (API) and Vercel (client) deploy automatically — the same test accounts then work on production for live testing, since both environments share the Supabase project. Optionally set `ENROLLMENT_PILOT_EMAILS` on Render (default already covers admin + test accounts). When the pilot ends, widen the lists (or set the env var to `*` semantics if added later) — real users start seeing the feature the moment their email joins the list.
 
 ## Out of scope
 
