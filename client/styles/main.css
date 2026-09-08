@@ -472,6 +472,13 @@ html body .hidden {
   display: flex !important;
 }
 
+#auth-screen:not(.active),
+html[data-theme="light"] #auth-screen:not(.active),
+html[data-theme="dark"] #auth-screen:not(.active),
+body #auth-screen:not(.active) {
+  display: none !important;
+}
+
 /* ---- Flat Surface Layout (replaces glassmorphism) ---- */
 .glass {
   background: var(--bg-surface);
@@ -880,17 +887,16 @@ html[data-theme="light"] .auth-form-panel input:-webkit-autofill {
   margin-bottom: 1rem;
 }
 
-/* ---- Responsive: mobile collapses to single column ---- */
 @media (max-width: 768px) {
-  #auth-screen:not(.active) {
+  #auth-screen:not(.active),
+  html[data-theme="light"] #auth-screen:not(.active),
+  html[data-theme="dark"] #auth-screen:not(.active) {
     display: none !important;
   }
-  #auth-screen,
   #auth-screen.active,
-  body #auth-screen,
   body #auth-screen.active,
-  html[data-theme="light"] #auth-screen,
-  html[data-theme="light"] #auth-screen.active {
+  html[data-theme="light"] #auth-screen.active,
+  html[data-theme="dark"] #auth-screen.active {
     display: flex !important;
     flex-direction: column !important;
     height: auto !important;
@@ -2100,11 +2106,24 @@ html body .stats-secondary-grid .stat-card {
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease !important;
 }
 
+html[data-theme="light"] .stats-secondary-grid .stat-card,
+html[data-theme="light"] body .stats-secondary-grid .stat-card {
+  background: #FFFFFF !important;
+  border-color: rgba(0, 0, 0, 0.09) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
 .stats-secondary-grid .stat-card:hover,
 html body .stats-secondary-grid .stat-card:hover {
   background: #202025 !important;
   border-color: rgba(255, 255, 255, 0.14) !important;
   transform: translateY(-1px);
+}
+
+html[data-theme="light"] .stats-secondary-grid .stat-card:hover,
+html[data-theme="light"] body .stats-secondary-grid .stat-card:hover {
+  background: #F8FAFC !important;
+  border-color: rgba(0, 0, 0, 0.16) !important;
 }
 
 /* Neutral/Muted Secondary Icons on Idle */
@@ -2124,6 +2143,13 @@ html body .stats-secondary-grid .stat-icon {
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease !important;
 }
 
+html[data-theme="light"] .stats-secondary-grid .stat-icon,
+html[data-theme="light"] body .stats-secondary-grid .stat-icon {
+  background: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+  color: #64748B !important;
+}
+
 /* Secondary Card Typography */
 .stats-secondary-grid .stat-label,
 html body .stats-secondary-grid .stat-label {
@@ -2133,6 +2159,11 @@ html body .stats-secondary-grid .stat-label {
   text-transform: uppercase !important;
   color: #8E8E9A !important;
   line-height: 1.25 !important;
+}
+
+html[data-theme="light"] .stats-secondary-grid .stat-label,
+html[data-theme="light"] body .stats-secondary-grid .stat-label {
+  color: #64748B !important;
 }
 
 .stats-secondary-grid .stat-value,
@@ -2145,11 +2176,21 @@ html body .stats-secondary-grid .stat-value {
   line-height: 1.15 !important;
 }
 
+html[data-theme="light"] .stats-secondary-grid .stat-value,
+html[data-theme="light"] body .stats-secondary-grid .stat-value {
+  color: #0F172A !important;
+}
+
 .stats-secondary-grid .stat-sublabel,
 html body .stats-secondary-grid .stat-sublabel {
   font-size: 0.65rem !important;
   color: var(--text-tertiary, #6E6E7A) !important;
   margin-top: 0.1rem !important;
+}
+
+html[data-theme="light"] .stats-secondary-grid .stat-sublabel,
+html[data-theme="light"] body .stats-secondary-grid .stat-sublabel {
+  color: #64748B !important;
 }
 
 /* Semantic Hover & Micro-States for Secondary Cards */
@@ -2252,6 +2293,16 @@ html body .stats-secondary-grid .stat-income:hover .stat-icon {
     line-height: 1.15 !important;
   }
 
+  html[data-theme="light"] .stats-secondary-grid .stat-label,
+  html[data-theme="light"] body .stats-secondary-grid .stat-label {
+    color: #64748B !important;
+  }
+
+  html[data-theme="light"] .stats-secondary-grid .stat-value,
+  html[data-theme="light"] body .stats-secondary-grid .stat-value {
+    color: #0F172A !important;
+  }
+
   .stats-secondary-grid .stat-sublabel,
   html body .stats-secondary-grid .stat-sublabel {
     display: block !important;
@@ -2259,6 +2310,11 @@ html body .stats-secondary-grid .stat-income:hover .stat-icon {
     color: var(--text-tertiary, #6E6E7A) !important;
     white-space: normal !important;
     margin-top: 0.1rem !important;
+  }
+
+  html[data-theme="light"] .stats-secondary-grid .stat-sublabel,
+  html[data-theme="light"] body .stats-secondary-grid .stat-sublabel {
+    color: #64748B !important;
   }
 }
 
