@@ -1128,9 +1128,9 @@
       <span class="nav-icon"><iconify-icon icon="solar:calendar-date-linear"></iconify-icon></span>
       <span>Events</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="transactions" title="Transactions Ledger">
-      <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span>
-      <span>Ledger</span>
+    <a href="#" class="bottom-nav-item" data-view="units" title="Academic Progress">
+      <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span>
+      <span>Academic</span>
     </a>
     <a href="#" class="bottom-nav-item" data-view="reports" title="Financial Reports">
       <span class="nav-icon"><iconify-icon icon="solar:document-text-linear"></iconify-icon></span>
@@ -1162,27 +1162,20 @@
       </div>
     </div>
     <div class="mobile-sheet-body">
-      <!-- Section: ACADEMIC -->
-      <div class="mobile-sheet-section">
-        <span class="mobile-sheet-section-label">Academic</span>
-        <div class="mobile-sheet-group">
-          <button type="button" class="mobile-sheet-row" data-view="units" data-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:#38BDF8; background:rgba(56,189,248,0.12);">
-              <iconify-icon icon="solar:diploma-verified-linear"></iconify-icon>
-            </div>
-            <div class="mobile-sheet-row-content">
-              <span class="mobile-sheet-row-title">Academic Progress (Units)</span>
-              <span class="mobile-sheet-row-desc">Engineering curriculum checklist</span>
-            </div>
-            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
-          </button>
-        </div>
-      </div>
-
       <!-- Section: FINANCE -->
       <div class="mobile-sheet-section">
         <span class="mobile-sheet-section-label">Finance</span>
         <div class="mobile-sheet-group">
+          <button type="button" class="mobile-sheet-row" data-view="transactions" data-sheet-action="nav">
+            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(255,85,51,0.12);">
+              <iconify-icon icon="solar:card-transfer-linear"></iconify-icon>
+            </div>
+            <div class="mobile-sheet-row-content">
+              <span class="mobile-sheet-row-title">Transactions Ledger</span>
+              <span class="mobile-sheet-row-desc">Recent transactions & financial records</span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
+          </button>
           <button type="button" class="mobile-sheet-row" data-view="income" data-sheet-action="nav">
             <div class="mobile-sheet-row-icon" style="color:var(--status-positive); background:rgba(34,197,94,0.12);">
               <iconify-icon icon="solar:wallet-money-linear"></iconify-icon>
