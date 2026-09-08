@@ -18,7 +18,7 @@
 - Program casing is exact (`'BSCoE' | 'BSCE' | 'BSECE'`) wherever the checklists API is called — never `.toUpperCase()` the value passed to an API.
 - QA constraint: emails fire only to fake test addresses; never touch the real admin account's password.
 - Test password for all seeded accounts: `Coetest2026!`.
-- Pilot list (verbatim, client and server default): `lexmatondo@g.cjc.edu.ph`, `test.newuser@g.cjc.edu.ph`, `bsce.test@g.cjc.edu.ph`, `head.test@g.cjc.edu.ph`, `dean.test@g.cjc.edu.ph`, `sa.test@g.cjc.edu.ph`.
+- Pilot list (verbatim, client and server default): `lexmatondo@g.cjc.edu.ph`, `test.newuser@g.cjc.edu.ph`, `bsce.test@g.cjc.edu.ph`, `head.test@g.cjc.edu.ph`, `dean.test@g.cjc.edu.ph`, `sa.test@g.cjc.edu.ph`, `klydemodina@g.cjc.edu.ph`.
 - Subject IDs are UUIDs; `subjects.id` is shared by Grizz and the enrollment module (both read `Api.units.checklists`).
 
 ---
@@ -55,7 +55,7 @@ const roles = read('server/middleware/roles.js');
 check('pilotGate middleware defined', /function pilotGate\(/.test(roles));
 check('pilotGate checks req.user.email', /req\.user\?\.email/.test(roles));
 check('pilotGate default includes admin + test accounts',
-  ['lexmatondo', 'test.newuser', 'bsce.test', 'head.test', 'dean.test', 'sa.test']
+  ['lexmatondo', 'test.newuser', 'bsce.test', 'head.test', 'dean.test', 'sa.test', 'klydemodina']
     .every(e => roles.includes(e + '@g.cjc.edu.ph')));
 check('pilotGate reads ENROLLMENT_PILOT_EMAILS env', /ENROLLMENT_PILOT_EMAILS/.test(roles));
 check('pilotGate exported', /pilotGate/.test((roles.match(/module\.exports[^;]+/) || [''])[0]));
@@ -90,6 +90,7 @@ const PILOT_DEFAULT = [
   'head.test@g.cjc.edu.ph',
   'dean.test@g.cjc.edu.ph',
   'sa.test@g.cjc.edu.ph',
+  'klydemodina@g.cjc.edu.ph',
 ];
 
 function pilotGate(req, res, next) {
@@ -157,7 +158,7 @@ Append to `scripts/smoke-test-pilot-gate.js` before the summary `console.log`:
 const cfg = read('client/js/config.js');
 check('config defines ENROLLMENT_PILOT_EMAILS', /ENROLLMENT_PILOT_EMAILS\s*=/.test(cfg));
 check('config defines isEnrollmentPilot', /window\.isEnrollmentPilot\s*=/.test(cfg));
-check('config pilot list has 6 emails', (cfg.match(/@g\.cjc\.edu\.ph/g) || []).length >= 6);
+check('config pilot list has 7 emails', (cfg.match(/@g\.cjc\.edu\.ph/g) || []).length >= 7);
 
 const enrollmentJs = read('client/js/enrollment.js');
 check('enrollment load() checks isEnrollmentPilot', /isEnrollmentPilot/.test(enrollmentJs));
@@ -182,6 +183,7 @@ window.ENROLLMENT_PILOT_EMAILS = [
   'head.test@g.cjc.edu.ph',    // program head (BSCoE)
   'dean.test@g.cjc.edu.ph',    // dean
   'sa.test@g.cjc.edu.ph',      // student assistant (faculty role)
+  'klydemodina@g.cjc.edu.ph',  // real student account for live testing
 ];
 window.isEnrollmentPilot = function (email) {
   const v = String(email || '').trim().toLowerCase();

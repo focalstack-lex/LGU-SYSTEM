@@ -25,6 +25,7 @@ window.ENROLLMENT_PILOT_EMAILS = [
   'head.test@g.cjc.edu.ph',    // program head (BSCoE)
   'dean.test@g.cjc.edu.ph',    // dean
   'sa.test@g.cjc.edu.ph',      // student assistant (faculty role)
+  'klydemodina@g.cjc.edu.ph',  // real student account for live testing
 ];
 window.isEnrollmentPilot = function (email) {
   const v = String(email || '').trim().toLowerCase();
@@ -38,7 +39,7 @@ window.isEnrollmentPilot = function (email) {
 
 ### Server
 
-New middleware (`server/middleware/roles.js`): `pilotGate` — allowlist from `process.env.ENROLLMENT_PILOT_EMAILS` (comma-separated), defaulting to the same six addresses as the client list. Matches `req.user.email` (the auth middleware's `req.profile` select does not include email; `req.user` does). Non-pilot → `403 { error: 'This feature is still under development.' }`. Applied with `router.use(pilotGate)` at the top of `server/routes/enrollment.js` and `server/routes/faculty.js`, so the UI hiding is backed by a real API block.
+New middleware (`server/middleware/roles.js`): `pilotGate` — allowlist from `process.env.ENROLLMENT_PILOT_EMAILS` (comma-separated), defaulting to the same seven addresses as the client list. Matches `req.user.email` (the auth middleware's `req.profile` select does not include email; `req.user` does). Non-pilot → `403 { error: 'This feature is still under development.' }`. Applied with `router.use(pilotGate)` at the top of `server/routes/enrollment.js` and `server/routes/faculty.js`, so the UI hiding is backed by a real API block.
 
 Widening access later = edit the `config.js` array (client) + set the Render env var (server). No code archaeology.
 
