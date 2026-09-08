@@ -42,3 +42,5 @@ Thumbs.db
 *.sln
 *.swp
 .playwright-mcp/
+gui-test-screenshots/
+t0_login_page.png

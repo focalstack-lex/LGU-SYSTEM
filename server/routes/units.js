@@ -52,6 +52,42 @@ function sanitizeOptionalText(val) {
   return s === '' ? null : s;
 }
 
+// Component-level outcomes (spec addendum 2026-09-08): optional per-component
+// status/grade for subjects with a lab split. Absent or invalid values are
+// dropped (→ null) so one bad field cannot block logging the record, and rows
+// without component values behave exactly as today.
+function sanitizeComponentStatus(val) {
+  if (val === null || val === undefined || val === '') return null;
+  const s = String(val);
+  return isValidEnum(s, VALID_STATUSES) ? s : null;
+}
+
+function sanitizeComponentGrade(val) {
+  if (val === null || val === undefined || val === '') return null;
+  if (!isValidGrade(val)) return null;
+  return normalizeGrade(val);
+}
+
+// Sanitize all four component fields at once. Enroll/batch-enroll copy only
+// the non-null results into the upsert row, so a payload that omits them
+// never wipes previously logged values on conflict.
+function sanitizeComponentOutcomes(src = {}) {
+  return {
+    lec_status: sanitizeComponentStatus(src.lec_status),
+    lab_status: sanitizeComponentStatus(src.lab_status),
+    lec_grade:  sanitizeComponentGrade(src.lec_grade),
+    lab_grade:  sanitizeComponentGrade(src.lab_grade),
+  };
+}
+
+function applyComponentOutcomes(row, src = {}) {
+  const outcomes = sanitizeComponentOutcomes(src);
+  for (const [key, value] of Object.entries(outcomes)) {
+    if (value !== null) row[key] = value;
+  }
+  return row;
+}
+
 function isMissingRelation(err) {
   return /relation .* does not exist/i.test(err?.message || '');
 }
@@ -74,7 +110,14 @@ router.get('/checklists', async (req, res) => {
       .order('code',       { ascending: true });
     if (program) subjQuery = subjQuery.eq('program', program);
 
-    const [reqRes, subjRes] = await Promise.all([reqQuery, subjQuery]);
+    const [reqRes, subjRes, prereqRes] = await Promise.all([
+      reqQuery,
+      subjQuery,
+      supabase
+        .from('subject_prerequisites')
+        .select('id, subject_id, depends_on_subject_id, kind, detail, depends_on_subject_id(code)')
+        .order('id', { ascending: true }),
+    ]);
     if (reqRes.error || subjRes.error) {
       if (isMissingRelation(reqRes.error || subjRes.error)) {
         return res.status(503).json({ error: 'The credit unit tracker is not set up yet. Please run the 005_credit_unit_tracker.sql migration in the Supabase SQL console.' });
@@ -83,7 +126,23 @@ router.get('/checklists', async (req, res) => {
       return res.status(500).json({ error: 'Failed to load the curriculum.' });
     }
 
-    res.json({ requirements: reqRes.data, subjects: subjRes.data });
+    // Graceful degradation: migration 031 not applied yet -> empty prereq list.
+    let prerequisites = [];
+    if (prereqRes.error) {
+      if (!isMissingRelation(prereqRes.error)) {
+        logError('units/checklists/prereqs', prereqRes.error);
+      }
+    } else {
+      prerequisites = (prereqRes.data || []).map(r => ({
+        id: r.id,
+        subject_id: r.subject_id,
+        kind: r.kind,
+        detail: r.detail,
+        depends_code: r.depends_on_subject_id?.code || null,
+      }));
+    }
+
+    res.json({ requirements: reqRes.data, subjects: subjRes.data, prerequisites: prerequisites });
   } catch (err) {
     logError('units/checklists', err);
     res.status(500).json({ error: 'Failed to load the curriculum.' });
@@ -96,7 +155,7 @@ router.get('/my', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('student_units')
-      .select('id, school_year, semester, grade, status, created_at, instructor, schedule, subjects(id, code, title, units, program, year_level, semester)')
+      .select('id, school_year, semester, grade, status, created_at, lec_grade, lab_grade, lec_status, lab_status, instructor, schedule, subjects(id, code, title, units, lec_units, lab_units, program, year_level, semester)')
       .eq('student_id', req.user.id)
       .order('created_at', { ascending: false });
 
@@ -274,8 +333,12 @@ router.get('/standing', async (req, res) => {
     doc.moveDown(5);
 
     // ── Subject table ──
-    const cols = { code: 72, title: 126, units: 298, sy: 332, sem: 392, status: 442, grade: 504 };
-    const colW = { code: 52, title: 170, units: 32, sy: 58, sem: 48, status: 60, grade: 36 };
+    // LEC/LAB split column: title narrowed (170->136) and sem trimmed (48->46)
+    // to fund the 34pt split column so the table still spans exactly
+    // contentLeft(72)..contentRight(540) - the plan's raw geometry (grade
+    // ending at 574) overflowed the 1" right margin and the row bands.
+    const cols = { code: 72, title: 126, split: 264, units: 300, sy: 334, sem: 394, status: 442, grade: 504 };
+    const colW = { code: 52, title: 136, split: 34, units: 32, sy: 58, sem: 46, status: 60, grade: 36 };
 
     function tableHeader() {
       const y = doc.y;
@@ -284,6 +347,7 @@ router.get('/standing', async (req, res) => {
       doc.text('CODE',         cols.code,  y + 7, { width: colW.code });
       doc.text('SUBJECT TITLE', cols.title, y + 7, { width: colW.title });
       doc.text('UNITS',        cols.units, y + 7, { width: colW.units, align: 'right' });
+      doc.text('LEC/LAB',      cols.split, y + 7, { width: colW.split, align: 'right' });
       doc.text('SCHOOL YEAR',  cols.sy,    y + 7, { width: colW.sy });
       doc.text('SEM',          cols.sem,   y + 7, { width: colW.sem });
       doc.text('STATUS',       cols.status,y + 7, { width: colW.status });
@@ -341,12 +405,23 @@ router.get('/standing', async (req, res) => {
                .text(s.title, cols.title, rowY + 6, { width: colW.title, height: rowH - 8 });
             doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
                .text(String(s.units), cols.units, rowY + 6, { width: colW.units, align: 'right' });
+            const splitText = Number(s.lab_units) > 0 ? `${s.lec_units}+${s.lab_units}` : '—';
+            doc.text(splitText, cols.split, rowY + 6, { width: colW.split, align: 'right' });
             doc.text(rec?.school_year || '-', cols.sy, rowY + 6, { width: colW.sy });
             doc.text(SEM_SHORT[rec?.semester ?? s.semester] || '-', cols.sem, rowY + 6, { width: colW.sem });
             doc.fillColor(statusColors[status] || textMuted).font('Helvetica-Bold').fontSize(8)
                .text((STATUS_LABELS[status] || status).toUpperCase(), cols.status, rowY + 6, { width: colW.status });
-            doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
-               .text(rec?.grade != null ? String(rec.grade) : '-', cols.grade, rowY + 6, { width: colW.grade, align: 'right' });
+            // Component grades (spec addendum 2026-09-08): records with
+            // lec/lab grades print as "1.75 / 5.00"; rows without them keep
+            // the plain overall grade. The joined string is set a size
+            // smaller so it still fits the 36pt GRADE column.
+            const hasComponentGrades = rec != null && (rec.lec_grade != null || rec.lab_grade != null);
+            const gradeText = hasComponentGrades
+              ? `${rec.lec_grade != null ? String(rec.lec_grade) : '-'} / ${rec.lab_grade != null ? String(rec.lab_grade) : '-'}`
+              : (rec?.grade != null ? String(rec.grade) : '-');
+            doc.fillColor(textMuted).font('Helvetica')
+               .fontSize(hasComponentGrades ? 7.5 : 8.5)
+               .text(gradeText, cols.grade, rowY + 6, { width: colW.grade, align: 'right' });
 
             rowY += rowH;
             band++;
@@ -399,7 +474,7 @@ router.get('/standing', async (req, res) => {
 // Log a subject for the current student.
 router.post('/enroll', async (req, res) => {
   try {
-    const { subject_id, school_year, semester, status = 'enrolled', grade = null, instructor = null, schedule = null } = req.body || {};
+    const { subject_id, school_year, semester, status = 'enrolled', grade = null, instructor = null, schedule = null, lec_status, lab_status, lec_grade, lab_grade } = req.body || {};
 
     const missing = assertRequired({ subject_id, school_year, semester });
     if (missing) return res.status(400).json({ error: missing });
@@ -428,18 +503,21 @@ router.post('/enroll', async (req, res) => {
       return res.status(403).json({ error: 'You can only log subjects from your enrolled program.' });
     }
 
+    const payload = {
+      student_id: req.user.id,
+      subject_id,
+      school_year,
+      semester: Number(semester),
+      status,
+      grade: normalizeGrade(grade),
+      instructor: sanitizeOptionalText(instructor),
+      schedule: sanitizeOptionalText(schedule),
+    };
+    applyComponentOutcomes(payload, { lec_status, lab_status, lec_grade, lab_grade });
+
     const { error } = await supabase
       .from('student_units')
-      .upsert({
-        student_id: req.user.id,
-        subject_id,
-        school_year,
-        semester: Number(semester),
-        status,
-        grade: normalizeGrade(grade),
-        instructor: sanitizeOptionalText(instructor),
-        schedule: sanitizeOptionalText(schedule),
-      }, {
+      .upsert(payload, {
         onConflict: 'student_id,subject_id,school_year,semester',
       });
 
@@ -490,7 +568,7 @@ router.post('/batch-enroll', async (req, res) => {
 
     const rowsToUpsert = [];
     for (const item of items) {
-      const { subject_id, school_year, semester, status = 'enrolled', grade = null } = item;
+      const { subject_id, school_year, semester, status = 'enrolled', grade = null, lec_status, lab_status, lec_grade, lab_grade } = item;
       if (!SCHOOL_YEAR_RE.test(school_year)) {
         return res.status(400).json({ error: `Invalid school year format: ${school_year}` });
       }
@@ -512,14 +590,14 @@ router.post('/batch-enroll', async (req, res) => {
         return res.status(403).json({ error: 'You can only log subjects from your enrolled program.' });
       }
 
-      rowsToUpsert.push({
+      rowsToUpsert.push(applyComponentOutcomes({
         student_id: req.user.id,
         subject_id,
         school_year,
         semester: Number(semester),
         status,
         grade: normalizeGrade(grade),
-      });
+      }, { lec_status, lab_status, lec_grade, lab_grade }));
     }
 
     const { error: upsertErr } = await supabase
@@ -555,7 +633,7 @@ router.patch('/update/:id', async (req, res) => {
       .single();
     if (fetchErr || !existing) return res.status(404).json({ error: 'Record not found.' });
 
-    const { status, grade, school_year, semester, instructor, schedule } = req.body || {};
+    const { status, grade, school_year, semester, instructor, schedule, lec_status, lab_status, lec_grade, lab_grade } = req.body || {};
     const updates = {};
 
     if (status !== undefined) {
@@ -576,6 +654,7 @@ router.patch('/update/:id', async (req, res) => {
     }
     if (instructor !== undefined) updates.instructor = sanitizeOptionalText(instructor);
     if (schedule !== undefined) updates.schedule = sanitizeOptionalText(schedule);
+    applyComponentOutcomes(updates, { lec_status, lab_status, lec_grade, lab_grade });
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'Nothing to update.' });
     }

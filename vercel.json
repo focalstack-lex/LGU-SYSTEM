@@ -36,6 +36,10 @@
       "dest": "client/feedback/index.html"
     },
     {
+      "src": "/faculty",
+      "dest": "client/faculty.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "client/$1",
       "check": true

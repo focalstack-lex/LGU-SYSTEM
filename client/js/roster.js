@@ -39,6 +39,10 @@ const Roster = (() => {
             }));
             return _cachedRoster;
           }
+          // Empty result: the pre-load fetch runs before login and RLS hides
+          // the roster from anon users. Don't pin that empty promise — allow
+          // a re-fetch once the user is authenticated.
+          _fetchPromise = null;
         } catch (e) {
           console.warn("[Roster] DB fetch fallback:", e);
         }

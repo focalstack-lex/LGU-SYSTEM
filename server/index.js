@@ -11,6 +11,9 @@ const reportsRouter       = require("./routes/reports");
 const announcementsRouter = require("./routes/announcements");
 const adminRouter         = require("./routes/admin");
 const unitsRouter         = require("./routes/units");
+const curriculumRouter    = require("./routes/curriculum");
+const enrollmentRouter    = require("./routes/enrollment");
+const facultyRouter       = require("./routes/faculty");
 const { router: notificationsRouter } = require("./routes/notifications");
 const publicRouter        = require("./routes/public");
 const feedbackRouter      = require("./routes/feedback");
@@ -155,6 +158,7 @@ app.use(express.static(path.join(__dirname, "../client")));
 const feedbackDir = path.join(__dirname, "../client/feedback");
 app.get(["/feedback", "/feedback/"],        (req, res) => res.sendFile(path.join(feedbackDir, "index.html")));
 app.get(["/feedback/view", "/feedback/view/"], (req, res) => res.sendFile(path.join(feedbackDir, "view", "index.html")));
+app.get(["/faculty", "/faculty/"],           (req, res) => res.sendFile(path.join(__dirname, "../client", "faculty.html")));
 
 // =============================================
 // Public Routes
@@ -174,6 +178,9 @@ app.use("/api/reports",       authMiddleware, onlyWrites(writeLimiter), reportsR
 app.use("/api/announcements", authMiddleware, onlyWrites(writeLimiter), announcementsRouter);
 app.use("/api/admin",         authMiddleware, onlyWrites(writeLimiter), adminRouter);
 app.use("/api/units",         authMiddleware, onlyWrites(writeLimiter), unitsRouter);
+app.use("/api/curriculum",    authMiddleware, onlyWrites(writeLimiter), curriculumRouter);
+app.use("/api/enrollment",    authMiddleware, onlyWrites(writeLimiter), enrollmentRouter);
+app.use("/api/faculty",       authMiddleware, onlyWrites(writeLimiter), facultyRouter);
 app.use("/api/notifications", authMiddleware, onlyWrites(writeLimiter), notificationsRouter);
 app.use("/api/cv",            onlyWrites(writeLimiter), cvRouter);
 

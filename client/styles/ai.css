@@ -581,6 +581,25 @@ body:has(#ursa-drawer.active) .grizz-launcher {
   border-color: rgba(245, 158, 11, 0.25);
 }
 
+/* Phase C: per-card add button on recommendation cards */
+.ursa-add-btn {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.22rem 0.55rem;
+  color: var(--primary);
+  background: transparent;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+.ursa-add-btn:hover:not(:disabled) { background: var(--primary); color: #fff; }
+.ursa-add-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.ursa-add-btn.added { color: #4ADE80; border-color: rgba(34, 197, 94, 0.45); }
+[data-theme="light"] .ursa-add-btn.added { color: #16A34A; }
+
 /* Data Box (Financials) */
 .ursa-data-box {
   background: rgba(0, 0, 0, 0.28);

@@ -9,6 +9,7 @@ const GrizzAI = (() => {
   let subjects = [];
   let myUnits = [];
   let requirements = [];
+  let prereqRows = [];
   let isOpen = false;
   let activeTab = 'academic';
   let isInitialized = false;
@@ -318,6 +319,7 @@ const GrizzAI = (() => {
       ]);
       subjects = checklistRes.subjects || [];
       requirements = checklistRes.requirements || [];
+      prereqRows = checklistRes.prerequisites || [];
       myUnits = unitsRes || [];
       updateInitialGreeting();
     } catch (err) {
@@ -536,6 +538,7 @@ const GrizzAI = (() => {
     `;
     stream.appendChild(msg);
     scrollToBottom();
+    return msg;
   }
 
   function scrollToBottom() {
@@ -765,22 +768,89 @@ const GrizzAI = (() => {
     }
   }
 
+  // Structured prerequisite evaluation (migration 031 rows).
+  // Legacy free-text fallback keeps the old regex path when the table is empty
+  // for a subject, so Grizz never regresses before the migration lands.
+  function evaluatePrereqs(subject, prereqsBySubject, passedCodes, enrolledCodes, currentYear) {
+    const rows = prereqsBySubject.get(subject.id) || [];
+    if (!rows.length) return null; // signal: caller falls back to legacy parsing
+
+    let satisfied = true;
+    const missing = [];
+    const notes = [];
+    for (const row of rows) {
+      const depCode = row.depends_code;
+      if ((row.kind === 'prerequisite' || row.kind === 'corequisite') && depCode) {
+        if (!passedCodes.has(depCode) && !enrolledCodes.has(depCode)) {
+          satisfied = false;
+          missing.push(depCode);
+        }
+      } else if (row.kind === 'year_standing' && row.detail) {
+        const requiredYr = Number((row.detail.match(/(\d+)/) || [])[1] || 0);
+        if (currentYear < requiredYr) {
+          satisfied = false;
+          missing.push(row.detail);
+        }
+      } else if (row.kind === 'special' && row.detail) {
+        notes.push(row.detail);
+      }
+    }
+    return { satisfied, missing, notes };
+  }
+
+  // Lecture/lab-aware unit label for recommendation cards ("3+1 units" when lab > 0).
+  function unitsLabel(s) {
+    return Number(s.lab_units) > 0 ? `${s.lec_units}+${s.lab_units} units` : `${s.units} unit${s.units === 1 ? "" : "s"}`;
+  }
+
+  // Component-aware pass classification (spec addendum 2026-09-08).
+  // Only a FULL pass - overall 'passed', or both lec+lab components
+  // 'passed' - satisfies a prerequisite. A record with exactly one passed
+  // component is a partial pass: the passed component's units bank, but the
+  // subject surfaces in the Component Backlog (retake the failed part only).
+  // Records are classified newest-first per subject code, so retakes never
+  // resurrect an older outcome.
+  function classifyPasses(records) {
+    const passedCodes = new Set();
+    const enrolledCodes = new Set();
+    const partialPasses = new Map(); // subject code -> passed component ('lecture' | 'laboratory')
+    const seen = new Set();
+    records.forEach(u => {
+      const code = (u.subjects?.code || '').trim().toUpperCase();
+      if (!code || seen.has(code)) return; // newest record per subject wins
+      seen.add(code);
+      const lecPassed = u.lec_status === 'passed';
+      const labPassed = u.lab_status === 'passed';
+      if (u.status === 'passed' || (lecPassed && labPassed)) {
+        passedCodes.add(code);
+      } else if (u.status !== 'enrolled' && lecPassed !== labPassed) {
+        // exactly one component passed on a settled (non-current-term) record
+        partialPasses.set(code, lecPassed ? 'lecture' : 'laboratory');
+      }
+      if (u.status === 'enrolled') enrolledCodes.add(code);
+    });
+    return { passedCodes, enrolledCodes, partialPasses };
+  }
+
   // 1. Next Semester Subject Recommendations
-  function handleNextSemRecommendations() {
+  async function handleNextSemRecommendations() {
     const prog = profile?.course || 'BSCoE';
     const progTitle = PROGRAM_NAMES[prog] || prog;
 
-    const passedCodes = new Set();
-    const enrolledCodes = new Set();
-
-    myUnits.forEach(u => {
-      const code = u.subjects?.code || '';
-      if (u.status === 'passed') passedCodes.add(code.trim().toUpperCase());
-      if (u.status === 'enrolled') enrolledCodes.add(code.trim().toUpperCase());
-    });
+    // Partial-pass records do not satisfy prerequisites (handled inside
+    // classifyPasses); the Component Backlog note for them is rendered by
+    // the Academic Progress summary.
+    const { passedCodes, enrolledCodes } = classifyPasses(myUnits);
 
     const currentYear = Number(profile?.year_level) || 1;
-    
+
+    // Build once per recommendation run, from the checklists payload captured in loadData():
+    const prereqsBySubject = new Map();
+    for (const r of (prereqRows || [])) {
+      if (!prereqsBySubject.has(r.subject_id)) prereqsBySubject.set(r.subject_id, []);
+      prereqsBySubject.get(r.subject_id).push(r);
+    }
+
     // Find uncompleted subjects (exclude both PASSED and CURRENTLY ENROLLED subjects)
     const uncompleted = subjects.filter(s => {
       const c = s.code.trim().toUpperCase();
@@ -793,6 +863,17 @@ const GrizzAI = (() => {
     uncompleted.forEach(s => {
       const prereqStr = (s.prerequisites || '').trim();
 
+      const verdict = evaluatePrereqs(s, prereqsBySubject, passedCodes, enrolledCodes, currentYear);
+      if (verdict) {
+        if (verdict.satisfied) {
+          eligible.push({ ...s, missingPrereq: null, prereqNotes: verdict.notes });
+        } else {
+          blockedByPrereq.push({ ...s, reason: `Missing prerequisite: ${verdict.missing.join(', ')}` });
+        }
+        return;
+      }
+
+      // ---- legacy fallback (subjects with no structured rows yet) ----
       if (!prereqStr || prereqStr === 'None' || prereqStr === '-') {
         eligible.push({ ...s, missingPrereq: null });
         return;
@@ -851,17 +932,48 @@ const GrizzAI = (() => {
       return;
     }
 
+    // Phase C: pilot accounts can push recommendations into their Load
+    // Verification draft. Non-pilots get today's cards with no add UI.
+    const pilot = window.isEnrollmentPilot?.(profile?.email);
+    let canEdit = false;
+    let lockNote = '';
+    let inLoad = new Set();
+    if (pilot && window.Enrollment?.ensureReady) {
+      try { await window.Enrollment?.ensureReady(); } catch { /* state stays null → rendered as locked */ }
+      canEdit = !!window.Enrollment.canEdit?.();
+      lockNote = window.Enrollment.lockedReason?.() || '';
+      inLoad = window.Enrollment.draftSubjectIds?.() || new Set();
+    }
+
+    const addButtonFor = (s) => inLoad.has(s.id)
+      ? '<span class="ursa-subject-tag active">In your load ✓</span>'
+      : `<button type="button" class="ursa-add-btn"${canEdit ? '' : ' disabled'} data-grizz-add="${esc(s.id)}">+ Add</button>`;
+
     const cardsHtml = recommended.map(s => `
       <div class="ursa-subject-item">
         <div class="ursa-subject-meta">
-          <span class="ursa-subject-code">${esc(s.code)} <span class="ursa-units-badge">${s.units} Units</span></span>
+          <span class="ursa-subject-code">${esc(s.code)} <span class="ursa-units-badge">${unitsLabel(s)}</span></span>
           <span class="ursa-subject-title" title="${esc(s.title)}">${esc(s.title)}</span>
         </div>
         <span class="ursa-subject-tag">
           Yr ${s.year_level} · Sem ${s.semester}
         </span>
+        ${(s.prereqNotes || []).length ? `<span class="ursa-subject-tag req">Note: ${esc(s.prereqNotes.join(', '))}</span>` : ''}
+        ${pilot ? addButtonFor(s) : ''}
       </div>
     `).join('');
+
+    const addAllHtml = pilot ? `
+      <div class="ursa-response-actions" style="margin-top:0.6rem;">
+        <button type="button" class="ursa-chip-action" data-grizz-add-all
+          ${(!canEdit || !recommended.some(s => !inLoad.has(s.id))) ? 'disabled' : ''}>
+          <iconify-icon icon="solar:cart-plus-linear"></iconify-icon> Add all recommended
+        </button>
+      </div>
+      <p class="ursa-note-text" data-grizz-lock ${canEdit ? 'hidden' : ''}>🔒 Your load is ${esc(lockNote || 'not editable right now')} — subjects can be added once it's back in draft.</p>` : '';
+
+    const jumpHtml = pilot ? `
+      <p style="margin:0.6rem 0 0;"><a href="#" class="ursa-nav-link" data-view="enrollment" style="color:var(--primary);font-weight:600;">Open Load Verification →</a></p>` : '';
 
     const html = `
       <div class="ursa-summary-bar">
@@ -880,15 +992,69 @@ const GrizzAI = (() => {
         ${cardsHtml}
       </div>
 
+      ${addAllHtml}
+      ${jumpHtml}
+      <p class="ursa-note-text" data-grizz-result hidden></p>
       <p class="ursa-note-text">
         Grades can be updated directly in the Academic Progress tab.
       </p>
     `;
 
-    appendBotMessage('Recommended Subject Load', html, [
+    const msg = appendBotMessage('Recommended Subject Load', html, [
       { action: 'academic-progress', label: 'Academic Progress Tally', icon: 'solar:diploma-verified-linear' },
       { action: 'check-prereq', label: 'Check Prerequisites', icon: 'solar:branching-paths-down-linear' },
     ]);
+    if (!pilot || !msg) return;
+
+    const resultEl = msg.querySelector('[data-grizz-result]');
+    const showResult = (text) => { if (resultEl) { resultEl.hidden = false; resultEl.textContent = text; } };
+    const loadIds = () => window.Enrollment.draftSubjectIds?.() || new Set();
+
+    const syncButtons = () => {
+      const ids = loadIds();
+      const editable = !!window.Enrollment.canEdit?.();
+      msg.querySelectorAll('[data-grizz-add]').forEach(b => {
+        const done = ids.has(b.dataset.grizzAdd);
+        b.disabled = done || !editable;
+        b.classList.toggle('added', done);
+        b.textContent = done ? '✓ Added' : '+ Add';
+      });
+      const allBtn = msg.querySelector('[data-grizz-add-all]');
+      if (allBtn) allBtn.disabled = !editable || recommended.every(s => ids.has(s.id));
+    };
+
+    const addOne = async (btn, subject) => {
+      btn.disabled = true;
+      const res = await window.Enrollment.addFromGrizz(subject, 'Recommended by Grizz')
+        .catch(err => ({ ok: false, error: err.message }));
+      showResult(res?.ok ? `✓ Added ${subject.code} to your proposed load.` : (res?.error || 'Could not add the subject.'));
+      syncButtons();
+    };
+
+    msg.querySelectorAll('[data-grizz-add]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const subject = recommended.find(s => String(s.id) === btn.dataset.grizzAdd);
+        if (subject) addOne(btn, subject);
+      });
+    });
+
+    msg.querySelector('[data-grizz-add-all]')?.addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      const ids = loadIds();
+      const pending = recommended.filter(s => !ids.has(s.id));
+      let added = 0;
+      let lastErr = '';
+      for (const s of pending) {
+        const res = await window.Enrollment.addFromGrizz(s, 'Recommended by Grizz')
+          .catch(err => ({ ok: false, error: err.message }));
+        if (res?.ok) added++; else lastErr = res?.error || 'request failed';
+      }
+      showResult(added
+        ? `✓ Added ${added} subject${added === 1 ? '' : 's'} to your proposed load.` + (lastErr ? ` (${pending.length - added} failed: ${lastErr})` : '')
+        : (lastErr || 'Nothing to add.'));
+      syncButtons();
+    });
   }
 
   // 2. Ask About Current Subjects
@@ -960,11 +1126,30 @@ const GrizzAI = (() => {
     const passedUnits = passed.reduce((acc, u) => acc + (Number(u.subjects?.units) || 0), 0);
     const pct = Math.min(100, Math.round((passedUnits / (req.total_units || 1)) * 100));
 
-    const failed = myUnits.filter(u => u.status === 'failed' || u.status === 'dropped');
+    const failedAll = myUnits.filter(u => u.status === 'failed' || u.status === 'dropped');
+
+    // Component Backlog (spec addendum 2026-09-08): a partial pass banks the
+    // passed component's units, but the subject is not done - Grizz points
+    // at the exact component to retake instead of the generic backlog line.
+    const { partialPasses } = classifyPasses(myUnits);
+    const partialCodes = new Set(partialPasses.keys());
+    const failed = failedAll.filter(u => !partialCodes.has((u.subjects?.code || '').trim().toUpperCase()));
 
     let backlogNote = '';
+    if (partialPasses.size > 0) {
+      const componentNotes = [...partialPasses.entries()].map(([code, component]) =>
+        component === 'lecture'
+          ? `You passed <strong>${esc(code)}</strong> lecture — retake the lab only.`
+          : `You passed <strong>${esc(code)}</strong> lab — retake the lecture only.`
+      );
+      backlogNote += `
+        <div class="ursa-alert-box">
+          <strong>Component Backlog:</strong> ${componentNotes.join(' ')}
+        </div>
+      `;
+    }
     if (failed.length > 0) {
-      backlogNote = `
+      backlogNote += `
         <div class="ursa-alert-box">
           <strong>Backlog Notice:</strong> You have ${failed.length} subject(s) marked as Failed or Dropped. Check your prerequisites to retake them.
         </div>
