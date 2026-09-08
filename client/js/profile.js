@@ -204,6 +204,27 @@ const ProfileModal = (() => {
       'profile-enrollment-year'
     ];
 
+    // Helper to calculate enrollment year based on current school year (SY 2026-2027 start year: 2026)
+    const computeEnrollmentYear = (yearLevel) => {
+      const y = parseInt(yearLevel, 10);
+      if (!y || y < 1) return null;
+      const currentSYStart = 2026;
+      return currentSYStart - (y - 1);
+    };
+
+    // Auto calculate enrollment year when year level changes
+    const yearSelect = document.getElementById('profile-year-select');
+    const enrollInput = document.getElementById('profile-enrollment-year');
+    if (yearSelect && enrollInput) {
+      yearSelect.addEventListener('change', () => {
+        const calculated = computeEnrollmentYear(yearSelect.value);
+        if (calculated) {
+          enrollInput.value = calculated;
+        }
+        updateSaveButtonState();
+      });
+    }
+
     inputIds.forEach(id => {
       const el = document.getElementById(id);
       if (el) {
@@ -303,7 +324,7 @@ const ProfileModal = (() => {
     const fullName = profile?.full_name || '';
     const course = profile?.course || 'BSCoE';
     const yearLevel = String(profile?.year_level || '1');
-    const enrollmentYear = profile?.enrollment_year || new Date().getFullYear();
+    const enrollmentYear = profile?.enrollment_year || (2026 - (parseInt(yearLevel, 10) - 1));
     const ROLE_LABELS = {
       admin: 'Administrator',
       governor: 'Governor',

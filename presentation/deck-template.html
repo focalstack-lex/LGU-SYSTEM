@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asa Kaya Napadulong ang Pondo? · COE Budget Transparency System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg: #0B0F17;
+        --panel: #101623;
+        --ink: #F1F5F9;
+        --muted: #94A0B8;
+        --faint: #5B6579;
+        --accent: #F97316;
+        --accent-soft: #FDBA74;
+        --hairline: rgba(255, 255, 255, 0.09);
+        --font-head: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+        --font-body: 'Inter', 'Segoe UI', Arial, sans-serif;
+        --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--font-body);
+        overflow: hidden;
+    }
+
+    .slide-deck { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+
+    @media (min-width: 769px) {
+        .slide-deck {
+            max-width: calc(100vh * 16 / 9);
+            max-height: calc(100vw * 9 / 16);
+            margin: auto;
+            position: absolute;
+            inset: 0;
+        }
+    }
+
+    .slide {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        padding: clamp(28px, 4.5vh, 52px) clamp(30px, 4.5vw, 64px) clamp(40px, 7.5vh, 68px);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.45s ease;
+        overflow: hidden;
+        background:
+            radial-gradient(1200px 700px at 85% -10%, rgba(249, 115, 22, 0.07), transparent 60%),
+            radial-gradient(900px 600px at -5% 110%, rgba(249, 115, 22, 0.05), transparent 55%),
+            radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px) 0 0 / 26px 26px,
+            var(--bg);
+    }
+
+    .slide.active { opacity: 1; visibility: visible; z-index: 2; }
+
+    /* ---- chrome ---- */
+    .chrome-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: var(--font-mono);
+        font-size: clamp(9px, 1.1vw, 12px);
+        letter-spacing: 2.5px;
+        color: var(--faint);
+        text-transform: uppercase;
+        margin-bottom: clamp(10px, 2vh, 22px);
+    }
+
+    .chrome-foot {
+        position: absolute;
+        left: clamp(30px, 4.5vw, 64px);
+        right: clamp(30px, 4.5vw, 64px);
+        bottom: clamp(14px, 2.6vh, 26px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--hairline);
+        padding-top: clamp(8px, 1.4vh, 14px);
+        font-family: var(--font-mono);
+        font-size: clamp(8.5px, 1vw, 11.5px);
+        letter-spacing: 2px;
+        color: var(--faint);
+        text-transform: uppercase;
+        z-index: 5;
+    }
+    .chrome-foot .pg b { color: var(--accent); font-weight: 600; }
+
+    .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 0;
+    }
+
+    /* ---- typography ---- */
+    .kicker {
+        font-family: var(--font-mono);
+        font-size: clamp(10px, 1.25vw, 14px);
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    h1, h2 { font-family: var(--font-head); font-weight: 800; letter-spacing: -0.5px; }
+
+    .h-title { font-size: clamp(34px, 5.8vw, 76px); line-height: 1.04; }
+    .h-title .em { color: var(--accent); }
+
+    .h-slide { font-size: clamp(24px, 3.6vw, 46px); line-height: 1.1; }
+    .h-slide .em { color: var(--accent); }
+
+    .lede { font-size: clamp(13px, 1.55vw, 18px); color: var(--muted); line-height: 1.55; font-weight: 400; }
+
+    /* ---- screenshot frame ---- */
+    .shot { border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.14); background: #1A2233; box-shadow: 0 24px 70px -18px rgba(0,0,0,0.75), 0 0 0 1px rgba(249,115,22,0.08), 0 12px 44px -10px rgba(249,115,22,0.13); }
+    .shot-bar {
+        display: flex; align-items: center; gap: 8px;
+        padding: 7px 12px;
+        background: linear-gradient(180deg, #1C2536, #161D2C);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .shot-bar i { width: 8px; height: 8px; border-radius: 50%; background: #3A4560; }
+    .shot-bar i:nth-child(1) { background: #E5684F; }
+    .shot-bar i:nth-child(2) { background: #E8B84F; }
+    .shot-bar i:nth-child(3) { background: #6FBF73; }
+    .shot-bar .url {
+        flex: 1;
+        margin-left: 6px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 6px;
+        padding: 3px 10px;
+        font-family: var(--font-mono);
+        font-size: clamp(8px, 0.95vw, 11px);
+        color: var(--muted);
+        letter-spacing: 0.5px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .shot img { display: block; width: 100%; height: auto; }
+
+    .caption {
+        font-family: var(--font-mono);
+        font-size: clamp(8.5px, 1vw, 11.5px);
+        letter-spacing: 1.5px;
+        color: var(--faint);
+        text-transform: uppercase;
+        margin-top: 10px;
+        display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ---- numbered rows ---- */
+    .rows { display: flex; flex-direction: column; }
+    .row {
+        display: flex; align-items: baseline; gap: clamp(12px, 1.8vw, 24px);
+        padding: clamp(9px, 1.7vh, 17px) 0;
+        border-bottom: 1px solid var(--hairline);
+    }
+    .row:first-child { border-top: 1px solid var(--hairline); }
+    .row .no {
+        font-family: var(--font-mono);
+        font-size: clamp(10px, 1.2vw, 13.5px);
+        color: var(--accent);
+        letter-spacing: 1px;
+        width: 2.2em; flex-shrink: 0;
+    }
+    .row .rt { font-size: clamp(14px, 1.8vw, 22px); font-weight: 600; letter-spacing: -0.2px; }
+    .row .rd { font-size: clamp(11.5px, 1.35vw, 16px); color: var(--muted); margin-left: auto; text-align: right; max-width: 46%; }
+
+    /* ---- big stat ---- */
+    .stat-big { font-family: var(--font-head); font-weight: 800; font-size: clamp(40px, 6.4vw, 88px); line-height: 1; letter-spacing: -1.5px; }
+    .stat-big .old { color: var(--faint); text-decoration: line-through; text-decoration-color: rgba(248,113,113,0.7); text-decoration-thickness: 4px; }
+    .stat-big .arr { color: var(--accent); font-weight: 600; }
+    .stat-big .new { color: var(--accent); }
+
+    .chips { display: flex; gap: 10px; flex-wrap: wrap; }
+    .chip {
+        font-family: var(--font-mono);
+        font-size: clamp(9.5px, 1.15vw, 13px);
+        letter-spacing: 1px;
+        color: var(--accent-soft);
+        border: 1px solid rgba(249, 115, 22, 0.35);
+        background: rgba(249, 115, 22, 0.07);
+        border-radius: 999px;
+        padding: 7px 16px;
+        white-space: nowrap;
+    }
+    .chip b { color: var(--ink); font-weight: 600; }
+
+    .quote {
+        font-family: var(--font-head);
+        font-weight: 700;
+        font-size: clamp(17px, 2.4vw, 30px);
+        line-height: 1.35;
+        letter-spacing: -0.3px;
+        color: var(--ink);
+        max-width: 30ch;
+    }
+    .quote .em { color: var(--accent); }
+
+    .mascot { width: clamp(70px, 9vw, 120px); opacity: 0.95; filter: drop-shadow(0 10px 30px rgba(249,115,22,0.25)); }
+
+    /* ---- animations ---- */
+    .slide.active .anim { animation: fadeUp 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+    .slide.active .anim.d1 { animation-delay: 0.07s; } .slide.active .anim.d2 { animation-delay: 0.16s; }
+    .slide.active .anim.d3 { animation-delay: 0.25s; } .slide.active .anim.d4 { animation-delay: 0.34s; }
+    .slide.active .anim.d5 { animation-delay: 0.43s; } .slide.active .anim.d6 { animation-delay: 0.52s; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+    /* ---- progress + nav ---- */
+    .progress-bar { position: fixed; top: 0; left: 0; height: 2.5px; background: var(--accent); transition: width 0.3s; z-index: 1000; }
+    .nav-controls {
+        position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+        display: flex; align-items: center; gap: 14px; z-index: 1000;
+        opacity: 0.35; transition: opacity 0.25s;
+    }
+    .nav-controls:hover { opacity: 1; }
+    .nav-btn {
+        background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+        color: var(--ink); width: 34px; height: 34px; border-radius: 50%;
+        cursor: pointer; font-size: 14px;
+    }
+    .nav-btn:hover { background: rgba(249,115,22,0.25); border-color: var(--accent); }
+    .slide-counter { color: var(--faint); font-size: 12px; font-family: var(--font-mono); }
+
+    @media (max-width: 768px) {
+        .slide { padding: 20px 18px 64px; }
+        .cols { flex-direction: column !important; }
+        .row .rd { display: none; }
+    }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="slide-deck">
+
+    <!-- ============ SLIDE 1 · TITLE ============ -->
+    <div class="slide active">
+        <div class="chrome-top"><span>COE · BTMS</span><span>Case Study · 2026</span></div>
+        <div class="content">
+            <div class="cols" style="display:flex; gap:clamp(24px,4vw,56px); align-items:center;">
+                <div style="flex:1.05; display:flex; flex-direction:column; gap:clamp(12px,2.2vh,22px);">
+                    <p class="kicker anim">A Case Study in Digital Governance</p>
+                    <h1 class="h-title anim d1">Asa kaya<br>napadulong<br>ang <span class="em">pondo?</span></h1>
+                    <p class="lede anim d2">Every peso, visible. Every transaction, accounted for.</p>
+                    <div class="anim d3" style="margin-top: 4px;">
+                        <p style="font-size: clamp(12px, 1.45vw, 17px); font-weight: 600;">Budget Transparency &amp; Financial Monitoring System</p>
+                        <p style="font-size: clamp(10.5px, 1.2vw, 14px); color: var(--muted); margin-top: 3px;">Presented by [Your Name] · College of Engineering</p>
+                    </div>
+                </div>
+                <div style="flex:1; min-width:0;" class="anim d2">
+                    <div class="shot">
+                        <div class="shot-bar"><i></i><i></i><i></i><span class="url">coelgu-system.engineer</span></div>
+                        <img src="{{IMG:dashboard}}" alt="Financial Dashboard">
+                    </div>
+                    <p class="caption">Live dashboard · actual system</p>
+                </div>
+            </div>
+        </div>
+        <div class="chrome-foot"><span>College of Engineering · Official Student Portal</span><span class="pg"><b>01</b> / 07</span></div>
+    </div>
+
+    <!-- ============ SLIDE 2 · THE PROBLEM ============ -->
+    <div class="slide">
+        <div class="chrome-top"><span>COE · BTMS</span><span>The Problem</span></div>
+        <div class="content">
+            <div style="display:flex; gap:clamp(28px,4.5vw,64px); align-items:center;">
+                <div style="flex:1.15; min-width:0;">
+                    <p class="kicker anim">The Problem</p>
+                    <h2 class="h-slide anim d1" style="margin: clamp(10px,2vh,20px) 0 clamp(14px,2.6vh,26px);">Trust doesn't break on purpose. <span class="em">It breaks on paperwork.</span></h2>
+                    <div class="rows">
+                        <div class="row anim d2">
+                            <span class="no">01</span>
+                            <span class="rt">Paper receipts</span>
+                            <span class="rd">fade, fold, and vanish before audit season</span>
+                        </div>
+                        <div class="row anim d3">
+                            <span class="no">02</span>
+                            <span class="rt">Manual spreadsheets</span>
+                            <span class="rd">slow to reconcile, easy to get wrong</span>
+                        </div>
+                        <div class="row anim d4">
+                            <span class="no">03</span>
+                            <span class="rt">Zero visibility</span>
+                            <span class="rd">members fund the org but never see the breakdown</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="flex:0.72; min-width:0;" class="anim d3">
+                    <div style="border:1px dashed rgba(249,115,22,0.45); background:rgba(249,115,22,0.05); border-radius:16px; padding:clamp(18px,2.6vw,36px); display:flex; flex-direction:column; gap:clamp(8px,1.6vh,14px);">
+                        <p style="font-family:var(--font-mono); font-size:clamp(9px,1.05vw,12px); letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin:0;">The old way</p>
+                        <div class="stat-big" style="font-size:clamp(32px,4.4vw,62px); letter-spacing:-1px;">2 to 3 <span style="color:var(--accent)">weeks</span></div>
+                        <p class="lede" style="margin:0;">to liquidate one single event</p>
+                        <hr style="border:none; border-top:1px solid var(--hairline); margin:clamp(4px,1vh,8px) 0;">
+                        <p style="font-size:clamp(14px,1.7vw,21px); font-weight:600; color:var(--ink); line-height:1.4; margin:0;">The money isn't missing.<br>The <i style="color:var(--accent)">proof</i> is.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chrome-foot"><span>College of Engineering · Official Student Portal</span><span class="pg"><b>02</b> / 07</span></div>
+    </div>
+
+    <!-- ============ SLIDE 3 · THE SYSTEM ============ -->
+    <div class="slide">
+        <div class="chrome-top"><span>COE · BTMS</span><span>The System</span></div>
+        <div class="content">
+            <p class="kicker anim">The Solution</p>
+            <h2 class="h-slide anim d1" style="margin: clamp(8px,1.6vh,16px) 0 clamp(14px,2.8vh,26px);">One portal for students. <span class="em">One console for the council.</span></h2>
+            <div style="display:flex; gap: clamp(16px,2.6vw,36px); align-items:stretch;">
+                <div style="flex:1; min-width:0;" class="anim d2">
+                    <div class="shot">
+                        <div class="shot-bar"><i></i><i></i><i></i><span class="url">coelgu-system.engineer</span></div>
+                        <img src="{{IMG:login}}" alt="Login">
+                    </div>
+                    <p class="caption">Secure sign-in · official CJC Google account</p>
+                </div>
+                <div style="flex:1; min-width:0;" class="anim d3">
+                    <div class="shot">
+                        <div class="shot-bar"><i></i><i></i><i></i><span class="url">coelgu-system.engineer</span></div>
+                        <img src="{{IMG:events}}" alt="Events">
+                    </div>
+                    <p class="caption">Every event · budget vs. actual in the open</p>
+                </div>
+            </div>
+            <p class="lede anim d4" style="margin-top: clamp(12px,2.4vh,22px);">
+                Any browser. Any phone. Installable. Works offline.
+            </p>
+        </div>
+        <div class="chrome-foot"><span>College of Engineering · Official Student Portal</span><span class="pg"><b>03</b> / 07</span></div>
+    </div>
+
+    <!-- ============ SLIDE 4 · WHAT'S INSIDE ============ -->
+    <div class="slide">
+        <div class="chrome-top"><span>COE · BTMS</span><span>Key Features</span></div>
+        <div class="content">
+            <div style="display:flex; gap:clamp(24px,4vw,56px); align-items:center;">
+                <div style="flex:1.15; min-width:0;">
+                    <p class="kicker anim">What's Inside</p>
+                    <h2 class="h-slide anim d1" style="margin: clamp(8px,1.6vh,16px) 0 clamp(12px,2.4vh,22px);">Built for <span class="em">everyday transparency</span></h2>
+                    <div class="rows">
+                        <div class="row anim d2"><span class="no">01</span><span class="rt" style="font-size:clamp(13px,1.6vw,19px);">Real-time dashboard</span><span class="rd">live totals, always current</span></div>
+                        <div class="row anim d2"><span class="no">02</span><span class="rt" style="font-size:clamp(13px,1.6vw,19px);">Events &amp; budgets tracker</span><span class="rd">budget vs. actual, per event</span></div>
+                        <div class="row anim d3"><span class="no">03</span><span class="rt" style="font-size:clamp(13px,1.6vw,19px);">Digital receipt vault</span><span class="rd">photo proof on every transaction</span></div>
+                        <div class="row anim d4"><span class="no">04</span><span class="rt" style="font-size:clamp(13px,1.6vw,19px);">One-click reports</span><span class="rd">audit-ready exports, anytime</span></div>
+                        <div class="row anim d5"><span class="no">05</span><span class="rt" style="font-size:clamp(13px,1.6vw,19px);">Grizz AI copilot</span><span class="rd">ask the ledger in plain language</span></div>
+                    </div>
+                </div>
+                <div style="flex:0.85; min-width:0;" class="anim d3">
+                    <div class="shot" style="max-width: 400px; margin: 0 auto;">
+                        <img src="{{IMG:grizzanswer}}" alt="Grizz AI">
+                    </div>
+                    <p class="caption" style="justify-content:center;">Grizz AI · answers from the live ledger</p>
+                </div>
+            </div>
+        </div>
+        <div class="chrome-foot"><span>College of Engineering · Official Student Portal</span><span class="pg"><b>04</b> / 07</span></div>
+    </div>
+
+    <!-- ============ SLIDE 5 · THE PROOF ============ -->
+    <div class="slide">
+        <div class="chrome-top"><span>COE · BTMS</span><span>Case Study</span></div>
+        <div class="content">
+            <div style="display:flex; gap:clamp(24px,4vw,56px); align-items:center;">
+                <div style="flex:1.1; min-width:0;">
+                    <p class="kicker anim">The Proof · One Real Liquidation</p>
+                    <h2 class="h-slide anim d1" style="margin: clamp(8px,1.6vh,16px) 0 clamp(14px,2.6vh,26px);">A <span class="em">₱150,000</span> event, fully liquidated</h2>
+                    <div class="stat-big anim d2"><span class="old">26 days</span> <span class="arr">→</span> <span class="new">3 minutes</span></div>
+                    <p class="lede anim d3" style="margin: clamp(8px,1.8vh,16px) 0 clamp(14px,2.6vh,26px);">Same funds. Same rules. A system instead of paper.</p>
+                    <div class="chips anim d4">
+                        <span class="chip"><b>28</b> digital receipts</span>
+                        <span class="chip"><b>0</b> lost documents</span>
+                        <span class="chip"><b>~80%</b> faster reporting</span>
+                    </div>
+                </div>
+                <div style="flex:0.9; min-width:0;" class="anim d3">
+                    <div class="shot" style="max-width: 420px; margin: 0 auto;">
+                        <div class="shot-bar"><i></i><i></i><i></i><span class="url">official receipt · attached to transaction</span></div>
+                        <img src="{{IMG:receipt}}" alt="Official Receipt">
+                    </div>
+                    <p class="caption" style="justify-content:center;">Actual receipt view · recorded in the system</p>
+                </div>
+            </div>
+        </div>
+        <div class="chrome-foot"><span>College of Engineering · Official Student Portal</span><span class="pg"><b>05</b> / 07</span></div>
+    </div>
+
+    <!-- ============ SLIDE 6 · WHY IT MATTERS ============ -->
+    <div class="slide">
+        <div class="chrome-top"><span>COE · BTMS</span><span>Why It Matters</span></div>
+        <div class="content">
+            <div style="display:flex; gap:clamp(24px,4vw,56px); align-items:center;">
+                <div style="flex:1.2; min-width:0;">
+                    <p class="kicker anim">Why It Matters</p>
+                    <h2 class="h-slide anim d1" style="margin: clamp(8px,1.6vh,16px) 0 clamp(12px,2.2vh,20px);">More than an app. <span class="em">A culture of trust.</span></h2>
+                    <div class="rows">
+                        <div class="row anim d2"><span class="no">✓</span><span class="rt" style="font-size:clamp(13px,1.6vw,19px);">Transparency</span><span class="rd">trust is earned in real time</span></div>
+                        <div class="row anim d2"><span class="no">✓</span><span class="rt" style="font-size:clamp(13px,1.6vw,19px);">Accountability</span><span class="rd">every peso has a record &amp; a receipt</span></div>
+                        <div class="row anim d3"><span class="no">✓</span><span class="rt" style="font-size:clamp(13px,1.6vw,19px);">Audit-ready</span><span class="rd">organized daily, not when auditors arrive</span></div>
+                        <div class="row anim d4"><span class="no">✓</span><span class="rt" style="font-size:clamp(13px,1.6vw,19px);">Scalable</span><span class="rd">same model works for LGUs &amp; councils</span></div>
+                    </div>
+                    <p class="quote anim d5" style="margin-top: clamp(14px,3vh,28px);">"Transparency shouldn't be a report you make once. <span class="em">It should be a system that never sleeps.</span>"</p>
+                </div>
+                <div style="flex:0.5; min-width:0; display:flex; flex-direction:column; align-items:center; gap:clamp(10px,2vh,18px);" class="anim d4">
+                    <img class="mascot" src="{{IMG:grizz}}" alt="Grizz">
+                    <p class="lede" style="text-align:center; font-size:clamp(11px,1.3vw,15px); max-width: 24ch;">Questions welcome.</p>
+                </div>
+            </div>
+        </div>
+        <div class="chrome-foot"><span>College of Engineering · Official Student Portal</span><span class="pg"><b>06</b> / 07</span></div>
+    </div>
+
+    <!-- ============ SLIDE 7 · THANK YOU + FEEDBACK QR ============ -->
+    <div class="slide">
+        <div class="chrome-top"><span>COE · BTMS</span><span>Thank You</span></div>
+        <div class="content">
+            <div style="display:flex; gap:clamp(28px,4.5vw,64px); align-items:center;">
+                <div style="flex:1.2; min-width:0;">
+                    <p class="kicker anim">Maraming Salamat Po · Thank You</p>
+                    <h2 class="h-slide anim d1" style="font-size:clamp(34px,5vw,64px); margin: clamp(10px,2vh,20px) 0 clamp(14px,2.6vh,26px);">Thank <span class="em">you!</span></h2>
+                    <p class="lede anim d2" style="max-width: 46ch;">You've seen what the system can do — now tell us how it feels to use it. Scan the code, sign in with your student account, and send your feedback straight to the council.</p>
+                    <div class="chips anim d3" style="margin-top: clamp(14px,2.8vh,26px);">
+                        <span class="chip"><b>8</b> questions</span>
+                        <span class="chip"><b>~2</b> minutes</span>
+                        <span class="chip">straight to the officers</span>
+                    </div>
+                </div>
+                <div style="flex:0.8; min-width:0; display:flex; flex-direction:column; align-items:center; gap:clamp(8px,1.6vh,14px);" class="anim d3">
+                    <div class="anim d4" style="background:#FFFFFF; border-radius:18px; padding:clamp(14px,1.8vw,22px); border:1px solid rgba(255,255,255,0.25); box-shadow:0 24px 70px -18px rgba(0,0,0,0.75), 0 0 0 1px rgba(249,115,22,0.15), 0 12px 44px -10px rgba(249,115,22,0.25);">
+                        <img src="{{IMG:qrFeedback}}" alt="QR code — feedback form" style="display:block; width:clamp(180px,22vw,280px); height:auto;">
+                    </div>
+                    <p class="caption" style="margin-top:0; color:var(--accent-soft);">Scan to leave your feedback</p>
+                    <p style="font-family:var(--font-mono); font-size:clamp(10px,1.2vw,14px); letter-spacing:1px; color:var(--muted); margin:0;">coelgu-system.engineer/feedback</p>
+                </div>
+            </div>
+        </div>
+        <div class="chrome-foot"><span>College of Engineering · Official Student Portal</span><span class="pg"><b>07</b> / 07</span></div>
+    </div>
+
+</div><!-- /.slide-deck -->
+
+<div class="nav-controls">
+    <button class="nav-btn" onclick="prevSlide()">←</button>
+    <span class="slide-counter"><span id="current">1</span> / <span id="total">6</span></span>
+    <button class="nav-btn" onclick="nextSlide()">→</button>
+</div>
+
+<script>
+    let current = 1;
+    const total = document.querySelectorAll('.slide').length;
+    document.getElementById('total').textContent = total;
+
+    function showSlide(n) {
+        if (n < 1) n = 1;
+        if (n > total) n = total;
+        current = n;
+        document.querySelectorAll('.slide').forEach((s, i) => {
+            s.classList.toggle('active', i === n - 1);
+        });
+        document.getElementById('current').textContent = n;
+        document.getElementById('progressBar').style.width = (n / total * 100) + '%';
+    }
+
+    function nextSlide() { showSlide(current + 1); }
+    function prevSlide() { showSlide(current - 1); }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+        if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+        if (e.key === 'Home') { e.preventDefault(); showSlide(1); }
+        if (e.key === 'End') { e.preventDefault(); showSlide(total); }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-controls')) nextSlide();
+    });
+
+    showSlide(1);
+</script>
+</body>
+</html>

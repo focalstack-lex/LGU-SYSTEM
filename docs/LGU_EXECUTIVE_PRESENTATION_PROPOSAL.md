@@ -5,7 +5,7 @@
 > **Target Audience:** Local Chief Executives (Mayors/Governors/Deans), Sanggunian Members, Barangay Captains, Treasurers, Budget Officers, Planning Coordinators, and Department Heads.  
 > **Core Objective:** Plain-language demonstration of how modernizing our financial management builds constituent trust, ensures 100% audit readiness, and saves hundreds of staff hours.
 
----
+
 
 ## 📑 Table of Contents
 1. [Executive Summary](#1-executive-summary)
@@ -45,7 +45,7 @@ Our **LGU Financial Transparency and Monitoring System** is an all-in-one, user-
 - **Drastically cuts liquidation time:** From 2–3 weeks of paper gathering to a single click.
 - **Compliant with Good Governance Standards:** Supports the Department of the Interior and Local Government (DILG) Full Disclosure Policy and Commission on Audit (COA) requirements.
 
----
+
 
 ## 2. The Reality Today: The Cost of Traditional Manual Systems
 
@@ -58,7 +58,7 @@ Our **LGU Financial Transparency and Monitoring System** is an all-in-one, user-
 | ⏳ **Liquidation Bottlenecks** | Gathering receipts, balancing totals, and drafting reports takes weeks of overtime before deadlines. | Delayed releases for future project funding; unliquidated cash advances. |
 | 🗣️ **Public Skepticism** | Citizens and members ask *"Saan napunta ang pondo?"* (Where did the money go?) but reports are published late or on printed paper boards. | Misinformation, public distrust, and lack of engagement from constituents. |
 
----
+
 
 ## 3. The Solution: LGU Financial Transparency & Monitoring System
 
@@ -86,7 +86,7 @@ The system acts as a **Single Source of Truth** for the entire organization. It 
                      └─────────────────────────────────────────┘
 ```
 
----
+
 
 ## 4. System Tour in Plain English (Zero Tech Jargon)
 
@@ -125,7 +125,7 @@ Here is what each module does in simple government operational terms:
   - *"Where can I download the latest financial statement?"*
 * **Value:** Answers routine inquiries 24/7 without burdening office staff.
 
----
+
 
 ## 5. Real-World Case Studies & Scenarios
 
@@ -134,61 +134,61 @@ Here is what each module does in simple government operational terms:
 ```
 ────────────────────────────────────────────────────────────────────────────────
 BEFORE (Manual System):
-• Budget allocated: ₱150,000.
-• 12 different committee members bought food, stage rentals, prizes, and tokens.
-• 3 receipts got soaked in water during setup; 2 thermal receipts faded completely.
-• The Treasurer spent 14 nights sorting crumpled papers, finding a ₱4,250 discrepancy.
-• Final liquidation submission took 26 days after the event.
+- Budget allocated: ₱150,000.
+- 12 different committee members bought food, stage rentals, prizes, and tokens.
+- 3 receipts got soaked in water during setup; 2 thermal receipts faded completely.
+- The Treasurer spent 14 nights sorting crumpled papers, finding a ₱4,250 discrepancy.
+- Final liquidation submission took 26 days after the event.
 ────────────────────────────────────────────────────────────────────────────────
 AFTER (With the LGU Transparency System):
-• Event created with ₱150,000 allocated budget ceiling in the system.
-• Committee leads uploaded photo receipts from their phones at the moment of purchase.
-• Dashboard showed remaining balance updating live as each expense was logged.
-• At the conclusion of the event, the Treasurer clicked "Export Liquidation Report".
-• Total liquidation generated with all 28 digital receipts attached in 3 minutes!
+- Event created with ₱150,000 allocated budget ceiling in the system.
+- Committee leads uploaded photo receipts from their phones at the moment of purchase.
+- Dashboard showed remaining balance updating live as each expense was logged.
+- At the conclusion of the event, the Treasurer clicked "Export Liquidation Report".
+- Total liquidation generated with all 28 digital receipts attached in 3 minutes!
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
----
+
 
 ### Case Study 2: Answering a Constituent Inquiry at the Council Hall
 
 ```
 ────────────────────────────────────────────────────────────────────────────────
 BEFORE (Manual System):
-• A constituent questions: "Why did the relief program cost ₱80,000?"
-• Officers had to look through physical filing cabinets, schedule a follow-up meeting, 
+- A constituent questions: "Why did the relief program cost ₱80,000?"
+- Officers had to look through physical filing cabinets, schedule a follow-up meeting, 
   and photocopy old logbooks.
-• Result: Suspicion grew online before the data could be found.
+- Result: Suspicion grew online before the data could be found.
 ────────────────────────────────────────────────────────────────────────────────
 AFTER (With the LGU Transparency System):
-• Officer opens the Public Transparency Dashboard on a tablet during the session.
+- Officer opens the Public Transparency Dashboard on a tablet during the session.
 • Searches "Relief Program" - immediately displays total breakdown:
   - 500 Food Packs @ ₱120/pack = ₱60,000 (with supplier receipt attached)
   - Logistics & Fuel = ₱12,000 (with pump receipt attached)
   - Remaining ₱8,000 returned to general fund.
-• Constituent sees verified proof immediately. Trust is strengthened on the spot!
+- Constituent sees verified proof immediately. Trust is strengthened on the spot!
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
----
+
 
 ### Case Study 3: Preparing for Commission on Audit (COA) Inspection
 
 ```
 ────────────────────────────────────────────────────────────────────────────────
 BEFORE:
-• 3 weeks of panic: Printing old spreadsheets, cross-checking bank records,
+- 3 weeks of panic: Printing old spreadsheets, cross-checking bank records,
   hunting down former officers for missing vouchers.
 ────────────────────────────────────────────────────────────────────────────────
 AFTER:
-• Auditor is given secure read-only review access or an exported digital packet.
-• Every single entry has: Date + Time + User who entered it + Exact receipt scan.
-• Zero unliquidated mysteries. Audit passed with flying colors!
+- Auditor is given secure read-only review access or an exported digital packet.
+- Every single entry has: Date + Time + User who entered it + Exact receipt scan.
+- Zero unliquidated mysteries. Audit passed with flying colors!
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
----
+
 
 ## 6. Department-by-Department Benefits Matrix
 
@@ -201,7 +201,7 @@ AFTER:
 | 🔍 **Internal Auditor / COA Liaison** | Verification, compliance, voucher audit | Tamper-proof audit logs showing who created, edited, or approved any transaction with timestamp. |
 | 👥 **Constituents & Stakeholders** | Right to information, community participation | Access to a transparent public portal showing honest government stewardship in action. |
 
----
+
 
 ## 7. The Journey of One Peso: Visual Workflow
 
@@ -222,7 +222,7 @@ flowchart TD
     style G fill:#fbe9e7,stroke:#d84315,stroke-width:2px;
 ```
 
----
+
 
 ## 8. Security, Accountability & Legal Compliance
 
@@ -240,7 +240,7 @@ Non-technical officers often ask: *"Is our data safe? Can somebody tamper with t
 4. **Cloud Redundancy & Automated Backups:**
    - Database backups run automatically every week with 90-day retention. If a municipal office computer crashes or catches fire, zero records are lost.
 
----
+
 
 ## 9. Smart AI Assistant: Your 24/7 Office Companion
 
@@ -253,7 +253,7 @@ Integrated inside the platform is **"Grizz / URSA"**, an intelligent assistant d
   - *"Paano mag-upload ng resibo?"* (Step-by-step receipt upload guide)
 - **Guided Navigation:** AI takes the user directly to the relevant report or screen with one click.
 
----
+
 
 ## 10. Implementation Plan & 4-Week Rollout Roadmap
 
@@ -279,7 +279,7 @@ Adopting this system does not require months of downtime. Here is our structured
   - Full operational deployment across all offices.
   - Public transparency link made accessible to constituents.
 
----
+
 
 ## 11. Frequently Asked Questions (FAQ) for Officers
 
@@ -298,7 +298,7 @@ Adopting this system does not require months of downtime. Here is our structured
 **Q5: What hardware do we need to buy?**  
 > *Answer:* Zero new hardware required! The platform runs smoothly on existing office PCs, laptops, Android phones, or iPhones.
 
----
+
 
 ## 12. Next Steps & Recommendation for Official Adoption
 
@@ -308,7 +308,7 @@ To bring these benefits to our organization, we recommend the following simple a
 2. **Designation of Key Focal Persons:** Appoint the Lead Finance Officer / Treasurer as Primary Administrator.
 3. **Schedule 1-Hour Orientation Session:** Schedule a live demonstration and onboarding workshop for all departmental heads and project leads.
 
----
+
 
 ### 📞 Contact & System Information
 - **System Name:** LGU Financial Transparency and Monitoring System

@@ -18,6 +18,11 @@ const OfficerApp = (() => {
     if (execEventActions) execEventActions.style.display = exec ? '' : 'none';
     const announceFormCard = $('of-exec-announce-card');
     if (announceFormCard) announceFormCard.style.display = exec ? '' : 'none';
+    // Curriculum Manager is admin-only: hide its nav entries for other roles
+    const isAdmin = _profile && _profile.role === 'admin';
+    document.querySelectorAll('[data-of="curriculum"]').forEach(el => {
+      el.style.display = isAdmin ? '' : 'none';
+    });
   }
 
   let _profile   = null;
@@ -214,12 +219,16 @@ const OfficerApp = (() => {
       }
     });
 
-    $('of-shell').classList.remove('hidden');
+    document.body.classList.remove('more-sheet-open');
+    document.body.style.overflow = '';
+    document.body.style.touchAction = '';
+    $('of-shell')?.classList.remove('hidden');
+    $('of-bottom-nav')?.classList.remove('hidden');
 
     try {
       await refreshCoreData();
       const savedSection = window.location.hash.slice(1) || localStorage.getItem('officer_last_view') || 'overview';
-      const validSections = ['overview', 'record', 'events', 'reports', 'people', 'announcements', 'roster'];
+      const validSections = ['overview', 'record', 'events', 'reports', 'people', 'announcements', 'roster', 'curriculum'];
       const targetSection = validSections.includes(savedSection) ? savedSection : 'overview';
       await switchSection(targetSection);
     } catch (err) {
@@ -241,7 +250,7 @@ const OfficerApp = (() => {
 
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.slice(1);
-    const validSections = ['overview', 'record', 'events', 'reports', 'people', 'announcements', 'roster'];
+    const validSections = ['overview', 'record', 'events', 'reports', 'people', 'announcements', 'roster', 'curriculum'];
     if (validSections.includes(hash)) {
       switchSection(hash);
     }
@@ -431,6 +440,12 @@ const OfficerApp = (() => {
           }
         });
       });
+
+      sheet.querySelectorAll('a.mobile-sheet-row, a[href]').forEach(a => {
+        a.addEventListener('click', () => {
+          closeSheet();
+        });
+      });
     }
   }
 
@@ -458,6 +473,12 @@ const OfficerApp = (() => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const diff = currentScrollTop - lastScrollTop;
+
+          // Do not reveal bottom nav if Grizz AI assistant or mobile more drawer is open
+          if (document.body.classList.contains('ursa-open') || document.body.classList.contains('more-sheet-open')) {
+            ticking = false;
+            return;
+          }
 
           if (currentScrollTop <= 25 || isAtBottom) {
             // At the top OR reached the bottom -> Always reveal floating bottom nav!
@@ -490,8 +511,10 @@ const OfficerApp = (() => {
 
   async function switchSection(section) {
     if (!section || !$(`of-view-${section}`)) section = 'overview';
+    // Curriculum Manager is admin-only: fall back for non-admin deep links
+    if (section === 'curriculum' && (!(_profile) || _profile.role !== 'admin')) section = 'overview';
 
-    const moreSections = ['roster', 'people', 'announcements'];
+    const moreSections = ['roster', 'people', 'announcements', 'curriculum'];
     const isMoreActive = moreSections.includes(section);
     const moreBtn = $('of-bottom-nav-more-btn');
     if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
@@ -521,6 +544,7 @@ const OfficerApp = (() => {
       else if (section === 'people')       { await loadPeople(!isFirstLoad); }
       else if (section === 'announcements') { await loadAnnouncements(!isFirstLoad); }
       else if (section === 'roster')       { await loadRoster(!isFirstLoad); }
+      else if (section === 'curriculum')   { await loadCurriculum(); }
     } catch (err) {
       if (isFirstLoad) toast(err.message || 'Failed to load section.', 'error');
     } finally {
@@ -686,14 +710,17 @@ const OfficerApp = (() => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '74%',
+        cutout: '68%',
+        layout: {
+          padding: { top: 6, bottom: 8, left: 6, right: 6 }
+        },
         plugins: {
           legend: {
             position: 'bottom',
             labels: {
               color: textColor,
-              font: { family: 'Inter, sans-serif', size: 12, weight: '500' },
-              padding: 16,
+              font: { family: 'Inter, sans-serif', size: 11, weight: '500' },
+              padding: 12,
               usePointStyle: true,
               pointStyle: 'circle',
               boxWidth: 7,
@@ -2011,6 +2038,22 @@ const OfficerApp = (() => {
         <span class="of-when">${UI.dateStr(a.created_at)}</span>
       </div>`).join('')
       : '<p style="font-size:0.82rem;color:var(--text-secondary)">No announcements yet.</p>';
+  }
+
+  // ---------- Curriculum Manager (admin-only) ----------
+
+  let _curriculumInited = false; // one-time CurriculumManager.init() guard
+
+  async function loadCurriculum() {
+    if (typeof CurriculumManager === 'undefined') return;
+    if (_curriculumInited) return;
+    _curriculumInited = true;
+    try {
+      await CurriculumManager.init();
+    } catch (err) {
+      _curriculumInited = false; // allow retry on next open
+      throw err;
+    }
   }
 
   // ---------- Enrolled Roster Management ----------

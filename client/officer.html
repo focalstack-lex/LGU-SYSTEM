@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
   <meta name="robots" content="noindex" />
   <title>Executive Portal - College of Engineering</title>
   <!-- PWA: installable app with home-screen icon and offline shell -->
@@ -15,10 +16,9 @@
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" href="assets/coe-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=4.0" />
-  <link rel="stylesheet" href="styles/officer.css?v=4.1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css?v=7.2" />
+  <link rel="stylesheet" href="styles/officer.css?v=6.5" />
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.2/dist/iconify-icon.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script>
@@ -95,6 +95,9 @@
         </button>
         <button type="button" class="nav-item" data-of="roster">
           <span class="nav-icon"><iconify-icon icon="solar:user-plus-linear"></iconify-icon></span><span>Enrolled Roster</span>
+        </button>
+        <button type="button" class="nav-item" data-of="curriculum">
+          <span class="nav-icon"><iconify-icon icon="solar:book-bookmark-linear"></iconify-icon></span><span>Curriculum</span>
         </button>
         <a href="/" class="nav-item of-nav-back-link" title="Back to Main Dashboard">
           <span class="nav-icon"><iconify-icon icon="solar:home-2-linear"></iconify-icon></span><span>Main Dashboard</span>
@@ -604,6 +607,38 @@
         </div>
       </section>
 
+      <!-- 8. Curriculum Manager (Admin Only) -->
+      <section class="of-view" id="of-view-curriculum">
+        <div class="view-header of-view-head">
+          <div>
+            <h2>Curriculum Manager</h2>
+            <p class="view-sub">Edit lecture/laboratory components and prerequisites. Changes are audit-logged.</p>
+          </div>
+        </div>
+        <div id="curriculum-section">
+          <div class="curriculum-filters">
+            <select id="curriculum-program" class="of-select" aria-label="Program"></select>
+            <select id="curriculum-year" class="of-select" aria-label="Year level">
+              <option value="">All years</option>
+              <option value="1">Year 1</option>
+              <option value="2">Year 2</option>
+              <option value="3">Year 3</option>
+              <option value="4">Year 4</option>
+            </select>
+            <select id="curriculum-sem" class="of-select" aria-label="Semester">
+              <option value="">All semesters</option>
+              <option value="1">1st</option>
+              <option value="2">2nd</option>
+              <option value="3">Summer</option>
+            </select>
+          </div>
+          <div class="of-card">
+            <div id="curriculum-grid"></div>
+          </div>
+          <div id="curriculum-prereq-editor" hidden></div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -662,6 +697,17 @@
             <div class="mobile-sheet-row-content">
               <span class="mobile-sheet-row-title">Enrolled Roster</span>
               <span class="mobile-sheet-row-desc">Student database verification & approvals</span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
+          </button>
+
+          <button type="button" class="mobile-sheet-row" data-of="curriculum" data-of-sheet-action="nav">
+            <div class="mobile-sheet-row-icon" style="color:#A78BFA; background:rgba(167,139,250,0.12);">
+              <iconify-icon icon="solar:book-bookmark-linear"></iconify-icon>
+            </div>
+            <div class="mobile-sheet-row-content">
+              <span class="mobile-sheet-row-title">Curriculum Manager</span>
+              <span class="mobile-sheet-row-desc">Lec/lab components &amp; prerequisites</span>
             </div>
             <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
           </button>
@@ -1090,19 +1136,20 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="vendor/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="js/config.js?v=5.3"></script>
+  <script src="js/config.js?v=5.5"></script>
   <script src="js/roster.js?v=5.3"></script>
-  <script src="js/auth.js?v=5.3"></script>
+  <script src="js/auth.js?v=5.4"></script>
   <script src="js/api.js?v=5.3"></script>
-  <script src="js/ui.js?v=5.4"></script>
+  <script src="js/ui.js?v=5.7"></script>
   <script src="js/receipt-capture.js?v=5.3"></script>
   <script src="js/receipt-modal.js?v=5.4"></script>
   <script src="js/dropdown.js?v=5.3"></script>
   <script src="js/profile.js?v=5.3"></script>
   <script src="js/notifications.js?v=5.3"></script>
-  <script src="js/officer/officer-app.js?v=5.4"></script>
+  <script src="js/officer/curriculum.js?v=1.0"></script>
+  <script src="js/officer/officer-app.js?v=6.3"></script>
   <script>
     // PWA: register the app-shell service worker (skipped in Electron's file:// windows)
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {

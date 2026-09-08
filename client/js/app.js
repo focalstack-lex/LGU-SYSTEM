@@ -91,6 +91,20 @@
     if (el) Dropdowns.bindDropdown(el);
   });
 
+  // Auto-calculate enrollment year based on selected Year Level (SY 2026-2027 base: 2026)
+  const onboardingYearSelect = document.getElementById('onboarding-year');
+  const onboardingEnrollSelect = document.getElementById('onboarding-enrollment-year');
+  if (onboardingYearSelect && onboardingEnrollSelect) {
+    onboardingYearSelect.addEventListener('change', () => {
+      const y = parseInt(onboardingYearSelect.value, 10);
+      if (y >= 1 && y <= 5) {
+        const computedYear = String(2026 - (y - 1));
+        onboardingEnrollSelect.value = computedYear;
+        Dropdowns.syncAll();
+      }
+    });
+  }
+
   // Every other select in the logged-in app
   Dropdowns.bindAll('#app-screen');
 
@@ -504,11 +518,17 @@
       try { sessionStorage.removeItem('lastView'); } catch { /* storage unavailable */ }
       UI.showScreen('auth');
       Dashboard.destroy();
+      if (typeof Notifications !== 'undefined' && Notifications.destroy) {
+        Notifications.destroy();
+      }
     }
   });
 
   // ---- Boot on existing session ----
-  const session = await Auth.getSession();
+  // validateSession() (not plain getSession()) drops localStorage sessions whose
+  // token the server no longer accepts — those are what produce the recurring
+  // JwtSignatureError noise in the Supabase realtime logs.
+  const session = await (Auth.validateSession ? Auth.validateSession() : Auth.getSession());
   if (session) {
     if (_bootedUserId !== session.user.id) {
       _bootedUserId = session.user.id;
@@ -546,7 +566,7 @@
     UI.showView(view);
 
     // Sync active class on both sidebar and bottom nav
-    const moreViews = ['income', 'units', 'admin'];
+    const moreViews = ['income', 'units', 'enrollment', 'admin'];
     const isMoreActive = moreViews.includes(view);
     const moreBtn = document.getElementById('bottom-nav-more-btn');
     if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
@@ -569,6 +589,7 @@
         Income.bindForm();
     }
     if (view === 'units')       Units.load();
+    if (view === 'enrollment')  EnrollmentSection.load();
     if (view === 'admin')        Admin.init();
   }
 
@@ -685,6 +706,12 @@
           }
         });
       });
+
+      sheet.querySelectorAll('a.mobile-sheet-row, a[href]').forEach(a => {
+        a.addEventListener('click', () => {
+          closeSheet();
+        });
+      });
     }
   }
   bindMobileMoreSheet();
@@ -753,6 +780,14 @@
     const profile = await Auth.getProfile();
     const roleKey = profile?.role || 'student';
     const officerRole = ['admin', 'governor', 'cashier', 'officer'].includes(roleKey);
+    const facultyRole = ['faculty', 'program_head', 'dean'].includes(roleKey);
+
+    // Faculty roles land directly in the faculty portal - the student
+    // masterlist/verification gate below does not apply to them.
+    if (facultyRole && !isOffline) {
+      window.location.replace('/faculty');
+      return;
+    }
 
     const offlineBanner = document.getElementById('offline-banner');
     if (offlineBanner) offlineBanner.classList.toggle('hidden', !isOffline);
@@ -810,7 +845,7 @@
 
     // Sidebar & Mobile Header user info
     const displayName = profile?.full_name || session.user.email;
-    const roleLabels  = { admin: 'Administrator', governor: 'Governor', cashier: 'Cashier', officer: 'Officer', student: 'Student' };
+    const roleLabels  = { admin: 'Administrator', governor: 'Governor', cashier: 'Cashier', officer: 'Officer', student: 'Student', faculty: 'Faculty / Student Assistant', program_head: 'Program Head', dean: 'Dean' };
     const roleLabel   = roleLabels[roleKey] || UI.capitalize(roleKey);
 
     document.getElementById('user-name').textContent   = displayName;
@@ -838,6 +873,10 @@
       GrizzAI.init();
     } else if (window.UrsaAI) {
       UrsaAI.init();
+    }
+
+    if (typeof Notifications !== 'undefined' && Notifications.init) {
+      Notifications.init();
     }
 
     // Return the user to the view they were last on instead of resetting to

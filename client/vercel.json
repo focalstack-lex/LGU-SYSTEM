@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    { "source": "/faculty", "destination": "/faculty.html" },
+    { "source": "/faculty/", "destination": "/faculty.html" },
+    { "source": "/cv-builder", "destination": "/cv-builder.html" },
+    { "source": "/cv-builder/", "destination": "/cv-builder.html" },
+    { "source": "/cv-verify", "destination": "/cv-verify.html" },
+    { "source": "/cv-verify/", "destination": "/cv-verify.html" },
+    { "source": "/feedback", "destination": "/feedback/index.html" },
+    { "source": "/feedback/", "destination": "/feedback/index.html" },
+    { "source": "/feedback/view", "destination": "/feedback/view/index.html" },
+    { "source": "/feedback/view/", "destination": "/feedback/view/index.html" }
+  ]
+}

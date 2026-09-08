@@ -157,13 +157,16 @@ const Api = (() => {
   };
 
   const admin = {
-    users:          ()         => _request('GET',   '/admin/users', null, false, 30000),
-    setRole:        (id, role) => _request('PATCH', `/admin/users/${id}/role`, { role }),
-    auditLogs:      (params={})=> {
+    users:                  ()            => _request('GET',   '/admin/users', null, false, 30000),
+    setRole:                (id, role)    => _request('PATCH', `/admin/users/${id}/role`, { role }),
+    verifyUser:             (id)          => _request('POST',  `/admin/users/${id}/verify`),
+    sendApprovalEmail:      (email, full_name) => _request('POST', '/admin/send-approval-email', { email, full_name }),
+    backfillApprovalEmails: ()            => _request('POST',  '/admin/backfill-approval-emails'),
+    auditLogs:              (params={})   => {
       const q = new URLSearchParams(params).toString();
       return _request('GET', `/admin/audit-logs${q ? '?' + q : ''}`, null, false, 30000);
     },
-    transfer:       (body)     => _request('POST',  '/admin/budget-transfer', body),
+    transfer:               (body)        => _request('POST',  '/admin/budget-transfer', body),
   };
 
   const units = {
@@ -179,6 +182,44 @@ const Api = (() => {
     list:   ()       => _request('GET',  '/announcements', null, false, 45000),
     create: (body)   => _request('POST', '/announcements', body),
   };
+
+  // Enrollment submissions (Phase B): student draft/submit flow.
+  const enrollment = {
+    my:        () => _request('GET', '/enrollment/submissions/my', null, false, 15000),
+    createTerm: (school_year, semester) => _request('POST', '/enrollment/submissions', { school_year, semester }),
+    addItem:   (id, subject_id, grizz_reason) => _request('POST', `/enrollment/submissions/${id}/items`,
+                  grizz_reason ? { subject_id, origin: 'grizz', grizz_reason } : { subject_id }),
+    removeItem:(id, itemId) => _request('DELETE', `/enrollment/submissions/${id}/items/${itemId}`),
+    submit:    (id) => _request('POST', `/enrollment/submissions/${id}/submit`),
+  };
+
+  // Faculty portal (Phase B): program-head evaluation + SA encoding queue.
+  const faculty = {
+    submissions: (status) => _request('GET', `/faculty/submissions${status ? '?status=' + encodeURIComponent(status) : ''}`, null, false, 15000),
+    detail:      (id) => _request('GET', `/faculty/submissions/${id}`, null, false, 0),
+    open:        (id) => _request('POST', `/faculty/submissions/${id}/open`),
+    addItem:     (id, subject_id, head_note) => _request('POST', `/faculty/submissions/${id}/items`, { subject_id, head_note }),
+    removeItem:  (id, itemId, head_note) => _request('PATCH', `/faculty/submissions/${id}/items/${itemId}`, { head_note }),
+    approve:     (id, notes) => _request('POST', `/faculty/submissions/${id}/approve`, notes ? { notes } : {}),
+    return:      (id, notes) => _request('POST', `/faculty/submissions/${id}/return`, { notes }),
+    reject:      (id, notes) => _request('POST', `/faculty/submissions/${id}/reject`, { notes }),
+    markEncoded: (id) => _request('POST', `/faculty/submissions/${id}/mark-encoded`),
+    exportBlob: async (id) => {
+      const token = await _getToken();
+      const res = await fetch(`${window.API_BASE}/api/faculty/submissions/${id}/export`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error('Export failed.');
+      return res.blob();
+    },
+  };
+
+  // Curriculum management (Phase A). The route contract uses full /api/...
+  // paths, but _request already prepends the /api prefix itself, so this
+  // local shim strips it before delegating to the shared request helper.
+  const request = (method, path, body) =>
+    _request(method, path.replace(/^\/api(?=\/)/, ''), body);
+
 
   // ---- Background Pre-fetch Queue (Paced & Idle-friendly) ----
   async function prefetchAll(role = 'student', program = 'BSCoE') {
@@ -459,7 +500,7 @@ const Api = (() => {
         .from('enrollment_verification_requests')
         .select('*')
         .eq('id', requestId)
-        .single();
+        .maybeSingle();
       if (reqErr || !req) throw new Error(reqErr?.message || 'Verification request not found');
 
       // 2. Insert into enrolled_students (ignore if duplicate)
@@ -487,10 +528,31 @@ const Api = (() => {
         })
         .eq('id', requestId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw new Error(error.message);
-      return data;
+
+      // 4. Verify user account profile & dispatch Gmail notification
+      const targetUserId = req.user_id;
+      const targetEmail = req.email || req.user_email;
+
+      if (targetUserId) {
+        try {
+          await admin.verifyUser(targetUserId);
+        } catch (err) {
+          console.warn('[RosterRequests] User profile verification by ID note:', err?.message || err);
+        }
+      }
+      
+      if (targetEmail) {
+        try {
+          await admin.sendApprovalEmail(targetEmail, req.full_name || studentName);
+        } catch (err) {
+          console.warn('[RosterRequests] Direct email approval dispatch note:', err?.message || err);
+        }
+      }
+
+      return data || req;
     },
 
     async bulkApprove(requestIds) {
@@ -535,7 +597,15 @@ const Api = (() => {
         .select();
 
       if (updateErr) throw new Error(updateErr.message);
-      return data || [];
+
+      // Verify user profiles & dispatch Gmail notification
+      for (const r of reqs) {
+        if (r.user_id) {
+          admin.verifyUser(r.user_id).catch(() => {});
+        }
+      }
+
+      return data || reqs;
     },
 
     async reject(requestId, reason = '') {
@@ -552,7 +622,7 @@ const Api = (() => {
         })
         .eq('id', requestId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw new Error(error.message);
       return data;
@@ -570,6 +640,21 @@ const Api = (() => {
     admin,
     units,
     announcements,
+    // Load submission flows (Phase B): student enrollment + faculty evaluation.
+    enrollment,
+    faculty,
+    // Curriculum management (Phase A): contract paths are full /api/... —
+    // `request` (above) strips the prefix before delegating to _request.
+    curriculum: {
+      subjects: (program) =>
+        request('GET', `/api/units/checklists?program=${encodeURIComponent(program)}`),
+      updateComponents: (id, lec_units, lab_units) =>
+        request('PATCH', `/api/curriculum/subjects/${id}`, { lec_units, lab_units }),
+      prerequisites: (subjectId) =>
+        request('GET', `/api/curriculum/subjects/${subjectId}/prerequisites`),
+      addPrereq: (payload) => request('POST', '/api/curriculum/prerequisites', payload),
+      deletePrereq: (id) => request('DELETE', `/api/curriculum/prerequisites/${id}`),
+    },
     roster,
     rosterRequests,
     profile,

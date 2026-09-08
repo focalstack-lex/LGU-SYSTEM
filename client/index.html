@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
   <title>College of Engineering · Official Student Portal</title>
   <!-- PWA: installable app with home-screen icon and offline shell -->
   <link rel="manifest" href="manifest.json" />
@@ -15,11 +16,10 @@
   <link rel="icon" type="image/png" href="assets/coe-logo.png" />
   <meta name="description" content="Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=4.1" />
-  <link rel="stylesheet" href="styles/ai.css?v=4.0" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css?v=7.2" />
+  <link rel="stylesheet" href="styles/ai.css?v=6.5" />
+  <script src="vendor/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.2/dist/iconify-icon.min.js" defer></script>
   <script>
@@ -296,6 +296,9 @@
         </a>
         <a href="#" class="nav-item" data-view="units" id="nav-units">
           <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span><span>Academic Progress</span>
+        </a>
+        <a href="#" class="nav-item" data-view="enrollment" id="nav-enrollment">
+          <span class="nav-icon"><iconify-icon icon="solar:clipboard-check-linear"></iconify-icon></span><span>Load Verification</span>
         </a>
         <a href="/officer.html" class="nav-item officer-only hidden" id="nav-executive-portal">
           <span class="nav-icon"><iconify-icon icon="solar:shield-user-linear"></iconify-icon></span><span>Executive Portal</span>
@@ -642,6 +645,34 @@
           <!-- Right: Grouped syllabus checklist -->
           <div class="units-checklist" id="units-checklist">
             <div class="loading-state">Loading curriculum…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Load Verification (Phase B) -->
+      <section class="view" id="view-enrollment">
+        <div class="view-header">
+          <div>
+            <h2>Load Verification</h2>
+            <p class="view-sub">Build your proposed load and send it to your Program Head for evaluation</p>
+          </div>
+        </div>
+
+        <div class="enrollment-grid">
+          <div class="enrollment-card" id="enrollment-draft-card">
+            <h3>Proposed Load</h3>
+            <p class="enrollment-note" id="enrollment-term-line"></p>
+            <div id="enrollment-items"></div>
+            <div class="enrollment-picker">
+              <select id="enrollment-subject-select" aria-label="Choose a subject"></select>
+              <button type="button" class="btn btn-primary" id="enrollment-add-btn">Add Subject</button>
+            </div>
+            <div class="auth-error hidden" id="enrollment-error"></div>
+            <button type="button" class="btn btn-primary" id="enrollment-submit-btn">Submit for Verification</button>
+          </div>
+          <div class="enrollment-card" id="enrollment-status-card">
+            <h3>Submission Status</h3>
+            <div id="enrollment-status-body"><p class="enrollment-empty">No submission for this term yet.</p></div>
           </div>
         </div>
       </section>
@@ -1209,7 +1240,7 @@
     <span id="toast-message">Action completed.</span>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="vendor/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <!-- Skeleton Loading Screen (replaces logo splash) -->
@@ -1504,11 +1535,11 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=5.3"></script>
-  <script src="js/roster.js?v=5.3"></script>
-  <script src="js/auth.js?v=5.3"></script>
+  <script src="js/config.js?v=5.5"></script>
+  <script src="js/roster.js?v=5.4"></script>
+  <script src="js/auth.js?v=5.4"></script>
   <script src="js/api.js?v=5.3"></script>
-  <script src="js/ui.js?v=5.4"></script>
+  <script src="js/ui.js?v=5.7"></script>
   <script src="js/dashboard.js?v=5.3"></script>
   <script src="js/events.js?v=5.3"></script>
   <script src="js/transactions.js?v=5.3"></script>
@@ -1519,10 +1550,11 @@
   <script src="js/receipt-modal.js?v=5.4"></script>
   <script src="js/dropdown.js?v=5.3"></script>
   <script src="js/admin.js?v=5.3"></script>
-  <script src="js/ai-assistant.js?v=5.3"></script>
+  <script src="js/ai-assistant.js?v=5.5"></script>
   <script src="js/profile.js?v=5.3"></script>
   <script src="js/notifications.js?v=5.3"></script>
-  <script src="js/app.js?v=5.4"></script>
+  <script src="js/enrollment.js?v=1.1"></script>
+  <script src="js/app.js?v=6.5"></script>
   <script>
     // PWA: register the app-shell service worker (skipped in Electron's file:// windows)
     if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {

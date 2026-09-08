@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback · Developer View</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/grizz.png" />
+  <link rel="stylesheet" href="/styles/feedback.css" />
+  <link rel="stylesheet" href="/styles/feedback-view.css" />
+</head>
+<body>
+  <main class="fb">
+
+    <!-- Login gate -->
+    <section id="view-login" class="hidden">
+      <header class="fb-head">
+        <p class="fb-overline">College of Engineering · Student Council</p>
+        <h1>Feedback</h1>
+        <p class="fb-sub">Developer view. Sign in with an allowlisted account.</p>
+      </header>
+      <form id="fbv-login-form" class="fbv-login" novalidate>
+        <label class="fbv-field">
+          <span>Email</span>
+          <input type="email" id="fbv-email" autocomplete="email" required />
+        </label>
+        <label class="fbv-field">
+          <span>Password</span>
+          <input type="password" id="fbv-password" autocomplete="current-password" required />
+        </label>
+        <button type="submit" id="fbv-login-btn">Sign in</button>
+        <button type="button" id="fbv-google-btn" class="fbv-secondary">Continue with Google</button>
+        <p class="fb-error hidden" id="fbv-login-error" role="alert"></p>
+      </form>
+    </section>
+
+    <!-- Data view -->
+    <section id="view-data" class="hidden">
+      <header class="fb-head fbv-head-row">
+        <div>
+          <p class="fb-overline">Developer · Submissions</p>
+          <h1>Feedback</h1>
+        </div>
+        <div class="fbv-actions">
+          <button type="button" id="fbv-refresh" class="fbv-secondary">Refresh</button>
+          <button type="button" id="fbv-logout" class="fbv-secondary">Sign out</button>
+        </div>
+      </header>
+
+      <div class="fbv-stats" id="fbv-stats"></div>
+
+      <div class="fbv-list" id="fbv-list"></div>
+      <p class="fb-error hidden" id="fbv-error" role="alert"></p>
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/feedback-view.js"></script>
+</body>
+</html>

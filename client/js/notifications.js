@@ -174,29 +174,45 @@ const Notifications = (() => {
     });
   }
 
-  function setupRealtimeListener() {
+  async function setupRealtimeListener() {
     try {
-      if (typeof supabase !== 'undefined' && supabase.channel) {
-        realtimeChannel = supabase
-          .channel('public:notifications')
-          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, payload => {
-            const newNotif = payload.new;
-            if (newNotif) {
-              fetchNotifications();
-              if (typeof UI !== 'undefined' && UI.toast) {
-                UI.toast(`${newNotif.title}`, 'info');
-              }
-            }
-          })
-          .subscribe();
+      if (!window.supabaseClient || typeof window.supabaseClient.channel !== 'function') return;
+
+      const { data: { session } } = await window.supabaseClient.auth.getSession();
+      const token = session?.access_token;
+      if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
+        return;
       }
+
+      if (realtimeChannel) {
+        window.supabaseClient.removeChannel(realtimeChannel);
+      }
+
+      realtimeChannel = window.supabaseClient
+        .channel('public:notifications')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, payload => {
+          const newNotif = payload.new;
+          if (newNotif) {
+            fetchNotifications();
+            if (typeof UI !== 'undefined' && UI.toast) {
+              UI.toast(`${newNotif.title}`, 'info');
+            }
+          }
+        })
+        .subscribe();
     } catch (err) {
       console.debug('[Notifications] Realtime subscription skipped:', err.message);
     }
   }
 
-  function init() {
+  async function init() {
     if (isInitialized) return;
+
+    if (window.supabaseClient?.auth) {
+      const { data: { session } } = await window.supabaseClient.auth.getSession();
+      if (!session) return;
+    }
+
     isInitialized = true;
 
     fetchNotifications();
@@ -208,15 +224,28 @@ const Notifications = (() => {
     pollingInterval = setInterval(fetchNotifications, 30000);
   }
 
+  function destroy() {
+    if (realtimeChannel && window.supabaseClient) {
+      try { window.supabaseClient.removeChannel(realtimeChannel); } catch {}
+      realtimeChannel = null;
+    }
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+      pollingInterval = null;
+    }
+    isInitialized = false;
+  }
+
   return {
     init,
+    destroy,
     fetch: fetchNotifications,
     markCategoryRead,
     getState: () => state
   };
 })();
 
-// Auto-boot notifications when auth is ready
+// Auto-boot notifications when auth is ready (safe guarded if session exists)
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => Notifications.init());
 } else {

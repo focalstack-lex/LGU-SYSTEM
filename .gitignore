@@ -1,14 +1,46 @@
+# Dependencies
 node_modules/
-.env*
+electron/node_modules/
+
+# Environment Variables & Secrets (CRITICAL SECURITY)
+.env
+.env.*
 !.env.example
+*.pem
+*.key
+*.cert
+*.pfx
+*.credentials
+
+# Scratch & Temporary Testing Folders
+scratch/
+tmp/
+temp/
+logs/
 *.log
-.DS_Store
-Thumbs.db
+
+# Build & Packaging Directories
+dist/
 dist*/
 dist-build*/
+build/
 *.exe
+*.dmg
+*.AppImage
 *.blockmap
-*.yaml
-.playwright-mcp/
+electron/dist/
+electron/dist-build*/
 electron-builder/
-logs/
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.playwright-mcp/
+gui-test-screenshots/
+t0_login_page.png

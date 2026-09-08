@@ -241,9 +241,12 @@ function renderMonthlyChart(monthly) {
   if (!canvas || !window.Chart) return;
   if (_monthlyChart) _monthlyChart.destroy();
 
+  const isMobile = window.innerWidth <= 640;
   const labels = monthly.map(m => {
     const [y, mo] = m.month.split('-');
-    return new Date(y, mo - 1).toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
+    return isMobile
+      ? new Date(y, mo - 1).toLocaleDateString('en-PH', { month: 'short' })
+      : new Date(y, mo - 1).toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
   });
 
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -265,7 +268,7 @@ function renderMonthlyChart(monthly) {
           hoverBackgroundColor: isLight ? '#2A4A73' : '#5F89BC',
           borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: 'bottom',
-          maxBarThickness: 32,
+          maxBarThickness: isMobile ? 18 : 32,
           categoryPercentage: 0.75,
           barPercentage: 0.85
         },
@@ -276,7 +279,7 @@ function renderMonthlyChart(monthly) {
           hoverBackgroundColor: isLight ? '#CBD5E1' : '#64748B',
           borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: 'bottom',
-          maxBarThickness: 32,
+          maxBarThickness: isMobile ? 18 : 32,
           categoryPercentage: 0.75,
           barPercentage: 0.85
         }
@@ -291,12 +294,12 @@ function renderMonthlyChart(monthly) {
           align: 'end',
           labels: {
             color: textColor,
-            font: { family: 'Inter, sans-serif', size: 12, weight: '500' },
+            font: { family: 'Inter, sans-serif', size: isMobile ? 11 : 12, weight: '500' },
             usePointStyle: true,
             pointStyle: 'circle',
             boxWidth: 7,
             boxHeight: 7,
-            padding: 16
+            padding: isMobile ? 10 : 16
           }
         },
         tooltip: {
@@ -328,7 +331,10 @@ function renderMonthlyChart(monthly) {
           grid: { display: false },
           ticks: {
             color: textColor,
-            font: { family: 'Inter, sans-serif', size: 11, weight: '500' },
+            font: { family: 'Inter, sans-serif', size: isMobile ? 10 : 11, weight: '500' },
+            maxRotation: 0,
+            autoSkip: isMobile,
+            maxTicksLimit: isMobile ? 6 : 12,
             padding: 6
           }
         },

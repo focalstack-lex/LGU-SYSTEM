@@ -1,0 +1,176 @@
+/* =============================================
+   feedback-view.css - developer-only feedback viewer
+   Same tokens and flat language as the public form.
+   ============================================= */
+
+.hidden { display: none; }
+
+/* ---------- Login gate ---------- */
+
+.fbv-login { margin-top: 2.6rem; padding-top: 1.6rem; border-top: 1px solid var(--line); }
+
+.fbv-field { display: block; margin-bottom: 0.9rem; }
+
+.fbv-field span {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 0.35rem;
+}
+
+.fbv-field input {
+  width: 100%;
+  background: var(--field);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: var(--ink);
+  font: inherit;
+  padding: 0.65rem 0.7rem;
+}
+
+#fbv-login-btn,
+#fb-login-btn {
+  font: inherit;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: none;
+  border-radius: 3px;
+  padding: 0.7rem 1.4rem;
+  cursor: pointer;
+  margin-top: 0.4rem;
+}
+
+#fbv-login-btn:disabled,
+#fb-login-btn:disabled { opacity: 0.55; cursor: default; }
+
+.fbv-secondary {
+  font: inherit;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0.7rem 1.4rem;
+  cursor: pointer;
+}
+
+.fbv-secondary:hover { border-color: var(--ink-3); color: var(--ink); }
+
+#fbv-google-btn { margin-left: 0.6rem; }
+
+/* ---------- Header row (data view) ---------- */
+
+.fbv-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.fbv-actions { display: flex; gap: 0.6rem; padding-bottom: 0.3rem; }
+
+.fbv-actions .fbv-secondary { padding: 0.45rem 0.9rem; font-size: 0.85rem; }
+
+/* ---------- Stats strip ---------- */
+
+.fbv-stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 2rem;
+}
+
+.fbv-stat {
+  background: var(--bg);
+  padding: 0.85rem 0.9rem;
+}
+
+.fbv-stat b {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.fbv-stat b em {
+  font-style: normal;
+  font-size: 0.7rem;
+  color: var(--ink-3);
+}
+
+.fbv-stat span {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--ink-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+}
+
+/* ---------- Submission list ---------- */
+
+.fbv-list { margin-top: 2.4rem; }
+
+.fbv-item {
+  padding: 1.2rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.fbv-item:first-child { border-top: none; }
+
+.fbv-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink-3);
+}
+
+.fbv-ratings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
+  margin-top: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--ink-2);
+}
+
+.fbv-ratings b { color: var(--ink); font-weight: 500; }
+
+.fbv-ratings .na { color: var(--ink-3); }
+
+.fbv-text {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--ink);
+  max-width: 60ch;
+}
+
+.fbv-text span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-right: 0.5rem;
+}
+
+.fbv-empty { color: var(--ink-3); padding: 2rem 0; }
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 640px) {
+  .fbv-stats { grid-template-columns: repeat(3, 1fr); }
+  .fbv-head-row { flex-direction: column; align-items: flex-start; }
+  #fbv-google-btn { margin-left: 0; margin-top: 0.6rem; width: 100%; }
+  #fbv-login-btn { width: 100%; }
+}

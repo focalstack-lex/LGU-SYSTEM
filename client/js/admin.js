@@ -652,7 +652,7 @@ const Admin = (() => {
     container.innerHTML = `
         <div class="table-wrapper">
           <table class="data-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Course</th><th>Year</th><th>Role</th><th style="text-align:center;">Action</th></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Course</th><th>Year</th><th>Role</th><th>Verification</th><th style="text-align:center;">Action</th></tr></thead>
             <tbody>
               ${filtered.map(u => `
                 <tr>
@@ -661,17 +661,46 @@ const Admin = (() => {
                   <td style="font-size:.8rem">${u.course || '-'}</td>
                   <td style="font-size:.8rem">${u.year_level || '-'}</td>
                   <td>${UI.renderStatusBadge(u.role)}</td>
+                  <td>
+                    ${u.is_verified 
+                      ? '<span style="font-size:0.75rem;padding:3px 10px;border-radius:12px;background:rgba(34,197,94,0.15);color:#22c55e;font-weight:700;display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="solar:check-circle-bold"></iconify-icon> Verified</span>'
+                      : '<span style="font-size:0.75rem;padding:3px 10px;border-radius:12px;background:rgba(245,158,11,0.15);color:#f59e0b;font-weight:700;display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="solar:clock-circle-bold"></iconify-icon> Pending</span>'
+                    }
+                  </td>
                   <td style="text-align:center;">
-                    <button class="tx-action-btn" style="font-size:.8rem;padding:.3rem .7rem;"
-                      onclick="Admin.toggleRole('${u.id}', '${u.role}', this)">
-                      ${u.role === 'admin' ? 'Demote' : 'Promote to Admin'}
-                    </button>
+                    <div style="display:flex;gap:4px;justify-content:center;">
+                      ${!u.is_verified ? `
+                        <button class="tx-action-btn" style="font-size:.8rem;padding:.3rem .7rem;background:#16a34a;color:white;border:none;border-radius:6px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"
+                          onclick="Admin.verifyUser('${u.id}', this)">
+                          <iconify-icon icon="solar:letter-bold"></iconify-icon> Approve Account
+                        </button>
+                      ` : ''}
+                      <button class="tx-action-btn" style="font-size:.8rem;padding:.3rem .7rem;"
+                        onclick="Admin.toggleRole('${u.id}', '${u.role}', this)">
+                        ${u.role === 'admin' ? 'Demote' : 'Promote to Admin'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
         </div>`;
+  }
+
+  async function verifyUser(userId, btn) {
+    if (!confirm('Are you sure you want to verify this user account? An automated approval email will be sent to their Gmail address.')) return;
+    btn.disabled = true;
+    btn.textContent = 'Sending Email…';
+    try {
+      const res = await Api.admin.verifyUser(userId);
+      UI.toast(res.message || 'User account verified and approval email sent!', 'success');
+      await loadUsers();
+    } catch (err) {
+      UI.toast(err.message || 'Failed to verify user account.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Approve Account';
+    }
   }
 
   async function toggleRole(userId, currentRole, btn) {
@@ -859,5 +888,5 @@ const Admin = (() => {
     });
   }
 
-  return { init, toggleRole };
+  return { init, toggleRole, verifyUser };
 })();

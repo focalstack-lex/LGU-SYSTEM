@@ -24,6 +24,35 @@ Migrations are applied by hand in the **Supabase SQL console** (the project has 
 
 Pending as of 2026-08-22: `010_profiles_course_constraint.sql`, `011_events_archived_status.sql`.
 
+## Migration 031 (Phase A: lec/lab + structured prerequisites)
+
+Migration file: `supabase/migrations/031_lec_lab_and_structured_prereqs.sql`.
+
+- Additive only. Applied via SQL editor, then `node scripts/preview-prereq-parse.js`
+  for the parse report, then `node scripts/seed-lec-lab.js`, then
+  `ALTER TABLE public.subjects VALIDATE CONSTRAINT subjects_units_components_check;`
+- Tokens flagged `special` in the parse report are fixed up in the Officer
+  Console → Curriculum Manager (they stay in the report output until corrected).
+- `subjects.prerequisites` (free text) is legacy: kept for reference, not read
+  by application logic.
+
+## Migrations 033 & 034 (component outcomes + Phase B faculty portal)
+
+- `supabase/migrations/033_component_outcomes.sql` — adds `lec_grade`/`lab_grade`
+  and `lec_status`/`lab_status` to `student_units` so lec and lab can pass/fail
+  independently; a passed component banks its units in progress views.
+- `supabase/migrations/034_faculty_roles_and_submissions.sql` — adds the
+  `faculty`, `program_head`, `dean` roles; tables `enrollment_submissions` /
+  `enrollment_submission_items`; SQL helpers `is_faculty()`,
+  `is_dean_or_admin()`, `is_program_head_for(uuid)`; widens
+  `notifications.target_role` for the new roles.
+- Both are additive and re-runnable (guarded constraints, DROP-first policies).
+  Apply via the SQL editor in order (033, then 034), then deploy server +
+  client together.
+- Program heads bind to a program via `profiles.course`; the dean is
+  viewer-only; approval of a submitted load auto-enrolls it into
+  `student_units` (idempotent upsert).
+
 ## Backups
 
 `.github/workflows/backup.yml` runs weekly (Monday 02:30 PHT) and produces three dump artifacts (roles, schema, data) retained 90 days.

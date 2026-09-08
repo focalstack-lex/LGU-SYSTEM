@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Credential Verification - COE LGU System</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .verify-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 36px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+    .verify-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #dcfce7;
+      color: #15803d;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .student-name {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0 0 4px 0;
+    }
+    .student-course {
+      color: #3b82f6;
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+    }
+    .verified-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .verified-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      background: #f8fafc;
+    }
+    .verified-item-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #0f172a;
+    }
+    .verified-item-sub {
+      font-size: 0.82rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .footer-stamp {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 0.78rem;
+      color: #94a3b8;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="verify-card" id="verify-container">
+    <div style="text-align: center; padding: 20px;">
+      <iconify-icon icon="line-md:loading-loop" style="font-size: 2.5rem; color: #3b82f6;"></iconify-icon>
+      <p style="color: #64748b; margin-top: 10px;">Verifying student credentials with College database...</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const container = document.getElementById('verify-container');
+
+      if (!token) {
+        container.innerHTML = `
+          <div style="text-align: center;">
+            <iconify-icon icon="solar:danger-circle-bold" style="font-size: 3rem; color: #ef4444;"></iconify-icon>
+            <h2>Invalid Verification Link</h2>
+            <p style="color: #64748b;">No verification token provided.</p>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/cv/verify/${token}`);
+        if (!res.ok) throw new Error('Verification failed');
+
+        const data = await res.json();
+
+        container.innerHTML = `
+          <div class="verify-badge">
+            <iconify-icon icon="solar:verified-check-bold"></iconify-icon>
+            OFFICIALLY VERIFIED STUDENT CREDENTIALS
+          </div>
+
+          <h1 class="student-name">${data.student_name}</h1>
+          <div class="student-course">${data.course} • Candidate ${data.enrollment_year ? Number(data.enrollment_year) + 4 : ''}</div>
+          <p style="font-size: 0.9rem; color: #475569; margin-bottom: 20px;">${data.headline || 'College of Engineering Student'}</p>
+
+          <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">College Verified Achievements & Roles</h3>
+
+          <div class="verified-list">
+            ${(data.verified_milestones || []).length > 0 ? data.verified_milestones.map(item => `
+              <div class="verified-item">
+                <div class="verified-item-title">✓ ${item.title}</div>
+                <div class="verified-item-sub">${item.organization} • ${item.date_range}</div>
+                <div style="font-size: 0.8rem; color: #475569; margin-top: 4px;">${item.description}</div>
+              </div>
+            `).join('') : '<div style="color: #64748b; font-size: 0.85rem;">No verified milestones attached to this public view.</div>'}
+          </div>
+
+          ${data.capstone_project && data.capstone_project.title ? `
+            <div style="margin-top: 20px;">
+              <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">Engineering Capstone Project</h3>
+              <div class="verified-item" style="background: #eff6ff; border-color: #bfdbfe;">
+                <div class="verified-item-title" style="color: #1e40af;">${data.capstone_project.title}</div>
+                <div style="font-size: 0.82rem; color: #1e3a8a; margin-top: 4px;">${data.capstone_project.abstract || ''}</div>
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="footer-stamp">
+            <iconify-icon icon="solar:shield-check-bold" style="color: #22c55e;"></iconify-icon>
+            Verified by College of Engineering Local Government Unit System<br>
+            Record Hash: ${token.substring(0, 16).toUpperCase()}
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `
+          <div style="text-align: center;">
+            <iconify-icon icon="solar:danger-triangle-bold" style="font-size: 3rem; color: #f59e0b;"></iconify-icon>
+            <h2>Verification Unreachable</h2>
+            <p style="color: #64748b;">Could not verify credentials with the database or the CV profile is private.</p>
+          </div>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

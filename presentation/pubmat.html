@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COE · BTMS Pubmat Generator & Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+  :root {
+    /* Reference Style Palette (Blue Theme) */
+    --theme-primary: #1A73E8;
+    --theme-primary-dark: #0D47A1;
+    --theme-primary-light: #4285F4;
+    --theme-accent: #0052CC;
+    --theme-bg-bottom: #0F62FE;
+    --theme-bg-wave: linear-gradient(180deg, #1877F2 0%, #0052CC 60%, #003E99 100%);
+    --theme-text-title: #0A192F;
+    --theme-text-sub: #4A5568;
+    --font-heading: 'Plus Jakarta Sans', 'Montserrat', sans-serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  /* COE Amber / Dark Theme Override */
+  [data-theme="coe-amber"] {
+    --theme-primary: #F97316;
+    --theme-primary-dark: #C2410C;
+    --theme-primary-light: #FB923C;
+    --theme-accent: #EA580C;
+    --theme-bg-bottom: #0B0F17;
+    --theme-bg-wave: linear-gradient(180deg, #1E293B 0%, #0F172A 50%, #080D1A 100%);
+    --theme-text-title: #0F172A;
+    --theme-text-sub: #475569;
+  }
+
+  /* Emerald Audit Theme Override */
+  [data-theme="emerald"] {
+    --theme-primary: #059669;
+    --theme-primary-dark: #065F46;
+    --theme-primary-light: #10B981;
+    --theme-accent: #047857;
+    --theme-bg-bottom: #047857;
+    --theme-bg-wave: linear-gradient(180deg, #059669 0%, #047857 60%, #064E3B 100%);
+    --theme-text-title: #064E3B;
+    --theme-text-sub: #374151;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #E2E8F0;
+    font-family: var(--font-body);
+    color: #1E293B;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 16px 60px;
+    overflow-x: hidden;
+  }
+
+  /* ================= TOP CONTROL BAR ================= */
+  .control-bar {
+    width: 100%;
+    max-width: 1080px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 18px 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .control-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .btn-chip {
+    background: #F1F5F9;
+    border: 1px solid #CBD5E1;
+    color: #334155;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-chip:hover {
+    background: #E2E8F0;
+    border-color: #94A3B8;
+  }
+
+  .btn-chip.active {
+    background: var(--theme-primary);
+    color: #FFFFFF;
+    border-color: var(--theme-primary);
+    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.25);
+  }
+
+  .action-btn {
+    background: #0F172A;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+
+  .action-btn:hover {
+    background: #1E293B;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .action-btn.secondary {
+    background: #F8FAFC;
+    color: #0F172A;
+    border: 1px solid #CBD5E1;
+  }
+  .action-btn.secondary:hover {
+    background: #F1F5F9;
+  }
+
+  /* ================= CANVAS WRAPPER (4:5 RATIO) ================= */
+  .pubmat-canvas-container {
+    position: relative;
+    box-shadow: 0 30px 90px -20px rgba(15, 23, 42, 0.25);
+    border-radius: 20px;
+    overflow: hidden;
+    background: #FFFFFF;
+    transition: transform 0.3s ease;
+  }
+
+  /* Standard 1080 x 1350 Pubmat Canvas (Scaled down cleanly for preview) */
+  #pubmatCanvas {
+    width: 864px; /* Render width in viewport */
+    height: 1080px; /* 4:5 ratio */
+    position: relative;
+    background: #FFFFFF;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    user-select: none;
+  }
+
+  /* Optional Aspect Ratio classes */
+  .ratio-1-1 #pubmatCanvas {
+    width: 864px;
+    height: 864px;
+  }
+  .ratio-9-16 #pubmatCanvas {
+    width: 608px;
+    height: 1080px;
+  }
+
+  /* Background Aesthetics */
+  .bg-top-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 55%;
+    background-image: radial-gradient(rgba(24, 119, 242, 0.08) 1.2px, transparent 1.2px);
+    background-size: 24px 24px;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .bg-glow-radial {
+    position: absolute;
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 500px;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(24, 119, 242, 0.12) 0%, transparent 80%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* The Signature Bottom Curved Base (Reference Style) */
+  .bg-curved-base {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 48%;
+    background: var(--theme-bg-wave);
+    border-top-left-radius: 50% 90px;
+    border-top-right-radius: 50% 90px;
+    z-index: 2;
+    transition: background 0.4s ease;
+  }
+
+  .bg-curved-base::before {
+    content: '';
+    position: absolute;
+    top: -24px;
+    left: 10%;
+    right: 10%;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.12);
+    filter: blur(28px);
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  /* ================= PUBMAT CONTENT ================= */
+  .pubmat-content {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 44px 50px 36px;
+  }
+
+  /* Top Section */
+  .pubmat-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .brand-logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 22px;
+    padding: 6px 16px 6px 14px;
+    border-radius: 999px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  }
+
+  .brand-logo-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--theme-primary);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-weight: 800;
+    font-size: 15px;
+    font-family: var(--font-heading);
+    box-shadow: 0 4px 10px rgba(24, 119, 242, 0.35);
+  }
+
+  .brand-logo-name {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+    color: #0F172A;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .brand-logo-sub {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: #64748B;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Main Big Headline */
+  .headline-main {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 52px;
+    line-height: 1.08;
+    color: var(--theme-text-title);
+    letter-spacing: -1.8px;
+    max-width: 680px;
+    margin-bottom: 16px;
+  }
+
+  .headline-highlight {
+    color: var(--theme-primary);
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Subtitle description */
+  .subtext-body {
+    font-family: var(--font-body);
+    font-size: 17.5px;
+    line-height: 1.5;
+    color: var(--theme-text-sub);
+    max-width: 640px;
+    margin: 0 auto;
+    font-weight: 500;
+  }
+
+  /* ================= CENTER HERO DEVICE SHOWCASE ================= */
+  .hero-device-stage {
+    position: relative;
+    width: 100%;
+    margin-top: 24px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1200px;
+  }
+
+  /* Realistic Laptop Mockup (Reference Style) */
+  .laptop-wrap {
+    position: relative;
+    width: 610px;
+    filter: drop-shadow(0 30px 45px rgba(0, 10, 30, 0.45));
+    transform: translateY(10px);
+    transition: transform 0.4s ease;
+  }
+
+  .laptop-lid {
+    position: relative;
+    background: #111726;
+    border-radius: 16px 16px 4px 4px;
+    padding: 10px 10px 14px 10px;
+    border: 2.5px solid #2B354F;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .laptop-camera {
+    width: 6px;
+    height: 6px;
+    background: #000;
+    border: 1px solid #334155;
+    border-radius: 50%;
+    margin: 0 auto 6px auto;
+  }
+
+  .laptop-screen-glass {
+    position: relative;
+    width: 100%;
+    height: 330px;
+    background: #0B0F17;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+  }
+
+  .laptop-screen-glass img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+    display: block;
+  }
+
+  /* Laptop Base & Keyboard Edge */
+  .laptop-base {
+    position: relative;
+    height: 14px;
+    background: linear-gradient(180deg, #DCE2EE 0%, #9DA9C0 100%);
+    border-radius: 0 0 16px 16px;
+    margin: 0 -18px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .laptop-notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 78px;
+    height: 5px;
+    background: #64748B;
+    border-radius: 0 0 5px 5px;
+  }
+
+  /* ================= FLOATING MOBILE / RECEIPT CARD (Reference Style) ================= */
+  .floating-card-device {
+    position: absolute;
+    right: -10px;
+    bottom: 30px;
+    width: 236px;
+    background: #FFFFFF;
+    border-radius: 18px;
+    box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.8);
+    overflow: hidden;
+    z-index: 15;
+    animation: floatCard 4s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatCard {
+    0% { transform: translateY(0px) rotate(1deg); }
+    100% { transform: translateY(-8px) rotate(-1deg); }
+  }
+
+  .card-device-header {
+    padding: 12px 14px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #F1F5F9;
+  }
+
+  .card-device-title {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #1E293B;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-device-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    background: #EEF2FF;
+    color: var(--theme-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+  }
+
+  .card-device-body {
+    padding: 14px 14px 10px;
+  }
+
+  .card-stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #64748B;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .card-stat-amount {
+    font-size: 24px;
+    font-weight: 800;
+    font-family: var(--font-heading);
+    color: var(--theme-primary);
+    margin: 2px 0 6px 0;
+  }
+
+  .card-receipt-preview {
+    width: 100%;
+    height: 115px;
+    border-radius: 10px;
+    border: 1px solid #E2E8F0;
+    overflow: hidden;
+    background: #F8FAFC;
+    margin-bottom: 10px;
+    position: relative;
+  }
+
+  .card-receipt-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .card-badge-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10.5px;
+    margin-bottom: 4px;
+  }
+
+  .card-status-verified {
+    background: #DCFCE7;
+    color: #15803D;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 9.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .card-cta-row {
+    padding: 8px 12px 12px;
+    text-align: center;
+  }
+
+  .card-cta-btn {
+    display: block;
+    width: 100%;
+    padding: 6px 0;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--theme-primary);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  /* ================= BOTTOM ACTION BAR (Reference Style) ================= */
+  .pubmat-footer {
+    position: relative;
+    z-index: 12;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  /* White Pill Button with Arrow */
+  .cta-pill-button {
+    background: #FFFFFF;
+    color: #0A192F;
+    border: none;
+    padding: 15px 36px;
+    border-radius: 999px;
+    font-family: var(--font-heading);
+    font-size: 15.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+  }
+
+  .cta-pill-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.3);
+  }
+
+  .cta-arrow-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid #0A192F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    transition: transform 0.2s;
+  }
+
+  .cta-pill-button:hover .cta-arrow-circle {
+    transform: translateX(3px);
+  }
+
+  /* Website URL Footer */
+  .footer-url-text {
+    font-family: var(--font-heading);
+    font-size: 16.5px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-url-text:hover {
+    color: #FFFFFF;
+    text-decoration: underline;
+  }
+
+  /* ================= CAPTIONS CONTAINER ================= */
+  .captions-section {
+    width: 100%;
+    max-width: 1080px;
+    margin-top: 36px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 30px 34px;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  }
+
+  .captions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 22px;
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 16px;
+  }
+
+  .captions-header h2 {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 800;
+    color: #0F172A;
+  }
+
+  .caption-badge {
+    background: #EFF6FF;
+    color: #1D4ED8;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .caption-card {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .caption-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--theme-primary);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .copy-btn {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    color: #334155;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover {
+    background: #E2E8F0;
+  }
+
+  .caption-text-area {
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #334155;
+    white-space: pre-wrap;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 900px) {
+    #pubmatCanvas {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4/5;
+    }
+    .pubmat-content {
+      padding: 30px 24px 28px;
+    }
+    .headline-main {
+      font-size: 34px;
+    }
+    .subtext-body {
+      font-size: 14px;
+    }
+    .laptop-wrap {
+      width: 95%;
+    }
+    .laptop-screen-glass {
+      height: 200px;
+    }
+    .floating-card-device {
+      width: 180px;
+      right: 0px;
+      bottom: 10px;
+    }
+    .card-stat-amount {
+      font-size: 18px;
+    }
+  }
+</style>
+</head>
+<body data-theme="blue">
+
+  <!-- ================= TOP CONTROLS ================= -->
+  <header class="control-bar">
+    <div class="control-group">
+      <span class="control-label">Theme Style:</span>
+      <button class="btn-chip active" id="themeBlueBtn" onclick="setTheme('blue')">
+        <span style="width:10px;height:10px;border-radius:50%;background:#1A73E8;display:inline-block;"></span>
+        Reference Blue
+      </button>
+      <button class="btn-chip" id="themeAmberBtn" onclick="setTheme('coe-amber')">
+        <span style="width:10px;height:10px;border-radius:50%;background:#F97316;display:inline-block;"></span>
+        COE Amber & Navy
+      </button>
+      <button class="btn-chip" id="themeEmeraldBtn" onclick="setTheme('emerald')">
+        <span style="width:10px;height:10px;border-radius:50%;background:#059669;display:inline-block;"></span>
+        Audit Emerald
+      </button>
+    </div>
+
+    <div class="control-group">
+      <span class="control-label">Content Hook:</span>
+      <button class="btn-chip active" id="hook1Btn" onclick="setHook(1)">Overview Hook</button>
+      <button class="btn-chip" id="hook2Btn" onclick="setHook(2)">Asa Kaya Ang Pondo?</button>
+      <button class="btn-chip" id="hook3Btn" onclick="setHook(3)">Receipt Vault</button>
+      <button class="btn-chip" id="hook4Btn" onclick="setHook(4)">3-Minute Liquidation</button>
+    </div>
+
+    <div class="control-group">
+      <button class="action-btn" onclick="exportPubmatImage()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Download Pubmat PNG
+      </button>
+      <button class="action-btn secondary" onclick="window.print()">
+        Print / Save PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN PUBMAT CANVAS (4:5 RATIO) ================= -->
+  <main class="pubmat-canvas-container" id="pubmatExportArea">
+    <div id="pubmatCanvas">
+      
+      <!-- Ambient Background Graphic Layers -->
+      <div class="bg-top-grid"></div>
+      <div class="bg-glow-radial"></div>
+      <div class="bg-curved-base"></div>
+
+      <!-- Foreground Elements -->
+      <div class="pubmat-content">
+
+        <!-- Top Header & Copy -->
+        <div class="pubmat-header">
+          <div class="brand-logo-badge">
+            <div class="brand-logo-icon">C</div>
+            <div class="brand-logo-name">COE · BTMS</div>
+            <span style="color:#CBD5E1">|</span>
+            <div class="brand-logo-sub">College of Engineering</div>
+          </div>
+
+          <h1 class="headline-main" id="pubmatTitle">
+            Still Managing Your <br>
+            <span class="headline-highlight" id="pubmatHighlight">Accounting Manually?</span>
+          </h1>
+
+          <p class="subtext-body" id="pubmatSubtitle">
+            Track collections, receivables, event budgets, receipt proofs, and liquidation in one automated student portal.
+          </p>
+        </div>
+
+        <!-- Center Laptop & Floating Phone Mockups -->
+        <div class="hero-device-stage">
+          
+          <!-- Realistic Laptop Shell -->
+          <div class="laptop-wrap">
+            <div class="laptop-lid">
+              <div class="laptop-camera"></div>
+              <div class="laptop-screen-glass">
+                <img id="laptopImg" src="./shots/dashboard.png" alt="COE BTMS Live System Dashboard">
+              </div>
+            </div>
+            <div class="laptop-base">
+              <div class="laptop-notch"></div>
+            </div>
+          </div>
+
+          <!-- Floating Modern Receipt / Verification Card -->
+          <div class="floating-card-device" id="floatingPhoneCard">
+            <div class="card-device-header">
+              <div class="card-device-title">
+                <span class="card-device-icon">📄</span>
+                <span>Receipt Proof Vault</span>
+              </div>
+              <span class="card-status-verified">✓ Verified</span>
+            </div>
+            <div class="card-device-body">
+              <div class="card-stat-label">Total Liquidated Event</div>
+              <div class="card-stat-amount" id="cardAmount">₱150,000</div>
+              <div class="card-receipt-preview">
+                <img id="phoneImg" src="./shots/receipt-modal.png" alt="Digital Receipt Proof">
+              </div>
+              <div class="card-badge-row">
+                <span style="color:#64748B;font-size:10px;">28 Digital Receipts</span>
+                <span style="color:#10B981;font-weight:700;font-size:10px;">0 Lost Docs</span>
+              </div>
+            </div>
+            <div class="card-cta-row">
+              <a href="#" class="card-cta-btn">View Official Ledger ➔</a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom Pill Button & Web Domain (Exact Reference Style) -->
+        <div class="pubmat-footer">
+          <a href="https://coelgu-system.engineer" target="_blank" class="cta-pill-button">
+            <span id="ctaBtnText">ACCESS THE PORTAL TODAY</span>
+            <span class="cta-arrow-circle">➔</span>
+          </a>
+          <a href="https://coelgu-system.engineer" target="_blank" class="footer-url-text">
+            www.coelgu-system.engineer
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ================= SHORT SOCIAL MEDIA CAPTIONS ================= -->
+  <!-- STRICT RULE ENFORCED: ZERO EM DASHES (— / --) -->
+  <section class="captions-section">
+    <div class="captions-header">
+      <div>
+        <h2>Official Pubmat Captions</h2>
+        <p style="color:#64748B; font-size:13.5px; margin-top:4px;">
+          Tailored for Facebook, Instagram, and Student Council Announcements. Short, clean, and zero em dashes.
+        </p>
+      </div>
+      <span class="caption-badge">Strict Rule: No Em Dashes</span>
+    </div>
+
+    <!-- Caption 1: Main Announcement -->
+    <div class="caption-card">
+      <div class="caption-card-title">
+        <span>Option 1: Primary Showcase & Launch Caption (Recommended for Main Post)</span>
+        <button class="copy-btn" onclick="copyCaption('caption1')">Copy Text</button>
+      </div>
+      <div class="caption-text-area" id="caption1">Still managing your council funds manually?
+
+Meet the COE Budget Transparency and Financial Monitoring System (BTMS). Every peso collected, every budget allocated, and every single receipt is now visible online in real time.
+
+What you can do on the portal:
+• Check live collections, expenses, and current cash balances
+• Inspect event budgets versus actual spending
+• Verify attached digital receipt proofs on every transaction
+• Ask questions to our Grizz AI assistant in plain language
+
+Sign in today with your official CJC Google account:
+👉 https://coelgu-system.engineer
+
+Transparency made simple. Zero missing papers. Zero guesswork.
+
+#COE #DigitalGovernance #BudgetTransparency #EngineeringExcellence #StudentPortal</div>
+    </div>
+
+    <!-- Caption 2: Educational / "Asa Kaya Ang Pondo?" -->
+    <div class="caption-card">
+      <div class="caption-card-title">
+        <span>Option 2: Problem to Solution (Teaches Students How To Track Funds)</span>
+        <button class="copy-btn" onclick="copyCaption('caption2')">Copy Text</button>
+      </div>
+      <div class="caption-text-area" id="caption2">Asa kaya napadulong ang pondo?
+
+When student funds are tracked on paper, receipts fade and folders get lost. Trust breaks on paperwork, not on purpose.
+
+The COE BTMS fixes this for good:
+1. Every event has a dedicated live budget tracker.
+2. Every expense requires a photo receipt proof before approval.
+3. Every student can inspect the official ledger 24/7.
+
+No requests to submit. No weeks of waiting. Open your browser and see for yourself:
+🌐 https://coelgu-system.engineer
+
+Your funds. Your portal. Full transparency at your fingertips.</div>
+    </div>
+
+    <!-- Caption 3: Case Study & Proof -->
+    <div class="caption-card">
+      <div class="caption-card-title">
+        <span>Option 3: Fast Liquidation Proof (For Council Officers & Audits)</span>
+        <button class="copy-btn" onclick="copyCaption('caption3')">Copy Text</button>
+      </div>
+      <div class="caption-text-area" id="caption3">From 26 days to 3 minutes.
+
+Liquidation no longer requires endless sorting of paper receipts. In our latest test case, a ₱150,000 major college event was fully liquidated in 3 minutes.
+
+The results speak for themselves:
+• 28 digital receipts uploaded and verified
+• 0 missing documents
+• Over 80% faster audit reporting
+
+See how digital governance empowers students and officers alike:
+👉 https://coelgu-system.engineer</div>
+    </div>
+
+    <!-- Caption 4: Short Bite-Sized / Story Caption -->
+    <div class="caption-card">
+      <div class="caption-card-title">
+        <span>Option 4: Ultra-Short (For Instagram Stories / Messenger / Telegram)</span>
+        <button class="copy-btn" onclick="copyCaption('caption4')">Copy Text</button>
+      </div>
+      <div class="caption-text-area" id="caption4">Still tracking student funds on paper?
+
+Check out the official COE Budget Transparency System. See live balances, event budgets, and receipt proofs directly on your phone.
+
+Explore the live portal now:
+🔗 https://coelgu-system.engineer</div>
+    </div>
+  </section>
+
+<script>
+  // Theme Switching
+  function setTheme(theme) {
+    document.body.setAttribute('data-theme', theme);
+    document.querySelectorAll('.control-bar #themeBlueBtn, .control-bar #themeAmberBtn, .control-bar #themeEmeraldBtn').forEach(b => b.classList.remove('active'));
+    if (theme === 'blue') document.getElementById('themeBlueBtn').classList.add('active');
+    if (theme === 'coe-amber') document.getElementById('themeAmberBtn').classList.add('active');
+    if (theme === 'emerald') document.getElementById('themeEmeraldBtn').classList.add('active');
+  }
+
+  // Hook Variations
+  const hooks = {
+    1: {
+      title: "Still Managing Your",
+      highlight: "Accounting Manually?",
+      subtitle: "Track collections, receivables, event budgets, receipt proofs, and liquidation in one automated student portal.",
+      cta: "ACCESS THE PORTAL TODAY",
+      amount: "₱150,000",
+      phoneImg: "./shots/receipt-modal.png",
+      laptopImg: "./shots/dashboard.png"
+    },
+    2: {
+      title: "Asa Kaya Napadulong",
+      highlight: "Ang Pondo?",
+      subtitle: "Every peso, visible. Every transaction, accounted for. Real-time digital governance for the College of Engineering.",
+      cta: "EXPLORE THE SYSTEM TODAY",
+      amount: "₱150,000",
+      phoneImg: "./shots/events.png",
+      laptopImg: "./shots/dashboard.png"
+    },
+    3: {
+      title: "Never Lose A Paper",
+      highlight: "Receipt Again.",
+      subtitle: "Attach photos of official receipts directly to the ledger. Audit-ready proofs available 24/7 for every student.",
+      cta: "VIEW RECEIPT VAULT",
+      amount: "28 Proofs",
+      phoneImg: "./shots/receipt-modal.png",
+      laptopImg: "./shots/transactions.png"
+    },
+    4: {
+      title: "From 26 Days To",
+      highlight: "3 Minutes.",
+      subtitle: "A ₱150,000 major event fully liquidated digitally. 28 receipts verified, 0 lost docs, and 80% faster audit reporting.",
+      cta: "SEE THE CASE STUDY",
+      amount: "3 Minutes",
+      phoneImg: "./shots/receipt-real.png",
+      laptopImg: "./shots/reports.png"
+    }
+  };
+
+  function setHook(num) {
+    const data = hooks[num];
+    document.getElementById('pubmatTitle').innerHTML = `${data.title} <br><span class="headline-highlight" id="pubmatHighlight">${data.highlight}</span>`;
+    document.getElementById('pubmatSubtitle').innerText = data.subtitle;
+    document.getElementById('ctaBtnText').innerText = data.cta;
+    document.getElementById('cardAmount').innerText = data.amount;
+    document.getElementById('phoneImg').src = data.phoneImg;
+    document.getElementById('laptopImg').src = data.laptopImg;
+
+    document.querySelectorAll('.control-bar #hook1Btn, .control-bar #hook2Btn, .control-bar #hook3Btn, .control-bar #hook4Btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`hook${num}Btn`).classList.add('active');
+  }
+
+  // Export as Image
+  async function exportPubmatImage() {
+    const canvasArea = document.getElementById('pubmatExportArea');
+    const prevTransform = canvasArea.style.transform;
+    canvasArea.style.transform = 'none';
+
+    try {
+      const canvas = await html2canvas(canvasArea, {
+        scale: 2, // High resolution retina scale (2160 x 2700 approx)
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#FFFFFF',
+        logging: false
+      });
+      const link = document.createElement('a');
+      link.download = 'COE-BTMS-Pubmat.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      console.error('Export error:', err);
+      alert('Generating screenshot... You can also right click or press Print to PDF.');
+    } finally {
+      canvasArea.style.transform = prevTransform;
+    }
+  }
+
+  // Copy caption utility
+  function copyCaption(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Caption copied to clipboard! (Zero em dashes verified)');
+    }).catch(err => {
+      console.error(err);
+    });
+  }
+</script>
+
+</body>
+</html>

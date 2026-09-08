@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback · COE Student Council</title>
+  <meta name="description" content="Feedback portal for the College of Engineering student council. Student sign-in required." />
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/assets/grizz.png" />
+  <link rel="stylesheet" href="/styles/feedback.css" />
+  <link rel="stylesheet" href="/styles/feedback-view.css" />
+</head>
+<body>
+  <main class="fb">
+
+    <!-- Login gate -->
+    <section id="fb-login" class="hidden">
+      <header class="fb-head">
+        <p class="fb-overline">College of Engineering · Student Council</p>
+        <h1>Feedback</h1>
+        <p class="fb-sub">Sign in with your student account to answer. Eight questions, about two minutes, straight to the officers.</p>
+      </header>
+      <form id="fb-login-form" class="fbv-login" novalidate>
+        <label class="fbv-field">
+          <span>Email</span>
+          <input type="email" id="fb-email" autocomplete="email" required />
+        </label>
+        <label class="fbv-field">
+          <span>Password</span>
+          <input type="password" id="fb-password" autocomplete="current-password" required />
+        </label>
+        <button type="submit" id="fb-login-btn">Sign in</button>
+        <button type="button" id="fb-google-btn" class="fbv-secondary">Continue with Google</button>
+        <p class="fb-error hidden" id="fb-login-error" role="alert"></p>
+      </form>
+    </section>
+
+    <!-- Form -->
+    <section id="fb-form-wrap" class="hidden">
+      <header class="fb-head">
+        <p class="fb-overline">College of Engineering · Student Council</p>
+        <h1>Feedback</h1>
+        <p class="fb-sub">Signed in as <span id="fb-who"></span>. Eight questions, about two minutes, straight to the officers.</p>
+      </header>
+
+      <form id="fb-form" novalidate>
+
+        <section class="fb-q">
+          <div class="fb-q-head">
+            <span class="fb-num">01</span>
+            <label class="fb-label" for="fb-program">Which program are you in? <em>optional</em></label>
+          </div>
+          <div class="fb-row">
+            <select id="fb-program" name="program">
+              <option value="">Program…</option>
+              <option value="BSCoE">BS Computer Engineering</option>
+              <option value="BSCE">BS Civil Engineering</option>
+              <option value="BSECE">BS Electronics Engineering</option>
+            </select>
+            <select id="fb-year" name="year_level">
+              <option value="">Year…</option>
+              <option value="1">1st</option>
+              <option value="2">2nd</option>
+              <option value="3">3rd</option>
+              <option value="4">4th</option>
+              <option value="5">5th</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="fb-q">
+          <div class="fb-q-head">
+            <span class="fb-num">02</span>
+            <span class="fb-label">Overall, how easy is the portal to use?</span>
+          </div>
+          <div class="fb-scale" data-name="ease" data-na="0"></div>
+          <div class="fb-poles"><span>Hard</span><span>Easy</span></div>
+        </section>
+
+        <section class="fb-q">
+          <div class="fb-q-head">
+            <span class="fb-num">03</span>
+            <span class="fb-label">How reliable is your academic data (subjects, units, prerequisites)?</span>
+          </div>
+          <div class="fb-scale" data-name="accuracy" data-na="Not sure"></div>
+          <div class="fb-poles"><span>Unreliable</span><span>Reliable</span></div>
+        </section>
+
+        <section class="fb-q">
+          <div class="fb-q-head">
+            <span class="fb-num">04</span>
+            <span class="fb-label">How clear is the financial ledger (transactions, balances, receipts)?</span>
+          </div>
+          <div class="fb-scale" data-name="ledger" data-na="Not sure"></div>
+          <div class="fb-poles"><span>Unclear</span><span>Clear</span></div>
+        </section>
+
+        <section class="fb-q">
+          <div class="fb-q-head">
+            <span class="fb-num">05</span>
+            <span class="fb-label">How helpful is Grizz, the built-in assistant?</span>
+          </div>
+          <div class="fb-scale" data-name="grizz" data-na="Haven't used it"></div>
+          <div class="fb-poles"><span>Not helpful</span><span>Very helpful</span></div>
+        </section>
+
+        <section class="fb-q">
+          <div class="fb-q-head">
+            <span class="fb-num">06</span>
+            <span class="fb-label">How does the portal run on your device (speed and stability)?</span>
+          </div>
+          <div class="fb-scale" data-name="performance" data-na="0"></div>
+          <div class="fb-poles"><span>Poor</span><span>Good</span></div>
+        </section>
+
+        <section class="fb-q">
+          <div class="fb-q-head">
+            <span class="fb-num">07</span>
+            <label class="fb-label" for="fb-improve">What should the council improve or add first? <em>optional</em></label>
+          </div>
+          <textarea id="fb-improve" name="improve" rows="4" maxlength="2000" placeholder="In your own words: one feature, one fix, or one complaint."></textarea>
+        </section>
+
+        <section class="fb-q">
+          <div class="fb-q-head">
+            <span class="fb-num">08</span>
+            <label class="fb-label" for="fb-bug">Hit a bug? Describe what happened and where. <em>optional</em></label>
+          </div>
+          <textarea id="fb-bug" name="bug" rows="3" maxlength="2000" placeholder="What you did, what you expected, what you saw."></textarea>
+        </section>
+
+        <!-- Honeypot: hidden from humans, catnip for bots -->
+        <div class="fb-hp" aria-hidden="true">
+          <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <div class="fb-actions">
+          <button type="submit" id="fb-submit">Submit feedback</button>
+          <p class="fb-error hidden" id="fb-error" role="alert"></p>
+        </div>
+      </form>
+    </section>
+
+    <!-- Done state -->
+    <div class="fb-done hidden" id="fb-done">
+      <h2>Received.</h2>
+      <p>Thank you. Every submission is read by the council officers.</p>
+      <p><button type="button" id="fb-signout" class="fbv-secondary">Sign out</button></p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/feedback.js"></script>
+</body>
+</html>

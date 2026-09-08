@@ -190,6 +190,12 @@ const UI = (() => {
         window.requestAnimationFrame(() => {
           const diff = currentScrollTop - lastScrollTop;
 
+          // Do not reveal bottom nav if Grizz AI assistant or mobile more drawer is open
+          if (document.body.classList.contains('ursa-open') || document.body.classList.contains('more-sheet-open')) {
+            ticking = false;
+            return;
+          }
+
           if (currentScrollTop <= 25 || isAtBottom) {
             // At the top OR reached the bottom -> Always reveal floating bottom nav!
             bottomNav.classList.remove('nav-hidden');
@@ -219,52 +225,21 @@ const UI = (() => {
     });
   }
 
-  // ---- Sliding Active Indicator (liquid pill that glides between icons) ----
-  // One absolutely-positioned pill per bottom nav; instead of each item
-  // painting its own background, the pill physically travels to the item
-  // that just became active.
-  const _navIndicatorPlaced = new WeakSet();
-  const _navIndicatorBound = new WeakSet();
-
-  function moveNavIndicator(nav) {
+  // Clean nav indicator handler: indicator pill removed, only the icon is orange on click
+  function moveNavIndicator(nav, previewTarget) {
     if (!nav) return;
-    let indicator = nav.querySelector(':scope > .nav-indicator');
-    if (!indicator) {
-      indicator = document.createElement('span');
-      indicator.className = 'nav-indicator ' +
-        (nav.id === 'of-bottom-nav' ? 'of-bottom-nav-indicator' : 'bottom-nav-indicator');
-      indicator.setAttribute('aria-hidden', 'true');
-      nav.prepend(indicator);
-      nav.classList.add('has-nav-indicator');
-    }
-    const target = Array.from(nav.children).find(el => el !== indicator && el.classList.contains('active'));
-    if (!target) return;
-    const x = target.offsetLeft;
-    const w = target.offsetWidth;
-    if (!w) return; // nav not laid out yet (hidden screen / desktop) — retry on next call
-    const firstPlacement = !_navIndicatorPlaced.has(nav);
-    if (firstPlacement) {
-      // Land instantly on the resting pill so the first reveal doesn't slide in from the edge
-      indicator.style.transition = 'none';
-    }
-    indicator.style.width = `${w}px`;
-    indicator.style.transform = `translateX(${x}px)`;
-    if (firstPlacement) {
-      void indicator.offsetWidth; // flush styles so the next move animates
-      indicator.style.transition = '';
-      _navIndicatorPlaced.add(nav);
-    }
+    const indicator = nav.querySelector(':scope > .nav-indicator');
+    if (indicator) indicator.remove();
+    nav.classList.remove('has-nav-indicator');
   }
 
   function initNavIndicators() {
     [document.getElementById('bottom-nav'), document.getElementById('of-bottom-nav')]
       .filter(Boolean)
       .forEach(nav => {
-        moveNavIndicator(nav);
-        if (!_navIndicatorBound.has(nav)) {
-          _navIndicatorBound.add(nav);
-          window.addEventListener('resize', () => moveNavIndicator(nav));
-        }
+        const indicator = nav.querySelector(':scope > .nav-indicator');
+        if (indicator) indicator.remove();
+        nav.classList.remove('has-nav-indicator');
       });
   }
 
@@ -274,15 +249,37 @@ const UI = (() => {
     if (meta) meta.setAttribute('content', theme === 'dark' ? '#0B0F14' : '#F8FAFC');
   }
 
+  // iOS standalone PWA quirk (iPhone home-indicator devices): the first layout
+  // can be computed against a stale viewport height, leaving a phantom gap at
+  // the very bottom of the screen until the user interacts. Nudge WebKit to
+  // re-measure shortly after launch and whenever the app becomes visible again.
+  function kickViewportRelayout() {
+    const body = document.body;
+    if (!body) return;
+    body.style.setProperty('min-height', 'calc(100dvh + 1px)', 'important');
+    // setTimeout instead of rAF: rAF is suspended in occluded tabs, and this
+    // must also run when the PWA window is restored from the background
+    setTimeout(() => {
+      body.style.removeProperty('min-height');
+      window.dispatchEvent(new Event('resize'));
+    }, 30);
+  }
+
   // Auto-bind scroll on DOM ready
   if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initAutoHideBottomNav);
       document.addEventListener('DOMContentLoaded', initNavIndicators);
+      document.addEventListener('DOMContentLoaded', () => setTimeout(kickViewportRelayout, 350));
     } else {
       setTimeout(initAutoHideBottomNav, 100);
       setTimeout(initNavIndicators, 100);
+      setTimeout(kickViewportRelayout, 350);
     }
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) setTimeout(kickViewportRelayout, 150);
+    });
+    window.addEventListener('pageshow', e => { if (e.persisted) kickViewportRelayout(); });
   }
 
   return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators };
