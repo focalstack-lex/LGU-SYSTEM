@@ -45,5 +45,13 @@ check('Enrollment exports lockedReason', /lockedReason:\s*\(\)/.test(enrollmentJ
 check('Enrollment exports draftSubjectIds', /draftSubjectIds:\s*\(\)/.test(enrollmentJs));
 check('addItem returns ok/error contract', /return\s*\{\s*ok:\s*false,\s*error/.test(enrollmentJs));
 
+// --- Grizz add buttons (Task 5) ---
+const aiJs = read('client/js/ai-assistant.js');
+check('appendBotMessage returns message element', /scrollToBottom\(\);\s*\n\s*return msg;/.test(aiJs));
+check('recommendations await ensureReady', /await window\.Enrollment\?\.ensureReady\(\)/.test(aiJs));
+check('per-card add buttons rendered', /data-grizz-add=/.test(aiJs));
+check('add-all button rendered', /data-grizz-add-all/.test(aiJs));
+check('jump link to enrollment view', /ursa-nav-link"\s+data-view="enrollment"/.test(aiJs));
+
 console.log(failed ? `\n${failed} check(s) FAILED` : '\nAll pilot-gate checks passed');
 process.exit(failed ? 1 : 0);

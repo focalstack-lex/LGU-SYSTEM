@@ -538,6 +538,7 @@ const GrizzAI = (() => {
     `;
     stream.appendChild(msg);
     scrollToBottom();
+    return msg;
   }
 
   function scrollToBottom() {
@@ -832,7 +833,7 @@ const GrizzAI = (() => {
   }
 
   // 1. Next Semester Subject Recommendations
-  function handleNextSemRecommendations() {
+  async function handleNextSemRecommendations() {
     const prog = profile?.course || 'BSCoE';
     const progTitle = PROGRAM_NAMES[prog] || prog;
 
@@ -931,6 +932,23 @@ const GrizzAI = (() => {
       return;
     }
 
+    // Phase C: pilot accounts can push recommendations into their Load
+    // Verification draft. Non-pilots get today's cards with no add UI.
+    const pilot = window.isEnrollmentPilot?.(profile?.email);
+    let canEdit = false;
+    let lockNote = '';
+    let inLoad = new Set();
+    if (pilot && window.Enrollment?.ensureReady) {
+      try { await window.Enrollment?.ensureReady(); } catch { /* state stays null → rendered as locked */ }
+      canEdit = !!window.Enrollment.canEdit?.();
+      lockNote = window.Enrollment.lockedReason?.() || '';
+      inLoad = window.Enrollment.draftSubjectIds?.() || new Set();
+    }
+
+    const addButtonFor = (s) => inLoad.has(s.id)
+      ? '<span class="ursa-subject-tag active">In your load ✓</span>'
+      : `<button type="button" class="ursa-add-btn" data-grizz-add="${esc(s.id)}">+ Add</button>`;
+
     const cardsHtml = recommended.map(s => `
       <div class="ursa-subject-item">
         <div class="ursa-subject-meta">
@@ -941,8 +959,21 @@ const GrizzAI = (() => {
           Yr ${s.year_level} · Sem ${s.semester}
         </span>
         ${(s.prereqNotes || []).length ? `<span class="ursa-subject-tag req">Note: ${esc(s.prereqNotes.join(', '))}</span>` : ''}
+        ${pilot ? addButtonFor(s) : ''}
       </div>
     `).join('');
+
+    const addAllHtml = pilot ? `
+      <div class="ursa-response-actions" style="margin-top:0.6rem;">
+        <button type="button" class="ursa-chip-action" data-grizz-add-all
+          ${(!canEdit || !recommended.some(s => !inLoad.has(s.id))) ? 'disabled' : ''}>
+          <iconify-icon icon="solar:cart-plus-linear"></iconify-icon> Add all recommended
+        </button>
+      </div>
+      <p class="ursa-note-text" data-grizz-lock ${canEdit ? 'hidden' : ''}>🔒 Your load is ${esc(lockNote || 'not editable right now')} — subjects can be added once it's back in draft.</p>` : '';
+
+    const jumpHtml = pilot ? `
+      <p style="margin:0.6rem 0 0;"><a href="#" class="ursa-nav-link" data-view="enrollment" style="color:var(--primary);font-weight:600;">Open Load Verification →</a></p>` : '';
 
     const html = `
       <div class="ursa-summary-bar">
@@ -961,15 +992,69 @@ const GrizzAI = (() => {
         ${cardsHtml}
       </div>
 
+      ${addAllHtml}
+      ${jumpHtml}
+      <p class="ursa-note-text" data-grizz-result hidden></p>
       <p class="ursa-note-text">
         Grades can be updated directly in the Academic Progress tab.
       </p>
     `;
 
-    appendBotMessage('Recommended Subject Load', html, [
+    const msg = appendBotMessage('Recommended Subject Load', html, [
       { action: 'academic-progress', label: 'Academic Progress Tally', icon: 'solar:diploma-verified-linear' },
       { action: 'check-prereq', label: 'Check Prerequisites', icon: 'solar:branching-paths-down-linear' },
     ]);
+    if (!pilot || !msg) return;
+
+    const resultEl = msg.querySelector('[data-grizz-result]');
+    const showResult = (text) => { if (resultEl) { resultEl.hidden = false; resultEl.textContent = text; } };
+    const loadIds = () => window.Enrollment.draftSubjectIds?.() || new Set();
+
+    const syncButtons = () => {
+      const ids = loadIds();
+      const editable = !!window.Enrollment.canEdit?.();
+      msg.querySelectorAll('[data-grizz-add]').forEach(b => {
+        const done = ids.has(b.dataset.grizzAdd);
+        b.disabled = done || !editable;
+        b.classList.toggle('added', done);
+        b.textContent = done ? '✓ Added' : '+ Add';
+      });
+      const allBtn = msg.querySelector('[data-grizz-add-all]');
+      if (allBtn) allBtn.disabled = !editable || recommended.every(s => ids.has(s.id));
+    };
+
+    const addOne = async (btn, subject) => {
+      btn.disabled = true;
+      const res = await window.Enrollment.addFromGrizz(subject, 'Recommended by Grizz')
+        .catch(err => ({ ok: false, error: err.message }));
+      showResult(res?.ok ? `✓ Added ${subject.code} to your proposed load.` : (res?.error || 'Could not add the subject.'));
+      syncButtons();
+    };
+
+    msg.querySelectorAll('[data-grizz-add]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const subject = recommended.find(s => String(s.id) === btn.dataset.grizzAdd);
+        if (subject) addOne(btn, subject);
+      });
+    });
+
+    msg.querySelector('[data-grizz-add-all]')?.addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      const ids = loadIds();
+      const pending = recommended.filter(s => !ids.has(s.id));
+      let added = 0;
+      let lastErr = '';
+      for (const s of pending) {
+        const res = await window.Enrollment.addFromGrizz(s, 'Recommended by Grizz')
+          .catch(err => ({ ok: false, error: err.message }));
+        if (res?.ok) added++; else lastErr = res?.error || 'request failed';
+      }
+      showResult(added
+        ? `✓ Added ${added} subject${added === 1 ? '' : 's'} to your proposed load.` + (lastErr ? ` (${pending.length - added} failed: ${lastErr})` : '')
+        : (lastErr || 'Nothing to add.'));
+      syncButtons();
+    });
   }
 
   // 2. Ask About Current Subjects
