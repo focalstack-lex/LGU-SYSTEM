@@ -284,8 +284,8 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Income',
           data: monthly.map(m => m.income),
-          backgroundColor: isLight ? '#0284C7' : '#38BDF8',
-          hoverBackgroundColor: isLight ? '#0369A1' : '#0EA5E9',
+          backgroundColor: isLight ? '#059669' : '#10B981',
+          hoverBackgroundColor: isLight ? '#047857' : '#059669',
           borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: 'bottom',
           maxBarThickness: isMobile ? 18 : 32,
@@ -382,17 +382,27 @@ function renderBreakdownChart(breakdown) {
   if (!canvas || !window.Chart) return;
   if (_breakdownChart) _breakdownChart.destroy();
 
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+
   const typeMap = [
-    { key: 'expense',    label: 'Expenses',   color: '#EF4444' },
-    { key: 'allocation', label: 'Allocation', color: '#8B5CF6' },
-    { key: 'donation',   label: 'Donations',  color: '#22C55E' },
-    { key: 'collection', label: 'Collection', color: '#38BDF8' },
+    { key: 'expense',    label: 'Expenses',   color: isLight ? '#DC2626' : '#EF4444' },
+    { key: 'allocation', label: 'Allocation', color: isLight ? '#4F46E5' : '#6366F1' },
+    { key: 'donation',   label: 'Donations',  color: isLight ? '#059669' : '#10B981' },
+    { key: 'collection', label: 'Collection', color: isLight ? '#0284C7' : '#0EA5E9' },
   ];
 
   const active = typeMap.filter(t => (breakdown[t.key] || 0) > 0);
   const hasData = active.length > 0;
+  const totalVal = active.reduce((sum, t) => sum + (breakdown[t.key] || 0), 0);
 
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const labels = hasData
+    ? active.map(t => {
+        const val = breakdown[t.key] || 0;
+        const pct = totalVal > 0 ? Math.round((val / totalVal) * 100) : 0;
+        return `${t.label} (${pct}%)`;
+      })
+    : ['No Data'];
+
   const textColor = isLight ? '#64748B' : '#94A3B8';
   const tooltipBg = isLight ? '#FFFFFF' : '#0F172A';
   const tooltipText = isLight ? '#0F172A' : '#F8FAFC';
@@ -401,7 +411,7 @@ function renderBreakdownChart(breakdown) {
   _breakdownChart = new Chart(canvas, {
     type: 'doughnut',
     data: {
-      labels: hasData ? active.map(t => t.label) : ['No Data'],
+      labels,
       datasets: [{
         data: hasData ? active.map(t => breakdown[t.key]) : [1],
         backgroundColor: hasData ? active.map(t => t.color) : ['#334155'],
@@ -414,7 +424,7 @@ function renderBreakdownChart(breakdown) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '74%',
+      cutout: '78%',
       plugins: {
         legend: {
           position: 'bottom',
@@ -439,7 +449,11 @@ function renderBreakdownChart(breakdown) {
           titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
           bodyFont: { family: 'Inter, sans-serif', size: 12 },
           callbacks: {
-            label: ctx => ` ${ctx.label}: ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+            label: ctx => {
+              const val = ctx.raw || 0;
+              const pct = totalVal > 0 ? Math.round((val / totalVal) * 100) : 0;
+              return ` ${ctx.label.split(' (')[0]}: ₱${Number(val).toLocaleString('en-PH', { minimumFractionDigits: 2 })} (${pct}%)`;
+            }
           }
         }
       }
