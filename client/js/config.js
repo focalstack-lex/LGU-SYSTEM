@@ -7,9 +7,10 @@ window.SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmF
 window.IS_ELECTRON = window.navigator.userAgent.includes('Electron');
 // Use production API by default for Desktop to avoid blank UI when local server is not running
 // Override via preload if needed: window.electronAPI.getApiBase()
-window.API_BASE = window.IS_ELECTRON 
+// On localhost dev, use the same origin - the CSP (connect-src 'self') blocks cross-origin API calls.
+window.API_BASE = window.IS_ELECTRON
   ? (window.electronAPI && window.electronAPI.getApiBase ? window.electronAPI.getApiBase() : 'https://api.coelgu-system.engineer')
-  : 'https://api.coelgu-system.engineer';
+  : (['localhost', '127.0.0.1'].includes(window.location.hostname) ? '' : 'https://api.coelgu-system.engineer');
 
 if (typeof supabase === 'undefined') {
   console.error('Supabase CDN failed to load. Check your internet connection.');
