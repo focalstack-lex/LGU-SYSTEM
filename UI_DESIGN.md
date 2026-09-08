@@ -26,65 +26,63 @@
 
 ## 1. Design Philosophy
 
-The system follows a **light-first, institutional minimalist** aesthetic. The visual language is modeled on official government and academic publications — calm paper surfaces, defined 1px structure, a sober navy action color — while retaining the College of Engineering's orange strictly as an identity accent.
+The system follows a **Flat Dark Charcoal & Vibrant Coral-Orange Pill** aesthetic. Inspired by modern high-contrast financial and administrative interfaces, the visual language combines flat dark matte surfaces, rounded card geometry, circular action controls, segmented pill toggles, and solid high-energy coral-orange action accents — strictly **without gradients or radial glow overlays**.
 
 **Core principles:**
-- **Structure over decoration** — Hierarchy is carried by 1px borders, spacing, and typographic weight. No glows, no gradients on controls, no hover-lift theatrics.
-- **Light default, dark opt-in** — `:root` is the light institutional theme; `[data-theme="dark"]` retains a graphite variant for users who prefer it.
-- **Institutional navy actions** — `--primary` (#1F3A5F) is used for buttons, links, focus rings, and active states. It passes WCAG AA against white text.
-- **Engineering orange is identity, not action** — `--brand-accent` (#B23A0A light / #ED7D33 dark) appears only on the logo context, unread/live indicator dots, and official marks.
-- **Color carries meaning** — Green = income/positive, Red = expense/negative, Navy = action, Neutral gray = transfers/allocation.
-- **Motion is restrained** — Animations are ≤ 0.45 s, ease/ease-out only (no spring bounce), and are disabled for `prefers-reduced-motion` users.
+- **Flat Solid Surfaces** — Hierarchy is carried by high-contrast matte surfaces (`#121214` base, `#1C1C20` cards, `#26262C` raised controls) and defined 1px structural borders. No gradients, glows, or radial background overlays.
+- **High-Energy Action Accent** — `--primary` and `--brand-accent` (`#FF5533`) provide instant visual clarity for CTAs, active pill tabs, active switches, and circular action icons.
+- **Modern Pill & Card Geometry** — Segmented control tracks use full rounded pills (`border-radius: 9999px`), while surface cards and modals use rounded 16px corners (`--radius-lg: 16px`).
+- **High Contrast Typography** — Headings and monetary metrics use crisp white (`#FFFFFF`) against muted secondary labels (`#9A9AA6`), passing WCAG AAA legibility standards.
+- **Restrained Motion** — State changes use swift 0.25s linear/ease transitions without spring bounce.
 
 ---
 
 ## 2. Color System
 
-### Light Mode (Default — `:root`)
+### Dark System (Default — `:root` / `[data-theme="dark"]`)
 
 | Token | Value | Usage |
 |---|---|---|
-| `--background` | `#F5F6F8` | Paper-gray app shell, page backgrounds |
-| `--surface` | `#FFFFFF` | Sidebar, cards, modals |
-| `--surface-secondary` | `#EEF1F4` | Input fields, raised surfaces |
-| `--surface-hover` | `#E4E8EC` | Hover states |
-| `--border` | `#D5DBE2` | Defined 1px structural borders |
-| `--border-hover` | `#B9C2CC` | Borders on hover |
-| `--primary` | `#1F3A5F` | Institutional navy — action/active/links |
-| `--primary-hover` | `#2A4A73` | Hover state of primary |
-| `--primary-active` | `#152C48` | Pressed/active state |
-| `--brand-accent` | `#B23A0A` | Engineering orange — identity accents only |
-| `--text-primary` | `#17202B` | Headings, primary body text |
-| `--text-secondary` | `#4E5D6E` | Sub-labels, metadata |
-| `--text-tertiary` | `#78859A` | Placeholders, disabled hints |
-| `--success` | `#17703B` | Income, collection, donations |
-| `--warning` | `#B45309` | Over-budget alerts |
-| `--error` | `#B42318` | Expenses, destructive actions |
+| `--background` | `#121214` | Deep matte charcoal app shell & page background |
+| `--surface` | `#1C1C20` | Flat dark card surface, sidebar, modals |
+| `--surface-secondary` | `#26262C` | Input fields, raised control tracks, sub-cards |
+| `--surface-hover` | `#303038` | Interactive hover states |
+| `--border` | `rgba(255,255,255,0.08)` | Crisp 1px structural dividers |
+| `--border-hover` | `rgba(255,255,255,0.16)` | Borders on hover |
+| `--primary` | `#FF5533` | Solid Vibrant Coral-Orange — action CTAs, active pills, links |
+| `--primary-hover` | `#FF6B4A` | Hover state of primary CTA |
+| `--primary-active` | `#E04826` | Pressed/active state of primary CTA |
+| `--brand-accent` | `#FF5533` | Vibrant Coral-Orange brand identity accent |
+| `--text-primary` | `#FFFFFF` | Crisp headings, primary metric amounts |
+| `--text-secondary` | `#9A9AA6` | Sub-labels, tab text, metadata |
+| `--text-tertiary` | `#6E6E7A` | Placeholders, disabled hints |
+| `--success` | `#22C55E` | Income, collection, positive balance |
+| `--warning` | `#F59E0B` | Over-budget alerts |
+| `--error` | `#EF4444` | Expenses, destructive actions |
 
-### Dark Mode (opt-in — `[data-theme="dark"]`)
+### Light Theme (`[data-theme="light"]`)
 
-Retains the graphite palette with institutional actions:
+Flat paper slate surfaces with solid coral-orange action accents:
 
 | Token | Value |
 |---|---|
-| `--background` | `#090D14` |
-| `--surface` | `#0E1520` |
-| `--surface-secondary` | `#131B27` |
-| `--border` | `rgba(255,255,255,0.08)` |
-| `--primary` | `#3E6393` (hover `#4E77AC`, active `#32517D`) |
-| `--brand-accent` | `#ED7D33` |
-| `--text-primary` | `#F1F5F9` |
-| `--success / --warning / --error` | `#22C55E / #F59E0B / #EF4444` |
+| `--background` | `#F4F5F7` |
+| `--surface` | `#FFFFFF` |
+| `--surface-secondary` | `#EAECEF` |
+| `--border` | `#D5DBE2` |
+| `--primary / --brand-accent` | `#FF5533` |
+| `--text-primary / --text-secondary` | `#121417 / #4E5766` |
+| `--success / --warning / --error` | `#16A34A / #D97706 / #DC2626` |
 
 ### Semantic Aliases
 
 | Alias | Resolves To | Context |
 |---|---|---|
-| `--accent` | `--primary` | Navy in action elements |
-| `--accent-muted` | navy/steel tint | Subtle action tint backgrounds |
-| `--status-positive` | `--success` | Income / donations |
+| `--accent` | `--primary` | Coral-orange in action elements |
+| `--accent-muted` | `rgba(255, 85, 51, 0.12)` | Subtle coral-orange tint backgrounds |
+| `--status-positive` | `--success` | Income / collections |
 | `--status-negative` | `--error` | Expenses |
-| `--status-warning` | `--warning` | Over-budget |
+| `--status-warning` | `--warning` | Over-budget alerts |
 | `--status-neutral` | `--text-secondary` | Allocations, transfers |
 
 ---

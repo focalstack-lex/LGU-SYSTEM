@@ -4,38 +4,37 @@
 
 /* ---- Design Tokens ---- */
 :root {
-  /* Render native controls (select dropdowns, scrollbars) in light mode */
-  color-scheme: light;
+  /* Render native controls and scrollbars in dark charcoal mode */
+  color-scheme: dark;
 
-  /* ---- Institutional Minimalist ----
-     Paper-neutral surfaces · navy action color · engineering orange demoted
-     to a restrained brand accent (logo, live indicators, official marks).
-     Structure is carried by 1px borders and spacing, not shadow or glow. */
-  --background: #F5F6F8;        /* paper-gray app shell, page background */
-  --surface: #FFFFFF;           /* sidebar, modals, cards */
-  --surface-secondary: #EEF1F4; /* input fields, raised surfaces */
-  --surface-hover: #E4E8EC;     /* hover states */
+  /* ---- Flat Dark Charcoal & Solid Coral-Orange System ----
+     Pure flat matte surfaces without gradients · high-contrast white typography ·
+     vibrant coral-orange actions & pill toggles · rounded 16px card geometry. */
+  --background: #121214;        /* Deep matte charcoal app shell & page background */
+  --surface: #1C1C20;           /* Flat dark card surface */
+  --surface-secondary: #26262C; /* Raised input fields, secondary cards & containers */
+  --surface-hover: #303038;     /* Surface hover state */
 
-  --border: #D5DBE2;            /* defined 1px structural border */
-  --border-hover: #B9C2CC;
+  --border: rgba(255, 255, 255, 0.08); /* 1px crisp structural border */
+  --border-hover: rgba(255, 255, 255, 0.16);
 
-  --primary: #1F3A5F;           /* institutional navy - actions, links, focus */
-  --primary-hover: #2A4A73;
-  --primary-active: #152C48;
-  --primary-glow: transparent;  /* glows removed - flat institutional surfaces */
+  --primary: #FF5533;           /* Solid Vibrant Coral-Orange CTA / Primary Action */
+  --primary-hover: #FF6B4A;
+  --primary-active: #E04826;
+  --primary-glow: transparent;  /* Gradients and radial glows strictly removed */
 
-  --brand-accent: #B23A0A;      /* deepened engineering orange - identity only */
-  --brand-accent-muted: rgba(178, 58, 10, 0.1);
+  --brand-accent: #FF5533;      /* Vibrant Coral-Orange brand identity accent */
+  --brand-accent-muted: rgba(255, 85, 51, 0.14);
 
-  --text-primary: #17202B;
-  --text-secondary: #4E5D6E;
-  --text-tertiary: #78859A;
+  --text-primary: #FFFFFF;      /* Crisp high-contrast heading and primary text */
+  --text-secondary: #9A9AA6;    /* Muted secondary labels & metadata */
+  --text-tertiary: #6E6E7A;     /* Input placeholders & minor hints */
 
-  --success: #17703B;
-  --warning: #B45309;
-  --error: #B42318;
+  --success: #22C55E;           /* Income & collection positive green */
+  --warning: #F59E0B;           /* Over-budget alerts amber */
+  --error: #EF4444;             /* Expenses & destructive red */
 
-  /* ---- Semantic aliases (older components reference these) ---- */
+  /* ---- Semantic aliases ---- */
   --bg-base: var(--background);
   --bg-surface: var(--surface);
   --bg-surface-raised: var(--surface-secondary);
@@ -43,37 +42,35 @@
   --border-default: var(--border);
 
   --accent: var(--primary);
-  --accent-muted: rgba(31, 58, 95, 0.08);
+  --accent-muted: rgba(255, 85, 51, 0.12);
   --accent-text-on: #FFFFFF;
 
-  --border-focus: var(--accent); /* focus = navy, matching the action color */
+  --border-focus: var(--accent); /* Focus ring = solid coral-orange */
 
-  --status-positive: var(--success); /* income / donation / collection */
-  --status-negative: var(--error);   /* expense */
-  --status-warning: var(--warning);  /* over-budget alerts */
-  --status-neutral: var(--text-secondary); /* allocation - informational */
+  --status-positive: var(--success);
+  --status-negative: var(--error);
+  --status-warning: var(--warning);
+  --status-neutral: var(--text-secondary);
 
-  /* Radius - crisper institutional geometry */
-  --radius-sm: 4px;
-  --radius-md: 6px;
+  /* Modern Pill & Card Geometry */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
 
-  /* Shadows - near-flat; hierarchy is carried by borders and spacing */
-  --shadow-popover: 0 4px 12px -2px rgba(16, 24, 40, 0.14);
-  --shadow-card: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
-  --shadow-card-hover: 0 1px 3px 0 rgba(16, 24, 40, 0.08);
-  --shadow-modal: 0 12px 32px -8px rgba(16, 24, 40, 0.22);
-  --bg-surface-elevated: #FFFFFF;
+  /* Flat Shadows - No gradient glows */
+  --shadow-popover: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: 0 4px 14px -2px rgba(0, 0, 0, 0.35);
+  --shadow-modal: 0 20px 48px -6px rgba(0, 0, 0, 0.7);
+  --bg-surface-elevated: #26262C;
 
   /* Sleek Scrollbar Tokens */
-  --scrollbar-thumb: rgba(23, 32, 43, 0.2);
-  --scrollbar-thumb-hover: rgba(23, 32, 43, 0.38);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.16);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
   --scrollbar-track: transparent;
 
-  /* ---- Typography Tokens ----
-     Inter = Primary UI, Headings, Navigation, Labels & General Typography
-     Public Sans = Numeric Metrics, Currency Figures, KPIs & Tabular Counts
-     (open-licensed government typeface, replaces Proxima Nova)
-     JetBrains Mono = Technical / Code / Monospaced Data */
+  /* ---- Typography Tokens ---- */
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-body: var(--font-ui);
   --font-family: var(--font-ui);
@@ -95,7 +92,7 @@
   --font-size-metadata: 0.75rem; /* 12px */
   --font-size-badge: 0.72rem; /* 11.5px */
 
-  /* Legacy Typographic scale (used by base heading/body rules) */
+  /* Legacy Typographic scale */
   --size-11: 11px;
   --size-13: 13px;
   --size-15: 14px;
@@ -103,13 +100,11 @@
   --size-22: 22px;
   --size-28: 30px;
 
-  /* Layout & Animation Utilities (Retained for Structural Integrity) */
+  /* Layout & Animation Utilities */
   --sidebar-w: 252px;
   --transition: 0.25s ease;
 
-  /* ---- Legacy aliases (kept for compatibility with older components) ----
-     These resolve to the current token system so leftover --col-* references
-     render correctly instead of silently falling back to browser defaults. */
+  /* Legacy aliases */
   --col-bg: var(--bg-base);
   --col-card: var(--bg-surface);
   --col-surface: var(--bg-surface);
@@ -122,58 +117,86 @@
   --col-primary: var(--accent);
 }
 
-/* Light is the default theme; this block keeps the explicit attribute valid. */
-[data-theme="light"] {
-  color-scheme: light;
-}
-
-/* ---- Dark Theme (opt-in) ----
-   Retains the graphite palette with the institutional action color:
-   steel-navy actions, orange kept strictly as a brand accent. */
+/* Explicit Dark Theme matches Root Charcoal System */
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --background: #090D14;
-  --surface: #0E1520;
-  --surface-secondary: #131B27;
-  --surface-hover: #192332;
+  --background: #121214;
+  --surface: #1C1C20;
+  --surface-secondary: #26262C;
+  --surface-hover: #303038;
 
   --border: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.16);
 
-  --primary: #3E6393;           /* steel navy - institutional action on dark */
-  --primary-hover: #4E77AC;
-  --primary-active: #32517D;
+  --primary: #FF5533;
+  --primary-hover: #FF6B4A;
+  --primary-active: #E04826;
   --primary-glow: transparent;
 
-  --brand-accent: #ED7D33;      /* engineering orange - identity accents only */
-  --brand-accent-muted: rgba(237, 125, 51, 0.16);
+  --brand-accent: #FF5533;
+  --brand-accent-muted: rgba(255, 85, 51, 0.14);
 
-  --text-primary: #F1F5F9;
-  --text-secondary: #94A3B8;
-  --text-tertiary: #64748B;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9A9AA6;
+  --text-tertiary: #6E6E7A;
 
   --success: #22C55E;
   --warning: #F59E0B;
   --error: #EF4444;
 
   --accent: var(--primary);
-  --accent-muted: rgba(122, 160, 205, 0.16);
+  --accent-muted: rgba(255, 85, 51, 0.12);
   --accent-text-on: #FFFFFF;
   --border-focus: var(--accent);
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
 
   --shadow-popover: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-  --shadow-card-hover: 0 1px 4px 0 rgba(0, 0, 0, 0.4);
-  --shadow-modal: 0 20px 48px -6px rgba(0, 0, 0, 0.65);
-  --bg-surface-elevated: #131B27;
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: 0 4px 14px -2px rgba(0, 0, 0, 0.35);
+  --shadow-modal: 0 20px 48px -6px rgba(0, 0, 0, 0.7);
+  --bg-surface-elevated: #26262C;
 
   --scrollbar-thumb: rgba(255, 255, 255, 0.16);
   --scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
   --scrollbar-track: transparent;
+}
+
+/* Light Theme Variant - Flat Paper Slate with Coral-Orange Action Accents */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --background: #F4F5F7;
+  --surface: #FFFFFF;
+  --surface-secondary: #EAECEF;
+  --surface-hover: #E0E3E8;
+
+  --border: #D5DBE2;
+  --border-hover: #B9C2CC;
+
+  --primary: #FF5533;
+  --primary-hover: #FF6B4A;
+  --primary-active: #E04826;
+  --primary-glow: transparent;
+
+  --brand-accent: #FF5533;
+  --brand-accent-muted: rgba(255, 85, 51, 0.1);
+
+  --text-primary: #121417;
+  --text-secondary: #4E5766;
+  --text-tertiary: #6E798A;
+
+  --success: #16A34A;
+  --warning: #D97706;
+  --error: #DC2626;
+
+  --bg-surface-elevated: #FFFFFF;
+  --scrollbar-thumb: rgba(18, 20, 23, 0.2);
+  --scrollbar-thumb-hover: rgba(18, 20, 23, 0.38);
 }
 
 
