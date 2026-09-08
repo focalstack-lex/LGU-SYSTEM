@@ -7123,6 +7123,12 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon {
   flex: 1;
   min-width: 0;
 }
+/* Dropdowns.js replaces the select with a .dd.dd-system wrapper, which is
+   flex: 0 0 auto by default - restore growth inside the picker row. */
+.enrollment-picker .dd-system {
+  flex: 1 1 auto;
+  min-width: 0;
+}
 #enrollment-submit-btn {
   width: 100%;
 }
