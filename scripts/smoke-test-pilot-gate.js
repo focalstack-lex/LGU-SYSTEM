@@ -34,5 +34,9 @@ const enrollmentJs = read('client/js/enrollment.js');
 check('enrollment load() checks isEnrollmentPilot', /isEnrollmentPilot/.test(enrollmentJs));
 check('enrollment renders gated notice', /renderGatedNotice/.test(enrollmentJs));
 
+// --- faculty portal gate (Task 3) ---
+const facultyJs = read('client/js/faculty/faculty.js');
+check('faculty boot() checks isEnrollmentPilot', /isEnrollmentPilot/.test(facultyJs));
+
 console.log(failed ? `\n${failed} check(s) FAILED` : '\nAll pilot-gate checks passed');
 process.exit(failed ? 1 : 0);

@@ -72,6 +72,9 @@ const FacultyPortal = (() => {
     if (!FACULTY_ROLES.includes(profile.role)) {
       return showGate('This portal is for program heads, faculty staff, and the dean only.');
     }
+    if (!window.isEnrollmentPilot?.(profile.email)) {
+      return showGate('🚧 The enrollment verification portal is still under development. It will open for your role soon.');
+    }
 
     $('faculty-gate').hidden = true;
     $('faculty-app').hidden = false;
