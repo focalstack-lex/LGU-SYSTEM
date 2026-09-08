@@ -4234,7 +4234,7 @@ iconify-icon {
   /* Scroll clearance: 58px nav + 10px float gap + 44px Grizz launcher parked
      above the nav + breathing room + full safe-area inset —
      content must clear both floating controls with dedicated reserved space */
-  body .main-content { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)) !important; }
+  body .main-content { padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important; }
   body .view { padding: 0 0.75rem 0 !important; }
   body #view-dashboard .dashboard-grid { margin-bottom: 1.5rem !important; }
   body .view-header {
@@ -7731,7 +7731,7 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon {
 /* Safe scroll clearance so scrolling stops cleanly right at the bottom of the card */
 @media (max-width: 768px) {
   .main-content {
-    padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 
