@@ -160,14 +160,16 @@ const GATED_NAME = 'Gate Checker (Test)';
     } else {
       await admin.from('profiles').update({ role: 'student', course: 'BSCoE', year_level: '1' }).eq('id', gatedUser.id);
     }
-    // Roster row so the sign-in verification gate lets the account through.
-    const rosterName = 'GATE, CHECKER TEST';
-    const { data: rosterRow } = await admin.from('enrolled_students').select('id').eq('full_name', rosterName).maybeSingle();
-    if (!rosterRow) {
-      const { error } = await admin.from('enrolled_students').insert({
-        full_name: rosterName, sex: 'M', department: 'CoE', course: 'BSCoE', year_level: '1',
-      });
-      if (error) console.log('  gated roster FAIL: ' + error.message);
+    // Roster rows so the sign-in verification gate lets the accounts through.
+    const rosterAdds = ['GATE, CHECKER TEST', 'SANTOS, MARIA TEST'];
+    for (const rosterName of rosterAdds) {
+      const { data: rosterRow } = await admin.from('enrolled_students').select('id').eq('full_name', rosterName).maybeSingle();
+      if (!rosterRow) {
+        const { error } = await admin.from('enrolled_students').insert({
+          full_name: rosterName, sex: 'F', department: 'CoE', course: rosterName.startsWith('SANTOS') ? 'BSCE' : 'BSCoE', year_level: rosterName.startsWith('SANTOS') ? '3' : '1',
+        });
+        if (error) console.log('  roster FAIL (' + rosterName + '): ' + error.message);
+      }
     }
   }
 
