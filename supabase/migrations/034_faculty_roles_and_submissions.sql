@@ -100,9 +100,9 @@ CREATE INDEX IF NOT EXISTS enrollment_submission_items_submission_idx
 -- 5. RLS (030/031 style: enable, revoke anon, DROP-first policies)
 -- =============================================
 ALTER TABLE public.enrollment_submissions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.enrollment_submissions REVOKE ALL ON TABLE enrollment_submissions FROM anon;
+REVOKE ALL ON TABLE public.enrollment_submissions FROM anon;
 ALTER TABLE public.enrollment_submission_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.enrollment_submission_items REVOKE ALL ON TABLE enrollment_submission_items FROM anon;
+REVOKE ALL ON TABLE public.enrollment_submission_items FROM anon;
 
 DROP POLICY IF EXISTS "Students read own submissions" ON public.enrollment_submissions;
 CREATE POLICY "Students read own submissions"
