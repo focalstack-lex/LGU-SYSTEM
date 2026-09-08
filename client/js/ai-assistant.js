@@ -947,7 +947,7 @@ const GrizzAI = (() => {
 
     const addButtonFor = (s) => inLoad.has(s.id)
       ? '<span class="ursa-subject-tag active">In your load ✓</span>'
-      : `<button type="button" class="ursa-add-btn" data-grizz-add="${esc(s.id)}">+ Add</button>`;
+      : `<button type="button" class="ursa-add-btn"${canEdit ? '' : ' disabled'} data-grizz-add="${esc(s.id)}">+ Add</button>`;
 
     const cardsHtml = recommended.map(s => `
       <div class="ursa-subject-item">
