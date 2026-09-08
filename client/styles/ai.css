@@ -1193,16 +1193,24 @@ body:has(#ursa-drawer.active) .grizz-launcher {
 
   .ursa-launcher,
   .grizz-launcher {
-    bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
-    right: max(1rem, env(safe-area-inset-right, 1rem)) !important;
-    width: 44px;
-    height: 44px;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    right: max(0.85rem, env(safe-area-inset-right, 0.85rem)) !important;
+    width: 42px;
+    height: 42px;
     padding: 0;
     border-radius: 50%;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease !important;
+  }
+
+  .ursa-launcher.launcher-hidden,
+  .grizz-launcher.launcher-hidden {
+    transform: translateY(36px) scale(0.85) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 
   .ursa-launcher .ursa-launcher-text,
@@ -1212,8 +1220,8 @@ body:has(#ursa-drawer.active) .grizz-launcher {
 
   .ursa-avatar-badge,
   .grizz-avatar-badge {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border: none;
   }
 
@@ -1222,15 +1230,16 @@ body:has(#ursa-drawer.active) .grizz-launcher {
   .ursa-dashboard-widget {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.4rem;
-    padding: 0.4rem 0.65rem;
-    margin-bottom: 0.85rem;
+    gap: 0.35rem;
+    padding: 0.35rem 0.6rem;
+    margin-bottom: 0.65rem;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--surface-secondary, #1C1C20);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md, 12px);
   }
 
   .grizz-bar-identity,
@@ -1240,6 +1249,23 @@ body:has(#ursa-drawer.active) .grizz-launcher {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    gap: 0.45rem;
+  }
+
+  .grizz-avatar-wrap,
+  .ursa-dash-avatar {
+    width: 22px;
+    height: 22px;
+  }
+
+  .grizz-name {
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .grizz-role {
+    font-size: 0.68rem;
+    color: var(--text-tertiary, #6E6E7A);
   }
 
   .grizz-bar-divider {
@@ -1252,20 +1278,25 @@ body:has(#ursa-drawer.active) .grizz-launcher {
     max-width: 100%;
     box-sizing: border-box;
     display: flex;
-    gap: 0.45rem;
+    gap: 0.35rem;
     padding-bottom: 2px;
     overflow-x: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    mask-image: linear-gradient(to right, black 88%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 88%, transparent 100%);
+    mask-image: linear-gradient(to right, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
   }
 
   .grizz-prompt-pill,
   .ursa-dash-chip {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.72rem;
-    height: 34px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.68rem;
+    height: 28px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 }
 

@@ -338,7 +338,7 @@
         <div class="view-header view-header-compact">
           <div>
             <h2>Financial Dashboard</h2>
-            <p class="view-sub">Real-time COE LGU funds overview <span class="view-sub-formula">&bull; General Fund = Net Cash − Unspent Envelopes</span></p>
+            <p class="view-sub">Real-time COE funds <span class="view-sub-formula">&bull; Gen Fund = Cash − Envelopes</span></p>
           </div>
         </div>
 
@@ -348,15 +348,14 @@
         <div class="stats-summary-wrapper">
           <!-- PRIMARY FEATURED METRIC: Available General Fund -->
           <div class="stat-card stat-card-hero stat-balance" data-nav="reports" role="button" tabindex="0" title="Open Financial Reports & Breakdown">
-            <div class="stat-hero-badge">
-              <span class="stat-icon"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></span>
+            <div class="stat-hero-header">
+              <div class="stat-hero-title-group">
+                <span class="stat-icon stat-icon-hero"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></span>
+                <p class="stat-label stat-label-hero">Available General Fund</p>
+              </div>
               <span class="hero-badge-tag">Actionable Balance</span>
             </div>
-            <div class="stat-body">
-              <div class="stat-label-row">
-                <p class="stat-label">Available General Fund</p>
-                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
-              </div>
+            <div class="stat-body stat-hero-body">
               <h3 class="stat-value stat-value-hero" id="stat-balance">₱0.00</h3>
               <p class="stat-sublabel">Immediately unreserved cash balance for LGU operations</p>
             </div>
@@ -370,7 +369,6 @@
               <div class="stat-body">
                 <div class="stat-label-row">
                   <p class="stat-label">Total Income</p>
-                  <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
                 </div>
                 <h3 class="stat-value" id="stat-income">₱0.00</h3>
                 <p class="stat-sublabel">All received funds</p>
@@ -383,7 +381,6 @@
               <div class="stat-body">
                 <div class="stat-label-row">
                   <p class="stat-label">Total Expenses</p>
-                  <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
                 </div>
                 <h3 class="stat-value" id="stat-expense">₱0.00</h3>
                 <p class="stat-sublabel">Total spent</p>
@@ -396,7 +393,6 @@
               <div class="stat-body">
                 <div class="stat-label-row">
                   <p class="stat-label">Total Donations</p>
-                  <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
                 </div>
                 <h3 class="stat-value" id="stat-donations">₱0.00</h3>
                 <p class="stat-sublabel">Sponsor gifts</p>

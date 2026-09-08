@@ -196,15 +196,19 @@ const UI = (() => {
             return;
           }
 
+          const launcher = document.getElementById('ursa-launcher-btn');
           if (currentScrollTop <= 25 || isAtBottom) {
-            // At the top OR reached the bottom -> Always reveal floating bottom nav!
+            // At the top OR reached the bottom -> Always reveal floating bottom nav and launcher!
             bottomNav.classList.remove('nav-hidden');
+            if (launcher) launcher.classList.remove('launcher-hidden');
           } else if (diff > HIDE_THRESHOLD) {
-            // Scrolling DOWN -> Hide floating nav
+            // Scrolling DOWN -> Hide floating nav and launcher for unobstructed view
             bottomNav.classList.add('nav-hidden');
+            if (launcher) launcher.classList.add('launcher-hidden');
           } else if (diff < -SHOW_THRESHOLD) {
-            // Scrolling UP -> Reveal floating nav
+            // Scrolling UP -> Reveal floating nav and launcher
             bottomNav.classList.remove('nav-hidden');
+            if (launcher) launcher.classList.remove('launcher-hidden');
           }
 
           lastScrollTop = Math.max(0, currentScrollTop);
@@ -221,6 +225,8 @@ const UI = (() => {
     document.querySelectorAll('.bottom-nav-item, .nav-item').forEach(btn => {
       btn.addEventListener('click', () => {
         bottomNav.classList.remove('nav-hidden');
+        const launcher = document.getElementById('ursa-launcher-btn');
+        if (launcher) launcher.classList.remove('launcher-hidden');
       });
     });
   }
