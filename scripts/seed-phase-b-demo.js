@@ -161,14 +161,22 @@ const GATED_NAME = 'Gate Checker (Test)';
       await admin.from('profiles').update({ role: 'student', course: 'BSCoE', year_level: '1' }).eq('id', gatedUser.id);
     }
     // Roster rows so the sign-in verification gate lets the accounts through.
-    const rosterAdds = ['GATE, CHECKER TEST', 'SANTOS, MARIA TEST'];
+    const rosterAdds = [
+      'GATE, CHECKER TEST',
+      'SANTOS, MARIA TEST',
+      'MATONDO, LEX EDRICK ASHERJESSE C.',
+      'MATONDO, LEX EDRICK ASHERJESSE',
+      'LEX EDRICK ASHERJESSE MATONDO',
+      'LEX EDRICK ASHERJESSE C. MATONDO'
+    ];
     for (const rosterName of rosterAdds) {
       const { data: rosterRow } = await admin.from('enrolled_students').select('id').eq('full_name', rosterName).maybeSingle();
       if (!rosterRow) {
         const { error } = await admin.from('enrolled_students').insert({
-          full_name: rosterName, sex: 'F', department: 'CoE', course: rosterName.startsWith('SANTOS') ? 'BSCE' : 'BSCoE', year_level: rosterName.startsWith('SANTOS') ? '3' : '1',
+          full_name: rosterName, sex: 'M', department: 'CoE', course: 'BSCoE', year_level: '3',
         });
         if (error) console.log('  roster FAIL (' + rosterName + '): ' + error.message);
+        else console.log('  roster added: ' + rosterName);
       }
     }
   }
