@@ -34,4 +34,22 @@ if (typeof supabase === 'undefined') {
   window.addEventListener('beforeunload', cleanupRealtime);
 }
 
+// =============================================
+// Enrollment pilot allowlist (Phase B/C rollout, spec 2026-09-08).
+// Server mirror: server/middleware/roles.js PILOT_DEFAULT.
+// =============================================
+window.ENROLLMENT_PILOT_EMAILS = [
+  'lexmatondo@g.cjc.edu.ph',   // admin / developer
+  'test.newuser@g.cjc.edu.ph', // student: Alex Rivera (BSCoE, Yr 2)
+  'bsce.test@g.cjc.edu.ph',    // student: Maria Santos (BSCE, seeded submitted load)
+  'head.test@g.cjc.edu.ph',    // program head (BSCoE)
+  'dean.test@g.cjc.edu.ph',    // dean
+  'sa.test@g.cjc.edu.ph',      // student assistant (faculty role)
+  'klydemodina@g.cjc.edu.ph',  // real student account for live testing
+];
+window.isEnrollmentPilot = function (email) {
+  const v = String(email || '').trim().toLowerCase();
+  return (window.ENROLLMENT_PILOT_EMAILS || []).some(e => String(e).trim().toLowerCase() === v);
+};
+
 

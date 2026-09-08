@@ -24,5 +24,15 @@ check('enrollment router applies pilotGate', /router\.use\(requireStudent\);\s*\
 const fac = read('server/routes/faculty.js');
 check('faculty router applies pilotGate', /router\.use\(requireFaculty\);\s*\n\s*router\.use\(pilotGate\)/.test(fac));
 
+// --- client flag + student gate (Task 2) ---
+const cfg = read('client/js/config.js');
+check('config defines ENROLLMENT_PILOT_EMAILS', /ENROLLMENT_PILOT_EMAILS\s*=/.test(cfg));
+check('config defines isEnrollmentPilot', /window\.isEnrollmentPilot\s*=/.test(cfg));
+check('config pilot list has 7 emails', (cfg.match(/@g\.cjc\.edu\.ph/g) || []).length >= 7);
+
+const enrollmentJs = read('client/js/enrollment.js');
+check('enrollment load() checks isEnrollmentPilot', /isEnrollmentPilot/.test(enrollmentJs));
+check('enrollment renders gated notice', /renderGatedNotice/.test(enrollmentJs));
+
 console.log(failed ? `\n${failed} check(s) FAILED` : '\nAll pilot-gate checks passed');
 process.exit(failed ? 1 : 0);

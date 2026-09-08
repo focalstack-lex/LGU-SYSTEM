@@ -21,8 +21,29 @@ const EnrollmentSection = (() => {
   let current = null; // active submission (with items)
 
   // ---- Load ----
+  // Pilot gate: non-allowlisted accounts see a notice instead of the feature.
+  function renderGatedNotice() {
+    const section = document.getElementById('view-enrollment');
+    if (!section) return;
+    section.querySelector('.enrollment-grid')?.remove();
+    let note = section.querySelector('.enrollment-gated');
+    if (!note) {
+      note = document.createElement('div');
+      note.className = 'enrollment-gated';
+      section.appendChild(note);
+    }
+    note.innerHTML = `
+      <h3>🚧 Load Verification is still under development</h3>
+      <p>This feature is being polished and will open for your account soon.
+         You'll be notified once it's live.</p>`;
+  }
+
   async function load() {
     const profile = await Auth.getProfile().catch(() => null);
+    if (!window.isEnrollmentPilot?.(profile?.email)) {
+      renderGatedNotice();
+      return;
+    }
     // checklists API validates exact casing ('BSCoE' | 'BSCE' | 'BSECE')
     const PROGRAMS = ['BSCoE', 'BSCE', 'BSECE'];
     const upper = (profile?.course || '').trim().toUpperCase();
