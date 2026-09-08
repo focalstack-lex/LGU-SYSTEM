@@ -479,54 +479,82 @@ html body .hidden {
 }
 
 /* =============================================
-   AUTHENTICATION SCREEN - Split Layout (Institutional Light)
-   Follows the global theme; the brand panel carries the official identity.
+   AUTHENTICATION SCREEN - Permanently Dark Charcoal & Coral-Orange
+   The login section MUST ALWAYS be dark mode and NEVER light under any circumstance.
    ============================================= */
-#auth-screen {
-  background-color: var(--background);
-  color: var(--text-primary);
+#auth-screen,
+html[data-theme="light"] #auth-screen,
+html[data-theme="dark"] #auth-screen,
+body #auth-screen {
+  color-scheme: dark !important;
+  --background: #121214 !important;
+  --surface: #1C1C20 !important;
+  --surface-secondary: #26262C !important;
+  --surface-hover: #303038 !important;
+  --border: rgba(255, 255, 255, 0.08) !important;
+  --border-hover: rgba(255, 255, 255, 0.16) !important;
+  --border-default: rgba(255, 255, 255, 0.08) !important;
+  --border-focus: #FF5533 !important;
+  --primary: #FF5533 !important;
+  --primary-hover: #FF6B4A !important;
+  --primary-active: #E04826 !important;
+  --brand-accent: #FF5533 !important;
+  --brand-accent-muted: rgba(255, 85, 51, 0.14) !important;
+  --text-primary: #FFFFFF !important;
+  --text-secondary: #9A9AA6 !important;
+  --text-tertiary: #6E6E7A !important;
+  --text-muted: #8B949E !important;
+  --bg-base: #121214 !important;
+  --bg-surface: #1C1C20 !important;
+  --bg-surface-raised: #26262C !important;
+  --bg-surface-elevated: #1C1C20 !important;
+  background-color: #121214 !important;
+  color: #FFFFFF !important;
   flex-direction: row;
   height: 100vh;
   overflow: hidden;
 }
 
-/* ---- Left Brand Panel ---- */
-.auth-brand-panel {
+/* ---- Left Brand Panel: Dark Institutional Slate ---- */
+.auth-brand-panel,
+html[data-theme="light"] .auth-brand-panel,
+html[data-theme="dark"] .auth-brand-panel {
   position: relative;
   flex: 0 0 50%;
-  background-color: #EEF1F4; /* paper panel - the pattern overlays it faintly */
-  border-right: 1px solid var(--border-default);
+  background-color: #0D1117 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Pattern artwork - restrained to a faint engraved texture on paper */
-.auth-brand-panel::before {
+/* Pattern artwork - crisp dark graphite engraving overlay */
+.auth-brand-panel::before,
+html[data-theme="light"] .auth-brand-panel::before,
+html[data-theme="dark"] .auth-brand-panel::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image: url('../assets/bg-pattern-front.png');
   background-size: cover;
   background-position: center;
-  opacity: 0.16;
+  opacity: 0.45 !important;
   pointer-events: none;
-  animation: brandPatternIn 0.6s ease-out both;
+  animation: brandPatternInDark 0.6s ease-out both;
 }
 
-/* Dark theme: the dark engraving reads as texture on a graphite panel */
 [data-theme="dark"] .auth-brand-panel {
-  background-color: #0D1117;
+  background-color: #0D1117 !important;
 }
 [data-theme="dark"] .auth-brand-panel::before {
-  opacity: 0.45;
+  opacity: 0.45 !important;
   animation-name: brandPatternInDark;
 }
 
 @keyframes brandPatternIn {
   from { opacity: 0; transform: scale(1.04); }
-  to   { opacity: 0.16; transform: scale(1); }
+  to   { opacity: 0.45; transform: scale(1); }
 }
 
 @keyframes brandPatternInDark {
@@ -603,13 +631,15 @@ html body .hidden {
 }
 
 /* ---- Right Form Panel ---- */
-.auth-form-panel {
+.auth-form-panel,
+html[data-theme="light"] .auth-form-panel,
+html[data-theme="dark"] .auth-form-panel {
   flex: 0 0 50%;
-  background-color: var(--bg-base);
-  /* Static engineering-grid hairlines - 1px, faint ink on paper, no blur/fade */
+  background-color: #121214 !important;
+  /* Dark subtle engineering grid - never white or paper */
   background-image:
-    repeating-linear-gradient(0deg,  rgba(23, 32, 43, 0.045) 0 1px, transparent 1px 28px),
-    repeating-linear-gradient(90deg, rgba(23, 32, 43, 0.045) 0 1px, transparent 1px 28px);
+    repeating-linear-gradient(0deg,  rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 28px) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -627,48 +657,61 @@ html body .hidden {
   text-align: center;
 }
 
-.auth-form-header h2 {
+.auth-form-header h2,
+html[data-theme="light"] .auth-form-header h2 {
   font-size: 1.8rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: var(--text-primary);
+  color: #FFFFFF !important;
 }
 
-.auth-form-header p {
+.auth-form-header p,
+html[data-theme="light"] .auth-form-header p {
   font-size: 0.95rem;
-  color: var(--text-secondary);
+  color: #9A9AA6 !important;
   margin-top: 0.5rem;
   line-height: 1.6;
   font-family: var(--font-body);
 }
 
-/* ---- Auth inputs - dark-on-dark, no white boxes ---- */
+/* ---- Auth inputs - strictly dark-on-dark, never light ---- */
 .auth-form-panel .form-group input,
-.auth-form-panel .form-group select {
-  background: var(--bg-surface-raised);
-  border: 1px solid var(--border-default);
-  color: var(--text-primary);
+.auth-form-panel .form-group select,
+html[data-theme="light"] .auth-form-panel .form-group input,
+html[data-theme="light"] .auth-form-panel .form-group select {
+  background: #26262C !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+  border-radius: var(--radius-md, 12px) !important;
   transition: border-color var(--transition), box-shadow var(--transition);
 }
+.auth-form-panel .form-group input::placeholder,
+html[data-theme="light"] .auth-form-panel .form-group input::placeholder {
+  color: #6E6E7A !important;
+}
 .auth-form-panel .form-group input:hover,
-.auth-form-panel .form-group select:hover {
-  border-color: var(--border-hover);
+.auth-form-panel .form-group select:hover,
+html[data-theme="light"] .auth-form-panel .form-group input:hover,
+html[data-theme="light"] .auth-form-panel .form-group select:hover {
+  border-color: rgba(255, 255, 255, 0.16) !important;
 }
 .auth-form-panel .form-group input:focus,
-.auth-form-panel .form-group select:focus {
-  border-color: var(--accent);
+.auth-form-panel .form-group select:focus,
+html[data-theme="light"] .auth-form-panel .form-group input:focus,
+html[data-theme="light"] .auth-form-panel .form-group select:focus {
+  border-color: #FF5533 !important;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(70, 110, 153, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 85, 51, 0.15) !important;
 }
 
-/* Force dark theme during browser autofill (UA default light-blue/yellow surfaces) */
+/* Force dark theme during browser autofill */
 .auth-form-panel input:-webkit-autofill,
 .auth-form-panel input:-webkit-autofill:hover,
 .auth-form-panel input:-webkit-autofill:focus,
-.auth-form-panel input:-webkit-autofill:active {
-  -webkit-text-fill-color: var(--text-primary) !important;
-  /* Translucent shadow override keeps the input dark-mode surface color */
-  box-shadow: 0 0 0 1000px var(--bg-surface-raised) inset !important;
+.auth-form-panel input:-webkit-autofill:active,
+html[data-theme="light"] .auth-form-panel input:-webkit-autofill {
+  -webkit-text-fill-color: #FFFFFF !important;
+  box-shadow: 0 0 0 1000px #26262C inset !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -842,39 +885,49 @@ html body .hidden {
   #auth-screen:not(.active) {
     display: none !important;
   }
-  #auth-screen.active {
+  #auth-screen,
+  #auth-screen.active,
+  body #auth-screen,
+  body #auth-screen.active,
+  html[data-theme="light"] #auth-screen,
+  html[data-theme="light"] #auth-screen.active {
     display: flex !important;
-    flex-direction: column;
-    height: auto;
-    min-height: 100vh;
-    min-height: 100dvh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    background-color: var(--bg-base);
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    background-color: #121214 !important;
   }
 
-  .auth-brand-panel {
-    border-right: none;
-    border-bottom: 1px solid var(--border-default);
-    height: 380px; /* tall enough for shield + text + wildcat stacked */
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: calc(1.5rem + env(safe-area-inset-top, 0px)) 1.5rem 1.5rem;
-    box-sizing: border-box;
-    position: relative;
-    overflow: hidden;
-    background-color: #0D0E10;
+  .auth-brand-panel,
+  html[data-theme="light"] .auth-brand-panel {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    height: auto !important;
+    min-height: 280px !important;
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: calc(1.5rem + env(safe-area-inset-top, 0px)) 1.5rem 1.5rem !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background-color: #0D1117 !important;
   }
-  .auth-brand-panel::before {
+  .auth-brand-panel::before,
+  html[data-theme="light"] .auth-brand-panel::before {
     content: '';
     position: absolute;
     inset: 0;
     background-image: url('../assets/bg-pattern-front.png');
     background-size: cover;
     background-position: center;
+    opacity: 0.45 !important;
     pointer-events: none;
   }
   .auth-brand-content {
@@ -893,20 +946,25 @@ html body .hidden {
     width: 80px;
     height: 80px;
   }
-  .auth-identity h1 {
+  .auth-identity h1,
+  html[data-theme="light"] .auth-identity h1 {
     font-size: 1.45rem;
     white-space: normal;
     text-align: left;
     line-height: 1.2;
     letter-spacing: -0.01em;
+    color: #FFFFFF !important;
   }
-  .auth-subtitle {
+  .auth-subtitle,
+  html[data-theme="light"] .auth-subtitle {
     font-size: 0.75rem;
     margin-top: 0.4rem;
     text-align: left;
     letter-spacing: 0.08em;
+    color: #9A9AA6 !important;
   }
-  .auth-brand-desc {
+  .auth-brand-desc,
+  html[data-theme="light"] .auth-brand-desc {
     display: block !important;
     font-size: 0.82rem;
     line-height: 1.5;
@@ -914,12 +972,16 @@ html body .hidden {
     opacity: 0.88;
     margin: 0;
     max-width: 380px;
+    color: #9A9AA6 !important;
   }
 
-  .auth-form-panel {
-    width: 100%;
+  .auth-form-panel,
+  html[data-theme="light"] .auth-form-panel {
+    width: 100% !important;
+    flex: 0 0 auto !important;
     max-width: 440px;
     margin: 0 auto;
+    background-color: #121214 !important;
     padding: 1.75rem 1.25rem calc(2rem + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
   }
@@ -1030,37 +1092,53 @@ html body .hidden {
   color: var(--text-tertiary);
 }
 
-/* ---- Auth screens: theme-aware text ----
-   Labels, hints, placeholders, chevrons, and brand copy follow the
-   global text tokens so both themes stay legible. */
+/* ---- Auth screens: permanently dark text tokens ---- */
 .auth-form-panel .auth-form-header p,
 .auth-form-panel .form-group label,
-.auth-form-panel .auth-switch {
-  color: var(--text-secondary);
+.auth-form-panel .auth-switch,
+html[data-theme="light"] .auth-form-panel .auth-form-header p,
+html[data-theme="light"] .auth-form-panel .form-group label,
+html[data-theme="light"] .auth-form-panel .auth-switch {
+  color: #9A9AA6 !important;
 }
-.auth-form-panel .auth-field-hint {
-  color: var(--text-tertiary);
+.auth-form-panel .auth-field-hint,
+html[data-theme="light"] .auth-form-panel .auth-field-hint {
+  color: #6E6E7A !important;
+}
+.auth-form-panel .auth-password-notice,
+html[data-theme="light"] .auth-form-panel .auth-password-notice {
+  color: #9A9AA6 !important;
+}
+.auth-form-panel .auth-password-notice strong,
+html[data-theme="light"] .auth-form-panel .auth-password-notice strong {
+  color: #FFFFFF !important;
 }
 .auth-form-panel .dd-label.dd-placeholder,
-.auth-form-panel .dd-chevron {
-  color: var(--text-tertiary);
+.auth-form-panel .dd-chevron,
+html[data-theme="light"] .auth-form-panel .dd-label.dd-placeholder,
+html[data-theme="light"] .auth-form-panel .dd-chevron {
+  color: #6E6E7A !important;
 }
-.auth-form-panel .dd-menu li {
-  color: var(--text-secondary);
+.auth-form-panel .dd-menu li,
+html[data-theme="light"] .auth-form-panel .dd-menu li {
+  color: #9A9AA6 !important;
 }
-.auth-brand-content .auth-subtitle {
-  color: var(--text-secondary);
+.auth-brand-content .auth-subtitle,
+html[data-theme="light"] .auth-brand-content .auth-subtitle {
+  color: #9A9AA6 !important;
 }
-.auth-brand-content .auth-brand-desc {
-  color: var(--text-secondary);
+.auth-brand-content .auth-brand-desc,
+html[data-theme="light"] .auth-brand-content .auth-brand-desc {
+  color: #6E6E7A !important;
 }
 
-.auth-error {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid var(--col-danger);
-  color: var(--col-danger);
+.auth-error,
+html[data-theme="light"] .auth-error {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  color: #EF4444 !important;
   padding: 0.6rem 1rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm, 8px);
   font-size: 0.85rem;
   margin-bottom: 1rem;
 }
@@ -1306,16 +1384,17 @@ input[type="checkbox"]:checked::before {
   font-size: 1rem;
 }
 
-/* Google OAuth Button */
-.btn-google {
+/* Google OAuth Button - permanently dark */
+.btn-google,
+html[data-theme="light"] .btn-google {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  background: var(--bg-surface-elevated, #161f30);
-  color: var(--text-primary, #f1f5f9);
-  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.12));
-  border-radius: var(--radius-md, 8px);
+  background: #1C1C20 !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: var(--radius-md, 12px) !important;
   padding: 0.85rem 1.25rem;
   font-size: 0.95rem;
   font-weight: 500;
@@ -1326,13 +1405,15 @@ input[type="checkbox"]:checked::before {
   overflow: hidden;
 }
 
-.btn-google:hover {
-  background: var(--surface-hover, #1e293b);
-  border-color: rgba(66, 133, 244, 0.5);
-  box-shadow: 0 0 0 1px rgba(66, 133, 244, 0.25);
+.btn-google:hover,
+html[data-theme="light"] .btn-google:hover {
+  background: #26262C !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 0 0 1px rgba(255, 85, 51, 0.25) !important;
 }
 
-.btn-google:active {
+.btn-google:active,
+html[data-theme="light"] .btn-google:active {
   transform: translateY(0);
 }
 
@@ -1342,13 +1423,14 @@ input[type="checkbox"]:checked::before {
   height: 18px;
 }
 
-/* Auth Divider */
-.auth-divider {
+/* Auth Divider - permanently dark */
+.auth-divider,
+html[data-theme="light"] .auth-divider {
   display: flex;
   align-items: center;
   text-align: center;
   margin: 1.1rem 0;
-  color: var(--text-muted, #94a3b8);
+  color: #6E6E7A !important;
   font-size: 0.78rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -1356,15 +1438,19 @@ input[type="checkbox"]:checked::before {
 }
 
 .auth-divider::before,
-.auth-divider::after {
+.auth-divider::after,
+html[data-theme="light"] .auth-divider::before,
+html[data-theme="light"] .auth-divider::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid var(--border-default, rgba(255, 255, 255, 0.08));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
-.auth-divider span {
+.auth-divider span,
+html[data-theme="light"] .auth-divider span {
   padding: 0 0.75rem;
   opacity: 0.75;
+  color: #6E6E7A !important;
 }
 
 /* Onboarding Modal Styling */
@@ -6183,15 +6269,49 @@ html body.is-admin th.admin-only {
 }
 
 [data-theme="light"] .modal-card,
-[data-theme="light"] .profile-modal,
-[data-theme="light"] .onboarding-card {
+[data-theme="light"] .profile-modal {
   background: #FFFFFF;
   border-color: var(--border);
   box-shadow: var(--shadow-modal);
 }
 
-[data-theme="light"] .onboarding-card .modal-header {
-  border-bottom-color: var(--border);
+/* Student Onboarding Card - stays dark */
+.onboarding-card,
+html[data-theme="light"] .onboarding-card {
+  background: #1C1C20 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: var(--shadow-modal) !important;
+  color: #FFFFFF !important;
+}
+
+.onboarding-card .modal-header,
+html[data-theme="light"] .onboarding-card .modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.onboarding-card .modal-title,
+html[data-theme="light"] .onboarding-card .modal-title {
+  color: #FFFFFF !important;
+}
+
+.onboarding-card .modal-subtitle,
+html[data-theme="light"] .onboarding-card .modal-subtitle {
+  color: #9A9AA6 !important;
+}
+
+.onboarding-card .form-group label,
+html[data-theme="light"] .onboarding-card .form-group label {
+  color: #9A9AA6 !important;
+}
+
+.onboarding-card .form-group input,
+.onboarding-card .form-group select,
+html[data-theme="light"] .onboarding-card .form-group input,
+html[data-theme="light"] .onboarding-card .form-group select {
+  background: #26262C !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+  border-radius: var(--radius-md, 12px) !important;
 }
 
 /* ---- Profile Modal & Avatar Picker ---- */

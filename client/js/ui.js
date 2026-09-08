@@ -29,10 +29,14 @@ const UI = (() => {
     const screen = document.getElementById(`${screenId}-screen`);
     if (screen) screen.classList.add('active');
 
-    // If switching to auth, strip all admin privileges and app state
+    // If switching to auth, strip all admin privileges and app state, lock theme-color to dark
     if (screenId === 'auth') {
       setAdminVisibility(false);
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      syncThemeColor('dark');
+    } else if (screenId === 'app') {
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      syncThemeColor(currentTheme);
     }
 
     // Show bottom nav only when app is active (mobile only via CSS)

@@ -24,7 +24,7 @@
   <script>
     // Apply theme immediately to prevent flashing
     (function() {
-      const savedTheme = localStorage.getItem('theme') || 'light';
+      const savedTheme = localStorage.getItem('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', savedTheme);
       const meta = document.querySelector('meta[name="theme-color"]');
       if (meta) meta.setAttribute('content', savedTheme === 'dark' ? '#0B0F14' : '#F5F6F8');

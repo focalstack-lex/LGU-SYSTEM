@@ -448,7 +448,7 @@
         btn.addEventListener('click', () => this.toggleTheme());
       });
       if (profileThemeSelect) {
-        profileThemeSelect.value = localStorage.getItem('theme') || 'light';
+        profileThemeSelect.value = localStorage.getItem('theme') || 'dark';
         profileThemeSelect.addEventListener('change', (e) => {
           this.setTheme(e.target.value);
         });
@@ -467,13 +467,13 @@
     },
 
     toggleTheme() {
-      const currentTheme = localStorage.getItem('theme') || 'light';
+      const currentTheme = localStorage.getItem('theme') || 'dark';
       const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
       this.setTheme(targetTheme);
     },
 
     updateUI() {
-      const currentTheme = localStorage.getItem('theme') || 'light';
+      const currentTheme = localStorage.getItem('theme') || 'dark';
       const icon = currentTheme === 'dark' ? 'solar:sun-linear' : 'solar:moon-linear';
       const title = currentTheme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme';
 

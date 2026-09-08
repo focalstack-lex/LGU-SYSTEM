@@ -23,12 +23,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.2/dist/iconify-icon.min.js" defer></script>
   <script>
-    // Apply theme immediately to prevent flashing
+    // Apply theme immediately to prevent flashing: default is ALWAYS dark mode
     (function() {
-      const savedTheme = localStorage.getItem('theme') || 'light';
+      const savedTheme = localStorage.getItem('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', savedTheme);
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', savedTheme === 'dark' ? '#0B0F14' : '#F5F6F8');
+      if (meta) meta.setAttribute('content', '#0B0F14');
     })();
   </script>
 </head>
