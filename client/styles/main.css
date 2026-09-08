@@ -3314,7 +3314,7 @@ iconify-icon {
     position: static !important;
     background: transparent !important;
     border-bottom: none !important;
-    margin-bottom: 0.65rem !important;
+    margin-bottom: 0.5rem !important;
     padding-top: 0.65rem !important;
     padding-bottom: 0.25rem !important;
     box-shadow: none !important;
