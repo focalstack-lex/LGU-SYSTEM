@@ -1947,13 +1947,6 @@ html[data-theme="light"] .auth-divider span {
   line-height: 1.4;
 }
 
-.view-sub-formula {
-  font-size: 0.76rem;
-  color: var(--text-tertiary);
-  font-weight: 400;
-  margin-left: 0.2rem;
-}
-
 /* =============================================
    DASHBOARD STATS & FINANCIAL SUMMARY HIERARCHY
    ============================================= */
@@ -1988,6 +1981,22 @@ html body .stat-card-hero:hover {
   border-left-color: var(--primary-hover, #FF6B4A) !important;
   box-shadow: 0 6px 24px -2px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 85, 51, 0.15) !important;
   transform: translateY(-1px);
+}
+
+/* Light Theme Hero Card: Clean white surface with subtle coral accent & left border */
+html[data-theme="light"] .stat-card-hero,
+html[data-theme="light"] body .stat-card-hero {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(255, 85, 51, 0.28) !important;
+  border-left: 4px solid var(--primary, #FF5533) !important;
+  box-shadow: 0 4px 16px -2px rgba(255, 85, 51, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+html[data-theme="light"] .stat-card-hero:hover,
+html[data-theme="light"] body .stat-card-hero:hover {
+  background: #FFFDFB !important;
+  border-color: rgba(255, 85, 51, 0.45) !important;
+  box-shadow: 0 6px 20px -2px rgba(255, 85, 51, 0.16), 0 2px 4px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
 .stat-hero-header {
@@ -2031,6 +2040,11 @@ html body .stat-label-hero {
   color: var(--text-secondary, #9A9AA6) !important;
   margin: 0 !important;
   white-space: nowrap !important;
+}
+
+html[data-theme="light"] .stat-label-hero,
+html[data-theme="light"] body .stat-label-hero {
+  color: #64748B !important;
 }
 
 /* Actionable Balance: Subtle secondary metadata, no visual competition with amount */
@@ -2080,12 +2094,22 @@ html body .stat-value-hero {
   font-variant-numeric: tabular-nums !important;
 }
 
+html[data-theme="light"] .stat-value-hero,
+html[data-theme="light"] body .stat-value-hero {
+  color: #0F172A !important;
+}
+
 .stat-card-hero .stat-sublabel,
 html body .stat-card-hero .stat-sublabel {
   color: var(--text-tertiary, #6E6E7A) !important;
   font-size: 0.72rem !important;
   line-height: 1.35 !important;
   margin-top: 0.15rem !important;
+}
+
+html[data-theme="light"] .stat-card-hero .stat-sublabel,
+html[data-theme="light"] body .stat-card-hero .stat-sublabel {
+  color: #64748B !important;
 }
 
 /* Secondary Metrics Grid: Desktop (3 columns) vs Mobile (2 columns responsive) */
