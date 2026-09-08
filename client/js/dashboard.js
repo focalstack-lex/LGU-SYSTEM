@@ -262,6 +262,28 @@ const Dashboard = (() => {
     }
   }
 
+  function formatTitle(title) {
+    if (!title) return '';
+    if (title === title.toUpperCase() && title.length > 3) {
+      return title.toLowerCase().replace(/(?:^|\s|-|:\s*)\w/g, m => m.toUpperCase());
+    }
+    return title;
+  }
+
+  function getBadgeConfig(title, body) {
+    const text = `${title} ${body}`.toLowerCase();
+    if (text.includes('notice') || text.includes('under active') || text.includes('important')) {
+      return { label: 'System Notice', icon: 'solar:danger-triangle-linear', type: 'notice' };
+    }
+    if (text.includes('version') || text.includes('v1.') || text.includes('v2.') || text.includes('update')) {
+      return { label: 'System Update', icon: 'solar:round-alt-arrow-up-linear', type: 'update' };
+    }
+    if (text.includes('redesign') || text.includes('new look') || text.includes('feature')) {
+      return { label: 'Feature', icon: 'solar:stars-minimalistic-linear', type: 'feature' };
+    }
+    return { label: 'Announcement', icon: 'solar:info-circle-linear', type: 'general' };
+  }
+
   async function loadAnnouncements() {
     const container = document.getElementById('announcement-list');
     try {
@@ -273,20 +295,46 @@ const Dashboard = (() => {
 
       if (!data?.length) { UI.setEmpty('announcement-list', 'solar:bell-linear', 'No announcements yet.'); return; }
 
-      container.innerHTML = data.map(a => `
-        <div class="announce-item">
-          <h4>${a.title}</h4>
-          <p class="announce-body">${a.body.replace(/\n/g, '<br>')}</p>
-          ${a.body.length > 200 ? '<button class="announce-expand-btn" type="button">Show more</button>' : ''}
-          <div class="announce-date">${UI.dateStr(a.created_at)}</div>
-        </div>
-      `).join('');
+      container.innerHTML = data.map((a, idx) => {
+        const title = formatTitle(a.title);
+        const badge = getBadgeConfig(a.title, a.body);
+        const isFeatured = idx === 0;
+        const author = a.author || 'COE LGU Officer';
+        const hasLongBody = a.body.length > 180;
+
+        return `
+          <div class="announce-item ${isFeatured ? 'announce-item-featured' : ''}">
+            <div class="announce-top-bar">
+              <span class="announce-badge announce-badge-${badge.type}">
+                <iconify-icon icon="${badge.icon}"></iconify-icon> ${badge.label}
+              </span>
+              ${isFeatured ? '<span class="announce-pin-tag"><iconify-icon icon="solar:pin-bold"></iconify-icon> Pinned</span>' : ''}
+            </div>
+            <h4 class="announce-title">${title}</h4>
+            <p class="announce-body">${a.body.replace(/\n/g, '<br>')}</p>
+            ${hasLongBody ? `
+              <button class="announce-expand-btn" type="button">
+                <span>Show more</span>
+                <iconify-icon icon="solar:alt-arrow-down-linear"></iconify-icon>
+              </button>` : ''}
+            <div class="announce-footer">
+              <span class="announce-meta-item"><iconify-icon icon="solar:user-circle-linear"></iconify-icon>${author}</span>
+              <span class="announce-meta-dot">•</span>
+              <span class="announce-meta-item"><iconify-icon icon="solar:calendar-minimalistic-linear"></iconify-icon>${UI.dateStr(a.created_at)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
 
       container.querySelectorAll('.announce-expand-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          const bodyEl = btn.closest('.announce-item').querySelector('.announce-body');
+          const item = btn.closest('.announce-item');
+          const bodyEl = item.querySelector('.announce-body');
+          const textSpan = btn.querySelector('span');
+          const iconEl = btn.querySelector('iconify-icon');
           const expanded = bodyEl.classList.toggle('expanded');
-          btn.textContent = expanded ? 'Show less' : 'Show more';
+          if (textSpan) textSpan.textContent = expanded ? 'Show less' : 'Show more';
+          if (iconEl) iconEl.setAttribute('icon', expanded ? 'solar:alt-arrow-up-linear' : 'solar:alt-arrow-down-linear');
         });
       });
     } catch (err) {
