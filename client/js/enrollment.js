@@ -129,14 +129,16 @@ const EnrollmentSection = (() => {
 
   // ---- Actions ----
   async function addItem(subjectId, grizzReason) {
-    if (!current || !subjectId) return;
+    if (!current) return { ok: false, error: 'Load not ready — open Load Verification first.' };
+    if (!subjectId) return { ok: false, error: 'No subject selected.' };
     try {
       const { item } = await Api.enrollment.addItem(current.id, subjectId, grizzReason);
       current.enrollment_submission_items = current.enrollment_submission_items || [];
       current.enrollment_submission_items.push(item);
       fillPicker();
       renderDraft();
-    } catch (err) { show(err.message); }
+      return { ok: true, item };
+    } catch (err) { return { ok: false, error: err.message }; }
   }
 
   async function removeItem(itemId) {
@@ -168,15 +170,29 @@ const EnrollmentSection = (() => {
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('enrollment-add-btn')?.addEventListener('click', () => {
+    document.getElementById('enrollment-add-btn')?.addEventListener('click', async () => {
       const sel = document.getElementById('enrollment-subject-select');
-      if (sel?.value) addItem(sel.value);
+      if (!sel?.value) return;
+      const res = await addItem(sel.value);
+      if (!res.ok) show(res.error);
     });
     document.getElementById('enrollment-submit-btn')?.addEventListener('click', submit);
   });
 
-  // Phase C hook: Grizz-recommended subjects land here with their reason.
-  window.Enrollment = { addFromGrizz: (subject, reason) => addItem(subject.id, reason || 'Recommended by Grizz') };
+  // Phase C hook surface (spec 2026-09-08): Grizz reads state and pushes subjects.
+  window.Enrollment = {
+    addFromGrizz: (subject, reason) => addItem(subject?.id, reason || 'Recommended by Grizz'),
+    ensureReady: load, // loads profile + checklists + submissions; creates the term draft if none
+    canEdit: () => !!current && ['draft', 'returned'].includes(current.status),
+    lockedReason: () => ({
+      submitted: 'Submitted — with your Program Head',
+      under_review: 'Under evaluation',
+      approved: 'Approved — locked',
+      rejected: 'Rejected',
+    }[current?.status] || ''),
+    draftSubjectIds: () => new Set((current?.enrollment_submission_items || [])
+      .filter(i => i.item_state !== 'removed_by_head').map(i => i.subject_id)),
+  };
 
   return { load };
 })();

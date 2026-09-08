@@ -38,5 +38,12 @@ check('enrollment renders gated notice', /renderGatedNotice/.test(enrollmentJs))
 const facultyJs = read('client/js/faculty/faculty.js');
 check('faculty boot() checks isEnrollmentPilot', /isEnrollmentPilot/.test(facultyJs));
 
+// --- enrollment export widening (Task 4) ---
+check('Enrollment exports ensureReady', /ensureReady:\s*load/.test(enrollmentJs));
+check('Enrollment exports canEdit', /canEdit:\s*\(\)/.test(enrollmentJs));
+check('Enrollment exports lockedReason', /lockedReason:\s*\(\)/.test(enrollmentJs));
+check('Enrollment exports draftSubjectIds', /draftSubjectIds:\s*\(\)/.test(enrollmentJs));
+check('addItem returns ok/error contract', /return\s*\{\s*ok:\s*false,\s*error/.test(enrollmentJs));
+
 console.log(failed ? `\n${failed} check(s) FAILED` : '\nAll pilot-gate checks passed');
 process.exit(failed ? 1 : 0);
