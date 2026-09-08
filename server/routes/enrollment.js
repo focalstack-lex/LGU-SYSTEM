@@ -9,6 +9,7 @@ const { logError } = require('../lib/logger');
 const { logAudit } = require('../lib/audit');
 const { createNotification } = require('./notifications');
 const { canStudentEdit, canTransition } = require('../lib/enrollment');
+const { pilotGate } = require('../middleware/roles');
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ function requireStudent(req, res, next) {
   next();
 }
 router.use(requireStudent);
+router.use(pilotGate);
 
 // GET /submissions/my - own submissions with items, newest term first
 router.get('/submissions/my', async (req, res) => {

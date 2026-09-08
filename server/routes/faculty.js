@@ -9,7 +9,7 @@ const supabase = require('../lib/supabase');
 const { isValidUUID } = require('../lib/validate');
 const { logError } = require('../lib/logger');
 const { logAudit } = require('../lib/audit');
-const { requireFaculty, requireProgramHead } = require('../middleware/roles');
+const { requireFaculty, requireProgramHead, pilotGate } = require('../middleware/roles');
 const { canHeadAct } = require('../lib/enrollment');
 const { createNotification } = require('./notifications');
 const { sendLoadStatusEmail } = require('../lib/email');
@@ -17,6 +17,7 @@ const ExcelJS = require('exceljs');
 
 const router = express.Router();
 router.use(requireFaculty);
+router.use(pilotGate);
 
 // student_id references public.profiles(id) inline in migration 034, so the
 // FK constraint is auto-named enrollment_submissions_student_id_fkey.
