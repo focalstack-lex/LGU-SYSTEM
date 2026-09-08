@@ -780,6 +780,14 @@
     const profile = await Auth.getProfile();
     const roleKey = profile?.role || 'student';
     const officerRole = ['admin', 'governor', 'cashier', 'officer'].includes(roleKey);
+    const facultyRole = ['faculty', 'program_head', 'dean'].includes(roleKey);
+
+    // Faculty roles land directly in the faculty portal - the student
+    // masterlist/verification gate below does not apply to them.
+    if (facultyRole && !isOffline) {
+      window.location.replace('/faculty');
+      return;
+    }
 
     const offlineBanner = document.getElementById('offline-banner');
     if (offlineBanner) offlineBanner.classList.toggle('hidden', !isOffline);
@@ -837,7 +845,7 @@
 
     // Sidebar & Mobile Header user info
     const displayName = profile?.full_name || session.user.email;
-    const roleLabels  = { admin: 'Administrator', governor: 'Governor', cashier: 'Cashier', officer: 'Officer', student: 'Student' };
+    const roleLabels  = { admin: 'Administrator', governor: 'Governor', cashier: 'Cashier', officer: 'Officer', student: 'Student', faculty: 'Faculty / Student Assistant', program_head: 'Program Head', dean: 'Dean' };
     const roleLabel   = roleLabels[roleKey] || UI.capitalize(roleKey);
 
     document.getElementById('user-name').textContent   = displayName;
