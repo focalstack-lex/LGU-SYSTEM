@@ -36,6 +36,23 @@ Migration file: `supabase/migrations/031_lec_lab_and_structured_prereqs.sql`.
 - `subjects.prerequisites` (free text) is legacy: kept for reference, not read
   by application logic.
 
+## Migrations 033 & 034 (component outcomes + Phase B faculty portal)
+
+- `supabase/migrations/033_component_outcomes.sql` — adds `lec_grade`/`lab_grade`
+  and `lec_status`/`lab_status` to `student_units` so lec and lab can pass/fail
+  independently; a passed component banks its units in progress views.
+- `supabase/migrations/034_faculty_roles_and_submissions.sql` — adds the
+  `faculty`, `program_head`, `dean` roles; tables `enrollment_submissions` /
+  `enrollment_submission_items`; SQL helpers `is_faculty()`,
+  `is_dean_or_admin()`, `is_program_head_for(uuid)`; widens
+  `notifications.target_role` for the new roles.
+- Both are additive and re-runnable (guarded constraints, DROP-first policies).
+  Apply via the SQL editor in order (033, then 034), then deploy server +
+  client together.
+- Program heads bind to a program via `profiles.course`; the dean is
+  viewer-only; approval of a submitted load auto-enrolls it into
+  `student_units` (idempotent upsert).
+
 ## Backups
 
 `.github/workflows/backup.yml` runs weekly (Monday 02:30 PHT) and produces three dump artifacts (roles, schema, data) retained 90 days.
