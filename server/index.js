@@ -158,6 +158,7 @@ app.use(express.static(path.join(__dirname, "../client")));
 const feedbackDir = path.join(__dirname, "../client/feedback");
 app.get(["/feedback", "/feedback/"],        (req, res) => res.sendFile(path.join(feedbackDir, "index.html")));
 app.get(["/feedback/view", "/feedback/view/"], (req, res) => res.sendFile(path.join(feedbackDir, "view", "index.html")));
+app.get(["/faculty", "/faculty/"],           (req, res) => res.sendFile(path.join(__dirname, "../client", "faculty.html")));
 
 // =============================================
 // Public Routes
