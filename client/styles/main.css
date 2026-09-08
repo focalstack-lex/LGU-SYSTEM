@@ -2737,10 +2737,15 @@ html body .stats-secondary-grid .stat-income:hover .stat-icon {
   font-family: var(--font-ui);
   font-size: 0.875rem;
   font-weight: 600;
-  color: #FFFFFF;
+  color: var(--text-primary, #FFFFFF);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+html[data-theme="light"] .tx-title,
+html[data-theme="light"] body .tx-title {
+  color: #0F172A !important;
 }
 
 .tx-sub-info {
@@ -2750,6 +2755,13 @@ html body .stats-secondary-grid .stat-income:hover .stat-icon {
   font-size: 0.73rem;
   color: var(--text-secondary);
   flex-wrap: wrap;
+}
+
+html[data-theme="light"] .tx-sub-info,
+html[data-theme="light"] body .tx-sub-info,
+html[data-theme="light"] .tx-event-name,
+html[data-theme="light"] .tx-date {
+  color: #64748B !important;
 }
 
 .tx-type-pill {
@@ -2882,6 +2894,11 @@ html body .stats-secondary-grid .stat-income:hover .stat-icon {
   border-color: var(--border-hover);
 }
 
+html[data-theme="light"] .announce-item {
+  background: #F8FAFC !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
 .announce-item h4 {
   font-family: var(--font-ui);
   font-size: 0.9375rem;
@@ -2891,6 +2908,11 @@ html body .stats-secondary-grid .stat-income:hover .stat-icon {
   line-height: 1.35;
   letter-spacing: -0.01em;
 }
+
+html[data-theme="light"] .announce-item h4 {
+  color: #0F172A !important;
+}
+
 .announce-body {
   font-family: var(--font-ui);
   font-size: var(--font-size-body-sm);
@@ -2901,6 +2923,11 @@ html body .stats-secondary-grid .stat-income:hover .stat-icon {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+html[data-theme="light"] .announce-body,
+html[data-theme="light"] .announce-date {
+  color: #475569 !important;
 }
 .announce-body.expanded {
   -webkit-line-clamp: unset;
