@@ -23,7 +23,10 @@ const EnrollmentSection = (() => {
   // ---- Load ----
   async function load() {
     const profile = await Auth.getProfile().catch(() => null);
-    const program = (profile?.course || '').trim().toUpperCase() || 'BSCoE';
+    // checklists API validates exact casing ('BSCoE' | 'BSCE' | 'BSECE')
+    const PROGRAMS = ['BSCoE', 'BSCE', 'BSECE'];
+    const upper = (profile?.course || '').trim().toUpperCase();
+    const program = PROGRAMS.find(p => p.toUpperCase() === upper) || 'BSCoE';
     const year = Number(profile?.year_level || 0);
     const now = new Date();
     const sy = now.getMonth() >= 5
