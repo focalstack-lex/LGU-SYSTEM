@@ -962,44 +962,60 @@ const GrizzAI = (() => {
     }
 
     const addButtonFor = (s) => inLoad.has(s.id)
-      ? '<span class="ursa-subject-tag active">In your load ✓</span>'
-      : `<button type="button" class="ursa-add-btn"${canEdit ? '' : ' disabled'} data-grizz-add="${esc(s.id)}">+ Add</button>`;
+      ? '<span class="ursa-subject-tag active"><iconify-icon icon="solar:check-circle-bold"></iconify-icon> In your load</span>'
+      : `<button type="button" class="ursa-add-btn"${canEdit ? '' : ' disabled'} data-grizz-add="${esc(s.id)}"><iconify-icon icon="solar:add-circle-linear"></iconify-icon> Add to Load</button>`;
 
     const cardsHtml = recommended.map(s => `
       <div class="ursa-subject-item">
-        <div class="ursa-subject-meta">
-          <span class="ursa-subject-code">${esc(s.code)} <span class="ursa-units-badge">${unitsLabel(s)}</span></span>
-          <span class="ursa-subject-title" title="${esc(s.title)}">${esc(s.title)}</span>
+        <div class="ursa-subject-header">
+          <div class="ursa-subject-code-group">
+            <span class="ursa-subject-code">${esc(s.code)}</span>
+            <span class="ursa-units-badge">${unitsLabel(s)}</span>
+          </div>
+          <span class="ursa-subject-term-tag">
+            <iconify-icon icon="solar:calendar-linear"></iconify-icon> Yr ${s.year_level} • Sem ${s.semester}
+          </span>
         </div>
-        <span class="ursa-subject-tag">
-          Yr ${s.year_level} · Sem ${s.semester}
-        </span>
-        ${(s.prereqNotes || []).length ? `<span class="ursa-subject-tag req">Note: ${esc(s.prereqNotes.join(', '))}</span>` : ''}
-        ${pilot ? addButtonFor(s) : ''}
+        <div class="ursa-subject-title" title="${esc(s.title)}">${esc(s.title)}</div>
+        ${(s.prereqNotes || []).length ? `
+          <div class="ursa-subject-note">
+            <iconify-icon icon="solar:info-circle-linear"></iconify-icon> ${esc(s.prereqNotes.join(', '))}
+          </div>` : ''}
+        ${pilot ? `
+          <div class="ursa-subject-footer">
+            ${addButtonFor(s)}
+          </div>` : ''}
       </div>
     `).join('');
 
     const addAllHtml = pilot ? `
-      <div class="ursa-response-actions" style="margin-top:0.6rem;">
+      <div class="ursa-response-actions" style="margin-top:0.75rem;">
         <button type="button" class="ursa-chip-action" data-grizz-add-all
           ${(!canEdit || !recommended.some(s => !inLoad.has(s.id))) ? 'disabled' : ''}>
           <iconify-icon icon="solar:cart-plus-linear"></iconify-icon> Add all recommended
         </button>
       </div>
-      <p class="ursa-note-text" data-grizz-lock ${canEdit ? 'hidden' : ''}>🔒 Your load is ${esc(lockNote || 'not editable right now')} — subjects can be added once it's back in draft.</p>` : '';
+      <p class="ursa-note-text" data-grizz-lock ${canEdit ? 'hidden' : ''}>
+        <iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon> Your load is ${esc(lockNote || 'not editable right now')} — subjects can be added once it's back in draft.
+      </p>` : '';
 
     const jumpHtml = pilot ? `
-      <p style="margin:0.6rem 0 0;"><a href="#" class="ursa-nav-link" data-view="enrollment" style="color:var(--primary);font-weight:600;">Open Load Verification →</a></p>` : '';
+      <p style="margin:0.75rem 0 0;">
+        <a href="#" class="ursa-nav-link" data-view="enrollment" style="color:var(--primary);font-weight:600;display:inline-flex;align-items:center;gap:0.3rem;">
+          <span>Open Load Verification</span>
+          <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
+        </a>
+      </p>` : '';
 
     const html = `
       <div class="ursa-summary-bar">
         <div class="ursa-summary-item">
-          <span class="ursa-summary-val">${recommended.length} Subjects</span>
+          <span class="ursa-summary-val"><iconify-icon icon="solar:book-bookmark-linear" style="color:var(--primary);margin-right:0.3rem;vertical-align:middle;"></iconify-icon>${recommended.length} Subjects</span>
           <span class="ursa-summary-label">Recommended</span>
         </div>
         <div class="ursa-summary-divider"></div>
         <div class="ursa-summary-item">
-          <span class="ursa-summary-val">${totalUnits} Units</span>
+          <span class="ursa-summary-val"><iconify-icon icon="solar:diploma-linear" style="color:var(--primary);margin-right:0.3rem;vertical-align:middle;"></iconify-icon>${totalUnits} Units</span>
           <span class="ursa-summary-label">Total Load</span>
         </div>
       </div>
@@ -1033,7 +1049,7 @@ const GrizzAI = (() => {
         const done = ids.has(b.dataset.grizzAdd);
         b.disabled = done || !editable;
         b.classList.toggle('added', done);
-        b.textContent = done ? '✓ Added' : '+ Add';
+        b.innerHTML = done ? '<iconify-icon icon="solar:check-circle-bold"></iconify-icon> Added' : '<iconify-icon icon="solar:add-circle-linear"></iconify-icon> Add to Load';
       });
       const allBtn = msg.querySelector('[data-grizz-add-all]');
       if (allBtn) allBtn.disabled = !editable || recommended.every(s => ids.has(s.id));
@@ -1043,7 +1059,7 @@ const GrizzAI = (() => {
       btn.disabled = true;
       const res = await window.Enrollment.addFromGrizz(subject, 'Recommended by Grizz')
         .catch(err => ({ ok: false, error: err.message }));
-      showResult(res?.ok ? `✓ Added ${subject.code} to your proposed load.` : (res?.error || 'Could not add the subject.'));
+      showResult(res?.ok ? `Added ${subject.code} to your proposed load.` : (res?.error || 'Could not add the subject.'));
       syncButtons();
     };
 
