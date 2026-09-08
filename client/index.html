@@ -335,64 +335,74 @@
 
       <!-- DASHBOARD -->
       <section class="view active" id="view-dashboard">
-        <div class="view-header">
+        <div class="view-header view-header-compact">
           <div>
             <h2>Financial Dashboard</h2>
-            <p class="view-sub">Real-time overview of COE LGU funds &bull; <span class="view-sub-note">Available General Fund = Net Cash Balance − unspent event envelopes</span></p>
+            <p class="view-sub">Real-time COE LGU funds overview <span class="view-sub-formula">&bull; General Fund = Net Cash − Unspent Envelopes</span></p>
           </div>
         </div>
 
         <!-- URSA AI Mascot Quick-Prompt Bar -->
         <div id="dashboard-ursa-container"></div>
 
-        <div class="stats-grid">
-          <div class="stat-card stat-income" data-nav="income" role="button" tabindex="0" title="Open Total Income Tracker">
-            <div class="stat-icon"><iconify-icon icon="solar:chart-2-linear"></iconify-icon></div>
-            <div class="stat-body">
-              <div class="stat-label-row">
-                <p class="stat-label">Total Income</p>
-                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
-              </div>
-              <h3 class="stat-value" id="stat-income">₱0.00</h3>
-              <p class="stat-sublabel">All received funds</p>
+        <div class="stats-summary-wrapper">
+          <!-- PRIMARY FEATURED METRIC: Available General Fund -->
+          <div class="stat-card stat-card-hero stat-balance" data-nav="reports" role="button" tabindex="0" title="Open Financial Reports & Breakdown">
+            <div class="stat-hero-badge">
+              <span class="stat-icon"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></span>
+              <span class="hero-badge-tag">Actionable Balance</span>
             </div>
-            <div class="stat-popover" id="pop-income"></div>
-          </div>
-          <div class="stat-card stat-expense" data-nav="transactions" role="button" tabindex="0" title="Open Transactions Ledger">
-            <div class="stat-icon"><iconify-icon icon="solar:chart-square-linear"></iconify-icon></div>
-            <div class="stat-body">
-              <div class="stat-label-row">
-                <p class="stat-label">Total Expenses</p>
-                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
-              </div>
-              <h3 class="stat-value" id="stat-expense">₱0.00</h3>
-              <p class="stat-sublabel">Total spent</p>
-            </div>
-            <div class="stat-popover" id="pop-expense"></div>
-          </div>
-          <div class="stat-card stat-balance" data-nav="reports" role="button" tabindex="0" title="Open Financial Reports">
-            <div class="stat-icon"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></div>
             <div class="stat-body">
               <div class="stat-label-row">
                 <p class="stat-label">Available General Fund</p>
                 <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
               </div>
-              <h3 class="stat-value" id="stat-balance">₱0.00</h3>
-              <p class="stat-sublabel">Unreserved funds</p>
+              <h3 class="stat-value stat-value-hero" id="stat-balance">₱0.00</h3>
+              <p class="stat-sublabel">Immediately unreserved cash balance for LGU operations</p>
             </div>
             <div class="stat-popover" id="pop-balance"></div>
           </div>
-          <div class="stat-card stat-donations" data-nav="income" role="button" tabindex="0" title="View Donations in Income Tracker">
-            <div class="stat-icon"><iconify-icon icon="solar:hand-money-linear"></iconify-icon></div>
-            <div class="stat-body">
-              <div class="stat-label-row">
-                <p class="stat-label">Total Donations</p>
-                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+
+          <!-- SECONDARY METRICS GRID: Income, Expenses, Donations -->
+          <div class="stats-secondary-grid">
+            <div class="stat-card stat-income" data-nav="income" role="button" tabindex="0" title="Open Total Income Tracker">
+              <div class="stat-icon"><iconify-icon icon="solar:chart-2-linear"></iconify-icon></div>
+              <div class="stat-body">
+                <div class="stat-label-row">
+                  <p class="stat-label">Total Income</p>
+                  <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+                </div>
+                <h3 class="stat-value" id="stat-income">₱0.00</h3>
+                <p class="stat-sublabel">All received funds</p>
               </div>
-              <h3 class="stat-value" id="stat-donations">₱0.00</h3>
-              <p class="stat-sublabel">Sponsor gifts</p>
+              <div class="stat-popover" id="pop-income"></div>
             </div>
-            <div class="stat-popover" id="pop-donations"></div>
+
+            <div class="stat-card stat-expense" data-nav="transactions" role="button" tabindex="0" title="Open Transactions Ledger">
+              <div class="stat-icon"><iconify-icon icon="solar:chart-square-linear"></iconify-icon></div>
+              <div class="stat-body">
+                <div class="stat-label-row">
+                  <p class="stat-label">Total Expenses</p>
+                  <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+                </div>
+                <h3 class="stat-value" id="stat-expense">₱0.00</h3>
+                <p class="stat-sublabel">Total spent</p>
+              </div>
+              <div class="stat-popover" id="pop-expense"></div>
+            </div>
+
+            <div class="stat-card stat-donations" data-nav="income" role="button" tabindex="0" title="View Donations in Income Tracker">
+              <div class="stat-icon"><iconify-icon icon="solar:hand-money-linear"></iconify-icon></div>
+              <div class="stat-body">
+                <div class="stat-label-row">
+                  <p class="stat-label">Total Donations</p>
+                  <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+                </div>
+                <h3 class="stat-value" id="stat-donations">₱0.00</h3>
+                <p class="stat-sublabel">Sponsor gifts</p>
+              </div>
+              <div class="stat-popover" id="pop-donations"></div>
+            </div>
           </div>
         </div>
 

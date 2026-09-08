@@ -242,13 +242,18 @@ const Dashboard = (() => {
 
       container.innerHTML = txs.map(tx => `
         <div class="tx-item">
-          ${UI.renderStatusBadge(tx.type)}
-          <span class="tx-desc" title="${tx.description}">${tx.description}</span>
-          <div>
+          <div class="tx-item-left">
+            <div class="tx-title" title="${tx.description}">${tx.description}</div>
+            <div class="tx-sub-info">
+              <span class="tx-type-pill tx-type-${tx.type}">${UI.capitalize(tx.type)}</span>
+              ${tx.event_name ? `<span class="tx-event-name">&bull; ${tx.event_name}</span>` : ''}
+              <span class="tx-date">&bull; ${UI.dateStr(tx.transaction_date)}</span>
+            </div>
+          </div>
+          <div class="tx-item-right">
             <div class="tx-amount ${tx.type}">
               ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
             </div>
-            <div class="tx-meta">${UI.dateStr(tx.transaction_date)}</div>
           </div>
         </div>
       `).join('');
