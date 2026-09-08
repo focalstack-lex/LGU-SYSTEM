@@ -11,6 +11,8 @@ const PASSWORD = 'Coetest2026!';
 const ALEX_ID = 'a8e399d9-2f2a-4e19-8e46-61b2a4f78d8a'; // test.newuser@g.cjc.edu.ph
 const BSCE_EMAIL = 'bsce.test@g.cjc.edu.ph';
 const BSCE_NAME = 'Maria Santos (Test)';
+const GATED_EMAIL = 'gated.test@g.cjc.edu.ph';
+const GATED_NAME = 'Gate Checker (Test)';
 
 (async () => {
   // ---- Does migration 033 exist? (component outcome columns) ----
@@ -126,8 +128,42 @@ const BSCE_NAME = 'Maria Santos (Test)';
     console.log('BSCE submitted load: ' + items.length + ' subjects (mix of grizz/manual origin)');
   }
 
+  // =============================================
+  // 3. Non-pilot QA account (NOT in ENROLLMENT_PILOT_EMAILS - verifies the
+  //    "under development" gate on client + server)
+  // =============================================
+  {
+    let gatedUser = null;
+    let page = 1;
+    for (let p = 1; p <= 5 && !gatedUser; p++) {
+      const { data } = await admin.auth.admin.listUsers({ perPage: 200, page: p });
+      gatedUser = (data?.users || []).find(u => (u.email || '').toLowerCase() === GATED_EMAIL);
+      if (!data?.users || data.users.length < 200) break;
+    }
+    if (!gatedUser) {
+      const { data: created, error } = await admin.auth.admin.createUser({
+        email: GATED_EMAIL, password: PASSWORD, email_confirm: true, user_metadata: { full_name: GATED_NAME },
+      });
+      if (error) { console.log('gated user FAIL: ' + error.message); return; }
+      gatedUser = created.user;
+      console.log('gated user created: ' + GATED_EMAIL);
+    } else {
+      await admin.auth.admin.updateUserById(gatedUser.id, { password: PASSWORD });
+      console.log('gated user exists (password reset): ' + GATED_EMAIL);
+    }
+    const { data: prof } = await admin.from('profiles').select('id').eq('id', gatedUser.id).maybeSingle();
+    if (!prof) {
+      const { error } = await admin.from('profiles').insert({
+        id: gatedUser.id, email: GATED_EMAIL, full_name: GATED_NAME, role: 'student', course: 'BSCoE', year_level: '1', enrollment_year: 2025,
+      });
+      if (error) console.log('  gated profile FAIL: ' + error.message);
+    } else {
+      await admin.from('profiles').update({ role: 'student', course: 'BSCoE', year_level: '1' }).eq('id', gatedUser.id);
+    }
+  }
+
   console.log('\n=== SEED COMPLETE ===');
   console.log('Alex Rivera history: Yr1 passes + 1 failed subject (retake test) + 1 lec-pass/lab-fail');
   console.log('Maria Santos (BSCE): submitted 2026-2027 Sem 1 load awaiting HER program head (BSCE)');
-  console.log('Logins: test.newuser / head.test / bsce.test @g.cjc.edu.ph - password: ' + PASSWORD);
+  console.log('Logins: test.newuser / head.test / bsce.test / gated.test @g.cjc.edu.ph - password: ' + PASSWORD);
 })();
