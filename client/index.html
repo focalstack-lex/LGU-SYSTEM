@@ -671,20 +671,34 @@
         </div>
 
         <div class="enrollment-grid">
-          <div class="enrollment-card" id="enrollment-draft-card">
-            <h3>Proposed Load</h3>
-            <p class="enrollment-note" id="enrollment-term-line"></p>
-            <div id="enrollment-items"></div>
-            <div class="enrollment-picker">
-              <select id="enrollment-subject-select" aria-label="Choose a subject"></select>
-              <button type="button" class="btn btn-primary" id="enrollment-add-btn">Add Subject</button>
+          <!-- Left Column: Proposed Load & Status Cards -->
+          <div class="enrollment-column-left">
+            <div class="enrollment-card" id="enrollment-draft-card">
+              <h3><iconify-icon icon="solar:document-text-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Proposed Load</h3>
+              <p class="enrollment-note" id="enrollment-term-line"></p>
+              <div id="enrollment-items"></div>
+              <div class="auth-error hidden" id="enrollment-error"></div>
+              <button type="button" class="btn btn-primary" id="enrollment-submit-btn" style="width:100%;margin-top:1rem;display:flex;align-items:center;justify-content:center;gap:0.4rem;">
+                <iconify-icon icon="solar:plain-3-linear" style="font-size:1.1rem;"></iconify-icon>
+                <span>Submit for Verification</span>
+              </button>
             </div>
-            <div class="auth-error hidden" id="enrollment-error"></div>
-            <button type="button" class="btn btn-primary" id="enrollment-submit-btn">Submit for Verification</button>
+            
+            <div class="enrollment-card" id="enrollment-status-card" style="margin-top:1.25rem;">
+              <h3><iconify-icon icon="solar:history-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Submission Status</h3>
+              <div id="enrollment-status-body"><p class="enrollment-empty">No submission for this term yet.</p></div>
+            </div>
           </div>
-          <div class="enrollment-card" id="enrollment-status-card">
-            <h3>Submission Status</h3>
-            <div id="enrollment-status-body"><p class="enrollment-empty">No submission for this term yet.</p></div>
+
+          <!-- Right Column: Eligible Courses Grid -->
+          <div class="enrollment-card" id="enrollment-eligible-card">
+            <div class="enrollment-eligible-header">
+              <h3><iconify-icon icon="solar:book-bookmark-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Eligible Courses for Term</h3>
+              <p class="enrollment-note" style="margin:0.25rem 0 0.85rem;">Click "+ Add to Load" on any eligible course to build your proposed load</p>
+            </div>
+            <div id="enrollment-eligible-list" class="enrollment-eligible-grid">
+              <div class="loading-state">Loading eligible courses…</div>
+            </div>
           </div>
         </div>
       </section>

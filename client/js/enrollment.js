@@ -72,16 +72,59 @@ const EnrollmentSection = (() => {
   }
 
   // ---- Draft card ----
+  // ---- Draft & Eligible Courses card ----
   function fillPicker() {
-    const sel = document.getElementById('enrollment-subject-select');
-    if (!sel) return;
+    const listEl = document.getElementById('enrollment-eligible-list');
+    if (!listEl) return;
+
     const taken = new Set((current?.enrollment_submission_items || [])
       .filter(i => i.item_state !== 'removed_by_head')
       .map(i => i.subject_id));
-    sel.innerHTML = subjects
-      .filter(s => !taken.has(s.id))
-      .map(s => `<option value="${s.id}">${esc(s.code)} — ${esc(s.title)} (${s.units}u)</option>`)
-      .join('');
+
+    const canEdit = !current || ['draft', 'returned'].includes(current.status);
+
+    if (!subjects.length) {
+      listEl.innerHTML = '<p class="enrollment-empty">No eligible subjects found for this term.</p>';
+      return;
+    }
+
+    listEl.innerHTML = subjects.map(s => {
+      const isAdded = taken.has(s.id);
+      const unitsLabel = `${s.units || 3} Units`;
+
+      return `
+        <div class="eligible-course-card ${isAdded ? 'course-is-added' : ''}">
+          <div class="eligible-course-head">
+            <span class="eligible-course-code">${esc(s.code)}</span>
+            <span class="eligible-units-badge">${unitsLabel}</span>
+          </div>
+          <div class="eligible-course-title" title="${esc(s.title)}">${esc(s.title)}</div>
+          <div class="eligible-course-footer">
+            <span class="eligible-course-term">
+              <iconify-icon icon="solar:calendar-linear"></iconify-icon> Yr ${s.year_level} • Sem ${s.semester}
+            </span>
+            ${isAdded
+              ? `<span class="course-added-tag"><iconify-icon icon="solar:check-circle-bold"></iconify-icon> Added</span>`
+              : `<button type="button" class="btn-add-course" data-add-subject="${s.id}" ${canEdit ? '' : 'disabled'}>
+                  <iconify-icon icon="solar:add-circle-linear"></iconify-icon> Add to Load
+                </button>`
+            }
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    listEl.querySelectorAll('[data-add-subject]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        const subjectId = btn.dataset.addSubject;
+        const res = await addItem(subjectId);
+        if (!res.ok) {
+          btn.disabled = false;
+          show(res.error);
+        }
+      });
+    });
   }
 
   function renderDraft() {
@@ -100,7 +143,7 @@ const EnrollmentSection = (() => {
         ${i.origin === 'grizz' ? `<span class="unit-badge unit-badge--none" style="width:auto;max-width:none;" title="${esc(i.grizz_reason || 'Recommended by Grizz')}">Grizz</span>` : ''}
         ${i.item_state === 'added_by_head' ? '<span class="unit-badge unit-badge--enrolled" style="width:auto;max-width:none;">Added by Program Head</span>' : ''}
         <button type="button" class="btn btn-ghost" data-remove-item="${i.id}" aria-label="Remove ${esc(i.subjects?.code)}">✕</button>
-      </div>`).join('') || '<p class="enrollment-empty">No subjects yet — add from the list below.</p>';
+      </div>`).join('') || '<p class="enrollment-empty">No subjects in proposed load yet. Pick courses from the Eligible Courses grid.</p>';
 
     itemsEl.querySelectorAll('[data-remove-item]').forEach(btn =>
       btn.addEventListener('click', () => removeItem(btn.dataset.removeItem)));
@@ -170,12 +213,6 @@ const EnrollmentSection = (() => {
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('enrollment-add-btn')?.addEventListener('click', async () => {
-      const sel = document.getElementById('enrollment-subject-select');
-      if (!sel?.value) return;
-      const res = await addItem(sel.value);
-      if (!res.ok) show(res.error);
-    });
     document.getElementById('enrollment-submit-btn')?.addEventListener('click', submit);
   });
 
