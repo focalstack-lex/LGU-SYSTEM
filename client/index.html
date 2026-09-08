@@ -578,6 +578,14 @@
             <h2>Financial Reports</h2>
             <p class="view-sub">Monthly summaries and breakdowns</p>
           </div>
+          <div class="filter-bar reports-filter-bar">
+            <select id="reports-range-filter" aria-label="Select report range" style="padding:0.55rem 1rem;background:var(--surface, #1C1C20);border:1px solid var(--border-default, rgba(255,255,255,0.08));border-radius:var(--radius-sm, 12px);color:var(--text-primary, #FFFFFF);font-size:0.87rem;">
+              <option value="all">All Time</option>
+              <option value="year">This Academic Year</option>
+              <option value="semester">This Semester</option>
+              <option value="month">This Month</option>
+            </select>
+          </div>
         </div>
         <div id="reports-content">
           <div class="loading-state">Loading reports…</div>

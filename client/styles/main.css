@@ -2613,6 +2613,25 @@ html body .stats-secondary-grid .stat-income:hover .stat-icon {
 .stat-card.stat-balance:hover .stat-icon { color: var(--primary, #FF5533); border-color: rgba(255, 85, 51, 0.35); background: rgba(255, 85, 51, 0.15); }
 .stat-card.stat-donations:hover .stat-icon { color: var(--status-positive, #22C55E); border-color: rgba(34, 197, 94, 0.3); background: rgba(34, 197, 94, 0.08); }
 
+/* Financial Reports Budget Utilized mini progress bar */
+.reports-util-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+.reports-util-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary, #FF5533), #FF7744);
+  border-radius: 9999px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-theme="light"] .reports-util-track {
+  background: rgba(0, 0, 0, 0.08);
+}
+
 /* ---- Offline Banner (token-tinted warning, mirrors status-badge tint pattern) ---- */
 .offline-banner {
   display: flex;

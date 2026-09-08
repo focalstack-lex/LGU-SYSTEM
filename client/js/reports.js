@@ -78,6 +78,20 @@ async function initReports() {
       renderBreakdownChart(summary.breakdown);
     });
 
+    // Wire up range filter dropdown if present in the header
+    const rangeFilter = document.getElementById('reports-range-filter');
+    if (rangeFilter && !rangeFilter.dataset.bound) {
+      rangeFilter.dataset.bound = 'true';
+      rangeFilter.addEventListener('change', () => {
+        const val = rangeFilter.value;
+        let filteredMonthly = _lastMonthlyData || monthly;
+        if (val === 'month') filteredMonthly = filteredMonthly.slice(-1);
+        else if (val === 'semester') filteredMonthly = filteredMonthly.slice(-6);
+        else if (val === 'year') filteredMonthly = filteredMonthly.slice(-12);
+        renderMonthlyChart(filteredMonthly);
+      });
+    }
+
     // Wire up download buttons
     container.querySelectorAll('[data-pdf]').forEach(btn => {
       btn.addEventListener('click', () => downloadReport('pdf', btn.dataset.pdf, btn.dataset.name));
@@ -132,7 +146,13 @@ function buildReportsHTML(summary, monthly, events) {
       </div>
       <div class="stat-card stat-donations">
         <div class="stat-icon"><iconify-icon icon="solar:pie-chart-2-linear"></iconify-icon></div>
-        <div class="stat-body"><p class="stat-label">Budget Utilized</p><h3 class="stat-value">${utilized}%</h3></div>
+        <div class="stat-body">
+          <p class="stat-label">Budget Utilized</p>
+          <h3 class="stat-value">${utilized}%</h3>
+          <div class="reports-util-track">
+            <div class="reports-util-fill" style="width:${Math.min(utilized, 100)}%;"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -264,8 +284,8 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Income',
           data: monthly.map(m => m.income),
-          backgroundColor: isLight ? '#1F3A5F' : '#4E77AC',
-          hoverBackgroundColor: isLight ? '#2A4A73' : '#5F89BC',
+          backgroundColor: isLight ? '#0284C7' : '#38BDF8',
+          hoverBackgroundColor: isLight ? '#0369A1' : '#0EA5E9',
           borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: 'bottom',
           maxBarThickness: isMobile ? 18 : 32,
@@ -275,8 +295,8 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Expenses',
           data: monthly.map(m => m.expense),
-          backgroundColor: isLight ? '#94A3B8' : '#475569',
-          hoverBackgroundColor: isLight ? '#CBD5E1' : '#64748B',
+          backgroundColor: isLight ? '#DC2626' : '#EF4444',
+          hoverBackgroundColor: isLight ? '#B91C1C' : '#F87171',
           borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: 'bottom',
           maxBarThickness: isMobile ? 18 : 32,
@@ -364,9 +384,9 @@ function renderBreakdownChart(breakdown) {
 
   const typeMap = [
     { key: 'expense',    label: 'Expenses',   color: '#EF4444' },
-    { key: 'allocation', label: 'Allocation', color: '#64748B' },
-    { key: 'donation',   label: 'Donations',  color: '#10B981' },
-    { key: 'collection', label: 'Collection', color: '#3E6393' },
+    { key: 'allocation', label: 'Allocation', color: '#8B5CF6' },
+    { key: 'donation',   label: 'Donations',  color: '#22C55E' },
+    { key: 'collection', label: 'Collection', color: '#38BDF8' },
   ];
 
   const active = typeMap.filter(t => (breakdown[t.key] || 0) > 0);
