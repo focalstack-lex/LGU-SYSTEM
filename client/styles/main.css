@@ -3298,13 +3298,18 @@ iconify-icon {
   .data-table th,
   .data-table td { padding: 0.6rem 0.75rem; font-size: 0.8rem; }
 
-  /* Financial Ledger Mobile View Switch */
-  #view-transactions .table-wrapper {
+  /* Financial Data Mobile View Switch — tables give way to tap-friendly cards
+     on every view that ships a .mobile-cards-container (ledger, income, reports) */
+  #view-transactions .table-wrapper,
+  #view-income .table-wrapper,
+  #view-reports .table-wrapper {
     display: none !important;
   }
 
   #view-transactions .mobile-cards-container,
-  #tx-mobile-cards {
+  #tx-mobile-cards,
+  #view-reports .mobile-cards-container,
+  #income-mobile-cards {
     display: flex !important;
     flex-direction: column !important;
     gap: 0.65rem !important;
@@ -3312,6 +3317,11 @@ iconify-icon {
     margin-top: 0.5rem !important;
     max-height: none !important;
     overflow: visible !important;
+  }
+
+  /* Chart.js canvases must never exceed their card on small phones */
+  #view-reports canvas {
+    max-width: 100%;
   }
 
   .ledger-header {
@@ -3376,6 +3386,11 @@ iconify-icon {
   }
   .events-filter-tabs::-webkit-scrollbar {
     display: none !important;
+  }
+  /* Trailing fade signals more filter pills beyond the viewport edge */
+  .events-filter-tabs {
+    mask-image: linear-gradient(to right, black 88%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 88%, transparent 100%);
   }
   .events-filter-btn {
     flex-shrink: 0 !important;
@@ -3586,8 +3601,9 @@ iconify-icon {
     flex-direction: column !important;
     gap: 0.3rem !important;
   }
-  body .data-card-row { display: flex !important; justify-content: space-between !important; font-size: 0.78rem !important; }
-  body .data-card-label { color: var(--text-secondary) !important; }
+  body .data-card-row { display: flex !important; justify-content: space-between !important; align-items: baseline !important; gap: 0.75rem !important; font-size: 0.78rem !important; }
+  body .data-card-label { color: var(--text-secondary) !important; white-space: nowrap !important; flex-shrink: 0 !important; }
+  body .data-card-row span:last-child { text-align: right !important; min-width: 0 !important; }
   body .data-card-actions {
     margin-top: 0.65rem !important;
     padding-top: 0.5rem !important;
@@ -3962,13 +3978,15 @@ iconify-icon {
     box-shadow: none !important;
   }
   body .auth-card { margin: 0.5rem !important; padding: 1.25rem 1rem !important; }
-  body #view-transactions .table-wrapper { 
-    display: none !important; 
+  body #view-transactions .table-wrapper,
+  body #view-income .table-wrapper,
+  body #view-reports .table-wrapper {
+    display: none !important;
   }
-  body .table-wrapper { 
-    margin: 0 -0.75rem !important; 
-    border-radius: 0 !important; 
-    max-height: 420px !important; 
+  body .table-wrapper {
+    margin: 0 -0.75rem !important;
+    border-radius: 0 !important;
+    max-height: 420px !important;
     overflow-x: auto !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
@@ -3979,7 +3997,9 @@ iconify-icon {
     min-width: 500px !important;
   }
   body #view-transactions .mobile-cards-container,
-  body #tx-mobile-cards {
+  body #tx-mobile-cards,
+  body #view-reports .mobile-cards-container,
+  body #income-mobile-cards {
     display: flex !important;
     flex-direction: column !important;
     gap: 0.65rem !important;

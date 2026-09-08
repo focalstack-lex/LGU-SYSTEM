@@ -14,8 +14,9 @@ const Income = (() => {
       });
       const incomes = Array.isArray(res) ? res : (res.data || []);
       renderTable(incomes);
+      renderMobileCards(incomes);
     } catch (err) {
-      document.getElementById('income-table-body').innerHTML = 
+      document.getElementById('income-table-body').innerHTML =
         `<tr><td colspan="5" class="loading-state">Failed to load income history.</td></tr>`;
     }
   }
@@ -35,6 +36,37 @@ const Income = (() => {
         <td class="tx-amount ${tx.type}">+${UI.currency(tx.amount)}</td>
         <td style="color:var(--text-secondary);font-size:0.82rem">${tx.profiles?.full_name || 'System'}</td>
       </tr>
+    `).join('');
+  }
+
+  // Mobile card layout (≤768px) — table-wrapper is hidden via CSS on phones.
+  function renderMobileCards(txs) {
+    const container = document.getElementById('income-mobile-cards');
+    if (!container) return;
+    if (!txs.length) {
+      container.innerHTML = `<div class="empty-state"><span class="empty-icon"><iconify-icon icon="solar:wallet-money-linear"></iconify-icon></span><p>No income recorded yet.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = txs.map(tx => `
+      <div class="data-card">
+        <div class="data-card-header">
+          <strong style="font-size:0.92rem;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${tx.description}</strong>
+          ${UI.renderStatusBadge(tx.type)}
+        </div>
+        <div class="data-card-row">
+          <span class="data-card-label">Date</span>
+          <span>${UI.dateStr(tx.transaction_date)}</span>
+        </div>
+        <div class="data-card-row">
+          <span class="data-card-label">Added By</span>
+          <span>${tx.profiles?.full_name || 'System'}</span>
+        </div>
+        <div class="data-card-row" style="margin-top:0.35rem;">
+          <span class="data-card-label">Amount</span>
+          <span class="tx-amount ${tx.type}" style="font-size:1.05rem;">+${UI.currency(tx.amount)}</span>
+        </div>
+      </div>
     `).join('');
   }
 
