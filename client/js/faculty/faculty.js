@@ -46,6 +46,13 @@ const FacultyPortal = (() => {
   const isHead = () => profile?.role === 'program_head' || profile?.role === 'admin';
   const isDean = () => profile?.role === 'dean' || profile?.role === 'admin';
 
+  // checklists API validates exact casing ('BSCoE' | 'BSCE' | 'BSECE')
+  const PROGRAMS = ['BSCoE', 'BSCE', 'BSECE'];
+  function programKey(course) {
+    const upper = String(course || '').trim().toUpperCase();
+    return PROGRAMS.find(p => p.toUpperCase() === upper) || '';
+  }
+
   function showGate(message) {
     $('faculty-app').hidden = true;
     $('faculty-gate').hidden = false;
@@ -177,7 +184,7 @@ const FacultyPortal = (() => {
   async function fillAddPicker(s) {
     const sel = document.getElementById('faculty-add-subject');
     sel.innerHTML = '<option value="">— subject —</option>';
-    const program = (s.student?.course || '').trim().toUpperCase();
+    const program = programKey(s.student?.course);
     if (!program) return;
     await guard('fillAddPicker', async () => {
       const checklists = await Api.units.checklists(program);
@@ -207,7 +214,7 @@ const FacultyPortal = (() => {
         (h.lec_status === 'passed' && h.lab_status === 'passed'))
       .map(([sid]) => sid));
 
-    const program = (detail.submission.student?.course || '').trim().toUpperCase();
+    const program = programKey(detail.submission.student?.course);
     body.innerHTML = '<p class="muted">Loading program checklist…</p>';
     guard('prospectus', async () => {
       const checklists = await Api.units.checklists(program);
