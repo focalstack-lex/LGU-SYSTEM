@@ -1,6 +1,6 @@
 // =============================================
-// enrollment.js - Student load verification (Phase B).
-// Draft builder + status card. Grizz calls Enrollment.addFromGrizz(subject, reason).
+// enrollment.js - Student Enrollment Verification (Phase B).
+// Draft builder + journey/status card. Grizz calls Enrollment.addFromGrizz(subject, reason).
 // =============================================
 const EnrollmentSection = (() => {
 
@@ -8,17 +8,11 @@ const EnrollmentSection = (() => {
     return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  const STATUS_LABELS = {
-    draft: 'Draft',
-    submitted: 'Submitted for evaluation',
-    under_review: 'Under evaluation',
-    approved: 'Approved',
-    returned: 'Returned for changes',
-    rejected: 'Rejected',
-  };
+  const EJ = window.EnrollmentJourney;
 
   let subjects = [];
   let current = null; // active submission (with items)
+  let program = 'COE';
 
   // ---- Load ----
   // Pilot gate: non-allowlisted accounts see a notice instead of the feature.
@@ -33,9 +27,8 @@ const EnrollmentSection = (() => {
       section.appendChild(note);
     }
     note.innerHTML = `
-      <h3>🚧 Load Verification is still under development</h3>
-      <p>This feature is being polished and will open for your account soon.
-         You'll be notified once it's live.</p>`;
+      <h3>Enrollment Verification is being rolled out</h3>
+      <p>This feature is still in a controlled pilot. It will open for your account soon, and you'll be notified once it's live.</p>`;
   }
 
   async function load() {
@@ -47,7 +40,7 @@ const EnrollmentSection = (() => {
     // checklists API validates exact casing ('BSCoE' | 'BSCE' | 'BSECE')
     const PROGRAMS = ['BSCoE', 'BSCE', 'BSECE'];
     const upper = (profile?.course || '').trim().toUpperCase();
-    const program = PROGRAMS.find(p => p.toUpperCase() === upper) || 'BSCoE';
+    program = PROGRAMS.find(p => p.toUpperCase() === upper) || 'COE';
     const year = Number(profile?.year_level || 0);
     if (year >= 1 && year <= 4) {
       activeYearFilter = String(year);
@@ -73,6 +66,10 @@ const EnrollmentSection = (() => {
     }
 
     fillPicker();
+    renderAll();
+  }
+
+  function renderAll() {
     renderDraft();
     renderStatus();
   }
@@ -134,11 +131,8 @@ const EnrollmentSection = (() => {
     const listEl = document.getElementById('enrollment-eligible-list');
     if (!listEl) return;
 
-    const taken = new Set((current?.enrollment_submission_items || [])
-      .filter(i => i.item_state !== 'removed_by_head')
-      .map(i => i.subject_id));
-
-    const canEdit = !current || ['draft', 'returned'].includes(current.status);
+    const taken = new Set(EJ.activeItems(current).map(i => i.subject_id));
+    const canEdit = EJ.canEdit(current);
 
     const filtered = subjects.filter(s => {
       if (activeYearFilter === 'all') return true;
@@ -146,8 +140,8 @@ const EnrollmentSection = (() => {
     });
 
     if (!filtered.length) {
-      const yearText = activeYearFilter === 'all' ? 'this term' : `Year ${activeYearFilter}`;
-      listEl.innerHTML = `<p class="enrollment-empty" style="grid-column: 1/-1; text-align: center; padding: 2rem 1rem; color: var(--text-tertiary);">No eligible courses found for ${yearText}.</p>`;
+      const yearText = activeYearFilter === 'all' ? 'this semester' : `Year ${activeYearFilter}`;
+      listEl.innerHTML = `<p class="enrollment-empty ev-eligible-empty">No eligible courses found for ${yearText}.</p>`;
       return;
     }
 
@@ -193,11 +187,16 @@ const EnrollmentSection = (() => {
   function renderDraft() {
     const itemsEl = document.getElementById('enrollment-items');
     if (!itemsEl) return;
-    const items = (current?.enrollment_submission_items || []).filter(i => i.item_state !== 'removed_by_head');
+    const items = EJ.activeItems(current);
     const total = items.reduce((sum, i) => sum + Number(i.subjects?.units || 0), 0);
+    const canEdit = EJ.canEdit(current);
 
-    document.getElementById('enrollment-term-line').textContent =
-      current ? `${current.school_year} · Semester ${current.semester} · ${items.length} subject(s) · ${total} units` : '';
+    const termEl = document.getElementById('enrollment-term-line');
+    if (termEl) {
+      termEl.textContent = current
+        ? `${current.school_year} · Semester ${current.semester} · ${items.length} subject${items.length === 1 ? '' : 's'} · ${total} units`
+        : '';
+    }
 
     itemsEl.innerHTML = items.map(i => `
       <div class="enrollment-item-row" data-item="${i.id}">
@@ -205,64 +204,214 @@ const EnrollmentSection = (() => {
         <span class="enrollment-item-title">${esc(i.subjects?.title)}</span>
         ${i.origin === 'grizz' ? `<span class="unit-badge unit-badge--none" style="width:auto;max-width:none;" title="${esc(i.grizz_reason || 'Recommended by Grizz')}">Grizz</span>` : ''}
         ${i.item_state === 'added_by_head' ? '<span class="unit-badge unit-badge--enrolled" style="width:auto;max-width:none;">Added by Program Head</span>' : ''}
-        <button type="button" class="btn btn-ghost" data-remove-item="${i.id}" aria-label="Remove ${esc(i.subjects?.code)}">✕</button>
-      </div>`).join('') || '<p class="enrollment-empty">No subjects in proposed load yet. Pick courses from the Eligible Courses grid.</p>';
+        ${canEdit
+          ? `<button type="button" class="btn btn-ghost" data-remove-item="${i.id}" aria-label="Remove ${esc(i.subjects?.code)}">✕</button>`
+          : ''}
+      </div>`).join('')
+      || (canEdit
+          ? '<p class="enrollment-empty">No subjects in your proposed load yet. Pick courses from the Eligible Courses list below, or ask Grizz for recommendations.</p>'
+          : '<p class="enrollment-empty">No subjects in your proposed load.</p>');
 
     itemsEl.querySelectorAll('[data-remove-item]').forEach(btn =>
       btn.addEventListener('click', () => removeItem(btn.dataset.removeItem)));
+
+    // Locked hint under the draft list
+    const lockedNote = document.getElementById('enrollment-locked-note');
+    if (lockedNote) {
+      if (current && ['submitted', 'under_review'].includes(current.status)) {
+        lockedNote.classList.remove('hidden');
+        lockedNote.innerHTML = '<iconify-icon icon="solar:lock-linear" style="font-size:0.9rem;"></iconify-icon> This load is locked while your Program Head reviews it.';
+      } else if (current && current.status === 'approved') {
+        lockedNote.classList.remove('hidden');
+        lockedNote.innerHTML = '<iconify-icon icon="solar:lock-keyhole-linear" style="font-size:0.9rem;"></iconify-icon> Verified by your Program Head — your load is locked.';
+      } else {
+        lockedNote.classList.add('hidden');
+      }
+    }
   }
 
-  // ---- Status card ----
+  // ---- Journey + status card ----
+  function statusMeta() {
+    if (!current) {
+      return {
+        chipTone: 'neutral', chipLabel: 'No open submission',
+        statusHtml: '<p class="ev-status-copy">We couldn\'t find an open enrollment term for you yet. If you expected one, contact the COE office.</p>',
+        metaHtml: '',
+      };
+    }
+    const step = EJ.stepOf(current);
+    const tone = EJ.toneFor(current);
+    const chipLabel = {
+      draft: 'Build your load',
+      submitted: 'With your Program Head',
+      under_review: 'Program Head is reviewing',
+      approved: current.encoded_at ? 'Encoded — done' : 'Verified — final load',
+    }[current.status] || (step.state === 'defensive' ? 'Not editable' : current.status);
+    const chipTone = {
+      draft: 'neutral', submitted: 'warning', under_review: 'warning', approved: 'success',
+    }[current.status] || 'danger';
+
+    const items = EJ.activeItems(current);
+    return {
+      chipTone, chipLabel,
+      statusHtml: buildStatusHtml(current, items),
+      metaHtml: statusMetaLine(current),
+    };
+  }
+
+  function statusMetaLine(s) {
+    if ((s.status === 'submitted' || s.status === 'under_review') && s.submitted_at) {
+      return `With your Program Head since ${UI.dateStr(s.submitted_at)}.`;
+    }
+    if (s.status === 'approved' && !s.encoded_at && s.reviewed_at) {
+      return `Verified on ${UI.dateStr(s.reviewed_at)}.`;
+    }
+    if (s.status === 'approved' && s.encoded_at) {
+      return `Encoded on ${UI.dateStr(s.encoded_at)}.`;
+    }
+    return '';
+  }
+
+  function buildStatusHtml(s, items) {
+    const step = EJ.stepOf(s);
+    if (step.state === 'defensive') {
+      return `<div class="ev-defensive-card"><strong>This submission is no longer editable.</strong><br/>Contact your Program Head or the COE office for help.</div>`;
+    }
+    if (s.status === 'draft') {
+      const total = items.reduce((sum, i) => sum + Number(i.subjects?.units || 0), 0);
+      return `<p class="ev-status-copy">${items.length} subject${items.length === 1 ? '' : 's'} (${total} units) in your proposed load. When it's ready, submit it to your <strong>${esc(program)}</strong> Program Head for review.</p>`;
+    }
+    if (s.status === 'submitted' || s.status === 'under_review') {
+      return `<p class="ev-status-copy">Your proposed load for <strong>Semester ${esc(s.semester)}</strong> was sent to your <strong>${esc(program)}</strong> Program Head. You'll be notified when they respond.</p>`;
+    }
+    if (s.status === 'approved') {
+      const listHtml = items.map(i => `
+        <li class="enrollment-item-row" style="border-bottom:none;padding:0.35rem 0;">
+          <span class="enrollment-item-code">${esc(i.subjects?.code)}</span>
+          <span class="enrollment-item-title">${esc(i.subjects?.title)}</span>
+        </li>`).join('');
+      const headChanges = headChangeLines(s);
+      if (s.encoded_at) {
+        return `
+          <div class="ev-done-card">
+            <h4><iconify-icon icon="solar:check-circle-bold"></iconify-icon> Your load is encoded</h4>
+            <p>Your final load has been encoded by the <strong>Student Assistant</strong>. Enrollment inside this system is complete. The next step — assessment and claiming — happens at the <strong>University Registrar</strong>, outside this system.</p>
+          </div>
+          <ul style="list-style:none;margin:0.8rem 0 0 0;padding:0;">${listHtml}</ul>`;
+      }
+      return `
+        <div class="ev-done-card">
+          <h4><iconify-icon icon="solar:verified-check-bold"></iconify-icon> Verified — your final load</h4>
+          <p>Your Program Head verified your load. This is the <strong>final list of subjects</strong> you will enroll this semester. Waiting for the Student Assistant to encode it.</p>
+        </div>
+        ${headChanges}
+        <ul style="list-style:none;margin:0.8rem 0 0 0;padding:0;">${listHtml}</ul>
+        <p class="ev-final-list-note">A copy of this final list was emailed to you. Nothing needed from you right now.</p>`;
+    }
+    return '';
+  }
+
+  function headChangeLines(s) {
+    const rows = (s.enrollment_submission_items || [])
+      .filter(i => i.item_state !== 'submitted' && i.head_note)
+      .map(i => `<li>${i.item_state === 'removed_by_head' ? 'Removed' : 'Added'} <strong>${esc(i.subjects?.code)}</strong> — ${esc(i.head_note)}</li>`);
+    return rows.length ? `<ul class="enrollment-changes">${rows.join('')}</ul>` : '';
+  }
+
   function renderStatus() {
     const body = document.getElementById('enrollment-status-body');
     if (!body) return;
-    if (!current) {
-      body.innerHTML = '<p class="enrollment-empty">No submission for this term yet.</p>';
-      return;
-    }
-    const items = current.enrollment_submission_items || [];
-    const changes = items
-      .filter(i => i.item_state !== 'submitted' && i.head_note)
-      .map(i => `<li>${i.item_state === 'removed_by_head' ? 'Removed' : 'Added'} <strong>${esc(i.subjects?.code)}</strong>: ${esc(i.head_note)}</li>`)
-      .join('');
+    const trackEl = document.getElementById('enrollment-journey-track');
+    const actionEl = document.getElementById('enrollment-action-area');
+
+    const meta = statusMeta();
+    if (trackEl) trackEl.innerHTML = renderTrack();
     body.innerHTML = `
-      <p><strong>${STATUS_LABELS[current.status] || esc(current.status)}</strong></p>
-      ${current.review_notes ? `<p class="enrollment-note">Program Head: ${esc(current.review_notes)}</p>` : ''}
-      ${changes ? `<ul class="enrollment-changes">${changes}</ul>` : ''}
-      ${current.encoded_at ? '<p class="enrollment-note">✓ Encoded by the registrar staff.</p>' : ''}
-      ${current.status === 'approved' ? '<p class="enrollment-note">Your subjects are now enrolled in your Academic Progress tab.</p>' : ''}`;
+      <span class="ev-chip ev-chip--${meta.chipTone}">${esc(meta.chipLabel)}</span>
+      ${meta.statusHtml}
+      ${meta.metaHtml ? `<p class="ev-status-meta">${esc(meta.metaHtml)}</p>` : ''}`;
+
+    if (actionEl) actionEl.innerHTML = renderAction();
+  }
+
+  function renderTrack() {
+    const step = EJ.stepOf(current);
+    const compact = window.matchMedia('(max-width: 480px)').matches;
+    const trackClass = compact ? 'ev-track ev-track--compact' : 'ev-track';
+    if (!current || step.state === 'defensive') {
+      return `<ol class="${trackClass}" aria-label="Enrollment steps"></ol>`;
+    }
+    const iconFor = i => {
+      if (i < step.stepIndex) return 'solar:check-bold';
+      if (i === step.stepIndex) return 'solar:' + currentStepIcon();
+      return '';
+    };
+    return `<ol class="${trackClass}" aria-label="Enrollment steps">` + EJ.STEPS.map((s, i) => {
+      const state = i < step.stepIndex ? 'done' : (i === step.stepIndex ? 'current' : 'upcoming');
+      const icon = iconFor(i);
+      return `
+        <li class="ev-step ev-step--${state}">
+          <span class="ev-step-dot" aria-hidden="true">${icon ? `<iconify-icon icon="${icon}"></iconify-icon>` : ''}</span>
+          <span class="ev-step-label">${s.label}</span>
+        </li>`;
+    }).join('') + '</ol>';
+  }
+
+  function currentStepIcon() {
+    if (!current) return 'clock-circle-linear';
+    if (current.status === 'draft') return 'pen-new-square-linear';
+    if (current.status === 'submitted' || current.status === 'under_review') return 'clock-circle-linear';
+    if (current.status === 'approved') return current.encoded_at ? 'check-circle-bold' : 'verified-check-bold';
+    return 'clock-circle-linear';
+  }
+
+  function renderAction() {
+    const action = EJ.actionFor(current);
+    const hint = action.hint ? `<p class="ev-action-hint">${esc(action.hint)}</p>` : '';
+    if (action.kind === 'submit') {
+      return `<button type="button" class="btn btn-primary" id="enrollment-submit-btn">
+                <iconify-icon icon="solar:plain-3-linear" style="font-size:1.1rem;"></iconify-icon>
+                <span>${esc(action.label)}</span>
+              </button>`;
+    }
+    return hint;
   }
 
   // ---- Actions ----
   async function addItem(subjectId, grizzReason) {
-    if (!current) return { ok: false, error: 'Load not ready — open Load Verification first.' };
+    if (!current) return { ok: false, error: 'Enrollment is not ready — open the Enrollment Verification screen first.' };
     if (!subjectId) return { ok: false, error: 'No subject selected.' };
     try {
       const { item } = await Api.enrollment.addItem(current.id, subjectId, grizzReason);
       current.enrollment_submission_items = current.enrollment_submission_items || [];
       current.enrollment_submission_items.push(item);
       fillPicker();
-      renderDraft();
+      renderAll();
       return { ok: true, item };
     } catch (err) { return { ok: false, error: err.message }; }
   }
 
   async function removeItem(itemId) {
-    if (!current) return;
+    if (!current || !EJ.canEdit(current)) return;
     try {
       await Api.enrollment.removeItem(current.id, itemId);
       current.enrollment_submission_items = (current.enrollment_submission_items || []).filter(i => i.id !== itemId);
       fillPicker();
-      renderDraft();
+      renderAll();
     } catch (err) { show(err.message); }
   }
 
   async function submit() {
-    if (!current) return;
+    if (!current || !EJ.canEdit(current)) return;
+    const items = EJ.activeItems(current);
+    if (!items.length) { show('Add at least one subject before submitting.'); return; }
+    const total = items.reduce((sum, i) => sum + Number(i.subjects?.units || 0), 0);
+    const ok = window.confirm(`Submit ${items.length} subject${items.length === 1 ? '' : 's'} (${total} units) to the ${program} Program Head?`);
+    if (!ok) return;
     try {
       const { submission } = await Api.enrollment.submit(current.id);
       current = submission;
-      renderStatus();
+      renderAll();
       UI.toast('Load submitted for verification.', 'success');
     } catch (err) { show(err.message); }
   }
@@ -275,23 +424,27 @@ const EnrollmentSection = (() => {
     setTimeout(() => el.classList.add('hidden'), 5000);
   }
 
+  // Action delegation (the action button is rendered dynamically).
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('enrollment-submit-btn')?.addEventListener('click', submit);
+    document.getElementById('enrollment-action-area')?.addEventListener('click', e => {
+      if (e.target.closest('#enrollment-submit-btn')) submit();
+    });
   });
 
   // Phase C hook surface (spec 2026-09-08): Grizz reads state and pushes subjects.
   window.Enrollment = {
     addFromGrizz: (subject, reason) => addItem(subject?.id, reason || 'Recommended by Grizz'),
     ensureReady: load, // loads profile + checklists + submissions; creates the term draft if none
-    canEdit: () => !!current && ['draft', 'returned'].includes(current.status),
-    lockedReason: () => ({
-      submitted: 'Submitted — with your Program Head',
-      under_review: 'Under evaluation',
-      approved: 'Approved — locked',
-      rejected: 'Rejected',
-    }[current?.status] || ''),
-    draftSubjectIds: () => new Set((current?.enrollment_submission_items || [])
-      .filter(i => i.item_state !== 'removed_by_head').map(i => i.subject_id)),
+    canEdit: () => EJ.canEdit(current),
+    lockedReason: () => {
+      if (!current) return '';
+      if (current.status === 'draft') return '';
+      if (current.status === 'approved') {
+        return current.encoded_at ? 'Encoded — your load is locked' : 'Verified — your final load is locked';
+      }
+      return 'Submitted — your load is with your Program Head';
+    },
+    draftSubjectIds: () => EJ.activeItems(current).reduce((set, i) => (set.add(i.subject_id), set), new Set()),
   };
 
   return { load };

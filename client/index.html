@@ -17,7 +17,7 @@
   <meta name="description" content="Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=7.3" />
+  <link rel="stylesheet" href="styles/main.css?v=7.4" />
   <link rel="stylesheet" href="styles/ai.css?v=6.5" />
   <script src="vendor/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
@@ -298,7 +298,7 @@
           <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span><span>Academic Progress</span>
         </a>
         <a href="#" class="nav-item" data-view="enrollment" id="nav-enrollment">
-          <span class="nav-icon"><iconify-icon icon="solar:clipboard-check-linear"></iconify-icon></span><span>Load Verification</span>
+          <span class="nav-icon"><iconify-icon icon="solar:clipboard-check-linear"></iconify-icon></span><span>Enrollment Verification</span>
         </a>
         <a href="/officer.html" class="nav-item officer-only hidden" id="nav-executive-portal">
           <span class="nav-icon"><iconify-icon icon="solar:shield-user-linear"></iconify-icon></span><span>Executive Portal</span>
@@ -661,44 +661,45 @@
         </div>
       </section>
 
-      <!-- Load Verification (Phase B) -->
+      <!-- Enrollment Verification (Phase B) -->
       <section class="view" id="view-enrollment">
         <div class="view-header">
           <div>
-            <h2>Load Verification</h2>
-            <p class="view-sub">Build your proposed load and send it to your Program Head for evaluation</p>
+            <h2>Enrollment Verification</h2>
+            <p class="view-sub">Build your proposed load, send it to your Program Head for review, and get it encoded by the SA.</p>
           </div>
         </div>
 
         <div class="enrollment-grid">
-          <!-- Left Column: Proposed Load & Status Cards -->
+          <!-- Left: Journey & status (persistent anchor) -->
           <div class="enrollment-column-left">
+            <div class="enrollment-card" id="enrollment-journey-card">
+              <h3><iconify-icon icon="solar:route-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Enrollment Status</h3>
+              <ol class="ev-track" id="enrollment-journey-track" aria-label="Enrollment steps"></ol>
+              <div id="enrollment-status-body"></div>
+              <div class="ev-action-area" id="enrollment-action-area"></div>
+            </div>
+          </div>
+
+          <!-- Right: Workspace (editable states) / read-only summary (locked states) -->
+          <div class="enrollment-column-right">
             <div class="enrollment-card" id="enrollment-draft-card">
               <h3><iconify-icon icon="solar:document-text-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Proposed Load</h3>
               <p class="enrollment-note" id="enrollment-term-line"></p>
               <div id="enrollment-items"></div>
+              <div class="ev-locked-note hidden" id="enrollment-locked-note"></div>
               <div class="auth-error hidden" id="enrollment-error"></div>
-              <button type="button" class="btn btn-primary" id="enrollment-submit-btn" style="width:100%;margin-top:1rem;display:flex;align-items:center;justify-content:center;gap:0.4rem;">
-                <iconify-icon icon="solar:plain-3-linear" style="font-size:1.1rem;"></iconify-icon>
-                <span>Submit for Verification</span>
-              </button>
             </div>
-            
-            <div class="enrollment-card" id="enrollment-status-card" style="margin-top:1.25rem;">
-              <h3><iconify-icon icon="solar:history-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Submission Status</h3>
-              <div id="enrollment-status-body"><p class="enrollment-empty">No submission for this term yet.</p></div>
-            </div>
-          </div>
 
-          <!-- Right Column: Eligible Courses Grid -->
-          <div class="enrollment-card" id="enrollment-eligible-card">
-            <div class="enrollment-eligible-header">
-              <h3><iconify-icon icon="solar:book-bookmark-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Eligible Courses for Term</h3>
-              <p class="enrollment-note" style="margin:0.25rem 0 0.85rem;">Click "+ Add to Load" on any eligible course to build your proposed load</p>
-            </div>
-            <div id="enrollment-year-filter" class="year-filter-pills"></div>
-            <div id="enrollment-eligible-list" class="enrollment-eligible-grid">
-              <div class="loading-state">Loading eligible courses…</div>
+            <div class="enrollment-card" id="enrollment-eligible-card">
+              <div class="enrollment-eligible-header">
+                <h3><iconify-icon icon="solar:book-bookmark-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Eligible Courses for this Semester</h3>
+                <p class="enrollment-note" style="margin:0.25rem 0 0.85rem;">Pick the subjects you need — Grizz's recommendations are a great starting point.</p>
+              </div>
+              <div id="enrollment-year-filter" class="year-filter-pills"></div>
+              <div id="enrollment-eligible-list" class="enrollment-eligible-grid">
+                <div class="loading-state">Loading eligible courses…</div>
+              </div>
             </div>
           </div>
         </div>
@@ -1186,6 +1187,23 @@
       </div>
     </div>
     <div class="mobile-sheet-body">
+      <!-- Section: ACADEMIC -->
+      <div class="mobile-sheet-section">
+        <span class="mobile-sheet-section-label">Academic</span>
+        <div class="mobile-sheet-group">
+          <button type="button" class="mobile-sheet-row" id="bottom-nav-enrollment" data-view="enrollment" data-sheet-action="nav">
+            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(255,85,51,0.12);">
+              <iconify-icon icon="solar:clipboard-check-linear"></iconify-icon>
+            </div>
+            <div class="mobile-sheet-row-content">
+              <span class="mobile-sheet-row-title">Enrollment</span>
+              <span class="mobile-sheet-row-desc">Build &amp; track your proposed load</span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
+          </button>
+        </div>
+      </div>
+
       <!-- Section: FINANCE -->
       <div class="mobile-sheet-section">
         <span class="mobile-sheet-section-label">Finance</span>
@@ -1559,7 +1577,7 @@
   <script src="js/roster.js?v=5.4"></script>
   <script src="js/auth.js?v=5.4"></script>
   <script src="js/api.js?v=5.3"></script>
-  <script src="js/ui.js?v=5.7"></script>
+  <script src="js/ui.js?v=5.8"></script>
   <script src="js/dashboard.js?v=5.3"></script>
   <script src="js/events.js?v=5.3"></script>
   <script src="js/transactions.js?v=5.3"></script>
@@ -1574,7 +1592,7 @@
   <script src="js/profile.js?v=5.3"></script>
   <script src="js/notifications.js?v=5.3"></script>
   <script src="js/enrollment-journey.js?v=1.0"></script>
-  <script src="js/enrollment.js?v=1.2"></script>
+  <script src="js/enrollment.js?v=1.3"></script>
   <script src="js/app.js?v=6.5"></script>
   <script>
     // PWA: register the app-shell service worker (skipped in Electron's file:// windows)

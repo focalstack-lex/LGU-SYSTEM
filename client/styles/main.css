@@ -8202,6 +8202,21 @@ html[data-theme="light"] .course-added-tag {
 .enrollment-gated h3 { margin: 0 0 0.6rem; }
 .enrollment-gated p { margin: 0; color: var(--text-secondary); }
 
+/* Enrollment Verification columns (Task 3) */
+.enrollment-column-left,
+.enrollment-column-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+.ev-eligible-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-tertiary, #6E6E7A);
+}
+
 @media (max-width: 768px) {
   .enrollment-grid { grid-template-columns: 1fr; }
 }

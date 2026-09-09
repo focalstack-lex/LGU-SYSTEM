@@ -18,7 +18,7 @@ const UI = (() => {
     // Remember the last navigable view so a page refresh returns the user
     // here instead of resetting to the dashboard. Sub-views that need their
     // own state (e.g. event-detail) are not stored.
-    const NAV_VIEWS = ['dashboard', 'events', 'transactions', 'income', 'reports', 'units', 'admin'];
+    const NAV_VIEWS = ['dashboard', 'events', 'transactions', 'income', 'reports', 'units', 'enrollment', 'admin'];
     if (NAV_VIEWS.includes(viewId)) {
       try { sessionStorage.setItem('lastView', viewId); } catch { /* storage unavailable */ }
     }
