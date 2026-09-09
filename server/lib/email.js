@@ -378,4 +378,4 @@ async function sendLoadStatusEmail({ to, name = 'COE Student', status, milestone
   }
 }
 
-module.exports = { sendAnnouncementEmail, sendNewEventEmail, sendAccountApprovalEmail, sendLoadStatusEmail };
+module.exports = { buildEmailTemplate, sendAnnouncementEmail, sendNewEventEmail, sendAccountApprovalEmail, sendLoadStatusEmail };
