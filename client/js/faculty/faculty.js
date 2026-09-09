@@ -9,8 +9,8 @@ const FacultyPortal = (() => {
   const STATUS_LABELS = {
     draft: 'Draft',
     submitted: 'Submitted',
-    under_review: 'Under evaluation',
-    approved: 'Approved',
+    under_review: 'Under review',
+    approved: 'Verified',
     returned: 'Returned',
     rejected: 'Rejected',
   };
@@ -73,7 +73,7 @@ const FacultyPortal = (() => {
       return showGate('This portal is for program heads, faculty staff, and the dean only.');
     }
     if (!window.isEnrollmentPilot?.(profile.email)) {
-      return showGate('🚧 The enrollment verification portal is still under development. It will open for your role soon.');
+      return showGate('The enrollment verification portal is still in a controlled pilot. It will open for your role soon.');
     }
 
     $('faculty-gate').hidden = true;
@@ -112,7 +112,7 @@ const FacultyPortal = (() => {
       <div class="faculty-row" data-open="${s.id}">
         <span><strong>${esc(s.student?.full_name || 'Student')}</strong> · ${esc(s.student?.course || '')} Yr ${esc(s.student?.year_level || '')}</span>
         <span>${(s.enrollment_submission_items || []).filter(i => i.item_state !== 'removed_by_head').length} subjects · ${STATUS_LABELS[s.status] || esc(s.status)}</span>
-        <span class="faculty-row-actions"><button type="button" class="btn btn-primary btn-sm">Evaluate</button></span>
+        <span class="faculty-row-actions"><button type="button" class="btn btn-primary btn-sm">Review</button></span>
       </div>`).join('') : '<p class="muted">The queue is empty.</p>';
     el.querySelectorAll('[data-open]').forEach(row =>
       row.addEventListener('click', () => guard('openEvaluation', () => openEvaluation(row.dataset.open))));
@@ -156,27 +156,13 @@ const FacultyPortal = (() => {
     // Add-subject picker: same program's checklist subjects not already in the load
     fillAddPicker(s);
 
+    // Verify is the head's only decision: add/remove adjust the load, verify
+    // finalizes it (spec D8 — no reject, no return-for-changes).
     document.getElementById('faculty-approve-btn').onclick = async () => {
-      if (!confirm('Approving enrolls these subjects for the student now. Continue?')) return;
+      if (!confirm('Verify and finalize this load? The subjects are enrolled for the student now. Continue?')) return;
       await guard('approve', async () => {
         const r = await Api.faculty.approve(s.id);
-        if (r.alreadyApproved) { alert('Already approved.'); return; }
-        backToQueue();
-      });
-    };
-    document.getElementById('faculty-return-btn').onclick = async () => {
-      const notes = prompt('Notes for the student (required):');
-      if (!notes || !notes.trim()) return;
-      await guard('return', async () => {
-        await Api.faculty.return(s.id, notes.trim());
-        backToQueue();
-      });
-    };
-    document.getElementById('faculty-reject-btn').onclick = async () => {
-      const notes = prompt('Reason for rejection (required):');
-      if (!notes || !notes.trim()) return;
-      await guard('reject', async () => {
-        await Api.faculty.reject(s.id, notes.trim());
+        if (r.alreadyApproved) { alert('This load is already verified.'); return; }
         backToQueue();
       });
     };
@@ -316,7 +302,7 @@ const FacultyPortal = (() => {
       byProgram[p][s.status] = (byProgram[p][s.status] || 0) + 1;
     }
     document.getElementById('faculty-dean-body').innerHTML = `
-      <p>Submitted: ${by.submitted || 0} · Under evaluation: ${by.under_review || 0} · Approved: ${by.approved || 0} · Returned: ${by.returned || 0} · Rejected: ${by.rejected || 0}</p>
+      <p>${['submitted', 'under_review', 'approved', 'returned', 'rejected'].map(k => `${STATUS_LABELS[k]} ${by[k] || 0}`).join(' · ')}</p>
       ${Object.entries(byProgram).map(([p, counts]) =>
         `<p><strong>${esc(p)}</strong>: ${Object.entries(counts).map(([k, v]) => `${STATUS_LABELS[k] || k} ${v}`).join(', ')}</p>`).join('')}`;
   }
