@@ -13,7 +13,8 @@
 //      satisfied by standing, so it never blocks a recommendation),
 //   5. putting owed retakes (failed/incomplete/dropped) ahead of fresh courses
 //      within each curriculum slot,
-//   6. capping the load at BOTH 5 subjects AND 24 units.
+//   6. filling toward a 24-unit load (subject count is only a safety ceiling,
+//      never the reason a load stops early).
 // UMD: browsers get window.GrizzRecommend; Node tests require() it.
 // =============================================
 (function (root, factory) {
@@ -22,7 +23,7 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  var MAX_SUBJECTS = 5;
+  var MAX_SUBJECTS = 8; // safety ceiling only — the unit cap is the target
   var MAX_UNITS = 24;
   var FAIL_STATUSES = ['failed', 'dropped', 'incomplete'];
 
@@ -467,7 +468,9 @@
     }
     eligible.sort(function (a, b) { return sortKey(a).localeCompare(sortKey(b)); });
 
-    // Load cap: BOTH at most 5 subjects AND at most 24 units.
+    // Load target: fill toward 24 units. MAX_SUBJECTS is only a safety ceiling
+    // (e.g. a stack of tiny courses) — it must never stop a load that is still
+    // well under the unit cap, or catch-up loads get under-filled.
     var recommended = [];
     var totalUnits = 0;
     var remainder = [];

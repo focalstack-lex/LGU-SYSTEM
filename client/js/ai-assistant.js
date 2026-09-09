@@ -925,7 +925,7 @@ const GrizzAI = (() => {
       : `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Nothing on record yet — starting with your earliest open courses.</p>`;
     const remUnits = remainder.reduce((sum, c) => sum + (Number(c.subject.units) || 0), 0);
     const overflowHtml = remainder.length
-      ? `<p class="ursa-note-text">+ ${remainder.length} more cleared course${remainder.length === 1 ? '' : 's'} (${remUnits} units) will fit once this load is lighter — kept under the 24-unit / 5-subject cap.</p>`
+      ? `<p class="ursa-note-text">+ ${remainder.length} more cleared course${remainder.length === 1 ? '' : 's'} (${remUnits} units) will fit once this load is lighter — the load target is 24 units.</p>`
       : '';
     const blockedHtml = blocked.length
       ? `<div class="grizz-locked">

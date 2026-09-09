@@ -101,11 +101,21 @@ t('cap: never exceeds 24 units (five 6-unit subjects -> four chosen)', () => {
   assert.strictEqual(r.remainder.length, 1);
 });
 
-t('cap: never exceeds 5 subjects (six 4-unit subjects -> five chosen)', () => {
-  const subjects = [1, 2, 3, 4, 5, 6].map(n => sb('s' + n, 'SUB' + n, 4, 1, 1));
+t('load fills toward 24 units instead of stopping at a low subject count', () => {
+  // Seven 3-unit open courses = 21 units: the OLD 5-subject ceiling gave 15
+  // units; the unit target must give all seven.
+  const subjects = [1, 2, 3, 4, 5, 6, 7].map(n => sb('s' + n, 'SUB' + n, 3, 1, 1));
   const r = GR.buildRecommendations(base(subjects));
-  assert.strictEqual(r.recommended.length, 5);
-  assert.strictEqual(r.remainder.length, 1);
+  assert.strictEqual(r.recommended.length, 7);
+  assert.strictEqual(r.totalUnits, 21);
+  assert.strictEqual(r.remainder.length, 0);
+});
+
+t('subject count is only a safety ceiling (ten 1-unit courses -> eight chosen)', () => {
+  const subjects = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => sb('s' + n, 'SUB' + n, 1, 1, 1));
+  const r = GR.buildRecommendations(base(subjects));
+  assert.ok(r.recommended.length <= 8);
+  assert.strictEqual(r.remainder.length, 10 - r.recommended.length);
 });
 
 // ---- Prerequisite phrasing ----
