@@ -270,20 +270,6 @@ const Dashboard = (() => {
     return title;
   }
 
-  function getBadgeConfig(title, body) {
-    const text = `${title} ${body}`.toLowerCase();
-    if (text.includes('notice') || text.includes('under active') || text.includes('important')) {
-      return { label: 'System Notice', icon: 'solar:danger-triangle-linear', type: 'notice' };
-    }
-    if (text.includes('version') || text.includes('v1.') || text.includes('v2.') || text.includes('update')) {
-      return { label: 'System Update', icon: 'solar:round-alt-arrow-up-linear', type: 'update' };
-    }
-    if (text.includes('redesign') || text.includes('new look') || text.includes('feature')) {
-      return { label: 'Feature', icon: 'solar:stars-minimalistic-linear', type: 'feature' };
-    }
-    return { label: 'Announcement', icon: 'solar:info-circle-linear', type: 'general' };
-  }
-
   async function loadAnnouncements() {
     const container = document.getElementById('announcement-list');
     try {
@@ -295,21 +281,13 @@ const Dashboard = (() => {
 
       if (!data?.length) { UI.setEmpty('announcement-list', 'solar:bell-linear', 'No announcements yet.'); return; }
 
-      container.innerHTML = data.map((a, idx) => {
+      container.innerHTML = data.map((a) => {
         const title = formatTitle(a.title);
-        const badge = getBadgeConfig(a.title, a.body);
-        const isFeatured = idx === 0;
         const author = a.author || 'COE LGU Officer';
         const hasLongBody = a.body.length > 180;
 
         return `
-          <div class="announce-item ${isFeatured ? 'announce-item-featured' : ''}">
-            <div class="announce-top-bar">
-              <span class="announce-badge announce-badge-${badge.type}">
-                <iconify-icon icon="${badge.icon}"></iconify-icon> ${badge.label}
-              </span>
-              ${isFeatured ? '<span class="announce-pin-tag"><iconify-icon icon="solar:pin-bold"></iconify-icon> Pinned</span>' : ''}
-            </div>
+          <div class="announce-item">
             <h4 class="announce-title">${title}</h4>
             <p class="announce-body">${a.body.replace(/\n/g, '<br>')}</p>
             ${hasLongBody ? `
@@ -317,10 +295,10 @@ const Dashboard = (() => {
                 <span>Show more</span>
                 <iconify-icon icon="solar:alt-arrow-down-linear"></iconify-icon>
               </button>` : ''}
-            <div class="announce-footer">
-              <span class="announce-meta-item"><iconify-icon icon="solar:user-circle-linear"></iconify-icon>${author}</span>
+            <div class="announce-meta">
+              <span>${author}</span>
               <span class="announce-meta-dot">•</span>
-              <span class="announce-meta-item"><iconify-icon icon="solar:calendar-minimalistic-linear"></iconify-icon>${UI.dateStr(a.created_at)}</span>
+              <span>${UI.dateStr(a.created_at)}</span>
             </div>
           </div>
         `;
