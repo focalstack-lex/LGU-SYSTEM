@@ -141,9 +141,47 @@
     return { schoolYear: label(start), semester: semester, yearLevel: yearLevel };
   }
 
+  // ---- Free-text prerequisite parsing helpers ----
+  // The catalog's legacy `prerequisites` strings use many phrasings:
+  //   "CE 211"                     plain prerequisite code
+  //   "CpE 112; CpE 223"           code list
+  //   "Co-req CpE 223"             corequisite
+  //   "Co: ECE 211"                corequisite
+  //   "co-requisite: EMath 121"    corequisite
+  //   "CE 211; co-requisite: CE 222"
+  //   "2nd/3rd/4th Yr Standing"    year standing
+  //   "3rd Year Standing"          year standing (full word)
+  //   "*240 hours / 4th Yr Standing" hours + standing (hours are descriptive)
+  //   "Depends: CE 211"            "depends" phrasing still means prerequisite
+
+  function normalizeCode(s) {
+    return String(s || '').trim().replace(/\s+/g, ' ').toUpperCase();
+  }
+
+  // A code-like token starts with letters, contains at least one letter and
+  // one digit, and uses only letters/digits/optional spaces (e.g. "CPE 223",
+  // "EMATH 100", "RS 1", "ECE L1", "MATH5"). Free-text phrases like "240 hours"
+  // or "Understanding the Self" must NOT be treated as codes.
+  function isCodeLike(s) {
+    var norm = normalizeCode(s);
+    if (!/[A-Z]/.test(norm) || !/\d/.test(norm)) return false;
+    return /^[A-Z]{1,10}(?:\s?[A-Z0-9]{1,5}){0,3}$/.test(norm);
+  }
+
+  // Markers that introduce a course requirement in free text.
+  var COREQ_MARKER = /^(?:co[- ]?req|corequisite|co-requisite|co)\s*[:.]?\s*/i;
+  var PREREQ_LABEL = /^(?:pre[- ]?req|pre-?requisite|prerequisite|depends?|subject to|requires?|take)\s*[:on-]*\s*/i;
+
+  function standingRequirementOf(text) {
+    var m = String(text || '').match(/(\d+)(?:st|nd|rd|th)?\s*(?:yr|year)s?\s*standing/i);
+    return m ? { year: Number(m[1]), phrase: m[0].trim() } : null;
+  }
+
   // Structured prereq gate (migration 031 rows). A corequisite is satisfied if
   // the paired subject is passed, enrolled, OR also being planned in the same
   // upcoming term (candidateScope) — co-reqs travel together in one load.
+  // Detail-only rows (no depends_code) fall back to free-text parsing so
+  // "standing"-in-detail and code-in-detail rows are never silently skipped.
   function evaluateStructuredPrereqs(subject, prereqsBySubject, passedCodes, enrolledCodes, candidateScope, standingYear) {
     var rows = prereqsBySubject.get(subject.id) || [];
     if (!rows.length) return null; // caller falls back to legacy parsing
@@ -153,56 +191,87 @@
     var notes = [];
     rows.forEach(function (row) {
       var depCode = row.depends_code;
-      if (row.kind === 'prerequisite' && depCode) {
-        if (!passedCodes.has(depCode) && !enrolledCodes.has(depCode)) {
-          satisfied = false;
-          missing.push(depCode);
-        }
-      } else if (row.kind === 'corequisite' && depCode) {
-        if (!passedCodes.has(depCode) && !enrolledCodes.has(depCode) && !candidateScope.has(depCode)) {
+      if ((row.kind === 'prerequisite' || row.kind === 'corequisite') && depCode) {
+        var ok = passedCodes.has(normalizeCode(depCode)) || enrolledCodes.has(normalizeCode(depCode));
+        if (row.kind === 'corequisite' && !ok) ok = candidateScope.has(normalizeCode(depCode));
+        if (!ok) {
           satisfied = false;
           missing.push(depCode);
         }
       } else if (row.kind === 'year_standing' && row.detail) {
-        var requiredYr = Number((String(row.detail).match(/(\d+)/) || [])[1] || 0);
+        var req = standingRequirementOf(row.detail);
+        var requiredYr = req ? req.year : Number((String(row.detail).match(/(\d+)/) || [])[1] || 0);
         if (standingYear < requiredYr) {
           satisfied = false;
-          missing.push(row.detail);
+          missing.push(req ? req.phrase : row.detail);
         }
       } else if (row.kind === 'special' && row.detail) {
         notes.push(row.detail);
+      } else if (row.detail) {
+        // Kind has no depends_code: parse the detail text as free text.
+        var norm = normalizeCode(row.detail);
+        var detailReq = standingRequirementOf(row.detail);
+        if (detailReq) {
+          if (standingYear < detailReq.year) {
+            satisfied = false;
+            missing.push(detailReq.phrase);
+          }
+        } else if (isCodeLike(norm)) {
+          if (!passedCodes.has(norm) && !enrolledCodes.has(norm)) {
+            satisfied = false;
+            missing.push(row.detail);
+          }
+        } else {
+          notes.push(row.detail); // descriptive-only (e.g. "240 hours") — informational
+        }
       }
     });
     return { satisfied: satisfied, missing: missing, notes: notes };
   }
 
-  // Legacy free-text fallback (identical rules to ai-assistant.js).
-  function evaluateLegacyPrereqs(subject, passedCodes, enrolledCodes, standingYear) {
+  // Legacy free-text fallback (identical rules to ai-assistant.js, extended to
+  // "Year Standing", "Co:"/"co-requisite", and "Depends:" phrasing).
+  function evaluateLegacyPrereqs(subject, passedCodes, enrolledCodes, standingYear, candidateScope) {
     var prereqStr = String(subject.prerequisites || '').trim();
     if (!prereqStr || prereqStr === 'None' || prereqStr === '-') {
       return { satisfied: true, missing: [], notes: [] };
     }
-    var standingMatch = prereqStr.match(/(\d+)(?:st|nd|rd|th)?\s*Yr\s*Standing/i);
-    if (standingMatch) {
-      var requiredYr = Number(standingMatch[1]);
-      if (standingYear < requiredYr) {
-        return { satisfied: false, missing: ['Year ' + requiredYr + ' standing'], notes: [] };
-      }
-    }
-    var rawTokens = prereqStr.split(/[;,/]/)
-      .map(function (t) { return String(t).replace(/co-req/i, '').trim(); })
-      .filter(Boolean);
+
     var satisfied = true;
     var missing = [];
-    rawTokens.forEach(function (token) {
-      var normToken = String(token).trim().toUpperCase();
-      if (normToken && !normToken.includes('STANDING') &&
-          !passedCodes.has(normToken) && !enrolledCodes.has(normToken) &&
-          /^[A-Z0-9\s-]+$/.test(normToken)) {
+    var tokens = prereqStr.split(/[;,/\r\n]+/).map(function (t) { return String(t).trim(); }).filter(Boolean);
+
+    tokens.forEach(function (token) {
+      // 1) Year-standing clause (Yr or Year, ordinal optional).
+      var standing = standingRequirementOf(token);
+      if (standing) {
+        if (standingYear < standing.year) {
+          satisfied = false;
+          missing.push(standing.phrase);
+        }
+        return;
+      }
+      // 2) Corequisite marker -> may be satisfied by a co-planned subject.
+      var coreqMatch = token.match(COREQ_MARKER);
+      var isCoreq = false;
+      if (coreqMatch) {
+        isCoreq = true;
+        token = token.slice(coreqMatch[0].length).trim();
+      } else {
+        // 3) "Depends:"-style labels still denote a plain prerequisite.
+        token = token.replace(PREREQ_LABEL, '').trim();
+      }
+      // 4) Only code-like tokens gate; descriptive phrases are informational.
+      if (!token || !isCodeLike(token)) return;
+      var norm = normalizeCode(token);
+      var ok = passedCodes.has(norm) || enrolledCodes.has(norm);
+      if (isCoreq && !ok) ok = candidateScope.has(norm);
+      if (!ok) {
         satisfied = false;
-        missing.push(String(token).trim());
+        missing.push(token);
       }
     });
+
     return { satisfied: satisfied, missing: missing, notes: [] };
   }
 
@@ -250,14 +319,14 @@
         candidates.push({ s: s, kind: 'backlog', retake: true });
       }
     });
-    candidates.forEach(function (c) { candidateScopeCodes.add(String(c.s.code).trim().toUpperCase()); });
+    candidates.forEach(function (c) { candidateScopeCodes.add(normalizeCode(c.s.code)); });
 
     var eligible = [];
     var blocked = [];
     candidates.forEach(function (c) {
       var verdict = evaluateStructuredPrereqs(
         c.s, prereqsBySubject, passedCodes, enrolledCodes, candidateScopeCodes, target.yearLevel);
-      if (verdict === null) verdict = evaluateLegacyPrereqs(c.s, passedCodes, enrolledCodes, target.yearLevel);
+      if (verdict === null) verdict = evaluateLegacyPrereqs(c.s, passedCodes, enrolledCodes, target.yearLevel, candidateScopeCodes);
       if (verdict.satisfied) {
         eligible.push({
           subject: c.s, kind: c.kind, retake: c.retake,
