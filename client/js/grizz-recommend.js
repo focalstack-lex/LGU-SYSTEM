@@ -13,8 +13,10 @@
 //      satisfied by standing, so it never blocks a recommendation),
 //   5. putting owed retakes (failed/incomplete/dropped) ahead of fresh courses
 //      within each curriculum slot,
-//   6. filling toward a 24-unit load (subject count is only a safety ceiling,
-//      never the reason a load stops early).
+//   6. always including the earliest open curriculum slot in FULL (a required
+//      row can be larger than any generic cap, e.g. a 26-unit first semester),
+//      then filling extra clear courses up to a 24-unit target (8-subject
+//      safety ceiling) — the cap never clips the required slot.
 // UMD: browsers get window.GrizzRecommend; Node tests require() it.
 // =============================================
 (function (root, factory) {
@@ -23,8 +25,8 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  var MAX_SUBJECTS = 8; // safety ceiling only — the unit cap is the target
-  var MAX_UNITS = 24;
+  var MAX_SUBJECTS = 8; // safety ceiling for EXTRA subjects beyond the required slot
+  var MAX_UNITS = 24;   // fill target for EXTRA subjects beyond the required slot
   var FAIL_STATUSES = ['failed', 'dropped', 'incomplete'];
 
   function clampYear(n) {
@@ -468,21 +470,30 @@
     }
     eligible.sort(function (a, b) { return sortKey(a).localeCompare(sortKey(b)); });
 
-    // Load target: fill toward 24 units. MAX_SUBJECTS is only a safety ceiling
-    // (e.g. a stack of tiny courses) — it must never stop a load that is still
-    // well under the unit cap, or catch-up loads get under-filled.
+    // The earliest open curriculum slot is always included in full — it is the
+    // student's required load (a fresh first-year's Semester-1 row is 26 units
+    // across 10 subjects, larger than any generic ceiling). After that
+    // mandatory slot, remaining clear courses fill up to MAX_UNITS with
+    // MAX_SUBJECTS as a safety ceiling for extras only.
     var recommended = [];
     var totalUnits = 0;
     var remainder = [];
-    eligible.forEach(function (c) {
-      var u = unitsOf(c.subject);
-      if (totalUnits + u <= MAX_UNITS && recommended.length < MAX_SUBJECTS) {
-        recommended.push(c);
-        totalUnits += u;
-      } else {
-        remainder.push(c);
-      }
-    });
+    if (eligible.length) {
+      var first = eligible[0].subject;
+      var slotYear = Number(first.year_level) || 0;
+      var slotSem = Number(first.semester) || 0;
+      eligible.forEach(function (c) {
+        var inRequiredSlot = (Number(c.subject.year_level) || 0) === slotYear &&
+          (Number(c.subject.semester) || 0) === slotSem;
+        var u = unitsOf(c.subject);
+        if (inRequiredSlot || (totalUnits + u <= MAX_UNITS && recommended.length < MAX_SUBJECTS)) {
+          recommended.push(c);
+          totalUnits += u;
+        } else {
+          remainder.push(c);
+        }
+      });
+    }
 
     return {
       standing: standing,

@@ -93,29 +93,35 @@ t('enrolled subjects are excluded but satisfy prerequisites of open courses', ()
 
 // ---- Load caps ----
 
-t('cap: never exceeds 24 units (five 6-unit subjects -> four chosen)', () => {
+t('earliest required slot is included in full, even above 24 units', () => {
+  // Five 6-unit subjects all in the same open slot = 30 units. The generic cap
+  // must never clip a required slot.
   const subjects = [1, 2, 3, 4, 5].map(n => sb('s' + n, 'SUB' + n, 6, 1, 1));
   const r = GR.buildRecommendations(base(subjects));
-  assert.strictEqual(r.recommended.length, 4);
-  assert.ok(r.totalUnits <= 24);
-  assert.strictEqual(r.remainder.length, 1);
-});
-
-t('load fills toward 24 units instead of stopping at a low subject count', () => {
-  // Seven 3-unit open courses = 21 units: the OLD 5-subject ceiling gave 15
-  // units; the unit target must give all seven.
-  const subjects = [1, 2, 3, 4, 5, 6, 7].map(n => sb('s' + n, 'SUB' + n, 3, 1, 1));
-  const r = GR.buildRecommendations(base(subjects));
-  assert.strictEqual(r.recommended.length, 7);
-  assert.strictEqual(r.totalUnits, 21);
+  assert.strictEqual(r.recommended.length, 5);
+  assert.strictEqual(r.totalUnits, 30);
   assert.strictEqual(r.remainder.length, 0);
 });
 
-t('subject count is only a safety ceiling (ten 1-unit courses -> eight chosen)', () => {
-  const subjects = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => sb('s' + n, 'SUB' + n, 1, 1, 1));
+t('first-semester row style: all ten required subjects recommended (26 units)', () => {
+  const units = [1, 2, 1, 4, 3, 4, 3, 3, 2, 3]; // 26 total
+  const subjects = units.map((u, i) => sb('s' + i, 'SUB' + i, u, 1, 1));
   const r = GR.buildRecommendations(base(subjects));
-  assert.ok(r.recommended.length <= 8);
-  assert.strictEqual(r.remainder.length, 10 - r.recommended.length);
+  assert.strictEqual(r.recommended.length, 10);
+  assert.strictEqual(r.totalUnits, 26);
+  assert.strictEqual(r.remainder.length, 0);
+});
+
+t('extra clear courses beyond the required slot fill toward 24 units / 8 subjects', () => {
+  const subjects = [
+    sb('req', 'REQ1', 2, 1, 1),           // required earliest slot (2 units)
+    ...['E1', 'E2', 'E3', 'E4', 'E5'].map((code, i) => sb('x' + i, code, 6, 2, 1)), // later extras
+  ];
+  const r = GR.buildRecommendations(base(subjects));
+  // Required slot (REQ1) + 3 extras (2+18 = 20u); a 4th extra would exceed 24.
+  assert.strictEqual(r.recommended.length, 4);
+  assert.strictEqual(r.totalUnits, 20);
+  assert.strictEqual(r.remainder.length, 2);
 });
 
 // ---- Prerequisite phrasing ----
