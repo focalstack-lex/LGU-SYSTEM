@@ -100,22 +100,116 @@ const FacultyPortal = (() => {
 
   // ---------- Evaluation queue (program head) ----------
 
+  const QUEUE_YEARS = [1, 2, 3, 4];
+  const QUEUE_YEAR_NAMES = ['', '1st', '2nd', '3rd', '4th'];
+  let queueList = [];
+  let queueYearFilter = 'all';
+
   async function loadQueue() {
     const { submissions } = await Api.faculty.submissions('submitted');
     const { submissions: reviewing } = await Api.faculty.submissions('under_review');
-    renderQueueList([...(submissions || []), ...(reviewing || [])]);
+    // Oldest submission first inside each year group (first-come first-served).
+    queueList = [...(submissions || []), ...(reviewing || [])].sort((a, b) => {
+      const ta = a.submitted_at ? new Date(a.submitted_at).getTime() : Number.MAX_SAFE_INTEGER;
+      const tb = b.submitted_at ? new Date(b.submitted_at).getTime() : Number.MAX_SAFE_INTEGER;
+      if (ta !== tb) return ta - tb;
+      return String(a.student?.full_name || '').localeCompare(String(b.student?.full_name || ''));
+    });
+    queueYearFilter = 'all';
+    renderQueueFilter();
+    renderQueueSections();
   }
 
-  function renderQueueList(list) {
-    const el = $('faculty-queue-list');
-    el.innerHTML = list.length ? list.map(s => `
-      <div class="faculty-row" data-open="${s.id}">
-        <span><strong>${esc(s.student?.full_name || 'Student')}</strong> · ${esc(s.student?.course || '')} Yr ${esc(s.student?.year_level || '')}</span>
-        <span>${(s.enrollment_submission_items || []).filter(i => i.item_state !== 'removed_by_head').length} subjects · ${STATUS_LABELS[s.status] || esc(s.status)}</span>
+  function activeItems(s) {
+    return (s.enrollment_submission_items || []).filter(i => i.item_state !== 'removed_by_head');
+  }
+
+  function queueGroups() {
+    const groups = { 1: [], 2: [], 3: [], 4: [] };
+    const others = [];
+    queueList.forEach(s => {
+      const y = Number(s.student?.year_level) || 0;
+      if (y >= 1 && y <= 4) groups[y].push(s);
+      else others.push(s);
+    });
+    return { groups, others };
+  }
+
+  function renderQueueFilter() {
+    const el = $('faculty-queue-filter');
+    if (!el) return;
+    const { groups } = queueGroups();
+    const total = QUEUE_YEARS.reduce((a, y) => a + groups[y].length, 0);
+    const pills = [
+      { key: 'all', label: 'All', count: total },
+      ...QUEUE_YEARS.map(y => ({ key: String(y), label: `${QUEUE_YEAR_NAMES[y]} Yr`, count: groups[y].length })),
+    ];
+    el.innerHTML = pills.map(p => `
+      <button type="button" class="year-pill ${queueYearFilter === p.key ? 'active' : ''}" data-queue-year="${p.key}">
+        <span>${p.label}</span>
+        <span class="year-pill-count">${p.count}</span>
+      </button>`).join('');
+    el.querySelectorAll('[data-queue-year]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        queueYearFilter = btn.dataset.queueYear;
+        renderQueueFilter();
+        renderQueueSections();
+      });
+    });
+  }
+
+  function queueRow(s) {
+    const items = activeItems(s);
+    const units = items.reduce((a, i) => a + (Number(i.subjects?.units) || 0), 0);
+    const subjLabel = `${items.length} subject${items.length === 1 ? '' : 's'} · ${units} units`;
+    const timeLabel = s.submitted_at
+      ? `<span class="fq-time">Submitted ${esc(typeof UI !== 'undefined' && UI.dateStr ? UI.dateStr(s.submitted_at) : '')}</span>`
+      : '';
+    return `
+      <div class="faculty-row fq-row" data-open="${s.id}">
+        <span class="fq-row-main">
+          <strong>${esc(s.student?.full_name || 'Student')}</strong>
+          <span class="fq-meta">${esc(s.student?.course || '')} · ${subjLabel} · ${esc(STATUS_LABELS[s.status] || s.status)}</span>
+          ${timeLabel}
+        </span>
         <span class="faculty-row-actions"><button type="button" class="btn btn-primary btn-sm">Review</button></span>
-      </div>`).join('') : '<p class="muted">The queue is empty.</p>';
-    el.querySelectorAll('[data-open]').forEach(row =>
-      row.addEventListener('click', () => guard('openEvaluation', () => openEvaluation(row.dataset.open))));
+      </div>`;
+  }
+
+  function renderQueueSections() {
+    const el = $('faculty-queue-list');
+    if (!el) return;
+    const { groups, others } = queueGroups();
+    const years = queueYearFilter === 'all' ? QUEUE_YEARS : [Number(queueYearFilter)];
+
+    let html = years.reduce((acc, y) => {
+      const rows = groups[y] || [];
+      if (!rows.length) return acc;
+      return acc + `
+        <div class="fq-group">
+          <div class="fq-group-head">
+            <h4>${QUEUE_YEAR_NAMES[y]} Year</h4>
+            <span class="fq-group-count">${rows.length} request${rows.length === 1 ? '' : 's'}</span>
+          </div>
+          ${rows.map(queueRow).join('')}
+        </div>`;
+    }, '');
+
+    if (queueYearFilter === 'all' && others.length) {
+      html += `
+        <div class="fq-group">
+          <div class="fq-group-head">
+            <h4>Year not set</h4>
+            <span class="fq-group-count">${others.length} request${others.length === 1 ? '' : 's'}</span>
+          </div>
+          ${others.map(queueRow).join('')}
+        </div>`;
+    }
+
+    el.innerHTML = html || '<p class="muted">The queue is empty.</p>';
+    el.querySelectorAll('[data-open]').forEach(row => {
+      row.addEventListener('click', () => guard('openEvaluation', () => openEvaluation(row.dataset.open)));
+    });
   }
 
   async function openEvaluation(id) {

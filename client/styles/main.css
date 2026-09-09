@@ -8640,3 +8640,59 @@ html[data-theme="light"] .ev-defensive-card { background: rgba(239, 68, 68, 0.05
   .faculty-eval-grid { grid-template-columns: 1fr; }
 }
 
+
+/* =========================================================
+   Faculty review queue — year-level groups (2026-09-10)
+   ========================================================= */
+.fq-filter {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin: 0.75rem 0 1.1rem;
+}
+.fq-filter .year-pill { flex: 0 1 auto; }
+.fq-group { margin: 0 0 1.4rem; }
+.fq-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+.fq-group-head h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #FFFFFF);
+}
+.fq-group-count {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, #6E6E7A);
+  background: var(--surface-secondary, #26262C);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 9999px;
+  padding: 0.22rem 0.6rem;
+  white-space: nowrap;
+}
+.fq-row { cursor: pointer; }
+.fq-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+  flex: 1;
+}
+.fq-meta {
+  color: var(--text-secondary, #9A9AA6);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+.fq-time {
+  color: var(--text-tertiary, #6E6E7A);
+  font-family: var(--font-data, 'Outfit', monospace);
+  font-size: 0.72rem;
+}
