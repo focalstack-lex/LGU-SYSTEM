@@ -290,23 +290,40 @@ async function sendAccountApprovalEmail(userEmail, userName = 'COE Member') {
 }
 
 /**
- * Sends a load approval status email to a student via Brevo API (HTTP).
- * status: 'approved' | 'returned' | 'rejected' | 'encoded'
+ * Sends an enrollment status email to a student via Brevo API (HTTP).
+ * Emails fire at exactly two milestones (spec D4):
+ *   status 'approved' + milestone 'verified' -> final list of subjects
+ *   status 'encoded'  + milestone 'encoded'  -> done, proceed to registrar
+ * 'returned'/'rejected' configs are kept only for defensive legacy calls and
+ * are no longer reachable from the product flow (spec D8).
  */
-async function sendLoadStatusEmail({ to, name = 'COE Student', status, studentName, term, lines = [], changes = null }) {
+async function sendLoadStatusEmail({ to, name = 'COE Student', status, milestone, studentName, term, lines = [], changes = null }) {
   try {
     const apiInstance = getBrevoApi();
     if (!apiInstance) return { sent: 0, reason: 'Brevo API key missing' };
     if (!to) return { sent: 0, reason: 'No recipient email provided' };
 
     const statusConfig = {
-      approved: { label: 'Load Approved', bg: 'rgba(34, 197, 94, 0.1)', color: '#16A34A', border: '#DCFCE7' },
+      approved: { label: 'Enrollment Verification — Final List', bg: 'rgba(34, 197, 94, 0.1)', color: '#16A34A', border: '#DCFCE7' },
+      encoded:  { label: 'Enrollment Verification — Encoded', bg: 'rgba(56, 189, 248, 0.1)', color: '#0284C7', border: '#E0F2FE' },
       returned: { label: 'Load Returned for Changes', bg: 'rgba(245, 158, 11, 0.1)', color: '#D97706', border: '#FEF3C7' },
       rejected: { label: 'Load Rejected', bg: 'rgba(239, 68, 68, 0.1)', color: '#DC2626', border: '#FEE2E2' },
-      encoded:  { label: 'Load Encoded', bg: 'rgba(56, 189, 248, 0.1)', color: '#0284C7', border: '#E0F2FE' },
     };
 
+    const phase = milestone === 'encoded' ? 'encoded' : (status === 'approved' ? 'verified' : status);
     const cfg = statusConfig[status] || { label: 'Load Update', bg: 'rgba(255, 85, 51, 0.1)', color: '#FF5533', border: '#FFEDD5' };
+
+    const heading = phase === 'verified'
+      ? `Your Program Head has <strong>verified</strong> your load for <strong>${term}</strong>.`
+      : phase === 'encoded'
+        ? `Your load for <strong>${term}</strong> has been encoded by the <strong>Student Assistant</strong>.`
+        : `Your load for <strong>${term}</strong> has been marked ${cfg.label.toLowerCase()}.`;
+    const subline = phase === 'verified'
+      ? 'These are the final subjects you will enroll this semester.'
+      : phase === 'encoded'
+        ? 'Your enrollment inside this system is complete. The next step — assessment and claiming — happens at the University Registrar, outside this system.'
+        : '';
+    const listHeader = phase === 'encoded' ? 'Encoded Subjects' : (phase === 'verified' ? 'Final Subjects' : 'Submitted Course Load');
 
     const changeHtml = changes && changes.length
       ? `<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:14px 16px;margin:16px 0;text-align:left;">
@@ -317,7 +334,7 @@ async function sendLoadStatusEmail({ to, name = 'COE Student', status, studentNa
 
     const listHtml = lines && lines.length
       ? `<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:16px;margin:20px 0;text-align:left;">
-           <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">Submitted Course Load</div>
+           <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;">${listHeader}</div>
            <table width="100%" cellpadding="0" cellspacing="0" border="0">
              ${lines.map(l => `
                <tr>
@@ -334,13 +351,14 @@ async function sendLoadStatusEmail({ to, name = 'COE Student', status, studentNa
     sendSmtpEmail.subject = `${cfg.label}: COE LGU Portal`;
     sendSmtpEmail.htmlContent = buildEmailTemplate({
       subject: cfg.label,
-      preheader: `${studentName} - load for ${term}`,
+      preheader: `${studentName} — load for ${term}`,
       content: `
         <div style="margin-bottom:20px;">
           <span style="display:inline-block;background:${cfg.bg};color:${cfg.color};border:1px solid ${cfg.border};padding:5px 16px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;">${cfg.label}</span>
         </div>
         <p style="margin:0 0 10px;color:#0F172A;font-size:14px;line-height:1.5;">Hi ${studentName},</p>
-        <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Your submitted proposed load for <strong>${term}</strong> has been <strong>${cfg.label}</strong>.</p>
+        <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">${heading}</p>
+        ${subline ? `<p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">${subline}</p>` : ''}
         ${changeHtml}
         ${listHtml}
         <div style="margin-top:24px;">
@@ -355,7 +373,7 @@ async function sendLoadStatusEmail({ to, name = 'COE Student', status, studentNa
     sendSmtpEmail.to = [{ email: to, name }];
 
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log(`[Email] Load status email (${status}) sent to ${to} via Brevo: ${data.messageId}`);
+    console.log(`[Email] Load status email (${phase}) sent to ${to} via Brevo: ${data.messageId}`);
     return { sent: 1, messageId: data.messageId };
   } catch (err) {
     logError('Email Load Status Error', err);
