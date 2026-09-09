@@ -7958,6 +7958,69 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon {
   line-height: 1.5;
 }
 
+/* ---- Year Filter Segmented Pills ---- */
+.year-filter-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding: 0.3rem;
+  background: var(--surface-raised, #26262C);
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.08));
+  border-radius: 9999px;
+  margin-bottom: 0.85rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.year-filter-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.year-pill {
+  flex: 1;
+  min-width: max-content;
+  padding: 0.38rem 0.75rem;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #9A9AA6);
+  font-family: var(--font-ui, 'Inter', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.year-pill:hover {
+  color: var(--text-primary, #FFFFFF);
+  background: rgba(255, 255, 255, 0.05);
+}
+.year-pill.active {
+  background: var(--primary, #FF5533);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(255, 85, 51, 0.3);
+}
+.year-pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.year-pill.active .year-pill-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
 /* ---- Option 2 Eligible Courses Grid ---- */
 .enrollment-eligible-grid {
   display: grid;
@@ -8087,6 +8150,21 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon {
 }
 
 /* Light mode overrides for Option 2 */
+html[data-theme="light"] .year-filter-pills {
+  background: #F1F5F9 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+html[data-theme="light"] .year-pill {
+  color: #64748B !important;
+}
+html[data-theme="light"] .year-pill:hover {
+  color: #0F172A !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+html[data-theme="light"] .year-pill.active {
+  background: var(--primary, #FF5533) !important;
+  color: #FFFFFF !important;
+}
 html[data-theme="light"] .eligible-course-card {
   background: #FFFFFF;
   border-color: rgba(0, 0, 0, 0.08);

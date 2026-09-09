@@ -49,6 +49,12 @@ const EnrollmentSection = (() => {
     const upper = (profile?.course || '').trim().toUpperCase();
     const program = PROGRAMS.find(p => p.toUpperCase() === upper) || 'BSCoE';
     const year = Number(profile?.year_level || 0);
+    if (year >= 1 && year <= 4) {
+      activeYearFilter = String(year);
+    } else {
+      activeYearFilter = 'all';
+    }
+
     const now = new Date();
     const sy = now.getMonth() >= 5
       ? `${now.getFullYear()}-${now.getFullYear() + 1}`
@@ -71,9 +77,60 @@ const EnrollmentSection = (() => {
     renderStatus();
   }
 
-  // ---- Draft card ----
   // ---- Draft & Eligible Courses card ----
+  let activeYearFilter = 'all';
+
+  function renderYearFilterPills() {
+    const filterEl = document.getElementById('enrollment-year-filter');
+    if (!filterEl) return;
+
+    if (!subjects.length) {
+      filterEl.innerHTML = '';
+      return;
+    }
+
+    const yearCounts = {
+      'all': subjects.length,
+      '1': subjects.filter(s => Number(s.year_level) === 1).length,
+      '2': subjects.filter(s => Number(s.year_level) === 2).length,
+      '3': subjects.filter(s => Number(s.year_level) === 3).length,
+      '4': subjects.filter(s => Number(s.year_level) === 4).length,
+    };
+
+    const pills = [
+      { key: 'all', label: 'All' },
+      { key: '1', label: '1st Yr' },
+      { key: '2', label: '2nd Yr' },
+      { key: '3', label: '3rd Yr' },
+      { key: '4', label: '4th Yr' },
+    ];
+
+    filterEl.innerHTML = pills.map(p => {
+      const count = yearCounts[p.key] || 0;
+      const isActive = activeYearFilter === p.key;
+      return `
+        <button type="button" class="year-pill ${isActive ? 'active' : ''}" data-year-filter="${p.key}">
+          <span>${p.label}</span>
+          <span class="year-pill-count">${count}</span>
+        </button>
+      `;
+    }).join('');
+
+    filterEl.querySelectorAll('[data-year-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeYearFilter = btn.dataset.yearFilter;
+        renderYearFilterPills();
+        renderEligibleList();
+      });
+    });
+  }
+
   function fillPicker() {
+    renderYearFilterPills();
+    renderEligibleList();
+  }
+
+  function renderEligibleList() {
     const listEl = document.getElementById('enrollment-eligible-list');
     if (!listEl) return;
 
@@ -83,12 +140,18 @@ const EnrollmentSection = (() => {
 
     const canEdit = !current || ['draft', 'returned'].includes(current.status);
 
-    if (!subjects.length) {
-      listEl.innerHTML = '<p class="enrollment-empty">No eligible subjects found for this term.</p>';
+    const filtered = subjects.filter(s => {
+      if (activeYearFilter === 'all') return true;
+      return String(s.year_level) === activeYearFilter;
+    });
+
+    if (!filtered.length) {
+      const yearText = activeYearFilter === 'all' ? 'this term' : `Year ${activeYearFilter}`;
+      listEl.innerHTML = `<p class="enrollment-empty" style="grid-column: 1/-1; text-align: center; padding: 2rem 1rem; color: var(--text-tertiary);">No eligible courses found for ${yearText}.</p>`;
       return;
     }
 
-    listEl.innerHTML = subjects.map(s => {
+    listEl.innerHTML = filtered.map(s => {
       const isAdded = taken.has(s.id);
       const unitsLabel = `${s.units || 3} Units`;
 
