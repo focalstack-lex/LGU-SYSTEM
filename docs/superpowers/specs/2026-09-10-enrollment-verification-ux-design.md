@@ -1,7 +1,7 @@
 # Enrollment Verification — Student Journey UX Redesign
 
 **Status:** Approved for implementation planning
-**Date:** 2026-09-10
+**Date:** 2026-09-10 (rev 2)
 **Branch:** `redesign` (synced to `origin/redesign/ui-enhancement`)
 **Related specs:** `2026-09-08-faculty-portal-and-load-approval-design.md`, `2026-09-08-grizz-load-add-and-pilot-gate-design.md`
 
@@ -9,7 +9,7 @@
 
 ## 1. Background & goal
 
-The **Enrollment Verification** feature (today's "Load Verification" view) lets a College of Engineering student build a proposed load from Grizz-suggested or eligible courses, submit it to their Program Head for evaluation, and then be marked *encoded* by the Student Assistant (SA) once the load is approved. The university registrar is **outside the department** and is not a user of this system; the in-system journey ends when the SA encodes the load and the student continues at the registrar for assessment.
+The **Enrollment Verification** feature (today's "Load Verification" view) lets a College of Engineering student build a proposed load from Grizz-suggested or eligible courses, submit it to their Program Head, and then be marked *encoded* by the Student Assistant (SA) once the load is verified. The Program Head **reviews by adding or removing subjects from what the student sent, then verifies the final list** — the head cannot reject a load. The university registrar is **outside the department** and is not a user of this system; the in-system journey ends when the SA encodes the load and the student continues at the registrar for assessment.
 
 **The university registrar and assessment claiming are outside the College of Engineering and are NOT part of this system** (confirmed by product owner, 2026-09-10).
 
@@ -34,7 +34,7 @@ From code review of `client/index.html`, `client/js/enrollment.js`, and the facu
 1. **No journey framing.** Status is plain bold text; no badges, timeline, or "what happens next." The student cannot tell who has the load or what they are waiting for.
 2. **Controls ignore state.** The Submit button is always rendered/enabled, and every draft row shows a ✕ remove button even when the submission is locked (`submitted`/`under_review`/`approved`). Clicking surfaces raw server errors like *"This submission is under_review and can no longer be edited."* directly into an inline error box (`client/js/enrollment.js:208`, `:260-268`).
 3. **Terminology drift.** The view mixes *verification / evaluation / proposed load / load / term / semester*. Sidebar and heading say "Load Verification"; status copy says "evaluation" and "verification" interchangeably; the course grid says "Term" while footers say "Yr X • Sem Y".
-4. **Dead ends and weak hand-offs.** *Returned* shows the head's notes but no obvious "fix and resubmit" affordance. *Rejected* is terminal with no guidance. *Approved-but-not-encoded* looks identical to *Approved-and-encoded* until the SA acts; there is no visible "waiting for SA" state and no completion state pointing the student to the registrar.
+4. **Dead ends and weak hand-offs.** *Approved-but-not-encoded* looks identical to *Approved-and-encoded* until the SA acts; there is no visible "waiting for SA" state and no completion state pointing the student to the registrar. The head's add/remove changes appear only as a bare bullet list with no clear "this is now your final list" moment.
 5. **Mobile is effectively unreachable.** The view is absent from the bottom nav and the "More" sheet; the only mobile entry is a link inside Grizz chat (`client/js/ai-assistant.js:1002-1008`). The nav label also doesn't persist on refresh (`client/js/ui.js:21`).
 6. **Silent implicit term.** Visiting the view auto-creates a Semester 1 draft; there is no term picker, no window awareness, and no "no active term" handling. If a prior-year submission exists and none for the current year, the student is stuck viewing an old locked term.
 7. **Raw/absent feedback.** Raw `err.message` strings are shown verbatim; no confirm on submit; no loading/empty state design beyond a bare "Loading eligible courses…".
@@ -49,10 +49,11 @@ From code review of `client/index.html`, `client/js/enrollment.js`, and the facu
 | D1 | Approach **A: Journey + timeline**. One screen that always answers "where am I / what's happening / what do I do next?", with a persistent status column and a state-aware workspace. | Approved |
 | D2 | View renamed **"Enrollment Verification"** everywhere student-facing; short mobile label **"Enrollment"**. | Approved — replaces "Load Verification" |
 | D3 | **No print/download** of an enrollment summary. After encoding, students are pointed to the registrar in copy only. | Approved |
-| D4 | **Students receive email ONLY when the SA encodes.** All other transitions are in-app notification only. | Approved — deliberate, small server change (see §8) |
+| D4 | **Students receive email at two moments only:** (1) when the Program Head **verifies** — the email lists the **final subjects** the student will enroll; (2) when the SA **encodes** — the email says it's done and to proceed to the registrar. All other transitions are in-app notification only. | Approved 2026-09-10 (rev 2) — supersedes the earlier "email only on encode" wording |
 | D5 | **Email plan: Brevo Free now → Starter at rollout.** A small send outbox/queue is implemented either way so no rework is needed at the plan switch. | Approved |
-| D6 | **Two-mode availability:** editing only during an office-defined enrollment window and while the submission is editable (draft/returned); outside the window the view is a read-only status hub. | Approved |
-| D7 | Work stays client-focused per `AGENTS.md`. Only functional server change is the email-gating condition in D4. Server state machine, pilot gate, RLS, and Supabase client (`client/js/api.js`) are untouched. | Constraint |
+| D6 | **Two-mode availability:** editing only during an office-defined enrollment window and while the submission is a `draft`; outside the window the view is a read-only status hub. | Approved |
+| D7 | Work stays client-focused per `AGENTS.md`. Only functional server changes are the email-gating conditions in D4 and the hidden head reject/return affordances in D8. Server state machine, pilot gate, RLS, and Supabase client (`client/js/api.js`) are untouched. | Constraint |
+| D8 | **Program Head cannot reject.** Head actions are limited to **Add subject / Remove subject / Verify**. "Reject" and "Return for changes" affordances are removed from the head UI. Server states for return/reject remain in the schema (legacy/defensive) but are no longer producible from the UI, and produce **no student email** if ever encountered. | Approved 2026-09-10 (rev 2) |
 
 ---
 
@@ -65,22 +66,22 @@ From code review of `client/index.html`, `client/js/enrollment.js`, and the facu
 | `draft` | **1 · Build your load** | Pick subjects (Grizz-suggested or eligible grid) → Submit |
 | `submitted` | **2 · With your Program Head** | Nothing — wait. Include sent timestamp. |
 | `under_review` | **2 · Program Head is reviewing** | Nothing — wait |
-| `returned` | **2 · Needs your changes** (flagged) | Read the requested changes, fix the load, resubmit |
-| `approved` (no `encoded_at`) | **3 · Approved — waiting for SA encoding** | Nothing — wait |
+| `approved` (no `encoded_at`) | **3 · Verified — your final load** | Read the final list; wait for the SA to encode |
 | `approved` + `encoded_at` | **4 · Encoded — done in this system** | Completion state; next step is at the University Registrar (outside this system) |
-| `rejected` | **Held — needs help** (rare/terminal) | Explanation + "contact your Program Head / COE office" |
+
+> **Returned / Rejected are no longer producible** — the head cannot return or reject a load (D8). If a legacy row in one of those states is ever encountered, the client renders it **defensively, read-only**, with *"This submission is no longer editable — contact your Program Head or the COE office"* guidance and **no email**.
 
 ### 4.2 Terminology rules (all student-facing copy)
 
-- **One consistent verb set:** *build → submit → review → approved → encoded*. Never "evaluation" vs "verification" drift.
+- **One consistent verb set:** *build → submit → verified → encoded*. Never "evaluation" vs "verification" drift.
 - **"Semester"** replaces "term" in student-facing prose.
 - Status labels (with the existing `UI.renderStatusBadge` color language):
   - *Build* — neutral
   - *Submitted / Under review / With your Program Head* — amber (waiting)
-  - *Needs your changes (returned)* — coral/red
-  - *Approved* — green
+  - *Verified — final load* — green
   - *Encoded* — green
-- Header subtitle describes the real process: *"Build your proposed load, get it evaluated by your Program Head, and encoded by the SA."*
+- Header subtitle describes the real process: *"Build your proposed load, send it to your Program Head for review, and get it encoded by the SA."*
+- After the head verifies, the student-facing language makes the moment explicit: **"Your Program Head verified your load. This is the final list of subjects you will enroll."**
 
 ---
 
@@ -91,13 +92,13 @@ From code review of `client/index.html`, `client/js/enrollment.js`, and the facu
 Two columns, purpose-driven:
 
 - **Left — Journey / Status (persistent anchor, ~40%):**
-  - Four-step tracker: *Build → With Program Head → Approved → Encoded*. Done steps get a coral check; current step is a solid coral dot; future steps muted; "Needs changes" renders as a flagged state inside step 2.
+  - Four-step tracker: *Build → With Program Head → Verified → Encoded*. Done steps get a coral check; current step is a solid coral dot; future steps muted.
   - "What's happening" panel: one plain-language paragraph + timestamp (e.g., *"Your load was sent to the BSCE Program Head. You'll be notified when they respond."*).
-  - Head changes feed: each head-added / head-removed item renders as a timeline row — icon + subject code + the head's note.
+  - Head changes feed: each head-added / head-removed item renders as a timeline row — icon + subject code + the head's note. After verification this feed collapses into the **final list** summary.
   - Exactly one action (see 5.3) pinned bottom-left.
 - **Right — Workspace (editable) or read-only summary (locked):**
   - Editable states: Proposed Load list (with badges + remove ✕) above the Eligible Courses grid.
-  - Locked states (`submitted` → `encoded`): read-only load summary only — no add/remove/submit affordances at all.
+  - Locked states (`submitted` → `encoded`): read-only load summary only — no add/remove/submit affordances at all. After verification this summary is labeled **"Final load (verified by <head>)"**.
 
 ### 5.2 Mobile (≤ 768px)
 
@@ -109,10 +110,10 @@ Single column with deliberate order: **journey/status first**, then proposed-loa
 |---|---|
 | `draft` (items ≥ 1) | **Submit to Program Head** |
 | `draft` (0 items) | (disabled) + helper copy to pick subjects |
-| `returned` | Workspace re-enables; then **Submit to Program Head** (resubmit) |
-| `submitted` / `under_review` / `approved` | No button — *"Nothing needed from you right now."* |
+| `submitted` / `under_review` | No button — *"Nothing needed from you right now."* |
+| `approved` (awaiting SA) | No button — *"Nothing needed — your final list has been sent to you by email."* |
 | `encoded` | Success completion card (green), copy pointing to the registrar |
-| `rejected` | Guidance copy + contact route |
+| Legacy `returned` / `rejected` | Defensive read-only card + contact-the-office guidance (D8) |
 
 Rule: **no control that can trigger a server edit error is ever rendered in a locked state.** The rough-edge errors from §2.2 become impossible to reach.
 
@@ -121,20 +122,20 @@ Rule: **no control that can trigger a server edit error is ever rendered in a lo
 ## 6. Interactions & microcopy
 
 - **Submit confirmation:** lightweight confirm panel — *"Submit 5 subjects (18 units) to the BSCE Program Head?"* — one tap to confirm, cancel returns to the load.
-- **Returned loop:** journey jumps back to *Build* with the "Needs changes" flag on step 2 for history; the head's requested changes are listed at the top of the workspace; student edits and resubmits in one flow.
+- **Verification hand-off:** when the head verifies, the journey advances to step 3 with the **final list** shown and a note that the list was emailed. If the head added or removed items, the changes feed shows them first (*"Added CS222 — this replaces your elective"*), then the final list.
 - **Waiting transparency:** waiting states show *"With your Program Head since <date>."* No countdowns, no fake urgency.
 - **No silent destructive action:** removing a subject toasts confirmation and nothing is removed that can't be re-added while editable.
-- **Rejected:** no server change; purely a friendlier presentation with next steps.
+- **No reject/return surface on the student side:** by design these cannot occur; the only defensive rendering is for legacy rows (D8).
 
 ---
 
 ## 7. Availability model (two modes)
 
-- **Open window:** office-defined enrollment window for the student's current program + semester. Editing (build/submit) is available **only** while the window is open **and** the submission is editable (`draft`/`returned`).
+- **Open window:** office-defined enrollment window for the student's current program + semester. Editing (build/submit) is available **only** while the window is open **and** the submission is a `draft`.
 - **Closed / outside window:** the screen renders read-only — *"Enrollment for Semester 2 is not open yet"* — but the tracker and last-submission history remain visible so the view is a year-round status hub.
 - After `encoded`, the completion state stays year-round ("your load was encoded — proceed to the registrar for assessment").
 
-**Rollout prerequisite (flagged, NOT in this UI workstream):** the client currently hard-codes Semester 1 and auto-creates the term on first visit with no window concept (`client/js/enrollment.js:71-73`). To support the real cadence (2 semesters/year) the client must receive its **active term + enrollment window from the server**. This requires a small backend/data contract change and is listed in §10 as a prerequisite to be planned separately; the client UI in this spec is designed to consume such a contract when it lands.
+**Rollout prerequisite (flagged, NOT in this UI workstream):** the client currently hard-codes Semester 1 and auto-creates the term on first visit with no window concept (`client/js/enrollment.js:71-73`). To support the real cadence (2 semesters/year) the client must receive its **active term + enrollment window from the server**. This requires a small backend/data contract change and is listed in §13 as a prerequisite to be planned separately; the client UI in this spec is designed to consume such a contract when it lands.
 
 ---
 
@@ -145,23 +146,26 @@ Rule: **no control that can trigger a server edit error is ever rendered in a lo
 | Event | In-app bell | Email to student |
 |---|---|---|
 | Submitted | ✅ (existing) | ❌ none |
-| Returned / Rejected | ✅ | ❌ none |
-| Approved by head | ✅ | ❌ none |
-| **Encoded by SA** | ✅ | ✅ **only email sent** |
+| Head adds/removes subjects | ✅ (part of review activity) | ❌ none |
+| **Verified by Program Head** | ✅ | ✅ **Email #1 — final subject list** ("These are the subjects you will enroll this semester.") |
+| **Encoded by SA** | ✅ | ✅ **Email #2 — done** ("Your load is encoded. Next: proceed to the University Registrar for assessment.") |
+| Legacy return / reject (unreachable) | ✅ | ❌ none |
 
-Heads/SA email and in-app notifications are unchanged. Subject line example: *"Enrollment Verification — Your load is encoded."* Body reuses the redesigned COE template already on this branch (`server/lib/email.js`), states the program/term, and tells the student the next step is at the University Registrar for assessment.
+Heads/SA in-app notifications are unchanged. Both student emails reuse the redesigned COE template already on this branch (`server/lib/email.js`), state the program/term, and are sent via the **transactional API** (`sib-api-v3-sdk`), not campaigns.
 
 ### 8.2 Volume & plan
 
-- One encode email per student per term ≈ **500 emails × 2 terms/year ≈ 1,000/year** (≈85/month average) — trivially small.
-- Brevo **Free**: 300 emails/day — fine for testing; fails on an encode-day burst > 300.
+- Two emails per student per term ≈ **500 students × 2 ≈ 1,000 emails/term**, **≈ 2,000 emails/year** (≈170/month average) — small.
+- Brevo **Free**: 300 emails/day — fine for testing; fails on an encode/verify-day burst > 300 (a full 500-student day overflows).
 - Brevo **Starter** (≈ $25–30/mo, ~5,000 emails/month, no daily 300 cap — verify current pricing/limits): burst-safe; a full 500-student day fits easily.
-- **Strategy (D5):** stay **Free** during testing; switch to **Starter** at rollout. Implement a tiny **send outbox/queue** behind the encode event so the plan switch requires zero rework. Optional free-plan fallback: drip at ≤ 280/day (must respect Brevo's daily reset clock, not local midnight).
-- **One email per student per cycle:** the existing `encoded_at` timestamp already guarantees no re-send on re-encode. Send via the **transactional API** (`sib-api-v3-sdk`), not campaigns.
+- **Strategy (D5):** stay **Free** during testing; switch to **Starter** at rollout. Implement a tiny **send outbox/queue** behind the two email events so the plan switch requires zero rework. Optional free-plan fallback: drip at ≤ 280/day (must respect Brevo's daily reset clock, not local midnight).
+- **One email per student per event:** the existing `approved`/`encoded_at` event timestamps guarantee no re-send on re-verify or re-encode.
 
 ### 8.3 Scope note
 
-D4 requires touching the server email dispatch path (gating the student email to the encode event only) — a deliberate exception to the client-only rule, approved by the owner, and confined to the notification/email wiring. No change to the status state machine, pilot gate, RLS, or Supabase client.
+D4 + D8 require two deliberate, confined server-side touches (exceptions to the client-only rule, owner-approved):
+1. **Email dispatch gating:** the student email fires only on the **verify** and **encode** events; no student email on return/reject (return/reject are no longer producible anyway).
+2. **Head capability surface:** the head UI offers **Add / Remove / Verify** only. Server endpoints for return/reject are retained but no longer reachable from the UI; the status state machine, pilot gate, RLS, and Supabase client are untouched.
 
 ---
 
@@ -171,7 +175,7 @@ D4 requires touching the server email dispatch path (gating the student email to
 - **No eligible courses:** proper empty state with the year-filter pills still visible, and copy making clear it's an office data state, not a bug.
 - **No active term / `createTerm` failure:** friendly explainer card — *"We couldn't find an open enrollment term for you — contact the COE office."* (Replaces the ambiguous *"No submission for this term yet."* with dead add buttons.)
 - **Locked:** a subtle "locked — read-only" hint on the read-only summary; no buttons that error.
-- **Rejected:** explanation + contact guidance; presented calmly, not as a wall.
+- **Legacy returned/rejected rows:** read-only defensive card with contact guidance (D8); no email, no dead-end panic.
 
 ---
 
@@ -192,18 +196,19 @@ Strictly within the tokens in `AGENTS.md` and `UI_DESIGN.md` (`client/styles/mai
 ## 11. Out of scope
 
 - Server state machine, pilot gate, roster gates, RLS policies, Supabase client queries (`client/js/api.js`) — untouched.
+- **Removal of server return/reject endpoints** — retained (schema/legacy), only hidden from the head UI (D8).
 - University registrar / assessment integration (outside the system by definition).
 - Official transcript / enrollment form printing.
 - Second-semester window mechanics and term picker (see §7 prerequisite).
-- Officer/faculty portal visual redesign (future workstreams).
+- Broader officer/faculty portal visual redesign (future workstreams) — only the head's evaluation action surface (add/remove/verify) changes as required by D8.
 
 ---
 
 ## 12. Verification & QA
 
-- **Playwright GUI flows** (tooling already in the repo): build → submit → returned loop → fix & resubmit → approved (locked, read-only) → SA encodes → completion state; run at mobile (≤ 768px) and desktop widths.
-- Assert: add/remove/submit controls never appear in locked states; no raw server error text ever renders; journey step reflects each state.
-- **Manual:** email sent **only** on encode (one per student per cycle); bell shows all other transitions; encode-day burst behavior under the current plan (Free: ≤300/day respected; Starter: burst ok).
+- **Playwright GUI flows** (tooling already in the repo): build → submit → head adds/removes → head verifies (final list state) → SA encodes → completion state; run at mobile (≤ 768px) and desktop widths.
+- Assert: add/remove/submit controls never appear in locked states; no raw server error text ever renders; journey step reflects each state; the head UI exposes **no Reject and no Return** actions.
+- **Manual email checks:** Email #1 fires on verify with the exact final subject list; Email #2 fires on encode; no student email on submit or interim head activity; one email per student per event (no re-sends).
 - Terminology scan: no *evaluation/verification/term* drift, no "Load Verification" remnants in student-facing copy.
 - Contrast/keyboard spot checks on the new tracker and action panel.
 - Run `node check_txs.js` before any push, per `AGENTS.md`.
