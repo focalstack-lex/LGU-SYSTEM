@@ -122,19 +122,22 @@ t('corequisites travel together when both are in the upcoming load', () => {
   assert.deepStrictEqual(codes, ['CS201', 'LAB201']);
 });
 
-t('failed backlog subjects are recommended and flagged as retakes', () => {
+t('failed subjects surface as prioritized retakes (kind retake)', () => {
   const subjects = [
     subj('r1', 'CALC1', 3, 1, 1),
     subj('p1', 'ENGG2', 3, 2, 1),
   ];
   const myUnits = [
-    { school_year: '2025-2026', semester: 1, status: 'failed', subjects: { code: 'CALC1' } },
+    { school_year: '2025-2026', semester: 1, status: 'failed', subjects: { code: 'CALC1', year_level: 1 } },
   ];
   const r = GR.buildRecommendations(baseOpts(subjects, { myUnits }));
   const calc = r.recommended.find(c => c.subject.code === 'CALC1');
-  assert.ok(calc, 'CALC1 should be recommended as backlog retake');
-  assert.strictEqual(calc.kind, 'backlog');
+  assert.ok(calc, 'CALC1 should be recommended as a retake');
+  assert.strictEqual(calc.kind, 'retake');
   assert.strictEqual(calc.retake, true);
+  // Retakes sort ahead of on-track subjects.
+  assert.strictEqual(r.recommended[0].subject.code, 'CALC1');
+  assert.strictEqual(r.counts.retake, 1);
 });
 
 t('returned metadata includes primary/backlog counts', () => {
@@ -258,6 +261,38 @@ t('structured: "Year Standing" detail rows are eligibility-only and never block'
   const r4 = GR.buildRecommendations(baseOpts(
     [subj('s1', 'ECE410', 3, 4, 1)], { profileYear: 4, prereqRows: rows, now: '2026-07-15T00:00:00Z' }));
   assert.ok(r4.recommended.some(c => c.subject.code === 'ECE410'));
+});
+
+t('standing is derived from the currently-enrolled term (records-first)', () => {
+  const subjects = [
+    subj('e1', 'ENGR0', 3, 2, 1),
+    subj('e2', 'ENGR2', 3, 2, 2),
+  ];
+  const myUnits = [
+    { school_year: '2026-2027', semester: 1, status: 'enrolled', subjects: { code: 'ENGR0', year_level: 2 } },
+  ];
+  const tgt = GR.resolveTarget({ profileYear: 2, myUnits, now: '2026-10-01T00:00:00Z' });
+  assert.strictEqual(tgt.semester, 2);
+  assert.strictEqual(tgt.yearLevel, 2);
+  assert.strictEqual(tgt.basis, 'records');
+  const r = GR.buildRecommendations(baseOpts(subjects, { myUnits }));
+  const codes = r.recommended.map(c => c.subject.code);
+  assert.ok(codes.includes('ENGR2'));
+  assert.ok(!codes.includes('ENGR0')); // currently enrolled -> excluded
+});
+
+t('currently-enrolled subject satisfies a prerequisite of the next course', () => {
+  const subjects = [
+    subj('e1', 'ENGR0', 3, 2, 1),
+    subj('e2', 'ENGR3', 3, 2, 2, { prerequisites: 'ENGR0' }),
+  ];
+  const myUnits = [
+    { school_year: '2026-2027', semester: 1, status: 'enrolled', subjects: { code: 'ENGR0', year_level: 2 } },
+  ];
+  const r = GR.buildRecommendations(baseOpts(subjects, { myUnits }));
+  const codes = r.recommended.map(c => c.subject.code);
+  assert.ok(codes.includes('ENGR3'), 'prereq satisfied by current enrolment');
+  assert.strictEqual(r.blocked.length, 0);
 });
 
 console.log(`\n${passed} grizz-recommend assertions passed.`);

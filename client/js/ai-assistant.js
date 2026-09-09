@@ -915,11 +915,10 @@ const GrizzAI = (() => {
         </a>
       </p>` : '';
 
-    const ctxHtml = `
-      <p class="grizz-term-ctx">
-        <iconify-icon icon="solar:calendar-linear"></iconify-icon>
-        Planning your <strong>Semester ${target.semester}</strong> load · SY ${esc(target.schoolYear)} · Year ${target.yearLevel}
-      </p>`;
+    const retakesInLoad = recommended.filter(r => r.kind === 'retake').length;
+    const ctxHtml = target.basis === 'records'
+      ? `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Based on your records — <strong>Year ${target.yearLevel} · Semester ${target.semester}</strong> · SY ${esc(target.schoolYear)}${retakesInLoad ? ` · ${retakesInLoad} retake${retakesInLoad === 1 ? '' : 's'}</strong>` : ''}</p>`
+      : `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Planning your <strong>Semester ${target.semester}</strong> load · SY ${esc(target.schoolYear)} · Year ${target.yearLevel}</p>`;
     const remUnits = remainder.reduce((sum, c) => sum + (Number(c.subject.units) || 0), 0);
     const overflowHtml = remainder.length
       ? `<p class="ursa-note-text">+ ${remainder.length} more cleared course${remainder.length === 1 ? '' : 's'} (${remUnits} units) will fit once this load is lighter — kept under the 24-unit / 5-subject cap.</p>`
