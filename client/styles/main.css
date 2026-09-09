@@ -11,10 +11,10 @@
      70% graphite/slate backgrounds · 20% neutral typography ·
      8% steel blue accents · 2% engineering orange (action only).
      Orange is reserved for ACTION / ACTIVE / IMPORTANT - never a fill. */
-  --background: #090D14;        /* app shell, page background */
-  --surface: #0E1520;           /* sidebar, modals, cards */
-  --surface-secondary: #131B27; /* input fields, raised surfaces */
-  --surface-hover: #192332;     /* hover states */
+  --background: #121214;        /* app shell, flat dark charcoal background */
+  --surface: #1C1C20;           /* sidebar, modals, cards - matte dark slate */
+  --surface-secondary: #26262C; /* input fields, raised surfaces */
+  --surface-hover: #2C2C34;     /* hover states */
 
   --border: rgba(255, 255, 255, 0.08);            /* crisp subtle border - modern tonal depth */
   --border-hover: rgba(255, 255, 255, 0.16);
@@ -59,7 +59,7 @@
   --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
   --shadow-card-hover: 0 4px 14px -2px rgba(0, 0, 0, 0.42), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
   --shadow-modal: 0 20px 48px -6px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-  --bg-surface-elevated: #131B27;
+  --bg-surface-elevated: #26262C;
 
   /* Sleek Scrollbar Tokens */
   --scrollbar-thumb: rgba(255, 255, 255, 0.16);
@@ -3397,10 +3397,10 @@ iconify-icon {
     z-index: 1000 !important;
     
     /* Frosted Glassmorphism */
-    background: rgba(17, 24, 32, 0.9) !important;
+    background: rgba(28, 28, 32, 0.92) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 30px !important;
     
     padding: 4px 4px !important;
@@ -3959,8 +3959,8 @@ html body.is-admin th.admin-only {
   max-width: 440px;
   margin: 0 auto;
   height: 56px;
-  background: rgba(17, 24, 32, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(28, 28, 32, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 30px;
   align-items: center;
   justify-content: space-around;
@@ -6714,7 +6714,7 @@ html body.is-admin th.admin-only {
 html body .mobile-sheet-backdrop {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(8, 12, 20, 0.88) !important;
+  background: rgba(14, 14, 16, 0.82) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   z-index: 10050 !important;

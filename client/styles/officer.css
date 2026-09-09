@@ -1669,10 +1669,10 @@ html, body {
     z-index: 1000 !important;
     box-sizing: border-box !important;
     
-    background: rgba(17, 24, 32, 0.9) !important;
+    background: rgba(28, 28, 32, 0.92) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 30px !important;
     padding: 4px 4px !important;
     justify-content: space-around !important;
