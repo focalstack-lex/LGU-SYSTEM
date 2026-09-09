@@ -3,7 +3,9 @@
 // Decides which subjects Grizz suggests for the upcoming term by:
 //   1. resolving the target term (active load submission > history > default),
 //   2. scoping candidates to that term's curriculum slot + lower-year backlog,
-//   3. enforcing prereq/co-req/standing gates (structured rows or legacy text),
+//   3. enforcing code prerequisites and co-requisites (structured rows or
+//      legacy free text; "Xth Yr/Year Standing" text is an ELIGIBILITY window
+//      satisfied by the year scoping, so it never blocks a recommendation),
 //   4. capping the load at BOTH 5 subjects AND 24 units.
 // UMD: browsers get window.GrizzRecommend; Node tests require() it.
 // =============================================
@@ -149,9 +151,9 @@
   //   "Co: ECE 211"                corequisite
   //   "co-requisite: EMath 121"    corequisite
   //   "CE 211; co-requisite: CE 222"
-  //   "2nd/3rd/4th Yr Standing"    year standing
-  //   "3rd Year Standing"          year standing (full word)
-  //   "*240 hours / 4th Yr Standing" hours + standing (hours are descriptive)
+  //   "2nd/3rd/4th Yr Standing"    eligibility note — satisfied by year scoping
+  //   "3rd Year Standing"          eligibility note (full word) — never blocks
+  //   "*240 hours / 4th Yr Standing" descriptive (hours/standing) — informational
   //   "Depends: CE 211"            "depends" phrasing still means prerequisite
 
   function normalizeCode(s) {
@@ -178,11 +180,12 @@
   }
 
   // Structured prereq gate (migration 031 rows). A corequisite is satisfied if
-  // the paired subject is passed, enrolled, OR also being planned in the same
-  // upcoming term (candidateScope) — co-reqs travel together in one load.
+  // the paired subject is passed, enrolled, OR also planned in the same load
+  // (candidateScope) — co-reqs travel together. Standing rows are eligibility
+  // only and never block (term scoping already limits candidates by year).
   // Detail-only rows (no depends_code) fall back to free-text parsing so
   // "standing"-in-detail and code-in-detail rows are never silently skipped.
-  function evaluateStructuredPrereqs(subject, prereqsBySubject, passedCodes, enrolledCodes, candidateScope, standingYear) {
+  function evaluateStructuredPrereqs(subject, prereqsBySubject, passedCodes, enrolledCodes, candidateScope) {
     var rows = prereqsBySubject.get(subject.id) || [];
     if (!rows.length) return null; // caller falls back to legacy parsing
 
@@ -198,30 +201,22 @@
           satisfied = false;
           missing.push(depCode);
         }
-      } else if (row.kind === 'year_standing' && row.detail) {
-        var req = standingRequirementOf(row.detail);
-        var requiredYr = req ? req.year : Number((String(row.detail).match(/(\d+)/) || [])[1] || 0);
-        if (standingYear < requiredYr) {
-          satisfied = false;
-          missing.push(req ? req.phrase : row.detail);
-        }
       } else if (row.kind === 'special' && row.detail) {
         notes.push(row.detail);
+      } else if (row.kind === 'year_standing' && row.detail) {
+        // Standing is an ELIGIBILITY window, not a prerequisite. Term scoping
+        // only offers courses at/below the student's target year, so a standing
+        // requirement is satisfied by construction — it never blocks here.
       } else if (row.detail) {
-        // Kind has no depends_code: parse the detail text as free text.
+        // Detail-only rows (no depends_code) fall back to free-text parsing so
+        // code-in-detail rows are honored and standing/hours text is ignored.
         var norm = normalizeCode(row.detail);
-        var detailReq = standingRequirementOf(row.detail);
-        if (detailReq) {
-          if (standingYear < detailReq.year) {
-            satisfied = false;
-            missing.push(detailReq.phrase);
-          }
-        } else if (isCodeLike(norm)) {
+        if (isCodeLike(norm) && !standingRequirementOf(row.detail)) {
           if (!passedCodes.has(norm) && !enrolledCodes.has(norm)) {
             satisfied = false;
             missing.push(row.detail);
           }
-        } else {
+        } else if (!standingRequirementOf(row.detail)) {
           notes.push(row.detail); // descriptive-only (e.g. "240 hours") — informational
         }
       }
@@ -231,7 +226,7 @@
 
   // Legacy free-text fallback (identical rules to ai-assistant.js, extended to
   // "Year Standing", "Co:"/"co-requisite", and "Depends:" phrasing).
-  function evaluateLegacyPrereqs(subject, passedCodes, enrolledCodes, standingYear, candidateScope) {
+  function evaluateLegacyPrereqs(subject, passedCodes, enrolledCodes, candidateScope) {
     var prereqStr = String(subject.prerequisites || '').trim();
     if (!prereqStr || prereqStr === 'None' || prereqStr === '-') {
       return { satisfied: true, missing: [], notes: [] };
@@ -242,15 +237,9 @@
     var tokens = prereqStr.split(/[;,/\r\n]+/).map(function (t) { return String(t).trim(); }).filter(Boolean);
 
     tokens.forEach(function (token) {
-      // 1) Year-standing clause (Yr or Year, ordinal optional).
-      var standing = standingRequirementOf(token);
-      if (standing) {
-        if (standingYear < standing.year) {
-          satisfied = false;
-          missing.push(standing.phrase);
-        }
-        return;
-      }
+      // 1) Year-standing clause ("3rd Yr/Year Standing"). Standing is an
+      //    ELIGIBILITY window, satisfied by term scoping — it never blocks.
+      if (standingRequirementOf(token)) return;
       // 2) Corequisite marker -> may be satisfied by a co-planned subject.
       var coreqMatch = token.match(COREQ_MARKER);
       var isCoreq = false;
@@ -325,8 +314,8 @@
     var blocked = [];
     candidates.forEach(function (c) {
       var verdict = evaluateStructuredPrereqs(
-        c.s, prereqsBySubject, passedCodes, enrolledCodes, candidateScopeCodes, target.yearLevel);
-      if (verdict === null) verdict = evaluateLegacyPrereqs(c.s, passedCodes, enrolledCodes, target.yearLevel, candidateScopeCodes);
+        c.s, prereqsBySubject, passedCodes, enrolledCodes, candidateScopeCodes);
+      if (verdict === null) verdict = evaluateLegacyPrereqs(c.s, passedCodes, enrolledCodes, candidateScopeCodes);
       if (verdict.satisfied) {
         eligible.push({
           subject: c.s, kind: c.kind, retake: c.retake,

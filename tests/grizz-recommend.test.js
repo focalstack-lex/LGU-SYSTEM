@@ -150,17 +150,18 @@ t('returned metadata includes primary/backlog counts', () => {
 
 // ---- Free-text prerequisite phrasing (standing / co-req / depends) ----
 
-// Standing gating: the catalog spells it both "Xth Yr Standing" and "Xth Year Standing".
-t('legacy: "3rd Year Standing" (full word) blocks a Year-2 student', () => {
+// Standing is an eligibility window, satisfied by term scoping — it must
+// never block a course or appear under "blocked".
+t('legacy: "3rd Year Standing" text is eligibility-only and never blocks', () => {
   const subjects = [
     subj('s1', 'ENGG101', 3, 2, 1, { prerequisites: '3rd Year Standing' }),
   ];
   const r = GR.buildRecommendations(baseOpts(subjects)); // profileYear 2, Sem 1
-  assert.strictEqual(r.recommended.length, 0);
-  assert.ok(r.blocked.some(b => b.subject.code === 'ENGG101' && /3rd Year Standing/i.test(b.reason)));
+  assert.ok(r.recommended.some(c => c.subject.code === 'ENGG101'));
+  assert.strictEqual(r.blocked.length, 0);
 });
 
-t('legacy: same standing requirement clears once the student is in Year 3', () => {
+t('legacy: standing requirement clears once the student is in Year 3', () => {
   const subjects = [
     subj('s1', 'ENGG301', 3, 3, 1, { prerequisites: '3rd Year Standing' }),
   ];
@@ -168,29 +169,29 @@ t('legacy: same standing requirement clears once the student is in Year 3', () =
   assert.ok(r.recommended.some(c => c.subject.code === 'ENGG301'), 'Year-3 subject should be recommended at Year-3 target');
 });
 
-t('legacy: "4th Yr Standing" (abbrev) gates at the right year', () => {
-  const gated = GR.buildRecommendations(baseOpts(
+t('legacy: "4th Yr Standing" (abbrev) no longer gates eligibility', () => {
+  const y3 = GR.buildRecommendations(baseOpts(
     [subj('s1', 'CAPSTONE', 3, 3, 1, { prerequisites: '4th Yr Standing' })],
     { profileYear: 3, now: '2026-07-15T00:00:00Z' }));
-  assert.strictEqual(gated.recommended.length, 0);
-  assert.ok(gated.blocked.some(b => b.subject.code === 'CAPSTONE'));
-  const cleared = GR.buildRecommendations(baseOpts(
+  assert.ok(y3.recommended.some(c => c.subject.code === 'CAPSTONE'));
+  assert.strictEqual(y3.blocked.length, 0);
+  const y4 = GR.buildRecommendations(baseOpts(
     [subj('s1', 'CAPSTONE', 3, 4, 1, { prerequisites: '4th Yr Standing' })],
     { profileYear: 4, now: '2026-07-15T00:00:00Z' }));
-  assert.ok(cleared.recommended.some(c => c.subject.code === 'CAPSTONE'));
+  assert.ok(y4.recommended.some(c => c.subject.code === 'CAPSTONE'));
 });
 
-t('legacy: "*240 hours / 4th Yr Standing" gates on standing only, ignores hours', () => {
+t('legacy: "*240 hours / 4th Yr Standing" is descriptive and never blocks', () => {
   const hoursPrereq = '*240 hours / 4th Yr Standing';
-  const blocked = GR.buildRecommendations(baseOpts(
+  const y3 = GR.buildRecommendations(baseOpts(
     [subj('s1', 'OJT', 6, 3, 1, { prerequisites: hoursPrereq })],
     { profileYear: 3, now: '2026-07-15T00:00:00Z' }));
-  assert.strictEqual(blocked.recommended.length, 0);
-  assert.ok(blocked.blocked.some(b => b.subject.code === 'OJT'), 'blocked before 4th year');
-  const cleared = GR.buildRecommendations(baseOpts(
+  assert.ok(y3.recommended.some(c => c.subject.code === 'OJT'));
+  const y4 = GR.buildRecommendations(baseOpts(
     [subj('s1', 'OJT', 6, 4, 1, { prerequisites: hoursPrereq })],
     { profileYear: 4, now: '2026-07-15T00:00:00Z' }));
-  assert.ok(cleared.recommended.some(c => c.subject.code === 'OJT'), 'eligible at 4th year despite hours text');
+  assert.ok(y4.recommended.some(c => c.subject.code === 'OJT'));
+  assert.strictEqual(y3.blocked.length + y4.blocked.length, 0);
 });
 
 t('legacy: "Co-req CpE 223" corequisite travels with a co-planned subject', () => {
@@ -246,17 +247,17 @@ t('legacy: multi-code list gates on every code', () => {
   assert.ok(r.blocked.some(b => b.subject.code === 'CE323' && /CE 222/.test(b.reason)));
 });
 
-t('structured: detail-only prerequisite row with "Year Standing" text is honored', () => {
+t('structured: "Year Standing" detail rows are eligibility-only and never block', () => {
   const rows = [
     { subject_id: 's1', kind: 'prerequisite', detail: '4th Year Standing', depends_code: null },
   ];
-  const blocked = GR.buildRecommendations(baseOpts(
+  const r3 = GR.buildRecommendations(baseOpts(
     [subj('s1', 'ECE410', 3, 3, 1)], { profileYear: 3, prereqRows: rows, now: '2026-07-15T00:00:00Z' }));
-  assert.strictEqual(blocked.recommended.length, 0);
-  assert.ok(blocked.blocked.some(b => b.subject.code === 'ECE410'));
-  const cleared = GR.buildRecommendations(baseOpts(
+  assert.ok(r3.recommended.some(c => c.subject.code === 'ECE410'));
+  assert.strictEqual(r3.blocked.length, 0);
+  const r4 = GR.buildRecommendations(baseOpts(
     [subj('s1', 'ECE410', 3, 4, 1)], { profileYear: 4, prereqRows: rows, now: '2026-07-15T00:00:00Z' }));
-  assert.ok(cleared.recommended.some(c => c.subject.code === 'ECE410'));
+  assert.ok(r4.recommended.some(c => c.subject.code === 'ECE410'));
 });
 
 console.log(`\n${passed} grizz-recommend assertions passed.`);
