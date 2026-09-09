@@ -839,7 +839,8 @@ const GrizzAI = (() => {
     const totalUnits = plan.totalUnits;
     const blocked = plan.blocked || [];
     const remainder = plan.remainder || [];
-    const target = plan.target;
+    const standing = plan.standing;
+    const ord = (y) => y + (y === 1 ? 'st' : y === 2 ? 'nd' : y === 3 ? 'rd' : 'th');
 
     if (recommended.length === 0) {
       const blockedNote = blocked.length
@@ -847,7 +848,7 @@ const GrizzAI = (() => {
         : '';
       appendBotMessage(
         'Curriculum Recommendations',
-        `<p>There are no new courses to add for <strong>${esc(target.schoolYear)} · Semester ${target.semester}</strong> — you've cleared or are currently taking every course available at that point in your program.</p>${blockedNote}`,
+        `<p>No open courses can be added right now — every course within your <strong>${ord(standing.yearLevel)} Year standing</strong> is cleared or currently being taken${standing.basis === 'records' ? ` (${standing.completedUnits} of ${standing.totalUnits} units completed)` : ''}.</p>${blockedNote}`,
         [
           { action: 'academic-progress', label: 'View Academic Progress', icon: 'solar:diploma-verified-linear' },
           blocked.length ? { action: 'check-prereq', label: 'Check Prerequisites', icon: 'solar:branching-paths-down-linear' } : null,
@@ -916,9 +917,12 @@ const GrizzAI = (() => {
       </p>` : '';
 
     const retakesInLoad = recommended.filter(r => r.kind === 'retake').length;
-    const ctxHtml = target.basis === 'records'
-      ? `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Based on your records — <strong>Year ${target.yearLevel} · Semester ${target.semester}</strong> · SY ${esc(target.schoolYear)}${retakesInLoad ? ` · ${retakesInLoad} retake${retakesInLoad === 1 ? '' : 's'}</strong>` : ''}</p>`
-      : `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Planning your <strong>Semester ${target.semester}</strong> load · SY ${esc(target.schoolYear)} · Year ${target.yearLevel}</p>`;
+    const openNote = plan.openCount
+      ? ` · ${plan.openCount} course${plan.openCount === 1 ? '' : 's'} still open`
+      : '';
+    const ctxHtml = standing.basis === 'records'
+      ? `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Based on your records — <strong>${ord(standing.yearLevel)} Year standing</strong> · ${standing.completedUnits} of ${standing.totalUnits} units${openNote}${retakesInLoad ? ` · ${retakesInLoad} retake${retakesInLoad === 1 ? '' : 's'}` : ''}</p>`
+      : `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Nothing on record yet — starting with your earliest open courses.</p>`;
     const remUnits = remainder.reduce((sum, c) => sum + (Number(c.subject.units) || 0), 0);
     const overflowHtml = remainder.length
       ? `<p class="ursa-note-text">+ ${remainder.length} more cleared course${remainder.length === 1 ? '' : 's'} (${remUnits} units) will fit once this load is lighter — kept under the 24-unit / 5-subject cap.</p>`

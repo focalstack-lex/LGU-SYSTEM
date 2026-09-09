@@ -2,15 +2,17 @@
 // grizz-recommend.js - Pure "next load" recommendation engine.
 // Decides which subjects Grizz suggests by:
 //   1. analyzing the student's ACTUAL records (passed / failed / incomplete /
-//      dropped / currently enrolled) to derive their standing,
-//   2. resolving the target term (open load submission > records > default),
-//   3. scoping candidates to that term's curriculum slot, owed retakes, and
-//      lower-year backlog (never future years or the wrong semester),
+//      dropped / currently enrolled) and banked units,
+//   2. deriving year standing from completed units vs the program's cumulative
+//      catalog units (registrar method) — NOT from the highest stray subject,
+//   3. offering every OPEN subject (not passed, not currently enrolled) in
+//      curriculum order so the oldest unfinished work surfaces first, instead
+//      of blindly listing the nominal next-semester catalog row,
 //   4. enforcing code prerequisites and co-requisites (structured rows or
 //      legacy free text; "Xth Yr/Year Standing" text is an ELIGIBILITY window
-//      satisfied by the year scoping, so it never blocks a recommendation),
-//   5. recommending owed retakes first (they unlock progression), then the
-//      on-track subjects, then remaining backlog,
+//      satisfied by standing, so it never blocks a recommendation),
+//   5. putting owed retakes (failed/incomplete/dropped) ahead of fresh courses
+//      within each curriculum slot,
 //   6. capping the load at BOTH 5 subjects AND 24 units.
 // UMD: browsers get window.GrizzRecommend; Node tests require() it.
 // =============================================
@@ -116,15 +118,15 @@
   }
 
   // Full record analysis: classifies every subject and derives the terms the
-  // student has genuinely passed or is currently enrolled in, which is what
-  // standing is inferred from. `failed` carries the retake debt with the units
-  // and catalog position of each owed subject.
+  // student has genuinely passed or is currently enrolled in. `failed` carries
+  // the retake debt; `passedUnits` is the banked units used to derive standing.
   function analyzeRecords(records) {
     var passedCodes = new Set();
     var enrolledCodes = new Set();
     var attemptedCodes = new Set();
     var failedCodes = new Set();
     var failed = [];
+    var passedUnits = 0;
     var seen = new Set();
     var terms = new Map(); // "start:semester" -> bucket
 
@@ -151,6 +153,7 @@
 
       if (isFullPass(u)) {
         passedCodes.add(code);
+        passedUnits += Number(sub.units) || 0;
         if (b) {
           b.hasPassed = true;
           if (yl > b.passedYear) b.passedYear = yl;
@@ -195,6 +198,7 @@
       attemptedCodes: attemptedCodes,
       failedCodes: failedCodes,
       failed: failed,
+      passedUnits: passedUnits,
       currentTerm: toTerm(currentTerm),
       passedTerm: toTerm(passedTerm),
       terms: terms,
@@ -363,19 +367,63 @@
     return Number(s.units) || 0;
   }
 
+  // Registrar-style year standing: completed units vs cumulative catalog units.
+  function cumulativeUnitsByYear(subjects) {
+    var map = new Map();
+    var running = 0;
+    for (var y = 1; y <= 4; y++) {
+      var yearTotal = (subjects || []).reduce(function (acc, s) {
+        return acc + (Number(s.year_level) === y ? unitsOf(s) : 0);
+      }, 0);
+      running += yearTotal;
+      map.set(y, running);
+    }
+    return map;
+  }
+
+  function yearStandingByUnits(completedUnits, boundaries) {
+    for (var y = 1; y <= 4; y++) {
+      if (completedUnits < (boundaries.get(y) || 0)) return y;
+    }
+    return 4;
+  }
+
   // Full recommendation pass.
+  // Standing comes from banked units (registrar method), NOT from the highest
+  // stray subject on the transcript (an irregular student enrolled in one
+  // Year-4 subject must not be treated as a Year-4). The pool is every OPEN
+  // subject — not passed and not currently enrolled — offered in curriculum
+  // order, so the oldest unfinished work surfaces first instead of whatever
+  // the nominal next-semester catalog row happens to be. Within one slot an
+  // owed retake (failed/incomplete/dropped) comes before a fresh course.
   function buildRecommendations(opts) {
     var subjects = (opts && opts.subjects) || [];
     var prereqRows = (opts && opts.prereqRows) || [];
     var myUnits = (opts && opts.myUnits) || [];
-    var target = resolveTarget(opts);
     var recs = analyzeRecords(myUnits);
 
     var passedCodes = recs.passedCodes;
     var enrolledCodes = recs.enrolledCodes;
     var failedCodes = recs.failedCodes;
-    var standingYear = target.yearLevel;
-    var targetSem = target.semester;
+
+    // Completed units: prefer units banked on records; fall back to summing
+    // the catalog for passed codes when records carried no unit value.
+    var passedUnits = recs.passedUnits;
+    if (passedUnits === 0 && passedCodes.size) {
+      passedUnits = subjects.reduce(function (acc, s) {
+        return acc + (passedCodes.has(normalizeCode(s.code)) ? unitsOf(s) : 0);
+      }, 0);
+    }
+    var catalogTotal = subjects.reduce(function (acc, s) { return acc + unitsOf(s); }, 0);
+    var boundaries = cumulativeUnitsByYear(subjects);
+    var standingYear = yearStandingByUnits(passedUnits, boundaries);
+    var hasRecords = passedUnits > 0 || passedCodes.size > 0 || enrolledCodes.size > 0;
+    var standing = {
+      yearLevel: standingYear,
+      basis: hasRecords ? 'records' : 'profile',
+      completedUnits: passedUnits,
+      totalUnits: catalogTotal,
+    };
 
     var prereqsBySubject = new Map();
     prereqRows.forEach(function (r) {
@@ -383,31 +431,17 @@
       prereqsBySubject.get(r.subject_id).push(r);
     });
 
-    // Candidate pool: retake debt (owed failed/incomplete/dropped subjects at
-    // or below standing), the on-track slot for the standing year + target
-    // semester, and remaining lower-year backlog. Future years and the other
-    // semester of the standing year are out of scope.
-    var candidateScopeCodes = new Set();
+    // Every open subject (not passed, not currently enrolled) is a candidate.
+    var openCount = 0;
     var candidates = [];
     subjects.forEach(function (s) {
       var code = normalizeCode(s.code);
-      if (!code || passedCodes.has(code) || enrolledCodes.has(code)) return;
-      var yl = Number(s.year_level) || 0;
-      var sem = Number(s.semester) || 0;
-      var owed = failedCodes.has(code);
-
-      if (yl === standingYear && sem === targetSem) {
-        // On-track slot: a retake if previously failed, else a fresh subject.
-        candidates.push({ s: s, kind: owed ? 'retake' : 'primary', retake: owed });
-      } else if (yl < standingYear) {
-        // Lower-year work still unfinished (owed retake or never-taken gap).
-        candidates.push({ s: s, kind: owed ? 'retake' : 'backlog', retake: owed });
-      } else if (owed && yl === standingYear && sem < targetSem) {
-        // Failed an earlier semester of the standing year; planning a later
-        // semester now -> the failure is still owed this year.
-        candidates.push({ s: s, kind: 'retake', retake: true });
-      }
+      if (!code) return;
+      if (passedCodes.has(code) || enrolledCodes.has(code)) return;
+      openCount++;
+      candidates.push({ s: s, retake: failedCodes.has(code) });
     });
+    var candidateScopeCodes = new Set();
     candidates.forEach(function (c) { candidateScopeCodes.add(normalizeCode(c.s.code)); });
 
     var eligible = [];
@@ -416,20 +450,19 @@
       var verdict = evaluateStructuredPrereqs(c.s, prereqsBySubject, passedCodes, enrolledCodes, candidateScopeCodes);
       if (verdict === null) verdict = evaluateLegacyPrereqs(c.s, passedCodes, enrolledCodes, candidateScopeCodes);
       if (verdict.satisfied) {
-        eligible.push({ subject: c.s, kind: c.kind, retake: c.retake, notes: verdict.notes || [] });
+        eligible.push({ subject: c.s, kind: c.retake ? 'retake' : 'open', retake: c.retake, notes: verdict.notes || [] });
       } else {
         blocked.push({ subject: c.s, reason: 'Missing prerequisite: ' + (verdict.missing || []).join(', ') });
       }
     });
 
-    // Owed retakes first (they unlock progression), then on-track subjects,
-    // then remaining backlog; deterministic within groups.
+    // Curriculum order — oldest unfinished work first; inside a slot an owed
+    // retake precedes a fresh course; code breaks ties deterministically.
     function sortKey(c) {
-      var group = c.kind === 'retake' ? 0 : (c.kind === 'primary' ? 1 : 2);
       var s = c.subject;
-      return group + ':' +
-        String(Number(s.year_level) || 0).padStart(2, '0') + ':' +
+      return String(Number(s.year_level) || 0).padStart(2, '0') + ':' +
         String(Number(s.semester) || 0).padStart(2, '0') + ':' +
+        (c.retake ? '0' : '1') + ':' +
         String(s.code || '').toUpperCase();
     }
     eligible.sort(function (a, b) { return sortKey(a).localeCompare(sortKey(b)); });
@@ -449,15 +482,15 @@
     });
 
     return {
-      target: target,
+      standing: standing,
       recommended: recommended,
       totalUnits: totalUnits,
       remainder: remainder,
       blocked: blocked,
+      openCount: openCount,
       counts: {
         retake: recommended.filter(function (c) { return c.kind === 'retake'; }).length,
-        primary: recommended.filter(function (c) { return c.kind === 'primary'; }).length,
-        backlog: recommended.filter(function (c) { return c.kind === 'backlog'; }).length,
+        open: recommended.filter(function (c) { return c.kind === 'open'; }).length,
         blocked: blocked.length,
       },
     };
