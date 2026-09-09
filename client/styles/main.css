@@ -8206,6 +8206,233 @@ html[data-theme="light"] .course-added-tag {
   .enrollment-grid { grid-template-columns: 1fr; }
 }
 
+/* =========================================================
+   Enrollment Verification — Journey UI (2026-09-10)
+   Token-only. Flat surfaces; semantic status colors; no gradients.
+   ========================================================= */
+
+/* ---- Journey tracker ---- */
+.ev-track {
+  list-style: none;
+  margin: 0.25rem 0 1rem 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ev-step {
+  position: relative;
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  padding: 0 0 1.1rem 0;
+}
+.ev-step:last-child { padding-bottom: 0.15rem; }
+.ev-step-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  flex: 0 0 18px;
+  margin-top: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border-hover, rgba(255, 255, 255, 0.16));
+  background: var(--surface-secondary, #26262C);
+  color: var(--text-tertiary, #6E6E7A);
+  font-size: 0.66rem;
+  line-height: 1;
+  transition: background var(--transition, 0.25s ease), border-color var(--transition, 0.25s ease);
+}
+.ev-step-dot .iconify-icon { font-size: 10px; }
+.ev-step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 22px;
+  bottom: -1px;
+  width: 2px;
+  background: var(--border, rgba(255, 255, 255, 0.08));
+}
+.ev-step--done .ev-step-dot,
+.ev-step--current .ev-step-dot {
+  background: var(--primary, #FF5533);
+  border-color: var(--primary, #FF5533);
+  color: #FFFFFF;
+}
+.ev-step--current .ev-step-dot {
+  box-shadow: 0 0 0 4px rgba(255, 85, 51, 0.15);
+}
+.ev-step--defensive .ev-step-dot {
+  background: var(--status-negative, #EF4444);
+  border-color: var(--status-negative, #EF4444);
+  color: #FFFFFF;
+}
+.ev-step-label {
+  font-family: var(--font-ui, 'Inter', sans-serif);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-secondary, #9A9AA6);
+  line-height: 1.35;
+  padding-top: 1px;
+}
+.ev-step--current .ev-step-label,
+.ev-step--done .ev-step-label { color: var(--text-primary, #FFFFFF); }
+.ev-step--defensive .ev-step-label { color: var(--status-negative, #EF4444); }
+
+/* ---- Status chip ---- */
+.ev-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: var(--surface-secondary, #26262C);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  color: var(--text-secondary, #9A9AA6);
+  margin-bottom: 0.7rem;
+}
+.ev-chip::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: currentColor;
+  flex: 0 0 7px;
+}
+.ev-chip--warning { color: var(--warning, #F59E0B); border-color: rgba(245, 158, 11, 0.35); }
+.ev-chip--success { color: var(--success, #22C55E); border-color: rgba(34, 197, 94, 0.35); }
+.ev-chip--danger { color: var(--status-negative, #EF4444); border-color: rgba(239, 68, 68, 0.35); }
+.ev-chip--neutral { color: var(--text-secondary, #9A9AA6); }
+
+/* ---- Status body copy ---- */
+.ev-status-copy {
+  color: var(--text-secondary, #9A9AA6);
+  font-family: var(--font-ui, 'Inter', sans-serif);
+  font-size: 0.83rem;
+  line-height: 1.6;
+  margin: 0.1rem 0 0.5rem 0;
+}
+.ev-status-copy strong { color: var(--text-primary, #FFFFFF); font-weight: 600; }
+.ev-status-meta {
+  font-family: var(--font-data, 'Outfit', monospace);
+  font-size: 0.72rem;
+  color: var(--text-tertiary, #6E6E7A);
+  margin: 0 0 0.9rem 0;
+}
+
+/* ---- Action area ---- */
+.ev-action-area { margin-top: 1.1rem; }
+.ev-action-area .btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+.ev-action-hint {
+  color: var(--text-tertiary, #6E6E7A);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  margin: 0.4rem 0 0 0;
+}
+
+/* ---- Verified / encoded status cards ---- */
+.ev-done-card {
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.08);
+  border-radius: var(--radius-lg, 16px);
+  padding: 1rem;
+  margin-top: 0.4rem;
+}
+.ev-done-card h4 {
+  margin: 0 0 0.35rem 0;
+  color: var(--success, #22C55E);
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.ev-done-card h4 iconify-icon { font-size: 1.1rem; }
+.ev-done-card p {
+  margin: 0;
+  color: var(--text-secondary, #9A9AA6);
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+.ev-done-card p strong { color: var(--text-primary, #FFFFFF); }
+
+.ev-final-list-note {
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #9A9AA6);
+  line-height: 1.55;
+}
+.ev-final-list-note strong { color: var(--success, #22C55E); }
+
+/* ---- Legacy defensive card ---- */
+.ev-defensive-card {
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.07);
+  border-radius: var(--radius-lg, 16px);
+  padding: 0.9rem 1rem;
+  margin-top: 0.35rem;
+  font-size: 0.83rem;
+  color: var(--text-secondary, #9A9AA6);
+  line-height: 1.55;
+}
+.ev-defensive-card strong { color: var(--status-negative, #EF4444); }
+
+/* ---- Read-only (locked) hints ---- */
+.ev-locked-note {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-tertiary, #6E6E7A);
+  font-size: 0.8rem;
+  margin: 0.6rem 0 0 0;
+}
+
+/* ---- Compact chip-row tracker (very small screens) ---- */
+@media (max-width: 480px) {
+  .ev-track.ev-track--compact {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0.4rem;
+    padding-bottom: 0.25rem;
+  }
+  .ev-track.ev-track--compact .ev-step {
+    flex: 1 0 auto;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-md, 12px);
+    background: var(--surface-secondary, #26262C);
+  }
+  .ev-track.ev-track--compact .ev-step:not(:last-child)::before { display: none; }
+  .ev-track.ev-track--compact .ev-step-label { font-size: 0.7rem; }
+}
+html[data-theme="light"] .ev-step-dot {
+  border-color: #CBD5E1;
+  background: #FFFFFF;
+  color: #94A3B8;
+}
+html[data-theme="light"] .ev-step:not(:last-child)::before { background: #E2E8F0; }
+html[data-theme="light"] .ev-chip { background: #FFFFFF; }
+html[data-theme="light"] .ev-done-card { background: rgba(34, 197, 94, 0.07); }
+html[data-theme="light"] .ev-defensive-card { background: rgba(239, 68, 68, 0.05); }
+@media (prefers-reduced-motion: reduce) {
+  .ev-step-dot { transition: none; }
+}
+
 /* =============================================
    Faculty Portal (Phase B, /faculty)
    ============================================= */
