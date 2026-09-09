@@ -96,6 +96,32 @@ const FacultyPortal = (() => {
       $('faculty-dean').hidden = false;
       await guard('loadDean', loadDean);
     }
+    subscribeRealtime();
+  }
+
+  let realtimeChannel = null;
+  function subscribeRealtime() {
+    if (!window.supabaseClient || typeof window.supabaseClient.channel !== 'function') return;
+    if (realtimeChannel) return;
+
+    realtimeChannel = window.supabaseClient
+      .channel('enrollment-faculty-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'enrollment_submissions' }, async (payload) => {
+        if (isHead()) guard('loadQueue', loadQueue);
+        guard('loadApproved', loadApproved);
+        if (isDean()) guard('loadDean', loadDean);
+        if (currentSubmission && payload.new && payload.new.id === currentSubmission.id) {
+          openEvaluation(currentSubmission.id);
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'enrollment_submission_items' }, async (payload) => {
+        if (isHead()) guard('loadQueue', loadQueue);
+        guard('loadApproved', loadApproved);
+        if (currentSubmission && ((payload.new && payload.new.submission_id === currentSubmission.id) || (payload.old && payload.old.submission_id === currentSubmission.id))) {
+          openEvaluation(currentSubmission.id);
+        }
+      })
+      .subscribe();
   }
 
   // ---------- Evaluation queue (program head) ----------
@@ -221,7 +247,7 @@ const FacultyPortal = (() => {
     document.getElementById('faculty-queue').hidden = true;
     document.getElementById('faculty-eval').hidden = false;
     document.getElementById('faculty-eval-title').textContent =
-      `${s.student?.full_name || 'Student'} — ${s.school_year} Sem ${s.semester} (${STATUS_LABELS[s.status] || s.status})`;
+      `${s.student?.full_name || 'Student'} · ${s.school_year} Sem ${s.semester} (${STATUS_LABELS[s.status] || s.status})`;
 
     const itemsEl = document.getElementById('faculty-items-list');
     itemsEl.innerHTML = (s.enrollment_submission_items || []).map(i => `
@@ -266,7 +292,7 @@ const FacultyPortal = (() => {
   // in the load (any item state — the server rejects duplicate inserts).
   async function fillAddPicker(s) {
     const sel = document.getElementById('faculty-add-subject');
-    sel.innerHTML = '<option value="">— subject —</option>';
+    sel.innerHTML = '<option value="">Select subject</option>';
     const program = programKey(s.student?.course);
     if (!program) return;
     await guard('fillAddPicker', async () => {
@@ -275,7 +301,7 @@ const FacultyPortal = (() => {
       const options = (checklists.subjects || [])
         .filter(sub => !inLoad.has(sub.id))
         .sort((a, b) => (a.year_level - b.year_level) || String(a.code).localeCompare(String(b.code)))
-        .map(sub => `<option value="${sub.id}">${esc(sub.code)} — ${esc(sub.title)} (${esc(sub.units)}u)</option>`)
+        .map(sub => `<option value="${sub.id}">${esc(sub.code)}: ${esc(sub.title)} (${esc(sub.units)}u)</option>`)
         .join('');
       if (options) sel.insertAdjacentHTML('beforeend', options);
       else sel.insertAdjacentHTML('beforeend', '<option value="">Every program subject is in the load</option>');
@@ -391,7 +417,7 @@ const FacultyPortal = (() => {
     const byProgram = {};
     for (const s of submissions || []) {
       by[s.status] = (by[s.status] || 0) + 1;
-      const p = s.student?.course || '—';
+      const p = s.student?.course || 'N/A';
       byProgram[p] = byProgram[p] || {};
       byProgram[p][s.status] = (byProgram[p][s.status] || 0) + 1;
     }

@@ -834,7 +834,7 @@ const GrizzAI = (() => {
     const recommended = plan.recommended.map(c => Object.assign({}, c.subject, {
       kind: c.kind,
       retake: c.retake,
-      prereqNotes: (c.notes || []).concat(c.retake ? ['Retake — you attempted this before.'] : []),
+      prereqNotes: (c.notes || []).concat(c.retake ? ['Retake: you attempted this before.'] : []),
     }));
     const totalUnits = plan.totalUnits;
     const blocked = plan.blocked || [];
@@ -844,11 +844,11 @@ const GrizzAI = (() => {
 
     if (recommended.length === 0) {
       const blockedNote = blocked.length
-        ? `<p>${blocked.length} course${blocked.length === 1 ? ' is' : 's are'} still locked by prerequisites — ${esc(blocked.slice(0, 5).map(b => b.subject.code).join(', '))}${blocked.length > 5 ? '…' : ''}.</p>`
+        ? `<p>${blocked.length} course${blocked.length === 1 ? ' is' : 's are'} still locked by prerequisites: ${esc(blocked.slice(0, 5).map(b => b.subject.code).join(', '))}${blocked.length > 5 ? '…' : ''}.</p>`
         : '';
       appendBotMessage(
         'Curriculum Recommendations',
-        `<p>No open courses can be added right now — every course within your <strong>${ord(standing.yearLevel)} Year standing</strong> is cleared or currently being taken${standing.basis === 'records' ? ` (${standing.completedUnits} of ${standing.totalUnits} units completed)` : ''}.</p>${blockedNote}`,
+        `<p>No open courses can be added right now: every course within your <strong>${ord(standing.yearLevel)} Year standing</strong> is cleared or currently being taken${standing.basis === 'records' ? ` (${standing.completedUnits} of ${standing.totalUnits} units completed)` : ''}.</p>${blockedNote}`,
         [
           { action: 'academic-progress', label: 'View Academic Progress', icon: 'solar:diploma-verified-linear' },
           blocked.length ? { action: 'check-prereq', label: 'Check Prerequisites', icon: 'solar:branching-paths-down-linear' } : null,
@@ -905,7 +905,7 @@ const GrizzAI = (() => {
         </button>
       </div>
       <p class="ursa-note-text" data-grizz-lock ${canEdit ? 'hidden' : ''}>
-        <iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon> Your load is ${esc(lockNote || 'not editable right now')} — you can add subjects only while you're still building it.
+        <iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon> Your load is ${esc(lockNote || 'not editable right now')}: you can add subjects only while you're still building it.
       </p>` : '';
 
     const jumpHtml = pilot ? `
@@ -921,11 +921,11 @@ const GrizzAI = (() => {
       ? ` · ${plan.openCount} course${plan.openCount === 1 ? '' : 's'} still open`
       : '';
     const ctxHtml = standing.basis === 'records'
-      ? `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Based on your records — <strong>${ord(standing.yearLevel)} Year standing</strong> · ${standing.completedUnits} of ${standing.totalUnits} units${openNote}${retakesInLoad ? ` · ${retakesInLoad} retake${retakesInLoad === 1 ? '' : 's'}` : ''}</p>`
-      : `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Nothing on record yet — starting with your earliest open courses.</p>`;
+      ? `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Based on your records · <strong>${ord(standing.yearLevel)} Year standing</strong> · ${standing.completedUnits} of ${standing.totalUnits} units${openNote}${retakesInLoad ? ` · ${retakesInLoad} retake${retakesInLoad === 1 ? '' : 's'}` : ''}</p>`
+      : `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Nothing on record yet: starting with your earliest open courses.</p>`;
     const remUnits = remainder.reduce((sum, c) => sum + (Number(c.subject.units) || 0), 0);
     const overflowHtml = remainder.length
-      ? `<p class="ursa-note-text">+ ${remainder.length} more cleared course${remainder.length === 1 ? '' : 's'} (${remUnits} units) can be added if your office allows a heavier load — Grizz already includes your earliest required courses in full.</p>`
+      ? `<p class="ursa-note-text">+ ${remainder.length} more cleared course${remainder.length === 1 ? '' : 's'} (${remUnits} units) can be added if your office allows a heavier load (Grizz already includes your earliest required courses in full).</p>`
       : '';
     const blockedHtml = blocked.length
       ? `<div class="grizz-locked">

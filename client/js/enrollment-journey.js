@@ -13,8 +13,8 @@
   var STEPS = [
     { key: 'build',     label: 'Build your load',            short: 'Build' },
     { key: 'with-head', label: 'With your Program Head',     short: 'Head review' },
-    { key: 'verified',  label: 'Verified — your final load', short: 'Verified' },
-    { key: 'encoded',   label: 'Encoded — done',             short: 'Encoded' }
+    { key: 'verified',  label: 'Verified: Final Load',       short: 'Verified' },
+    { key: 'encoded',   label: 'Encoded: Complete',          short: 'Encoded' }
   ];
 
   function activeItems(sub) {
@@ -53,7 +53,7 @@
     }
     if (sub.status === 'submitted') return { kind: 'none', label: '', hint: 'Your load was sent. You will be notified when your Program Head responds.' };
     if (sub.status === 'under_review') return { kind: 'none', label: '', hint: 'Your Program Head is reviewing your load. You will be notified when they respond.' };
-    if (sub.status === 'approved' && !sub.encoded_at) return { kind: 'none', label: '', hint: 'Your load is verified. Nothing needed from you right now — your final list was emailed to you.' };
+    if (sub.status === 'approved' && !sub.encoded_at) return { kind: 'none', label: '', hint: 'Your load is verified. Nothing needed from you right now. Your final list was emailed to you.' };
     if (sub.status === 'approved' && sub.encoded_at) return { kind: 'none', label: '', hint: '' };
     return { kind: 'none', label: '', hint: 'This submission is no longer editable. Contact your Program Head or the COE office.' };
   }

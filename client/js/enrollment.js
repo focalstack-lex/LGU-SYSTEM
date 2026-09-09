@@ -67,6 +67,31 @@ const EnrollmentSection = (() => {
 
     fillPicker();
     renderAll();
+    subscribeRealtime();
+  }
+
+  let realtimeChannel = null;
+  function subscribeRealtime() {
+    if (!window.supabaseClient || typeof window.supabaseClient.channel !== 'function') return;
+    if (realtimeChannel) return;
+
+    realtimeChannel = window.supabaseClient
+      .channel('enrollment-student-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'enrollment_submissions' }, async (payload) => {
+        if (current && payload.new && payload.new.id === current.id) {
+          const oldStatus = current.status;
+          await load();
+          if (oldStatus !== payload.new.status && typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Your enrollment status was updated in real time.', 'info');
+          }
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'enrollment_submission_items' }, async (payload) => {
+        if (current && ((payload.new && payload.new.submission_id === current.id) || (payload.old && payload.old.submission_id === current.id))) {
+          await load();
+        }
+      })
+      .subscribe();
   }
 
   function renderAll() {
@@ -223,7 +248,7 @@ const EnrollmentSection = (() => {
         lockedNote.innerHTML = '<iconify-icon icon="solar:lock-linear" style="font-size:0.9rem;"></iconify-icon> This load is locked while your Program Head reviews it.';
       } else if (current && current.status === 'approved') {
         lockedNote.classList.remove('hidden');
-        lockedNote.innerHTML = '<iconify-icon icon="solar:lock-keyhole-linear" style="font-size:0.9rem;"></iconify-icon> Verified by your Program Head — your load is locked.';
+        lockedNote.innerHTML = '<iconify-icon icon="solar:lock-keyhole-linear" style="font-size:0.9rem;"></iconify-icon> Verified by your Program Head: your load is locked.';
       } else {
         lockedNote.classList.add('hidden');
       }
@@ -245,7 +270,7 @@ const EnrollmentSection = (() => {
       draft: 'Build your load',
       submitted: 'With your Program Head',
       under_review: 'Program Head is reviewing',
-      approved: current.encoded_at ? 'Encoded — done' : 'Verified — final load',
+      approved: current.encoded_at ? 'Encoded: Done' : 'Verified: Final Load',
     }[current.status] || (step.state === 'defensive' ? 'Not editable' : current.status);
     const chipTone = {
       draft: 'neutral', submitted: 'warning', under_review: 'warning', approved: 'success',
@@ -295,13 +320,13 @@ const EnrollmentSection = (() => {
         return `
           <div class="ev-done-card">
             <h4><iconify-icon icon="solar:check-circle-bold"></iconify-icon> Your load is encoded</h4>
-            <p>Your final load has been encoded by the <strong>Student Assistant</strong>. Enrollment inside this system is complete. The next step — assessment and claiming — happens at the <strong>University Registrar</strong>, outside this system.</p>
+            <p>Your final load has been encoded by the <strong>Student Assistant</strong>. Enrollment inside this system is complete. The next step (assessment and claiming) happens at the <strong>University Registrar</strong>, outside this system.</p>
           </div>
           <ul class="ev-final-list">${listHtml}</ul>`;
       }
       return `
         <div class="ev-done-card">
-          <h4><iconify-icon icon="solar:verified-check-bold"></iconify-icon> Verified — your final load</h4>
+          <h4><iconify-icon icon="solar:verified-check-bold"></iconify-icon> Verified: Final Load</h4>
           <p>Your Program Head verified your load. This is the <strong>final list of subjects</strong> you will enroll this semester. Waiting for the Student Assistant to encode it.</p>
         </div>
         ${headChanges}
@@ -314,7 +339,7 @@ const EnrollmentSection = (() => {
   function headChangeLines(s) {
     const rows = (s.enrollment_submission_items || [])
       .filter(i => i.item_state !== 'submitted' && i.head_note)
-      .map(i => `<li>${i.item_state === 'removed_by_head' ? 'Removed' : 'Added'} <strong>${esc(i.subjects?.code)}</strong> — ${esc(i.head_note)}</li>`);
+      .map(i => `<li>${i.item_state === 'removed_by_head' ? 'Removed' : 'Added'} <strong>${esc(i.subjects?.code)}</strong>: ${esc(i.head_note)}</li>`);
     return rows.length ? `<ul class="enrollment-changes">${rows.join('')}</ul>` : '';
   }
 
@@ -379,7 +404,7 @@ const EnrollmentSection = (() => {
 
   // ---- Actions ----
   async function addItem(subjectId, grizzReason) {
-    if (!current) return { ok: false, error: 'Enrollment is not ready — open the Enrollment Verification screen first.' };
+    if (!current) return { ok: false, error: 'Enrollment is not ready: open the Enrollment Verification screen first.' };
     if (!subjectId) return { ok: false, error: 'No subject selected.' };
     try {
       const { item } = await Api.enrollment.addItem(current.id, subjectId, grizzReason);
@@ -441,9 +466,9 @@ const EnrollmentSection = (() => {
       if (!current) return '';
       if (current.status === 'draft') return '';
       if (current.status === 'approved') {
-        return current.encoded_at ? 'Encoded — your load is locked' : 'Verified — your final load is locked';
+        return current.encoded_at ? 'Encoded: your load is locked' : 'Verified: your final load is locked';
       }
-      return 'Submitted — your load is with your Program Head';
+      return 'Submitted: your load is with your Program Head';
     },
     draftSubjectIds: () => EJ.activeItems(current).reduce((set, i) => (set.add(i.subject_id), set), new Set()),
   };
