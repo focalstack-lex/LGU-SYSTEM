@@ -71,18 +71,18 @@ function buildEmailTemplate({ subject, preheader, content }) {
         <!-- Main Institutional Container: Clean 1px border, 8px radius, NO box shadow -->
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;margin:0 auto;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;">
           
-          <!-- Official COE Institutional Header -->
+          <!-- Official COE Institutional Header (Clean White Letterhead) -->
           <tr>
-            <td style="background:#121214;padding:24px 28px;border-bottom:3px solid #FF5533;">
+            <td style="background:#FFFFFF;padding:26px 28px 20px;border-top:4px solid #FF5533;border-bottom:1px solid #E2E8F0;">
               <table width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td width="54" style="vertical-align:middle;">
-                    <img src="${logoUrl}" alt="COE Logo" width="50" height="50" style="display:block;width:50px;height:50px;border-radius:50%;object-fit:contain;background:#FFFFFF;border:2px solid rgba(255,255,255,0.15);" />
+                    <img src="${logoUrl}" alt="COE Logo" width="50" height="50" style="display:block;width:50px;height:50px;object-fit:contain;" />
                   </td>
                   <td style="vertical-align:middle;padding-left:16px;text-align:left;">
-                    <span style="color:#A1A1AA;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:3px;">COR JESU COLLEGE</span>
-                    <h1 style="margin:0;color:#FFFFFF;font-size:20px;font-weight:800;letter-spacing:-0.3px;line-height:1.15;">College of Engineering</h1>
-                    <span style="color:#FF6B4A;font-size:12px;font-weight:600;display:block;margin-top:4px;letter-spacing:0.2px;">Local Government Unit & Academic Portal</span>
+                    <span style="color:#64748B;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:3px;">COR JESU COLLEGE</span>
+                    <h1 style="margin:0;color:#0F172A;font-size:20px;font-weight:800;letter-spacing:-0.3px;line-height:1.15;">College of Engineering</h1>
+                    <span style="color:#FF5533;font-size:12px;font-weight:600;display:block;margin-top:4px;letter-spacing:0.2px;">Local Government Unit & Academic Portal</span>
                   </td>
                 </tr>
               </table>
