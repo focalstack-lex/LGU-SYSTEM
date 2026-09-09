@@ -784,36 +784,6 @@ const GrizzAI = (() => {
     }
   }
 
-  // Structured prerequisite evaluation (migration 031 rows).
-  // Legacy free-text fallback keeps the old regex path when the table is empty
-  // for a subject, so Grizz never regresses before the migration lands.
-  function evaluatePrereqs(subject, prereqsBySubject, passedCodes, enrolledCodes, currentYear) {
-    const rows = prereqsBySubject.get(subject.id) || [];
-    if (!rows.length) return null; // signal: caller falls back to legacy parsing
-
-    let satisfied = true;
-    const missing = [];
-    const notes = [];
-    for (const row of rows) {
-      const depCode = row.depends_code;
-      if ((row.kind === 'prerequisite' || row.kind === 'corequisite') && depCode) {
-        if (!passedCodes.has(depCode) && !enrolledCodes.has(depCode)) {
-          satisfied = false;
-          missing.push(depCode);
-        }
-      } else if (row.kind === 'year_standing' && row.detail) {
-        const requiredYr = Number((row.detail.match(/(\d+)/) || [])[1] || 0);
-        if (currentYear < requiredYr) {
-          satisfied = false;
-          missing.push(row.detail);
-        }
-      } else if (row.kind === 'special' && row.detail) {
-        notes.push(row.detail);
-      }
-    }
-    return { satisfied, missing, notes };
-  }
-
   // Lecture/lab-aware unit label for recommendation cards ("3+1 units" when lab > 0).
   function unitsLabel(s) {
     return Number(s.lab_units) > 0 ? `${s.lec_units}+${s.lab_units} units` : `${s.units} unit${s.units === 1 ? "" : "s"}`;
@@ -849,101 +819,39 @@ const GrizzAI = (() => {
   }
 
   // 1. Next Semester Subject Recommendations
+  // Curriculum logic now lives in the tested engine grizz-recommend.js: term
+  // resolution, term-scoped candidates (target slot + backlog), prereq/co-req
+  // gates, and the 5-subject / 24-unit load cap.
   async function handleNextSemRecommendations() {
-    const prog = profile?.course || 'BSCoE';
-    const progTitle = PROGRAM_NAMES[prog] || prog;
-
-    // Partial-pass records do not satisfy prerequisites (handled inside
-    // classifyPasses); the Component Backlog note for them is rendered by
-    // the Academic Progress summary.
-    const { passedCodes, enrolledCodes } = classifyPasses(myUnits);
-
-    const currentYear = Number(profile?.year_level) || 1;
-
-    // Build once per recommendation run, from the checklists payload captured in loadData():
-    const prereqsBySubject = new Map();
-    for (const r of (prereqRows || [])) {
-      if (!prereqsBySubject.has(r.subject_id)) prereqsBySubject.set(r.subject_id, []);
-      prereqsBySubject.get(r.subject_id).push(r);
-    }
-
-    // Find uncompleted subjects (exclude both PASSED and CURRENTLY ENROLLED subjects)
-    const uncompleted = subjects.filter(s => {
-      const c = s.code.trim().toUpperCase();
-      return !passedCodes.has(c) && !enrolledCodes.has(c);
+    const plan = window.GrizzRecommend.buildRecommendations({
+      subjects,
+      prereqRows,
+      myUnits,
+      profileYear: Number(profile?.year_level) || 1,
+      activeTerm: window.Enrollment?.activeTerm?.() || null,
     });
 
-    const eligible = [];
-    const blockedByPrereq = [];
-
-    uncompleted.forEach(s => {
-      const prereqStr = (s.prerequisites || '').trim();
-
-      const verdict = evaluatePrereqs(s, prereqsBySubject, passedCodes, enrolledCodes, currentYear);
-      if (verdict) {
-        if (verdict.satisfied) {
-          eligible.push({ ...s, missingPrereq: null, prereqNotes: verdict.notes });
-        } else {
-          blockedByPrereq.push({ ...s, reason: `Missing prerequisite: ${verdict.missing.join(', ')}` });
-        }
-        return;
-      }
-
-      // ---- legacy fallback (subjects with no structured rows yet) ----
-      if (!prereqStr || prereqStr === 'None' || prereqStr === '-') {
-        eligible.push({ ...s, missingPrereq: null });
-        return;
-      }
-
-      const standingMatch = prereqStr.match(/(\d+)(?:st|nd|rd|th)?\s*Yr\s*Standing/i);
-      if (standingMatch) {
-        const requiredYr = Number(standingMatch[1]);
-        if (currentYear < requiredYr) {
-          blockedByPrereq.push({ ...s, reason: `Requires Year ${requiredYr} standing` });
-          return;
-        }
-      }
-
-      const rawTokens = prereqStr.split(/[;,/]/).map(t => t.replace(/co-req/i, '').trim()).filter(Boolean);
-      let satisfies = true;
-      let missing = [];
-
-      rawTokens.forEach(token => {
-        const normToken = token.trim().toUpperCase();
-        // Prerequisite is satisfied if passed or currently enrolled in active semester
-        if (normToken && !normToken.includes('STANDING') && !passedCodes.has(normToken) && !enrolledCodes.has(normToken)) {
-          if (/^[A-Z0-9\s-]+$/.test(normToken)) {
-            satisfies = false;
-            missing.push(token.trim());
-          }
-        }
-      });
-
-      if (satisfies) {
-        eligible.push({ ...s, missingPrereq: null });
-      } else {
-        blockedByPrereq.push({ ...s, reason: `Missing prerequisite: ${missing.join(', ')}` });
-      }
-    });
-
-    eligible.sort((a, b) => a.year_level - b.year_level || a.semester - b.semester);
-
-    let totalUnits = 0;
-    const recommended = [];
-    for (const s of eligible) {
-      if (totalUnits + s.units <= 24 || recommended.length < 5) {
-        recommended.push(s);
-        totalUnits += s.units;
-      }
-    }
+    const recommended = plan.recommended.map(c => Object.assign({}, c.subject, {
+      kind: c.kind,
+      retake: c.retake,
+      prereqNotes: (c.notes || []).concat(c.retake ? ['Retake — you attempted this before.'] : []),
+    }));
+    const totalUnits = plan.totalUnits;
+    const blocked = plan.blocked || [];
+    const remainder = plan.remainder || [];
+    const target = plan.target;
 
     if (recommended.length === 0) {
+      const blockedNote = blocked.length
+        ? `<p>${blocked.length} course${blocked.length === 1 ? ' is' : 's are'} still locked by prerequisites — ${esc(blocked.slice(0, 5).map(b => b.subject.code).join(', '))}${blocked.length > 5 ? '…' : ''}.</p>`
+        : '';
       appendBotMessage(
         'Curriculum Recommendations',
-        `<p>You have completed or are currently enrolled in all available prerequisite-cleared courses for <strong>${esc(progTitle)}</strong>.</p>`,
+        `<p>There are no new courses to add for <strong>${esc(target.schoolYear)} · Semester ${target.semester}</strong> — you've cleared or are currently taking every course available at that point in your program.</p>${blockedNote}`,
         [
           { action: 'academic-progress', label: 'View Academic Progress', icon: 'solar:diploma-verified-linear' },
-        ]
+          blocked.length ? { action: 'check-prereq', label: 'Check Prerequisites', icon: 'solar:branching-paths-down-linear' } : null,
+        ].filter(Boolean)
       );
       return;
     }
@@ -1007,7 +915,28 @@ const GrizzAI = (() => {
         </a>
       </p>` : '';
 
+    const ctxHtml = `
+      <p class="grizz-term-ctx">
+        <iconify-icon icon="solar:calendar-linear"></iconify-icon>
+        Planning your <strong>Semester ${target.semester}</strong> load · SY ${esc(target.schoolYear)} · Year ${target.yearLevel}
+      </p>`;
+    const remUnits = remainder.reduce((sum, c) => sum + (Number(c.subject.units) || 0), 0);
+    const overflowHtml = remainder.length
+      ? `<p class="ursa-note-text">+ ${remainder.length} more cleared course${remainder.length === 1 ? '' : 's'} (${remUnits} units) will fit once this load is lighter — kept under the 24-unit / 5-subject cap.</p>`
+      : '';
+    const blockedHtml = blocked.length
+      ? `<div class="grizz-locked">
+           <p class="grizz-locked-head">Locked by prerequisites (${blocked.length})</p>
+           ${blocked.slice(0, 6).map(b => `
+             <div class="grizz-locked-row">
+               <span class="ursa-subject-code">${esc(b.subject.code)}</span>
+               <span class="grizz-locked-reason">${esc(b.reason)}</span>
+             </div>`).join('')}
+         </div>`
+      : '';
+
     const html = `
+      ${ctxHtml}
       <div class="ursa-summary-bar">
         <div class="ursa-summary-item">
           <span class="ursa-summary-val"><iconify-icon icon="solar:book-bookmark-linear" style="color:var(--primary);margin-right:0.3rem;vertical-align:middle;"></iconify-icon>${recommended.length} Subjects</span>
@@ -1024,6 +953,8 @@ const GrizzAI = (() => {
         ${cardsHtml}
       </div>
 
+      ${overflowHtml}
+      ${blockedHtml}
       ${addAllHtml}
       ${jumpHtml}
       <p class="ursa-note-text" data-grizz-result hidden></p>

@@ -435,6 +435,7 @@ const EnrollmentSection = (() => {
   window.Enrollment = {
     addFromGrizz: (subject, reason) => addItem(subject?.id, reason || 'Recommended by Grizz'),
     ensureReady: load, // loads profile + checklists + submissions; creates the term draft if none
+    activeTerm: () => (current ? { schoolYear: current.school_year, semester: current.semester } : null),
     canEdit: () => EJ.canEdit(current),
     lockedReason: () => {
       if (!current) return '';

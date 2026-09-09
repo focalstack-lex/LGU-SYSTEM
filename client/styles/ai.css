@@ -1559,3 +1559,49 @@ body:has(#ursa-drawer.active) .grizz-launcher {
   color: var(--primary-hover);
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
 }
+
+/* =========================================================
+   Grizz recommendations — term context, overflow & blocked lists
+   ========================================================= */
+.grizz-term-ctx {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.9rem 0;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+.grizz-term-ctx .iconify-icon { color: var(--primary); font-size: 1rem; }
+.grizz-term-ctx strong { color: var(--text-primary); font-weight: 600; }
+
+.grizz-locked {
+  margin: 0.9rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border);
+}
+.grizz-locked-head {
+  margin: 0 0 0.35rem 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.grizz-locked-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  padding: 0.22rem 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.grizz-locked-row .ursa-subject-code {
+  min-width: 5.5rem;
+  font-size: 0.74rem;
+  color: var(--text-primary);
+}
+.grizz-locked-reason {
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
