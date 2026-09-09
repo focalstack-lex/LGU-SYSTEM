@@ -70,7 +70,11 @@ app.use(helmet({
 }));
 
 // =============================================
-// CORS - strict allowlist only
+// CORS - strict allowlist only.
+// credentials stays false on purpose: auth is Bearer-token based (no cookies,
+// no HTTP auth), so cross-origin requests can never carry ambient credentials.
+// Vercel preview deployments are matched only against this project's own
+// subdomain prefix, not the whole .vercel.app TLD.
 // =============================================
 const ALLOWED_ORIGINS = [
   'http://localhost:3000',
@@ -81,16 +85,18 @@ const ALLOWED_ORIGINS = [
   'https://coelgu-system.engineer',
   'https://www.coelgu-system.engineer',
 ];
+const VERCEL_PREVIEW_RE = /^https:\/\/lgu-system[a-z0-9-]*\.vercel\.app$/;
 
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    if (ALLOWED_ORIGINS.includes(origin) || origin.endsWith('.vercel.app')) {
+    if (ALLOWED_ORIGINS.includes(origin) || VERCEL_PREVIEW_RE.test(origin)) {
       return callback(null, true);
     }
-    callback(new Error(`CORS blocked: ${origin}`));
+    // Omitting the ACAO header makes the browser reject the request.
+    return callback(null, false);
   },
-  credentials: true,
+  credentials: false,
 }));
 
 // =============================================

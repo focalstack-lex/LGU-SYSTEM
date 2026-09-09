@@ -77,9 +77,11 @@ router.post('/profile', async (req, res) => {
 });
 
 // ── PATCH /api/admin/users/:id/role ──────────────────────────────────────────
-// Admins may assign any role; governors may assign officer/student roles but
-// never touch admin accounts; officers and cashiers have no role-assignment power.
-router.patch('/users/:id/role', async (req, res) => {
+// Fail-closed: only admins and governors pass requireGovernorOrAdmin (students,
+// officers, cashiers, and profile-less users are rejected before this handler).
+// Admins may assign any role; governors may assign non-admin roles but never
+// touch admin accounts.
+router.patch('/users/:id/role', requireGovernorOrAdmin, async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
   const actorRole = req.profile?.role;
@@ -89,9 +91,6 @@ router.patch('/users/:id/role', async (req, res) => {
   }
   if (!isValidEnum(role, ASSIGNABLE_ROLES)) {
     return res.status(400).json({ error: `Role must be one of: ${ASSIGNABLE_ROLES.join(', ')}.` });
-  }
-  if (['cashier', 'officer'].includes(actorRole)) {
-    return res.status(403).json({ error: 'Officers and cashiers cannot assign roles.' });
   }
   if (actorRole === 'governor') {
     if (!OFFICER_ASSIGNABLE_ROLES.includes(role)) {
