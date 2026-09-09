@@ -996,13 +996,13 @@ const GrizzAI = (() => {
         </button>
       </div>
       <p class="ursa-note-text" data-grizz-lock ${canEdit ? 'hidden' : ''}>
-        <iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon> Your load is ${esc(lockNote || 'not editable right now')} — subjects can be added once it's back in draft.
+        <iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon> Your load is ${esc(lockNote || 'not editable right now')} — you can add subjects only while you're still building it.
       </p>` : '';
 
     const jumpHtml = pilot ? `
       <p style="margin:0.75rem 0 0;">
         <a href="#" class="ursa-nav-link" data-view="enrollment" style="color:var(--primary);font-weight:600;display:inline-flex;align-items:center;gap:0.3rem;">
-          <span>Open Load Verification</span>
+          <span>Open Enrollment Verification</span>
           <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
         </a>
       </p>` : '';
