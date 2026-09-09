@@ -8390,6 +8390,12 @@ html[data-theme="light"] .course-added-tag {
   line-height: 1.55;
 }
 .ev-final-list-note strong { color: var(--success, #22C55E); }
+.ev-final-list {
+  list-style: none;
+  margin: 0.9rem 0 0 0;
+  padding: 0;
+}
+.ev-final-list .enrollment-item-row { border-bottom: none; padding: 0.4rem 0; }
 
 /* ---- Legacy defensive card ---- */
 .ev-defensive-card {

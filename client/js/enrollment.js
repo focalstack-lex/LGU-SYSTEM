@@ -286,7 +286,7 @@ const EnrollmentSection = (() => {
     }
     if (s.status === 'approved') {
       const listHtml = items.map(i => `
-        <li class="enrollment-item-row" style="border-bottom:none;padding:0.35rem 0;">
+        <li class="enrollment-item-row">
           <span class="enrollment-item-code">${esc(i.subjects?.code)}</span>
           <span class="enrollment-item-title">${esc(i.subjects?.title)}</span>
         </li>`).join('');
@@ -297,7 +297,7 @@ const EnrollmentSection = (() => {
             <h4><iconify-icon icon="solar:check-circle-bold"></iconify-icon> Your load is encoded</h4>
             <p>Your final load has been encoded by the <strong>Student Assistant</strong>. Enrollment inside this system is complete. The next step — assessment and claiming — happens at the <strong>University Registrar</strong>, outside this system.</p>
           </div>
-          <ul style="list-style:none;margin:0.8rem 0 0 0;padding:0;">${listHtml}</ul>`;
+          <ul class="ev-final-list">${listHtml}</ul>`;
       }
       return `
         <div class="ev-done-card">
@@ -305,7 +305,7 @@ const EnrollmentSection = (() => {
           <p>Your Program Head verified your load. This is the <strong>final list of subjects</strong> you will enroll this semester. Waiting for the Student Assistant to encode it.</p>
         </div>
         ${headChanges}
-        <ul style="list-style:none;margin:0.8rem 0 0 0;padding:0;">${listHtml}</ul>
+        <ul class="ev-final-list">${listHtml}</ul>
         <p class="ev-final-list-note">A copy of this final list was emailed to you. Nothing needed from you right now.</p>`;
     }
     return '';
