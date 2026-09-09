@@ -187,9 +187,17 @@ router.patch('/submissions/:id/items/:itemId', requireProgramHead, async (req, r
 function termLabel(s) { return `${s.school_year} Sem ${s.semester}`; }
 
 async function notifyStudent(submission, status, extraChanges = []) {
-  const lines = (submission.enrollment_submission_items || [])
-    .filter(i => i.item_state !== 'removed_by_head')
-    .map(i => `${i.subjects.code} - ${i.subjects.title}${i.item_state === 'added_by_head' ? ' (added by Program Head)' : ''}`);
+  const activeItems = (submission.enrollment_submission_items || [])
+    .filter(i => i.item_state !== 'removed_by_head');
+  const lines = activeItems.map(i => `${i.subjects.code} - ${i.subjects.title}${i.item_state === 'added_by_head' ? ' (added by Program Head)' : ''}`);
+  const items = activeItems.map(i => ({
+    code: i.subjects?.code,
+    title: i.subjects?.title,
+    units: i.subjects?.units,
+    addedByHead: i.item_state === 'added_by_head'
+  }));
+  const totalUnits = activeItems.reduce((sum, i) => sum + (Number(i.subjects?.units) || 0), 0);
+
   const changes = (submission.enrollment_submission_items || [])
     .filter(i => i.item_state !== 'submitted' && i.head_note)
     .map(i => `${i.item_state === 'removed_by_head' ? 'Removed' : 'Added'} ${i.subjects.code}: ${i.head_note}`)
@@ -228,7 +236,12 @@ async function notifyStudent(submission, status, extraChanges = []) {
       status,
       milestone: status === 'approved' ? 'verified' : 'encoded',
       studentName: submission.student?.full_name || 'COE Student',
-      term: termLabel(submission), lines, changes: changes.length ? changes : null,
+      course: submission.student?.course || null,
+      term: termLabel(submission),
+      lines,
+      items,
+      totalUnits,
+      changes: changes.length ? changes : null,
     });
   }
 }

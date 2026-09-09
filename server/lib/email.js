@@ -292,9 +292,10 @@ async function sendAccountApprovalEmail(userEmail, userName = 'COE Member') {
 
 /**
  * Sends an enrollment status email to a student via Brevo API (HTTP).
- * Minimalist institutional format with clean left-accent status lines.
+ * Minimalist institutional format with clean left-accent status lines,
+ * student metadata, per-subject unit counts, and total units calculation.
  */
-async function sendLoadStatusEmail({ to, name = 'COE Student', status, milestone, studentName, term, lines = [], changes = null }) {
+async function sendLoadStatusEmail({ to, name = 'COE Student', status, milestone, studentName, course = null, term, lines = [], items = null, totalUnits = null, changes = null }) {
   try {
     const apiInstance = getBrevoApi();
     if (!apiInstance) return { sent: 0, reason: 'Brevo API key missing' };
@@ -322,6 +323,28 @@ async function sendLoadStatusEmail({ to, name = 'COE Student', status, milestone
         : '';
     const listHeader = phase === 'encoded' ? 'Encoded Course Load' : (phase === 'verified' ? 'Final Verified Course Load' : 'Submitted Course Load');
 
+    // Build structured items list
+    let itemList = [];
+    if (items && Array.isArray(items) && items.length) {
+      itemList = items;
+    } else if (lines && Array.isArray(lines) && lines.length) {
+      itemList = lines.map(lineStr => {
+        const parts = String(lineStr).split(' - ');
+        return {
+          code: parts[0] || lineStr,
+          title: parts.slice(1).join(' - ') || '',
+          units: null,
+        };
+      });
+    }
+
+    // Calculate total units if not explicitly passed
+    let calculatedUnits = totalUnits;
+    if (calculatedUnits === null || calculatedUnits === undefined) {
+      const sum = itemList.reduce((acc, i) => acc + (Number(i.units) || 0), 0);
+      if (sum > 0) calculatedUnits = sum;
+    }
+
     const changeHtml = changes && changes.length
       ? `<div style="margin:16px 0;padding:12px;border-left:3px solid #D97706;background:#FFFBEB;text-align:left;">
            <div style="font-size:11px;font-weight:700;color:#B45309;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Changes by Program Head</div>
@@ -329,18 +352,58 @@ async function sendLoadStatusEmail({ to, name = 'COE Student', status, milestone
          </div>`
       : '';
 
-    const listHtml = lines && lines.length
+    // Metadata summary table (Student, Program, Term, Total Units)
+    const metaHtml = `
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:12px 14px;text-align:left;">
+        <tr>
+          <td style="padding:3px 0;font-size:12px;color:#64748B;">Student:</td>
+          <td align="right" style="padding:3px 0;font-size:12px;font-weight:700;color:#0F172A;">${studentName}</td>
+        </tr>
+        ${course ? `
+          <tr>
+            <td style="padding:3px 0;font-size:12px;color:#64748B;">Program:</td>
+            <td align="right" style="padding:3px 0;font-size:12px;font-weight:700;color:#0F172A;">${course}</td>
+          </tr>
+        ` : ''}
+        <tr>
+          <td style="padding:3px 0;font-size:12px;color:#64748B;">Academic Term:</td>
+          <td align="right" style="padding:3px 0;font-size:12px;font-weight:700;color:#0F172A;">${term}</td>
+        </tr>
+        ${calculatedUnits !== null ? `
+          <tr>
+            <td style="padding:3px 0;font-size:12px;color:#64748B;">Total Units Enrolled:</td>
+            <td align="right" style="padding:3px 0;font-size:13px;font-weight:800;color:#FF5533;">${calculatedUnits} Units</td>
+          </tr>
+        ` : ''}
+      </table>
+    `;
+
+    const listHtml = itemList && itemList.length
       ? `<div style="margin:20px 0 24px;border-top:1px solid #E2E8F0;padding-top:16px;text-align:left;">
-           <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">${listHeader}</div>
+           <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
+             <tr>
+               <td style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.8px;">${listHeader}</td>
+               ${calculatedUnits !== null ? `<td align="right" style="font-size:11px;font-weight:700;color:#FF5533;text-transform:uppercase;letter-spacing:0.5px;">Total: ${calculatedUnits} Units</td>` : ''}
+             </tr>
+           </table>
            <table width="100%" cellpadding="0" cellspacing="0" border="0">
-             ${lines.map(l => `
+             ${itemList.map(i => `
                <tr>
-                 <td style="padding:5px 0;color:#1E293B;font-size:13px;line-height:1.5;">
-                   <span style="color:#FF5533;font-weight:700;margin-right:8px;">•</span> ${l}
+                 <td style="padding:6px 0;border-bottom:1px solid #F1F5F9;color:#1E293B;font-size:13px;line-height:1.5;">
+                   <span style="color:#FF5533;font-weight:700;margin-right:6px;">•</span> <strong>${i.code || ''}</strong>${i.title ? ` - ${i.title}` : ''}${i.addedByHead ? ' <span style="color:#D97706;font-size:11px;">(added by Program Head)</span>' : ''}
                  </td>
+                 ${i.units ? `<td width="65" align="right" style="padding:6px 0;border-bottom:1px solid #F1F5F9;color:#64748B;font-size:12px;font-weight:600;white-space:nowrap;">${i.units} units</td>` : ''}
                </tr>
              `).join('')}
            </table>
+           ${calculatedUnits !== null ? `
+             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:10px;border-top:2px solid #E2E8F0;padding-top:8px;">
+               <tr>
+                 <td style="font-size:13px;font-weight:700;color:#0F172A;">Total Academic Load</td>
+                 <td align="right" style="font-size:14px;font-weight:800;color:#FF5533;">${calculatedUnits} Units</td>
+               </tr>
+             </table>
+           ` : ''}
          </div>`
       : '';
 
@@ -348,7 +411,7 @@ async function sendLoadStatusEmail({ to, name = 'COE Student', status, milestone
     sendSmtpEmail.subject = `[COE Portal] ${cfg.label} - ${term}`;
     sendSmtpEmail.htmlContent = buildEmailTemplate({
       subject: `${cfg.label}: COE LGU Portal`,
-      preheader: `${studentName} — load for ${term}`,
+      preheader: `${studentName} — ${calculatedUnits ? `${calculatedUnits} Units — ` : ''}${term}`,
       content: `
         <div style="margin-bottom:16px;padding-left:12px;border-left:3px solid ${cfg.color};text-align:left;">
           <span style="display:block;font-size:10px;font-weight:700;color:#64748B;letter-spacing:1px;text-transform:uppercase;">ENROLLMENT STATUS</span>
@@ -357,6 +420,7 @@ async function sendLoadStatusEmail({ to, name = 'COE Student', status, milestone
         <p style="margin:0 0 8px;color:#0F172A;font-size:15px;font-weight:600;text-align:left;">Hi ${studentName},</p>
         <p style="margin:0 0 12px;color:#334155;font-size:14px;line-height:1.6;text-align:left;">${heading}</p>
         ${subline ? `<p style="margin:0 0 14px;color:#64748B;font-size:13px;line-height:1.6;text-align:left;">${subline}</p>` : ''}
+        ${metaHtml}
         ${changeHtml}
         ${listHtml}
         <div style="margin-top:24px;">
