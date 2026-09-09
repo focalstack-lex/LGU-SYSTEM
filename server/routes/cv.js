@@ -3,6 +3,64 @@ const router  = express.Router();
 const supabase = require('../lib/supabase');
 const authMiddleware = require('../middleware/auth');
 
+// =============================================
+// CV field sanitation
+//
+// CV fields are rendered into HTML by cv-verify.html and cv-builder.html, so
+// every string is tag-stripped and length-capped BEFORE it reaches the
+// database; the render pages additionally escape on output (defense in
+// depth). Unlike validate.sanitizeText this deliberately does NOT encode
+// '&' - escaping happens at render time, and pre-encoding here would
+// double-encode once the render pages escape.
+// =============================================
+function cvClean(value, max = 500) {
+  if (typeof value !== 'string') return '';
+  return value
+    .replace(/<[^>]*>/g, '')       // strip HTML tags
+    .replace(/\s+/g, ' ')          // collapse whitespace/newlines
+    .trim()
+    .slice(0, max);
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function cvEmail(value) {
+  if (typeof value !== 'string') return '';
+  const v = value.trim().toLowerCase();
+  return (v.length <= 254 && EMAIL_RE.test(v)) ? v : '';
+}
+
+function cvUrl(value) {
+  if (typeof value !== 'string') return '';
+  const v = value.trim();
+  if (!v || v.length > 300) return '';
+  try {
+    const u = new URL(v);
+    return (u.protocol === 'https:' || u.protocol === 'http:') ? v : '';
+  } catch {
+    return '';
+  }
+}
+
+// Recursively sanitize unknown-shape structures (work_experience,
+// custom_sections): string values are cleaned, arrays/objects capped,
+// depth-limited to guard against pathological payloads.
+function cvDeep(value, depth = 0) {
+  if (depth > 4) return null;
+  if (typeof value === 'string') return cvClean(value, 2000);
+  if (Array.isArray(value)) return value.slice(0, 30).map((v) => cvDeep(v, depth + 1)).filter((v) => v !== null);
+  if (value && typeof value === 'object') {
+    const out = {};
+    for (const [k, v] of Object.entries(value).slice(0, 30)) {
+      out[String(k).replace(/[<>"'`]/g, '').slice(0, 60)] = cvDeep(v, depth + 1);
+    }
+    return out;
+  }
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'boolean') return value;
+  return null;
+}
+
 /**
  * Helper: Aggregate verified college milestones for a given user ID
  */
@@ -10,11 +68,27 @@ async function fetchVerifiedMilestones(userId, userEmail) {
   const milestones = [];
 
   // 1. Fetch Roster Roles & Affiliations
+  // Two separate equality lookups - never a string-interpolated .or filter,
+  // because userEmail may originate from the CV owner's own contact_email
+  // field (see the public /verify/:token route).
   try {
-    const { data: rosterEntries } = await supabase
-      .from('roster')
-      .select('id, name, role, department, course, year_level, status, created_at')
-      .or(`email.eq.${userEmail},id.eq.${userId}`);
+    const rosterFields = 'id, name, role, department, course, year_level, status, created_at';
+    const lookups = [supabase.from('roster').select(rosterFields).eq('id', userId)];
+    if (typeof userEmail === 'string' && EMAIL_RE.test(userEmail.trim())) {
+      lookups.push(supabase.from('roster').select(rosterFields).eq('email', userEmail.trim().toLowerCase()));
+    }
+
+    const results = await Promise.all(lookups);
+    const seen = new Set();
+    const rosterEntries = [];
+    for (const res of results) {
+      for (const item of res.data || []) {
+        if (!seen.has(item.id)) {
+          seen.add(item.id);
+          rosterEntries.push(item);
+        }
+      }
+    }
 
     if (rosterEntries && rosterEntries.length > 0) {
       rosterEntries.forEach(item => {
@@ -132,43 +206,37 @@ router.get('/me', authMiddleware, async (req, res) => {
 router.put('/me', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
-    const {
-      headline,
-      summary,
-      contact_email,
-      contact_phone,
-      location,
-      linkedin_url,
-      github_url,
-      portfolio_url,
-      technical_skills,
-      soft_skills,
-      capstone_project,
-      work_experience,
-      selected_locker_items,
-      custom_sections,
-      template_style,
-      is_public
-    } = req.body;
+    const body = req.body || {};
 
     const cvData = {
       user_id: userId,
-      headline: headline || '',
-      summary: summary || '',
-      contact_email: contact_email || req.user.email,
-      contact_phone: contact_phone || '',
-      location: location || '',
-      linkedin_url: linkedin_url || '',
-      github_url: github_url || '',
-      portfolio_url: portfolio_url || '',
-      technical_skills: Array.isArray(technical_skills) ? technical_skills : [],
-      soft_skills: Array.isArray(soft_skills) ? soft_skills : [],
-      capstone_project: capstone_project || {},
-      work_experience: Array.isArray(work_experience) ? work_experience : [],
-      selected_locker_items: Array.isArray(selected_locker_items) ? selected_locker_items : [],
-      custom_sections: Array.isArray(custom_sections) ? custom_sections : [],
-      template_style: template_style || 'harvard',
-      is_public: is_public !== undefined ? Boolean(is_public) : true,
+      headline:         cvClean(body.headline, 120),
+      summary:          cvClean(body.summary, 2000),
+      contact_email:    cvEmail(body.contact_email) || req.user.email,
+      contact_phone:    cvClean(body.contact_phone, 40),
+      location:         cvClean(body.location, 120),
+      linkedin_url:     cvUrl(body.linkedin_url),
+      github_url:       cvUrl(body.github_url),
+      portfolio_url:    cvUrl(body.portfolio_url),
+      technical_skills: Array.isArray(body.technical_skills)
+        ? body.technical_skills.map((s) => cvClean(s, 60)).filter(Boolean).slice(0, 30)
+        : [],
+      soft_skills:      Array.isArray(body.soft_skills)
+        ? body.soft_skills.map((s) => cvClean(s, 60)).filter(Boolean).slice(0, 30)
+        : [],
+      capstone_project: {
+        title:      cvClean(body.capstone_project?.title, 150),
+        abstract:   cvClean(body.capstone_project?.abstract, 2000),
+        tech_stack: cvClean(body.capstone_project?.tech_stack, 200),
+        advisor:    cvClean(body.capstone_project?.advisor, 120)
+      },
+      work_experience:  cvDeep(body.work_experience) || [],
+      selected_locker_items: Array.isArray(body.selected_locker_items)
+        ? body.selected_locker_items.filter((s) => typeof s === 'string' && /^[\w-]{1,80}$/.test(s)).slice(0, 50)
+        : [],
+      custom_sections:  cvDeep(body.custom_sections) || [],
+      template_style:   ['harvard'].includes(body.template_style) ? body.template_style : 'harvard',
+      is_public: body.is_public !== undefined ? Boolean(body.is_public) : true,
       updated_at: new Date()
     };
 

@@ -8,6 +8,11 @@ const CvBuilder = (() => {
   let selectedItems = new Set();
   let activeFilter = 'all';
 
+  // CV fields are user-controlled - escape before any innerHTML insertion.
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+
   /**
    * Fetch student's CV data from API
    */
@@ -87,14 +92,14 @@ const CvBuilder = (() => {
     container.innerHTML = filtered.map(item => {
       const isAdded = selectedItems.has(item.id);
       return `
-        <div class="locker-card ${isAdded ? 'in-cart' : ''}" id="locker-card-${item.id}">
+        <div class="locker-card ${isAdded ? 'in-cart' : ''}" id="locker-card-${esc(item.id)}">
           <div class="locker-card-title">
-            <span>${item.title}</span>
+            <span>${esc(item.title)}</span>
             <span class="badge-verified"><iconify-icon icon="solar:verified-check-bold"></iconify-icon> Verified</span>
           </div>
-          <div class="locker-card-sub">${item.organization} • ${item.date_range}</div>
+          <div class="locker-card-sub">${esc(item.organization)} • ${esc(item.date_range)}</div>
           <div class="locker-card-actions">
-            <span style="font-size: 0.75rem; color: #64748b;">${item.description}</span>
+            <span style="font-size: 0.75rem; color: #64748b;">${esc(item.description)}</span>
             <button class="btn-add-cart ${isAdded ? 'added' : ''}" onclick="CvBuilder.toggleItem('${item.id}')">
               ${isAdded ? '✓ Added' : '+ Add to CV'}
             </button>
@@ -172,9 +177,9 @@ const CvBuilder = (() => {
     canvas.innerHTML = `
       <!-- Harvard Header -->
       <div class="harvard-header">
-        <div class="harvard-name">${name}</div>
+        <div class="harvard-name">${esc(name)}</div>
         <div class="harvard-contact-line">
-          ${location}${phone ? ' • ' + phone : ''} • ${email}${linkedin}${portfolio}
+          ${esc(location)}${phone ? ' • ' + esc(phone) : ''} • ${esc(email)}${esc(linkedin)}${esc(portfolio)}
         </div>
         <div class="harvard-qr-box">
           <img src="${qrApiUrl}" class="harvard-qr-img" alt="QR Verify" />
@@ -186,8 +191,8 @@ const CvBuilder = (() => {
       <div class="harvard-section">
         <div class="harvard-section-title">Education</div>
         <div class="harvard-row">
-          <span class="harvard-title-left">${course}</span>
-          <span class="harvard-date-right">Candidate ${profile.enrollment_year ? Number(profile.enrollment_year) + 4 : '2026'}</span>
+          <span class="harvard-title-left">${esc(course)}</span>
+          <span class="harvard-date-right">Candidate ${profile.enrollment_year ? esc(Number(profile.enrollment_year) + 4) : '2026'}</span>
         </div>
         <div class="harvard-sub-left">College of Engineering • Local Government Unit Partner University</div>
         <ul class="harvard-bullets">
@@ -201,7 +206,7 @@ const CvBuilder = (() => {
       <div class="harvard-section">
         <div class="harvard-section-title">Technical Skills & Competencies</div>
         <ul class="harvard-bullets">
-          <li><strong>Engineering Tools & Software:</strong> ${techSkillsList.join(', ')}</li>
+          <li><strong>Engineering Tools & Software:</strong> ${esc(techSkillsList.join(', '))}</li>
         </ul>
       </div>
       ` : ''}
@@ -212,12 +217,12 @@ const CvBuilder = (() => {
         <div class="harvard-section-title">Leadership & College Affiliations</div>
         ${leadershipItems.map(item => `
           <div class="harvard-row">
-            <span class="harvard-title-left">${item.title} <span class="verified-inline-tag">✓ Verified</span></span>
-            <span class="harvard-date-right">${item.date_range}</span>
+            <span class="harvard-title-left">${esc(item.title)} <span class="verified-inline-tag">✓ Verified</span></span>
+            <span class="harvard-date-right">${esc(item.date_range)}</span>
           </div>
-          <div class="harvard-sub-left">${item.organization}</div>
+          <div class="harvard-sub-left">${esc(item.organization)}</div>
           <ul class="harvard-bullets">
-            <li>${item.description}</li>
+            <li>${esc(item.description)}</li>
           </ul>
         `).join('')}
       </div>
@@ -228,11 +233,11 @@ const CvBuilder = (() => {
       <div class="harvard-section">
         <div class="harvard-section-title">Engineering Capstone Project</div>
         <div class="harvard-row">
-          <span class="harvard-title-left">${capTitle}</span>
+          <span class="harvard-title-left">${esc(capTitle)}</span>
           <span class="harvard-date-right">Senior Design Project</span>
         </div>
         <ul class="harvard-bullets">
-          <li>${capAbstract || 'Developed and executed engineering design prototype.'}</li>
+          <li>${esc(capAbstract || 'Developed and executed engineering design prototype.')}</li>
         </ul>
       </div>
       ` : ''}
@@ -243,10 +248,10 @@ const CvBuilder = (() => {
         <div class="harvard-section-title">Certifications & Professional Workshops</div>
         ${seminarItems.map(item => `
           <div class="harvard-row">
-            <span class="harvard-title-left">${item.title} <span class="verified-inline-tag">✓ Verified</span></span>
-            <span class="harvard-date-right">${item.date_range}</span>
+            <span class="harvard-title-left">${esc(item.title)} <span class="verified-inline-tag">✓ Verified</span></span>
+            <span class="harvard-date-right">${esc(item.date_range)}</span>
           </div>
-          <div class="harvard-sub-left">${item.organization}</div>
+          <div class="harvard-sub-left">${esc(item.organization)}</div>
         `).join('')}
       </div>
       ` : ''}

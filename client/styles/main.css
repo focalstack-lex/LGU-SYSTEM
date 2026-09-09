@@ -4671,8 +4671,8 @@ html body.is-admin th.admin-only {
   max-width: 440px;
   margin: 0 auto;
   height: 56px;
-  background: rgba(17, 24, 32, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #18181B;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 30px;
   align-items: center;
   justify-content: space-around;
@@ -7535,7 +7535,7 @@ html[data-theme="light"] .onboarding-card .form-group select {
 html body .mobile-sheet-backdrop {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(8, 12, 20, 0.88) !important;
+  background: rgba(14, 14, 16, 0.82) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   z-index: 10050 !important;
