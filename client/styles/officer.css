@@ -2049,6 +2049,15 @@ html, body {
   margin-bottom: 1.25rem;
 }
 
+.curriculum-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md, 12px);
+  margin: 0;
+  padding: 0;
+}
+
 .of-select {
   padding: 0.55rem 0.85rem;
   background: var(--bg-surface-raised);
@@ -2073,6 +2082,7 @@ html, body {
 
 .curriculum-table {
   width: 100%;
+  min-width: 580px;
   border-collapse: collapse;
   font-size: 0.85rem;
   text-align: left;
@@ -2225,10 +2235,33 @@ html, body {
 }
 
 @media (max-width: 768px) {
+  .curriculum-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+  }
+  .curriculum-filters #curriculum-program {
+    grid-column: 1 / -1;
+  }
   .curriculum-table {
     font-size: 0.78rem;
+    min-width: 560px;
+  }
+  .curriculum-table th,
+  .curriculum-table td {
+    padding: 0.55rem 0.6rem;
   }
   .cur-prereq-summary {
     max-width: 140px;
+  }
+  #cur-prereq-add {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #cur-prereq-add select,
+  #cur-prereq-add input,
+  #cur-prereq-add button {
+    width: 100%;
+    box-sizing: border-box;
   }
 }

@@ -52,29 +52,31 @@ const CurriculumManager = (() => {
       return;
     }
     grid.innerHTML = `
-      <table class="curriculum-table">
-        <thead>
-          <tr><th>Code</th><th>Title</th><th>Units</th><th>Lec</th><th>Lab</th><th></th><th>Prerequisites</th></tr>
-        </thead>
-        <tbody>
-          ${rows.map(s => {
-            const rowsFor = prereqs.filter(r => r.subject_id === s.id);
-            return `
-            <tr data-subject="${s.id}">
-              <td class="mono">${esc(s.code)}</td>
-              <td>${esc(s.title)}</td>
-              <td>${s.units}</td>
-              <td><input type="number" min="0" max="${s.units}" value="${Number(s.lec_units)}" class="cur-input" data-lec="${s.id}" aria-label="Lecture units for ${esc(s.code)}" /></td>
-              <td><input type="number" min="0" max="${s.units}" value="${Number(s.lab_units)}" class="cur-input" data-lab="${s.id}" aria-label="Laboratory units for ${esc(s.code)}" /></td>
-              <td><button type="button" class="btn btn-ghost btn-sm" data-save="${s.id}">Save</button></td>
-              <td>
-                <span class="cur-prereq-summary">${esc(prereqSummary(rowsFor))}</span>
-                <button type="button" class="btn btn-ghost btn-sm" data-edit-prereqs="${s.id}">Edit</button>
-              </td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
+      <div class="curriculum-table-wrapper">
+        <table class="curriculum-table">
+          <thead>
+            <tr><th>Code</th><th>Title</th><th>Units</th><th>Lec</th><th>Lab</th><th></th><th>Prerequisites</th></tr>
+          </thead>
+          <tbody>
+            ${rows.map(s => {
+              const rowsFor = prereqs.filter(r => r.subject_id === s.id);
+              return `
+              <tr data-subject="${s.id}">
+                <td class="mono">${esc(s.code)}</td>
+                <td>${esc(s.title)}</td>
+                <td>${s.units}</td>
+                <td><input type="number" min="0" max="${s.units}" value="${Number(s.lec_units)}" class="cur-input" data-lec="${s.id}" aria-label="Lecture units for ${esc(s.code)}" /></td>
+                <td><input type="number" min="0" max="${s.units}" value="${Number(s.lab_units)}" class="cur-input" data-lab="${s.id}" aria-label="Laboratory units for ${esc(s.code)}" /></td>
+                <td><button type="button" class="btn btn-ghost btn-sm" data-save="${s.id}">Save</button></td>
+                <td>
+                  <span class="cur-prereq-summary">${esc(prereqSummary(rowsFor))}</span>
+                  <button type="button" class="btn btn-ghost btn-sm" data-edit-prereqs="${s.id}">Edit</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
 
     grid.querySelectorAll('[data-save]').forEach(btn =>
       btn.addEventListener('click', onSaveComponents));
