@@ -1660,7 +1660,8 @@ html, body {
     max-width: 480px !important;
     margin: 0 auto !important;
     z-index: 1000 !important;
-    box-sizing: border-box !impo    /* Flat Dark Charcoal Container - No Gradient, No Blur Glare */
+    box-sizing: border-box !important;
+    /* Flat Dark Charcoal Container - No Gradient, No Blur Glare */
     background: #18181B !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 20px !important;
