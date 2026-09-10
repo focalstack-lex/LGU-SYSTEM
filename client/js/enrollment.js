@@ -123,6 +123,9 @@ const EnrollmentSection = (() => {
     renderSemFilterSelect();
     renderYearFilterSelect();
     initFilterSelectListeners();
+    if (typeof Dropdowns !== 'undefined' && typeof Dropdowns.syncAll === 'function') {
+      Dropdowns.syncAll();
+    }
   }
 
   function renderSemFilterSelect() {

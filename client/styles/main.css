@@ -8033,11 +8033,75 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon {
 
 .enrollment-select-wrapper .filter-select-icon {
   position: absolute;
-  left: 0.75rem;
+  left: 0.85rem;
   font-size: 1.05rem;
   color: var(--primary, #FF5533);
   pointer-events: none;
-  z-index: 1;
+  z-index: 5;
+}
+
+/* Custom Dropdown (.dd) component overrides inside enrollment toolbar */
+.enrollment-select-wrapper .dd {
+  width: 100% !important;
+  flex: 1 1 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.enrollment-select-wrapper .dd-trigger {
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 0.5rem 1rem 0.5rem 2.4rem !important;
+  background: var(--surface-raised, #26262C) !important;
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 9999px !important;
+  font-family: var(--font-ui, 'Inter', sans-serif) !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  color: var(--text-primary, #FFFFFF) !important;
+  box-sizing: border-box !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.enrollment-select-wrapper .dd-trigger:hover,
+.enrollment-select-wrapper .dd.dd-open .dd-trigger {
+  border-color: var(--primary, #FF5533) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.enrollment-select-wrapper .dd-label {
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  color: #FFFFFF !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.enrollment-select-wrapper .dd-menu {
+  width: 100% !important;
+  min-width: 100% !important;
+  background: #1C1C20 !important;
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: var(--radius-md, 12px) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+  z-index: 100 !important;
+  box-sizing: border-box !important;
+}
+
+.enrollment-select-wrapper .dd-menu li {
+  padding: 0.6rem 0.85rem !important;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+  color: var(--text-secondary, #9A9AA6) !important;
+  white-space: nowrap !important;
+}
+
+.enrollment-select-wrapper .dd-menu li:hover,
+.enrollment-select-wrapper .dd-menu li.dd-selected {
+  background: rgba(255, 85, 51, 0.12) !important;
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
 }
 
 .enrollment-filter-select {
