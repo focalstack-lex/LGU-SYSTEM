@@ -22,6 +22,21 @@
       .filter(function (i) { return i.item_state !== 'removed_by_head'; });
   }
 
+  function normCode(code) {
+    return String(code || '').trim().toUpperCase();
+  }
+
+  // Curriculum subjects the student can still take: excludes anything already
+  // passed or currently enrolled (codes compared case/space-insensitively).
+  function filterAvailable(subjects, passedCodes, enrolledCodes) {
+    var passed = passedCodes || new Set();
+    var enrolled = enrolledCodes || new Set();
+    return (subjects || []).filter(function (s) {
+      var code = normCode(s && s.code);
+      return code && !passed.has(code) && !enrolled.has(code);
+    });
+  }
+
   // Server status -> { stepIndex, state, stepKey }.
   // state: 'current' | 'done' | 'upcoming' | 'defensive'
   function stepOf(sub) {
@@ -66,5 +81,5 @@
     return 'neutral';
   }
 
-  return { STEPS: STEPS, stepOf: stepOf, canEdit: canEdit, actionFor: actionFor, toneFor: toneFor, activeItems: activeItems };
+  return { STEPS: STEPS, stepOf: stepOf, canEdit: canEdit, actionFor: actionFor, toneFor: toneFor, activeItems: activeItems, filterAvailable: filterAvailable };
 });

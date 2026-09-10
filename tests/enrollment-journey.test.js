@@ -95,4 +95,22 @@ t('toneFor maps approved/waiting/legacy', () => {
   assert.strictEqual(EJ.toneFor(null), 'neutral');
 });
 
+t('filterAvailable excludes passed and enrolled subjects', () => {
+  const subjects = [
+    { id: '1', code: 'CpE 111' },
+    { id: '2', code: 'cpe 112  ' }, // enrolled, different case/spacing
+    { id: '3', code: 'EMath 111' },
+    { id: '4', code: 'NSTP 1' },
+  ];
+  const passed = new Set(['CPE 111']);
+  const enrolled = new Set(['CPE 112']);
+  const out = EJ.filterAvailable(subjects, passed, enrolled).map(s => s.id);
+  assert.deepStrictEqual(out, ['3', '4']);
+});
+
+t('filterAvailable tolerates missing codes and empty input', () => {
+  assert.strictEqual(EJ.filterAvailable([{ id: 'x', code: null }], new Set(), new Set()).length, 0);
+  assert.strictEqual(EJ.filterAvailable(null, null, null).length, 0);
+});
+
 console.log(`\n${passed} enrollment-journey assertions passed.`);

@@ -11,6 +11,8 @@ const EnrollmentSection = (() => {
   const EJ = window.EnrollmentJourney;
 
   let subjects = [];
+  let passedCodes = new Set();
+  let enrolledCodes = new Set();
   let current = null; // active submission (with items)
   let program = 'COE';
 
@@ -53,11 +55,20 @@ const EnrollmentSection = (() => {
       ? `${now.getFullYear()}-${now.getFullYear() + 1}`
       : `${now.getFullYear() - 1}-${now.getFullYear()}`;
 
-    const [checklists, mine] = await Promise.all([
+    const [checklists, mine, myUnits] = await Promise.all([
       Api.units.checklists(program),
       Api.enrollment.my().catch(() => ({ submissions: [] })),
+      Api.units.my().catch(() => []),
     ]);
     subjects = (checklists.subjects || []).filter(s => !year || s.year_level >= year - 1);
+
+    // Eligible courses must exclude anything already passed or currently
+    // enrolled — otherwise completed subjects keep showing as addable.
+    const passes = (window.GrizzRecommend && window.GrizzRecommend.classifyPasses)
+      ? window.GrizzRecommend.classifyPasses(myUnits)
+      : null;
+    passedCodes = passes ? passes.passedCodes : new Set();
+    enrolledCodes = passes ? passes.enrolledCodes : new Set();
 
     const terms = mine.submissions || [];
     current = terms.find(s => s.school_year === sy) || terms[0] || null;
@@ -103,6 +114,11 @@ const EnrollmentSection = (() => {
   let activeYearFilter = 'all';
   let activeSemFilter = 'all';
 
+  // Curriculum subjects still open to the student (not passed, not enrolled).
+  function availableSubjects() {
+    return EJ.filterAvailable(subjects, passedCodes, enrolledCodes);
+  }
+
   function renderFilterSelects() {
     renderSemFilterSelect();
     renderYearFilterSelect();
@@ -113,12 +129,13 @@ const EnrollmentSection = (() => {
     const sel = document.getElementById('enrollment-sem-select');
     if (!sel) return;
 
-    if (!subjects.length) {
+    const pool = availableSubjects();
+    if (!pool.length) {
       sel.innerHTML = '<option value="all">Both Semesters</option>';
       return;
     }
 
-    const yearFiltered = subjects.filter(s => {
+    const yearFiltered = pool.filter(s => {
       if (activeYearFilter === 'all') return true;
       return String(s.year_level) === activeYearFilter;
     });
@@ -146,12 +163,13 @@ const EnrollmentSection = (() => {
     const sel = document.getElementById('enrollment-year-select');
     if (!sel) return;
 
-    if (!subjects.length) {
+    const pool = availableSubjects();
+    if (!pool.length) {
       sel.innerHTML = '<option value="all">All Year Levels</option>';
       return;
     }
 
-    const semFiltered = subjects.filter(s => {
+    const semFiltered = pool.filter(s => {
       if (activeSemFilter === 'all') return true;
       return String(s.semester) === activeSemFilter;
     });
@@ -213,14 +231,19 @@ const EnrollmentSection = (() => {
 
     const taken = new Set(EJ.activeItems(current).map(i => i.subject_id));
     const canEdit = EJ.canEdit(current);
+    const pool = availableSubjects();
 
-    const filtered = subjects.filter(s => {
+    const filtered = pool.filter(s => {
       const matchYear = activeYearFilter === 'all' || String(s.year_level) === activeYearFilter;
       const matchSem = activeSemFilter === 'all' || String(s.semester) === activeSemFilter;
       return matchYear && matchSem;
     });
 
     if (!filtered.length) {
+      if (!pool.length) {
+        listEl.innerHTML = '<p class="enrollment-empty ev-eligible-empty">You\'ve already passed or are currently taking every course in your program\'s curriculum.</p>';
+        return;
+      }
       let filterText = '';
       if (activeSemFilter !== 'all' && activeYearFilter !== 'all') {
         filterText = `Year ${activeYearFilter}, ${activeSemFilter === '1' ? '1st' : '2nd'} Sem`;
