@@ -256,8 +256,10 @@ const Units = (() => {
     return `
       <button type="button" class="units-current-trigger" data-act="view-current" id="units-current-trigger" title="View enrolled subjects this semester">
         <iconify-icon icon="solar:calendar-date-linear"></iconify-icon>
-        <span class="units-current-trigger-label">Enrolled This Semester</span>
-        <span class="units-current-trigger-term">${term}</span>
+        <div class="units-current-trigger-info">
+          <span class="units-current-trigger-label">Enrolled This Semester</span>
+          <span class="units-current-trigger-term">${term}</span>
+        </div>
         <span class="units-current-trigger-units">${totalUnits} unit${totalUnits === 1 ? '' : 's'}</span>
         <iconify-icon icon="solar:alt-arrow-right-linear" class="units-current-trigger-chevron"></iconify-icon>
       </button>`;

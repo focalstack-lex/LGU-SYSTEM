@@ -5064,14 +5064,23 @@ html body.is-admin th.admin-only {
   font-size: 1.15rem;
   flex-shrink: 0;
 }
+.units-current-trigger-info {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
 .units-current-trigger-label {
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 .units-current-trigger-term {
   font-size: 0.74rem;
   font-weight: 400;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 .units-current-trigger-units {
   margin-left: auto;
@@ -5083,15 +5092,48 @@ html body.is-admin th.admin-only {
   padding: 0.2rem 0.55rem;
   border-radius: var(--radius-sm);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .units-current-trigger-chevron {
   color: var(--text-tertiary);
   font-size: 0.9rem;
   transition: transform var(--transition);
+  flex-shrink: 0;
 }
 .units-current-trigger:hover .units-current-trigger-chevron {
   color: var(--text-primary);
   transform: translateX(2px);
+}
+
+@media (max-width: 640px) {
+  .units-current-trigger {
+    padding: 0.65rem 0.85rem;
+    gap: 0.5rem;
+  }
+  .units-current-trigger-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+  .units-current-trigger-label {
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .units-current-trigger-term {
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .units-current-trigger-units {
+    padding: 0.15rem 0.45rem;
+    font-size: 0.72rem;
+  }
 }
 
 .units-current-modal-head {
