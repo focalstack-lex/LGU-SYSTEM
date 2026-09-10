@@ -101,6 +101,58 @@ const EnrollmentSection = (() => {
 
   // ---- Draft & Eligible Courses card ----
   let activeYearFilter = 'all';
+  let activeSemFilter = 'all';
+
+  function renderFilterPills() {
+    renderSemFilterPills();
+    renderYearFilterPills();
+  }
+
+  function renderSemFilterPills() {
+    const filterEl = document.getElementById('enrollment-sem-filter');
+    if (!filterEl) return;
+
+    if (!subjects.length) {
+      filterEl.innerHTML = '';
+      return;
+    }
+
+    const yearFiltered = subjects.filter(s => {
+      if (activeYearFilter === 'all') return true;
+      return String(s.year_level) === activeYearFilter;
+    });
+
+    const semCounts = {
+      'all': yearFiltered.length,
+      '1': yearFiltered.filter(s => Number(s.semester) === 1).length,
+      '2': yearFiltered.filter(s => Number(s.semester) === 2).length,
+    };
+
+    const pills = [
+      { key: 'all', label: 'Both Sems' },
+      { key: '1', label: '1st Sem' },
+      { key: '2', label: '2nd Sem' },
+    ];
+
+    filterEl.innerHTML = pills.map(p => {
+      const count = semCounts[p.key] || 0;
+      const isActive = activeSemFilter === p.key;
+      return `
+        <button type="button" class="year-pill ${isActive ? 'active' : ''}" data-sem-filter="${p.key}">
+          <span>${p.label}</span>
+          <span class="year-pill-count">${count}</span>
+        </button>
+      `;
+    }).join('');
+
+    filterEl.querySelectorAll('[data-sem-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeSemFilter = btn.dataset.semFilter;
+        renderFilterPills();
+        renderEligibleList();
+      });
+    });
+  }
 
   function renderYearFilterPills() {
     const filterEl = document.getElementById('enrollment-year-filter');
@@ -111,16 +163,21 @@ const EnrollmentSection = (() => {
       return;
     }
 
+    const semFiltered = subjects.filter(s => {
+      if (activeSemFilter === 'all') return true;
+      return String(s.semester) === activeSemFilter;
+    });
+
     const yearCounts = {
-      'all': subjects.length,
-      '1': subjects.filter(s => Number(s.year_level) === 1).length,
-      '2': subjects.filter(s => Number(s.year_level) === 2).length,
-      '3': subjects.filter(s => Number(s.year_level) === 3).length,
-      '4': subjects.filter(s => Number(s.year_level) === 4).length,
+      'all': semFiltered.length,
+      '1': semFiltered.filter(s => Number(s.year_level) === 1).length,
+      '2': semFiltered.filter(s => Number(s.year_level) === 2).length,
+      '3': semFiltered.filter(s => Number(s.year_level) === 3).length,
+      '4': semFiltered.filter(s => Number(s.year_level) === 4).length,
     };
 
     const pills = [
-      { key: 'all', label: 'All' },
+      { key: 'all', label: 'All Yrs' },
       { key: '1', label: '1st Yr' },
       { key: '2', label: '2nd Yr' },
       { key: '3', label: '3rd Yr' },
@@ -141,14 +198,14 @@ const EnrollmentSection = (() => {
     filterEl.querySelectorAll('[data-year-filter]').forEach(btn => {
       btn.addEventListener('click', () => {
         activeYearFilter = btn.dataset.yearFilter;
-        renderYearFilterPills();
+        renderFilterPills();
         renderEligibleList();
       });
     });
   }
 
   function fillPicker() {
-    renderYearFilterPills();
+    renderFilterPills();
     renderEligibleList();
   }
 
@@ -160,13 +217,23 @@ const EnrollmentSection = (() => {
     const canEdit = EJ.canEdit(current);
 
     const filtered = subjects.filter(s => {
-      if (activeYearFilter === 'all') return true;
-      return String(s.year_level) === activeYearFilter;
+      const matchYear = activeYearFilter === 'all' || String(s.year_level) === activeYearFilter;
+      const matchSem = activeSemFilter === 'all' || String(s.semester) === activeSemFilter;
+      return matchYear && matchSem;
     });
 
     if (!filtered.length) {
-      const yearText = activeYearFilter === 'all' ? 'this semester' : `Year ${activeYearFilter}`;
-      listEl.innerHTML = `<p class="enrollment-empty ev-eligible-empty">No eligible courses found for ${yearText}.</p>`;
+      let filterText = '';
+      if (activeSemFilter !== 'all' && activeYearFilter !== 'all') {
+        filterText = `Year ${activeYearFilter}, ${activeSemFilter === '1' ? '1st' : '2nd'} Sem`;
+      } else if (activeSemFilter !== 'all') {
+        filterText = `${activeSemFilter === '1' ? '1st' : '2nd'} Sem`;
+      } else if (activeYearFilter !== 'all') {
+        filterText = `Year ${activeYearFilter}`;
+      } else {
+        filterText = 'this semester';
+      }
+      listEl.innerHTML = `<p class="enrollment-empty ev-eligible-empty">No eligible courses found for ${filterText}.</p>`;
       return;
     }
 

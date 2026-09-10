@@ -8005,7 +8005,28 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon {
   line-height: 1.5;
 }
 
-/* ---- Year Filter Segmented Pills ---- */
+/* ---- Enrollment Filter Section (Semester & Year Level Pills) ---- */
+.enrollment-filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+}
+.enrollment-filter-section .year-filter-pills {
+  margin-bottom: 0;
+}
+.sem-filter-pills {
+  background: var(--bg-surface-raised, #1C1C20);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+@media (min-width: 640px) {
+  .enrollment-filter-section {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 0.5rem;
+  }
+}
+
 .year-filter-pills {
   display: flex;
   align-items: center;
