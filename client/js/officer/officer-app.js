@@ -2035,7 +2035,7 @@ const OfficerApp = (() => {
       <div class="of-announce-item">
         <strong>${esc(a.title)}</strong>
         <p>${esc(a.body)}</p>
-        <span class="of-when">${UI.dateStr(a.created_at)}</span>
+        <span class="of-when">${esc(a.author || 'COE LGU')} · ${UI.dateStr(a.created_at)}</span>
       </div>`).join('')
       : '<p style="font-size:0.82rem;color:var(--text-secondary)">No announcements yet.</p>';
   }

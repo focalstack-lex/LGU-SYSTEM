@@ -10,6 +10,20 @@ const { createNotification } = require('./notifications');
 const MAX_TITLE_LENGTH = 100;
 const MAX_BODY_LENGTH  = 5000;
 
+// Poster role -> label shown as the announcement author. Announcements have no
+// author column, so the label is derived from the poster's profile role.
+// Legacy rows with posted_by = null fall back to a neutral brand label.
+const ROLE_LABELS = {
+  admin: 'Admin',
+  governor: 'Governor',
+  cashier: 'Cashier',
+  officer: 'Officer',
+  program_head: 'Program Head',
+  dean: 'Dean',
+  faculty: 'Student Assistant',
+  student: 'Student',
+};
+
 // GET /api/announcements
 router.get('/', async (req, res) => {
   const { data, error } = await supabase
@@ -19,7 +33,27 @@ router.get('/', async (req, res) => {
     .limit(20);
 
   if (error) return res.status(500).json({ error: 'Failed to fetch announcements.' });
-  res.json(data);
+
+  const rows = data || [];
+  const posterIds = [...new Set(rows.map(r => r.posted_by).filter(Boolean))];
+  let posters = new Map();
+  if (posterIds.length) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, role, full_name')
+      .in('id', posterIds);
+    posters = new Map((profiles || []).map(p => [p.id, p]));
+  }
+
+  res.json(rows.map(r => {
+    const poster = r.posted_by ? posters.get(r.posted_by) : null;
+    return {
+      ...r,
+      author: poster ? (ROLE_LABELS[poster.role] || poster.role || 'COE LGU') : 'COE LGU',
+      poster_role: poster ? poster.role : null,
+      poster_name: poster ? poster.full_name : null,
+    };
+  }));
 });
 
 // POST /api/announcements (governors and admins)

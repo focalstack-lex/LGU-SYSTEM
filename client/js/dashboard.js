@@ -273,23 +273,21 @@ const Dashboard = (() => {
   async function loadAnnouncements() {
     const container = document.getElementById('announcement-list');
     try {
-      const { data } = await window.supabaseClient
-        .from('announcements')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
+      const list = await Api.announcements.list();
+      const data = (list || []).slice(0, 5);
 
-      if (!data?.length) { UI.setEmpty('announcement-list', 'solar:bell-linear', 'No announcements yet.'); return; }
+      if (!data.length) { UI.setEmpty('announcement-list', 'solar:bell-linear', 'No announcements yet.'); return; }
 
       container.innerHTML = data.map((a) => {
         const title = formatTitle(a.title);
-        const author = a.author || 'COE LGU Officer';
-        const hasLongBody = a.body.length > 180;
+        const author = a.author || 'COE LGU';
+        const body = a.body || '';
+        const hasLongBody = body.length > 180;
 
         return `
           <div class="announce-item">
             <h4 class="announce-title">${title}</h4>
-            <p class="announce-body">${a.body.replace(/\n/g, '<br>')}</p>
+            <p class="announce-body">${body.replace(/\n/g, '<br>')}</p>
             ${hasLongBody ? `
               <button class="announce-expand-btn" type="button">
                 <span>Show more</span>
