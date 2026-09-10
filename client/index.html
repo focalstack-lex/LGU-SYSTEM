@@ -697,9 +697,15 @@
                 <h3><iconify-icon icon="solar:book-bookmark-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Eligible Courses for this Semester</h3>
                 <p class="enrollment-note" style="margin:0.25rem 0 0.85rem;">Pick the subjects you need — Grizz's recommendations are a great starting point.</p>
               </div>
-              <div class="enrollment-filter-section">
-                <div id="enrollment-sem-filter" class="year-filter-pills sem-filter-pills"></div>
-                <div id="enrollment-year-filter" class="year-filter-pills"></div>
+              <div class="enrollment-filter-toolbar">
+                <div class="enrollment-select-wrapper">
+                  <iconify-icon icon="solar:calendar-linear" class="filter-select-icon"></iconify-icon>
+                  <select id="enrollment-sem-select" class="enrollment-filter-select" aria-label="Filter by Semester"></select>
+                </div>
+                <div class="enrollment-select-wrapper">
+                  <iconify-icon icon="solar:academic-cap-linear" class="filter-select-icon"></iconify-icon>
+                  <select id="enrollment-year-select" class="enrollment-filter-select" aria-label="Filter by Year Level"></select>
+                </div>
               </div>
               <div id="enrollment-eligible-list" class="enrollment-eligible-grid">
                 <div class="loading-state">Loading eligible courses…</div>

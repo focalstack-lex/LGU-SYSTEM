@@ -103,17 +103,18 @@ const EnrollmentSection = (() => {
   let activeYearFilter = 'all';
   let activeSemFilter = 'all';
 
-  function renderFilterPills() {
-    renderSemFilterPills();
-    renderYearFilterPills();
+  function renderFilterSelects() {
+    renderSemFilterSelect();
+    renderYearFilterSelect();
+    initFilterSelectListeners();
   }
 
-  function renderSemFilterPills() {
-    const filterEl = document.getElementById('enrollment-sem-filter');
-    if (!filterEl) return;
+  function renderSemFilterSelect() {
+    const sel = document.getElementById('enrollment-sem-select');
+    if (!sel) return;
 
     if (!subjects.length) {
-      filterEl.innerHTML = '';
+      sel.innerHTML = '<option value="all">Both Semesters</option>';
       return;
     }
 
@@ -128,38 +129,25 @@ const EnrollmentSection = (() => {
       '2': yearFiltered.filter(s => Number(s.semester) === 2).length,
     };
 
-    const pills = [
-      { key: 'all', label: 'Both Sems' },
-      { key: '1', label: '1st Sem' },
-      { key: '2', label: '2nd Sem' },
+    const options = [
+      { key: 'all', label: 'Both Semesters' },
+      { key: '1', label: '1st Semester' },
+      { key: '2', label: '2nd Semester' },
     ];
 
-    filterEl.innerHTML = pills.map(p => {
-      const count = semCounts[p.key] || 0;
-      const isActive = activeSemFilter === p.key;
-      return `
-        <button type="button" class="year-pill ${isActive ? 'active' : ''}" data-sem-filter="${p.key}">
-          <span>${p.label}</span>
-          <span class="year-pill-count">${count}</span>
-        </button>
-      `;
+    sel.innerHTML = options.map(o => {
+      const count = semCounts[o.key] || 0;
+      const selected = activeSemFilter === o.key ? 'selected' : '';
+      return `<option value="${o.key}" ${selected}>${o.label} (${count})</option>`;
     }).join('');
-
-    filterEl.querySelectorAll('[data-sem-filter]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        activeSemFilter = btn.dataset.semFilter;
-        renderFilterPills();
-        renderEligibleList();
-      });
-    });
   }
 
-  function renderYearFilterPills() {
-    const filterEl = document.getElementById('enrollment-year-filter');
-    if (!filterEl) return;
+  function renderYearFilterSelect() {
+    const sel = document.getElementById('enrollment-year-select');
+    if (!sel) return;
 
     if (!subjects.length) {
-      filterEl.innerHTML = '';
+      sel.innerHTML = '<option value="all">All Year Levels</option>';
       return;
     }
 
@@ -176,36 +164,46 @@ const EnrollmentSection = (() => {
       '4': semFiltered.filter(s => Number(s.year_level) === 4).length,
     };
 
-    const pills = [
-      { key: 'all', label: 'All Yrs' },
-      { key: '1', label: '1st Yr' },
-      { key: '2', label: '2nd Yr' },
-      { key: '3', label: '3rd Yr' },
-      { key: '4', label: '4th Yr' },
+    const options = [
+      { key: 'all', label: 'All Year Levels' },
+      { key: '1', label: '1st Year' },
+      { key: '2', label: '2nd Year' },
+      { key: '3', label: '3rd Year' },
+      { key: '4', label: '4th Year' },
     ];
 
-    filterEl.innerHTML = pills.map(p => {
-      const count = yearCounts[p.key] || 0;
-      const isActive = activeYearFilter === p.key;
-      return `
-        <button type="button" class="year-pill ${isActive ? 'active' : ''}" data-year-filter="${p.key}">
-          <span>${p.label}</span>
-          <span class="year-pill-count">${count}</span>
-        </button>
-      `;
+    sel.innerHTML = options.map(o => {
+      const count = yearCounts[o.key] || 0;
+      const selected = activeYearFilter === o.key ? 'selected' : '';
+      return `<option value="${o.key}" ${selected}>${o.label} (${count})</option>`;
     }).join('');
+  }
 
-    filterEl.querySelectorAll('[data-year-filter]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        activeYearFilter = btn.dataset.yearFilter;
-        renderFilterPills();
+  function initFilterSelectListeners() {
+    const semSel = document.getElementById('enrollment-sem-select');
+    const yearSel = document.getElementById('enrollment-year-select');
+
+    if (semSel && !semSel.dataset.bound) {
+      semSel.dataset.bound = 'true';
+      semSel.addEventListener('change', (e) => {
+        activeSemFilter = e.target.value;
+        renderFilterSelects();
         renderEligibleList();
       });
-    });
+    }
+
+    if (yearSel && !yearSel.dataset.bound) {
+      yearSel.dataset.bound = 'true';
+      yearSel.addEventListener('change', (e) => {
+        activeYearFilter = e.target.value;
+        renderFilterSelects();
+        renderEligibleList();
+      });
+    }
   }
 
   function fillPicker() {
-    renderFilterPills();
+    renderFilterSelects();
     renderEligibleList();
   }
 
