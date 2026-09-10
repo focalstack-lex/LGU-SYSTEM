@@ -3425,6 +3425,11 @@ iconify-icon {
   vertical-align: middle;
   flex-shrink: 0;
 }
+iconify-icon:not(:defined) {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}
 
 /* ---- Skeleton Loading ---- */
 .skeleton-stack {
