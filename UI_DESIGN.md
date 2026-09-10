@@ -21,6 +21,7 @@
 13. [Accessibility & Touch](#13-accessibility--touch)
 14. [Scrollbar Styling](#14-scrollbar-styling)
 15. [File Map](#15-file-map)
+16. [Enrollment Verification Architecture](#16-enrollment-verification-architecture)
 
 ---
 
@@ -540,4 +541,24 @@ Horizontal scroll containers (`.table-wrapper`, `.events-filter-bar`, tab bars) 
 
 ---
 
-*Last updated: 2026-09-03. Institutional minimalist redesign on the `redesign` branch — light-first tokens, navy action color, flattened depth and motion.*
+## 16. Enrollment Verification Architecture
+
+Added in Phase B/C (September 2026). Strictly adheres to flat matte charcoal UI principles, zero decorative AI slop, and real-time Supabase sync across student and program head portals.
+
+### Visual & Component Standards
+- **Flat Matte Containers**: Status cards (`.ev-done-card`, `.ev-defensive-card`) use flat matte dark slate (`#26262C`) with subtle 1px structural dividers (`rgba(255,255,255,0.08)`).
+- **Crisp Left-Border Accents**: Status distinction is conveyed using a solid 4px accent line (`border-left: 4px solid var(--success)` for verified loads; `border-left: 4px solid var(--status-negative)` for locked/defensive loads).
+- **Zero Decorative Slop**:
+  - No background mesh gradients or translucent tinted card overlays (`rgba(34, 197, 94, 0.08)` replaced with solid matte `#26262C`).
+  - No box-shadow glowing rings on step indicators (`.ev-step--current .ev-step-dot`).
+  - No colored dot pseudo-elements (`.ev-chip::before` set to `display: none`).
+  - No em-dashes (`—`) in UI copy; replaced with colons (`:`), middle dots (`·`), or clean parenthesis.
+
+### Real-Time Synchronization Protocol
+- **Student View (`client/js/enrollment.js`)**: Subscribes to Supabase Realtime channel `enrollment-student-realtime` on `enrollment_submissions` and `enrollment_submission_items`. Whenever a Program Head verifies a load or an SA marks it encoded, the student's view updates instantly without manual page refresh.
+- **Faculty / Program Head Portal (`client/js/faculty/faculty.js`)**: Subscribes to Supabase Realtime channel `enrollment-faculty-realtime`. Program Head review queue, student list counts, and open evaluation detail modals sync live across active devices.
+
+---
+
+*Last updated: 2026-09-10. Enrollment Verification flat matte redesign and real-time sync architecture on the `redesign` branch (`origin/redesign/ui-enhancement`).*
+
