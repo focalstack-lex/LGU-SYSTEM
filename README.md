@@ -61,3 +61,8 @@ npm run dev
 ```bash
 npm run package
 ```
+
+## Active Development
+
+- **Enrollment Verification & Real-Time Sync**: Phase B/C enrollment status verification, flat matte UI, and Supabase real-time updates (documented on `redesign` branch).
+
