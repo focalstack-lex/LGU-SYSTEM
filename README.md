@@ -19,6 +19,33 @@ A centralized web application designed for the College of Engineering (COE) and 
 - **Auth/Storage**: Supabase Auth & Storage
 - **Hosting**: Vercel (Frontend), Render (Backend)
 
+## Getting Started (Local Development)
+
+Prerequisites: Node.js (LTS recommended) and a Supabase project.
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Create your environment file and fill in the values:
+   ```bash
+   cp .env.example .env
+   ```
+   | Variable | Purpose |
+   | --- | --- |
+   | `SUPABASE_URL` | Supabase project URL |
+   | `SUPABASE_SERVICE_KEY` | Service-role key — **server-side only, never expose to the browser** |
+   | `SUPABASE_ANON_KEY` | Public anon key used by the client |
+   | `PORT` | Server port (defaults to `3000`) |
+   | `NODE_ENV` | `development` or `production` |
+   | `BREVO_API_KEY`, `BREVO_SENDER_EMAIL` | Outbound notification email (optional locally) |
+   | `APP_URL`, `RENDER_EXTERNAL_URL` | Public base URL used when generating links in emails |
+3. Start the server:
+   ```bash
+   npm start        # or: npm run dev (auto-reload via nodemon)
+   ```
+   The Express server serves the API and the `/client` frontend from a single origin — open [http://localhost:3000](http://localhost:3000).
+
 ## Core Features
 
 1. **Real-Time Dashboard**: Live updates of total funds, expenses, and balances.
