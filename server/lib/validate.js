@@ -24,17 +24,18 @@ const ALLOWED_RECEIPT_HOSTS = [
 ];
 
 function validateDriveUrl(url) {
-  if (!url) return true; // optional field - null is valid
+  if (!url) return null; // optional field - null is valid
   try {
     const parsed = new URL(url);
     // Only allow https
-    if (parsed.protocol !== 'https:') return false;
+    if (parsed.protocol !== 'https:') return null;
     // Only allow allowlisted hosts
-    return ALLOWED_RECEIPT_HOSTS.some(host =>
+    const isAllowed = ALLOWED_RECEIPT_HOSTS.some(host =>
       parsed.hostname === host || parsed.hostname.endsWith('.' + host)
     );
+    return isAllowed ? url : null; // return the URL string on success, null on failure
   } catch {
-    return false;
+    return null;
   }
 }
 

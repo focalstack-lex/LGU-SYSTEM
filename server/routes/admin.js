@@ -196,14 +196,26 @@ router.post('/send-approval-email', requireOfficer, async (req, res) => {
   const { email, full_name } = req.body;
   if (!email) return res.status(400).json({ error: 'Email is required.' });
 
-  // Update profile by email if profile exists
+  // BUG-003 FIX: Track whether the DB update actually matched a profile row,
+  // and log an audit entry so every is_verified change is traceable.
+  let profileUpdated = false;
   try {
-    await supabase
+    const { data } = await supabase
       .from('profiles')
       .update({ is_verified: true })
-      .eq('email', email);
+      .eq('email', email.trim().toLowerCase())
+      .select('id');
+    profileUpdated = Array.isArray(data) && data.length > 0;
   } catch (err) {
     /* non-fatal */
+  }
+
+  if (profileUpdated) {
+    logAudit(req.user.id, 'VERIFY_USER_ACCOUNT_BY_EMAIL', {
+      user_email: email,
+      verified_by: req.user.id,
+      note: 'Verified via send-approval-email endpoint'
+    });
   }
 
   const result = await sendAccountApprovalEmail(email, full_name || 'COE Member');
