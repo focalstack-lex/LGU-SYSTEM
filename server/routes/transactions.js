@@ -209,6 +209,12 @@ router.post('/', requireOfficer, parseReceiptWhenMultipart, async (req, res) => 
   const cleanDonor  = donor_name ? sanitizeText(donor_name) : null;
   const cleanReceipt = receipt_url ? validateDriveUrl(receipt_url) : null;
 
+  // BUG-001 FIX: validateDriveUrl now returns the URL string or null (not boolean).
+  // Reject if a receipt URL was provided but failed validation.
+  if (receipt_url && !cleanReceipt) {
+    return res.status(400).json({ error: 'Receipt URL must be a valid Google Drive or Google Docs link (https only).' });
+  }
+
   if (cleanDesc.length > 500) {
     return res.status(400).json({ error: 'Description must be 500 characters or less.' });
   }
