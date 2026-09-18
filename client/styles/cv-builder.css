@@ -1,121 +1,292 @@
-/* =============================================
-   cv-builder.css - Harvard Style CV & Locker UX
-   ============================================= */
+/* ==========================================================================
+   cv-builder.css - College of Engineering · Career Passport & Harvard CV Builder
+   Design System: Graphite & Slate Surfaces + Electric Engineering Orange Accents
+   ========================================================================== */
 
-.cv-builder-container {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
-  min-height: calc(100vh - 120px);
+/* ---------------- Root Base & App Container ---------------- */
+.cv-builder-body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background, #121214);
+  color: var(--text-primary, #F1F5F9);
+  font-family: var(--font-ui, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
-@media (max-width: 1024px) {
+/* ---------------- Top Navigation Header (Standalone) ---------------- */
+.cv-app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(28, 28, 32, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+.cv-header-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cv-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cv-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--surface-secondary, #26262C);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  color: var(--text-primary, #F1F5F9);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cv-back-link:hover {
+  background: var(--surface-hover, #2C2C34);
+  border-color: var(--primary, #FF5E14);
+  color: #FFFFFF;
+}
+
+.cv-header-sep {
+  width: 1px;
+  height: 24px;
+  background: var(--border, rgba(255, 255, 255, 0.12));
+}
+
+.cv-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cv-brand-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.cv-brand-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.cv-brand-portal {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary, #F1F5F9);
+}
+
+.cv-brand-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.cv-brand-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--primary, #FF5E14);
+}
+
+.cv-brand-tag {
+  font-size: 0.72rem;
+  color: var(--text-secondary, #94A3B8);
+}
+
+.cv-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cv-sample-btn {
+  font-size: 0.82rem;
+  padding: 8px 14px;
+}
+
+.cv-export-btn {
+  font-size: 0.82rem;
+  padding: 8px 16px;
+  box-shadow: 0 2px 10px var(--primary-glow, rgba(255, 94, 20, 0.35));
+}
+
+/* ---------------- Layout Grid ---------------- */
+.cv-builder-container {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  gap: 28px;
+  max-width: 1440px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1140px) {
   .cv-builder-container {
     grid-template-columns: 1fr;
+    padding: 12px;
   }
 }
 
-/* 🎒 LEFT PANE: Achievement Locker ("The Store") */
+/* ---------------- Left Pane: Achievement Locker ---------------- */
 .achievement-locker {
-  background: var(--bg-surface, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--surface, #1C1C20);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
   border-radius: 12px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-height: calc(100vh - 140px);
+  max-height: calc(100vh - 120px);
   position: sticky;
   top: 80px;
   overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-card, 0 1px 3px 0 rgba(0, 0, 0, 0.3));
+}
+
+/* Sleek Scrollbar */
+.achievement-locker::-webkit-scrollbar {
+  width: 6px;
+}
+.achievement-locker::-webkit-scrollbar-track {
+  background: transparent;
+}
+.achievement-locker::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+.achievement-locker::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.locker-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.locker-header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 94, 20, 0.12);
+  color: var(--primary, #FF5E14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
 }
 
 .locker-header h3 {
   margin: 0 0 4px 0;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-main, #0f172a);
+  color: var(--text-primary, #F1F5F9);
 }
 
 .locker-header p {
   margin: 0;
-  font-size: 0.85rem;
-  color: var(--text-muted, #64748b);
+  font-size: 0.8rem;
+  color: var(--text-secondary, #94A3B8);
+  line-height: 1.4;
 }
 
+/* Segmented Tabs (Clean Rectangular) */
 .locker-filters {
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 4px;
+  background: #141416;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
 }
 
 .locker-chip {
-  background: var(--bg-body, #f8fafc);
-  border: 1px solid var(--border-color, #cbd5e1);
-  padding: 6px 12px;
-  border-radius: 20px;
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  color: var(--text-main, #334155);
+  transition: all 0.15s ease;
+  color: var(--text-secondary, #94A3B8);
+  text-align: center;
 }
 
-.locker-chip.active, .locker-chip:hover {
-  background: #1e293b;
-  color: #ffffff;
-  border-color: #1e293b;
+.locker-chip:hover {
+  color: var(--text-primary, #F1F5F9);
+  background: rgba(255, 255, 255, 0.04);
 }
 
+.locker-chip.active {
+  background: var(--surface-secondary, #26262C);
+  color: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid var(--primary, #FF5E14);
+}
+
+/* Locker Items List */
 .locker-items-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow-y: auto;
-  padding-right: 4px;
 }
 
 .locker-card {
-  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--surface-secondary, #26262C);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
   border-radius: 8px;
-  padding: 12px;
-  background: var(--bg-card, #ffffff);
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  padding: 12px 14px;
+  transition: border-color 0.2s ease, transform 0.15s ease, background 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
 .locker-card:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
+  border-color: rgba(255, 94, 20, 0.4);
+  transform: translateY(-1px);
 }
 
 .locker-card.in-cart {
-  background: #f0fdf4;
-  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.06);
+  border-color: rgba(34, 197, 94, 0.4);
 }
 
 .locker-card-title {
   font-weight: 600;
-  font-size: 0.9rem;
-  color: #0f172a;
+  font-size: 0.88rem;
+  color: var(--text-primary, #F1F5F9);
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
 }
 
 .locker-card-sub {
-  font-size: 0.78rem;
-  color: #64748b;
+  font-size: 0.76rem;
+  color: var(--text-secondary, #94A3B8);
 }
 
 .locker-card-actions {
@@ -123,52 +294,368 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
 }
 
 .badge-verified {
   font-size: 0.7rem;
-  background: #dcfce7;
-  color: #15803d;
-  padding: 2px 8px;
-  border-radius: 12px;
+  color: #4ADE80;
   font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.btn-delete-item {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary, #64748B);
+  cursor: pointer;
+  padding: 2px;
+  font-size: 0.85rem;
+  transition: color 0.15s ease;
+}
+
+.btn-delete-item:hover {
+  color: #EF4444;
+}
+
+/* Drag & Drop Reordering & Action Styles */
+.locker-card[draggable="true"] {
+  cursor: grab;
+}
+.locker-card.dragging {
+  opacity: 0.4;
+  border: 1px dashed var(--primary, #FF5E14) !important;
+  transform: scale(0.98);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.locker-card.drag-over {
+  border-top: 2px solid var(--primary, #FF5E14) !important;
+  background: rgba(255, 94, 20, 0.08) !important;
+}
+
+.locker-card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.locker-drag-handle {
+  color: var(--text-tertiary, #64748B);
+  cursor: grab;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  padding: 3px;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.locker-drag-handle:hover {
+  color: var(--text-primary, #F1F5F9);
+  background: rgba(255, 255, 255, 0.08);
+}
+.locker-drag-handle:active {
+  cursor: grabbing;
+}
+
+.btn-card-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary, #64748B);
+  cursor: pointer;
+  padding: 3px 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.btn-card-icon:hover {
+  color: var(--text-primary, #F1F5F9);
+  background: rgba(255, 255, 255, 0.08);
+}
+.btn-card-icon.btn-edit-item:hover {
+  color: var(--primary, #FF5E14);
+}
+.btn-card-icon.btn-delete-item:hover {
+  color: #EF4444;
+}
+.btn-card-icon:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* Inline Card Edit Form */
+.locker-card-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+.locker-card-edit-form .edit-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.locker-card-edit-form label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94A3B8);
+}
+.cv-mini-input, .cv-mini-select, .cv-mini-textarea {
+  width: 100%;
+  background: #18181B;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: var(--text-primary, #F1F5F9);
+  font-size: 0.78rem;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+.cv-mini-input:focus, .cv-mini-select:focus, .cv-mini-textarea:focus {
+  border-color: var(--primary, #FF5E14);
+}
+.cv-mini-textarea {
+  resize: vertical;
+  min-height: 54px;
+}
+.edit-form-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 4px;
+}
+.btn-mini-save {
+  background: var(--primary, #FF5E14);
+  color: #FFF;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn-mini-save:hover {
+  background: #FF7A3D;
+}
+.btn-mini-cancel {
+  background: transparent;
+  color: var(--text-secondary, #94A3B8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.btn-mini-cancel:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, #F1F5F9);
 }
 
 .btn-add-cart {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 6px;
-  border: 1px solid #3b82f6;
-  background: #eff6ff;
-  color: #1d4ed8;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--surface-hover, #2C2C34);
+  color: var(--text-primary, #F1F5F9);
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .btn-add-cart:hover {
-  background: #3b82f6;
-  color: #ffffff;
+  border-color: var(--primary, #FF5E14);
+  background: var(--primary, #FF5E14);
+  color: #FFFFFF;
 }
 
 .btn-add-cart.added {
-  background: #22c55e;
-  border-color: #22c55e;
-  color: #ffffff;
+  background: #15803D;
+  border-color: #16A34A;
+  color: #FFFFFF;
 }
 
-/* 📄 RIGHT PANE: Live Harvard Canvas */
+/* Divider */
+.locker-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 8px 0 4px 0;
+}
+
+.locker-divider::before,
+.locker-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+.locker-divider span {
+  padding: 0 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #94A3B8);
+}
+
+/* Quick Suggestion Pills in Editor */
+.editor-suggestion-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.suggestion-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  color: var(--text-secondary, #94A3B8);
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.suggestion-chip:hover {
+  background: rgba(255, 94, 20, 0.15);
+  color: #FFFFFF;
+  border-color: var(--primary, #FF5E14);
+}
+
+.suggestion-chip.active {
+  background: var(--primary, #FF5E14);
+  color: #FFFFFF;
+  border-color: var(--primary, #FF5E14);
+  font-weight: 600;
+}
+
+/* ---------------- Personal & Career Details Form ---------------- */
+.cv-form-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.cv-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cv-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cv-form-group label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary, #94A3B8);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.cv-field-hint {
+  font-size: 0.68rem;
+  color: var(--text-tertiary, #64748B);
+  font-weight: 400;
+  text-transform: none;
+}
+
+.cv-input {
+  width: 100%;
+  background: #141416;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-sm, 6px);
+  color: var(--text-primary, #F1F5F9);
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cv-input:focus {
+  outline: none;
+  border-color: var(--primary, #FF5E14);
+  box-shadow: 0 0 0 3px rgba(255, 94, 20, 0.18);
+}
+
+.cv-input::placeholder {
+  color: rgba(148, 163, 184, 0.4);
+}
+
+select.cv-input {
+  cursor: pointer;
+}
+
+textarea.cv-input {
+  resize: vertical;
+  min-height: 56px;
+  line-height: 1.4;
+}
+
+.custom-entry-box {
+  background: #141416;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cv-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  gap: 12px;
+}
+
+.cv-save-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  font-weight: 600;
+  font-size: 0.84rem;
+}
+
+.cv-autosave-hint {
+  font-size: 0.72rem;
+  color: var(--text-tertiary, #64748B);
+  white-space: nowrap;
+}
+
+/* ---------------- Right Pane: Live Harvard Canvas ---------------- */
 .cv-preview-wrapper {
-  background: #f1f5f9;
-  padding: 24px;
+  background: #0E0E10;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
   border-radius: 12px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  box-shadow: var(--shadow-card, 0 1px 3px 0 rgba(0, 0, 0, 0.3));
+  overflow-x: auto;
 }
 
 .cv-toolbar {
@@ -177,16 +664,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #ffffff;
-  padding: 12px 20px;
+  background: var(--surface, #1C1C20);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  padding: 10px 18px;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
 .cv-toolbar-title {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--text-primary, #F1F5F9);
+}
+
+.cv-toolbar-icon {
+  color: var(--primary, #FF5E14);
+  font-size: 1.1rem;
 }
 
 .cv-toolbar-buttons {
@@ -194,62 +690,143 @@
   gap: 8px;
 }
 
-/* 🎓 HARVARD RESUME CANVAS (Exact Paper Specs) */
+.cv-toolbar-btn {
+  font-size: 0.78rem;
+  padding: 6px 12px;
+}
+
+/* ---------------- Authentic Harvard Resume Canvas ----------------
+   Standard ATS-Compliant Sheet: Balanced spacing, zero collisions,
+   and executive typography on pristine white paper.
+   ---------------------------------------------------------------- */
 .harvard-cv-paper {
   width: 100%;
   max-width: 800px;
+  min-width: 800px;
   min-height: 1030px;
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  padding: 48px 56px;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.2);
+  padding: 46px 54px;
   box-sizing: border-box;
   font-family: 'Times New Roman', Times, Georgia, serif;
-  color: #000000;
-  line-height: 1.35;
+  line-height: 1.45;
   font-size: 10.5pt;
   position: relative;
+  border-radius: 2px;
 }
 
 .harvard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.harvard-header-left {
+  flex: 1;
   text-align: center;
-  margin-bottom: 20px;
-  position: relative;
+}
+
+.harvard-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .harvard-name {
-  font-size: 22pt;
+  font-size: 20pt;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   font-family: 'Times New Roman', Times, Georgia, serif;
+  color: #000000;
+  line-height: 1.15;
 }
 
 .harvard-contact-line {
   font-size: 9.5pt;
   color: #222222;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  line-height: 1.35;
+}
+
+.harvard-contact-row {
+  display: flex;
   justify-content: center;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
+.harvard-contact-row .sep {
+  color: #555555;
+  user-select: none;
+}
+
+/* Profile photo upload area */
+.cv-photo-wrapper {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px dashed #aaa;
+  flex-shrink: 0;
+}
+
+.cv-photo-wrapper:hover {
+  border-color: #555;
+}
+
+.cv-profile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cv-photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #f5f5f5;
+  font-size: 6.5pt;
+  color: #888;
+  font-family: sans-serif;
+  text-align: center;
+  gap: 2px;
+}
+
 .harvard-qr-box {
-  position: absolute;
-  top: 0;
-  right: 0;
   text-align: center;
 }
 
 .harvard-qr-img {
-  width: 54px;
-  height: 54px;
+  width: 48px;
+  height: 48px;
+  display: block;
+  margin: 0 auto;
 }
 
 .harvard-qr-label {
-  font-size: 6.5pt;
+  font-size: 5.5pt;
   color: #555555;
   margin-top: 2px;
+  font-family: sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
 }
 
 .harvard-section {
@@ -262,35 +839,48 @@
   text-transform: uppercase;
   border-bottom: 1.25px solid #000000;
   padding-bottom: 2px;
-  margin-bottom: 8px;
+  margin-bottom: 7px;
   letter-spacing: 0.5px;
+  color: #000000;
 }
 
+/* Symmetrical row with guaranteed minimum gap to prevent title/date collisions */
 .harvard-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 20px;
+  margin-bottom: 2px;
 }
 
 .harvard-title-left {
   font-weight: bold;
   font-style: italic;
   font-size: 10.5pt;
+  color: #000000;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
 }
 
 .harvard-date-right {
   font-style: italic;
-  font-size: 10pt;
+  font-size: 9.5pt;
   white-space: nowrap;
+  color: #000000;
+  flex-shrink: 0;
+  text-align: right;
 }
 
 .harvard-sub-left {
   font-size: 10pt;
   margin-bottom: 4px;
+  color: #111111;
+  line-height: 1.35;
 }
 
 .harvard-bullets {
-  margin: 4px 0 8px 18px;
+  margin: 4px 0 8px 20px;
   padding: 0;
   list-style-type: disc;
 }
@@ -298,39 +888,84 @@
 .harvard-bullets li {
   margin-bottom: 3px;
   font-size: 10pt;
+  color: #000000;
+  line-height: 1.4;
 }
 
-.verified-inline-tag {
-  font-family: sans-serif;
-  font-size: 6.5pt;
-  font-weight: 700;
-  color: #166534;
-  background: #dcfce7;
-  padding: 1px 4px;
-  border-radius: 4px;
-  margin-left: 6px;
-  vertical-align: middle;
+/* ---------------- DIRECT WHITE PAPER WYSIWYG EDITING ---------------- */
+.harvard-cv-paper [contenteditable="true"] {
+  outline: none;
+  cursor: text;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 3px;
+  padding: 0 2px;
 }
 
-/* 🖨️ PRINT & PDF EXPORT OVERRIDES */
+.harvard-cv-paper [contenteditable="true"]:hover {
+  background: rgba(255, 94, 20, 0.08);
+  box-shadow: 0 0 0 1px rgba(255, 94, 20, 0.35);
+}
+
+.harvard-cv-paper [contenteditable="true"]:focus {
+  background: rgba(255, 94, 20, 0.12);
+  box-shadow: 0 0 0 2px var(--primary, #FF5E14);
+}
+
+.harvard-cv-paper [contenteditable="true"]:empty::before {
+  content: attr(data-placeholder);
+  color: #94A3B8;
+  font-style: italic;
+  pointer-events: none;
+}
+
+/* ---------------- PRINT & PDF EXPORT OVERRIDES ---------------- */
 @media print {
+  .harvard-cv-paper [contenteditable="true"]:hover,
+  .harvard-cv-paper [contenteditable="true"]:focus {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  @page {
+    size: letter portrait;
+    margin: 0.5in;
+  }
+
+  body, html {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   body * {
     visibility: hidden;
   }
-  .harvard-cv-paper, .harvard-cv-paper * {
-    visibility: visible;
+
+  .harvard-cv-paper,
+  .harvard-cv-paper * {
+    visibility: visible !important;
   }
+
   .harvard-cv-paper {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    max-width: 100%;
-    box-shadow: none;
-    padding: 0;
-    margin: 0;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
   }
-  .cv-builder-container, .achievement-locker, .cv-toolbar {
+
+  .cv-app-header,
+  .achievement-locker,
+  .cv-toolbar,
+  .toast,
+  .cv-builder-container {
     display: none !important;
   }
 }
+
