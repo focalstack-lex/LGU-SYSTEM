@@ -20,6 +20,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/main.css?v=7.2" />
   <link rel="stylesheet" href="styles/ai.css?v=6.5" />
+  <link rel="stylesheet" href="styles/cv-builder.css?v=2.0" />
   <script src="vendor/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.2/dist/iconify-icon.min.js" defer></script>
@@ -98,6 +99,16 @@
           <button class="btn btn-primary btn-full" id="login-btn" type="button">
             <span>Sign In</span>
           </button>
+          <button class="btn btn-secondary btn-full" id="local-preview-btn" type="button" style="display:none;margin-top:10px;font-size:0.82rem;" onclick="window.IS_PUBLIC_VIEWER=true; UI.showScreen('app'); UI.showView('cv'); if(typeof CvBuilder!=='undefined') CvBuilder.loadData();">
+            <iconify-icon icon="solar:eye-linear"></iconify-icon>
+            <span>Local Dev Preview: Open Student Portal</span>
+          </button>
+          <script>
+            if (['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+              const devBtn = document.getElementById('local-preview-btn');
+              if (devBtn) devBtn.style.display = 'inline-flex';
+            }
+          </script>
         </div>
       </div>
     </div>
@@ -300,6 +311,9 @@
         </a>
         <a href="#" class="nav-item" data-view="enrollment" id="nav-enrollment">
           <span class="nav-icon"><iconify-icon icon="solar:clipboard-check-linear"></iconify-icon></span><span>Load Verification</span>
+        </a>
+        <a href="#" class="nav-item" data-view="cv" id="nav-cv">
+          <span class="nav-icon"><iconify-icon icon="solar:diploma-linear"></iconify-icon></span><span>Career Passport</span>
         </a>
         <a href="/officer.html" class="nav-item officer-only hidden" id="nav-executive-portal">
           <span class="nav-icon"><iconify-icon icon="solar:shield-user-linear"></iconify-icon></span><span>Executive Portal</span>
@@ -675,6 +689,242 @@
             <h3>Submission Status</h3>
             <div id="enrollment-status-body"><p class="enrollment-empty">No submission for this term yet.</p></div>
           </div>
+        </div>
+      </section>
+
+      <!-- CAREER PASSPORT (CV BUILDER) -->
+      <section class="view" id="view-cv">
+        <div class="view-header">
+          <div>
+            <h2>Career Passport & Harvard CV Builder</h2>
+            <p class="view-sub">Curate verified achievements, customize your engineering profile, and export an ATS-compliant Harvard resume</p>
+          </div>
+          <div class="view-header-actions" style="display:flex; gap:10px; align-items:center;">
+            <button type="button" class="btn btn-secondary" onclick="CvBuilder.resetToSample()">
+              <iconify-icon icon="solar:magic-stick-3-linear"></iconify-icon>
+              <span>Sample Draft</span>
+            </button>
+            <button type="button" class="btn btn-primary" onclick="CvBuilder.exportPdf()">
+              <iconify-icon icon="solar:printer-bold"></iconify-icon>
+              <span>Print / Download PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="cv-builder-container" style="padding:0; margin:0; max-width:100%;">
+          <!-- LEFT PANE: Achievement Locker ("The Store") & Career Details -->
+          <aside class="achievement-locker">
+            <div class="locker-header">
+              <div class="locker-header-icon">
+                <iconify-icon icon="solar:backpack-linear"></iconify-icon>
+              </div>
+              <div>
+                <h3>Achievement Locker</h3>
+                <p>Click items to add or remove verified badges from your CV.</p>
+              </div>
+            </div>
+
+            <!-- Filter Chips -->
+            <div class="locker-filters">
+              <button type="button" class="locker-chip active" data-type="all" onclick="CvBuilder.filterLocker('all')">
+                <span>All Items</span>
+              </button>
+              <button type="button" class="locker-chip" data-type="leadership" onclick="CvBuilder.filterLocker('leadership')">
+                <span>Leadership</span>
+              </button>
+              <button type="button" class="locker-chip" data-type="seminar" onclick="CvBuilder.filterLocker('seminar')">
+                <span>Workshops</span>
+              </button>
+            </div>
+
+            <!-- Locker List -->
+            <div class="locker-items-list" id="locker-items-container">
+              <!-- Dynamically rendered by cv-builder.js -->
+            </div>
+
+            <div class="locker-divider">
+              <span>Personal & Career Details</span>
+            </div>
+
+            <!-- Form Edit Controls for Details & Technical Skills -->
+            <form class="cv-form-drawer" id="cv-details-form" onsubmit="return false;">
+              <!-- Engineering Discipline Quick Presets -->
+              <div class="cv-form-group" style="background:rgba(255,94,20,0.06); border:1px solid rgba(255,94,20,0.2); border-radius:8px; padding:10px 12px; margin-bottom:4px;">
+                <label for="cv-discipline" style="color:var(--primary); font-weight:700;">
+                  <span>Engineering Discipline Preset</span>
+                  <span class="cv-field-hint">Auto-configures skills & coursework</span>
+                </label>
+                <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
+                  <select id="cv-discipline" class="cv-input" onchange="CvBuilder.applyDisciplinePreset(this.value)" style="flex:1;">
+                    <option value="cpe">Computer Engineering (BSCPE)</option>
+                    <option value="ece">Electronics Engineering (BSECE)</option>
+                    <option value="ce">Civil Engineering (BSCE)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="cv-form-row">
+                <div class="cv-form-group">
+                  <label for="cv-name">Full Name</label>
+                  <input type="text" id="cv-name" class="cv-input" placeholder="e.g. Juan M. Dela Cruz" oninput="CvBuilder.handleInputChange()" />
+                </div>
+                <div class="cv-form-group">
+                  <label for="cv-email">Email Address</label>
+                  <input type="email" id="cv-email" class="cv-input" placeholder="you@g.cjc.edu.ph" oninput="CvBuilder.handleInputChange()" />
+                </div>
+              </div>
+
+              <div class="cv-form-row">
+                <div class="cv-form-group">
+                  <label for="cv-course">Degree & Major</label>
+                  <input type="text" id="cv-course" class="cv-input" placeholder="e.g. BS Civil Engineering" oninput="CvBuilder.handleInputChange()" />
+                </div>
+                <div class="cv-form-group">
+                  <label for="cv-grad-year">Candidate / Grad Year</label>
+                  <input type="text" id="cv-grad-year" class="cv-input" placeholder="e.g. 2028" oninput="CvBuilder.handleInputChange()" />
+                </div>
+              </div>
+
+              <div class="cv-form-group">
+                <label for="cv-coursework">
+                  <span>Relevant Coursework</span>
+                  <span class="cv-field-hint">Click tags below to toggle</span>
+                </label>
+                <input type="text" id="cv-coursework" class="cv-input" placeholder="e.g. Engineering Mathematics, Fluid Mechanics, CAD" oninput="CvBuilder.handleInputChange()" />
+                <div class="editor-suggestion-row" id="coursework-suggestions-container"></div>
+              </div>
+
+              <div class="cv-form-row">
+                <div class="cv-form-group">
+                  <label for="cv-phone">Contact Phone</label>
+                  <input type="text" id="cv-phone" class="cv-input" placeholder="+63 912 345 6789" oninput="CvBuilder.handleInputChange()" />
+                </div>
+                <div class="cv-form-group">
+                  <label for="cv-location">Location / City</label>
+                  <input type="text" id="cv-location" class="cv-input" placeholder="Davao del Sur, Philippines" oninput="CvBuilder.handleInputChange()" />
+                </div>
+              </div>
+
+              <div class="cv-form-row">
+                <div class="cv-form-group">
+                  <label for="cv-linkedin">LinkedIn Profile URL</label>
+                  <input type="text" id="cv-linkedin" class="cv-input" placeholder="linkedin.com/in/username" oninput="CvBuilder.handleInputChange()" />
+                </div>
+                <div class="cv-form-group">
+                  <label for="cv-github">GitHub / Portfolio Handle</label>
+                  <input type="text" id="cv-github" class="cv-input" placeholder="github.com/username" oninput="CvBuilder.handleInputChange()" />
+                </div>
+              </div>
+
+              <div class="cv-form-group">
+                <label for="cv-portfolio">Personal Website / Portfolio URL</label>
+                <input type="text" id="cv-portfolio" class="cv-input" placeholder="username.dev or portfolio link" oninput="CvBuilder.handleInputChange()" />
+              </div>
+
+              <div class="cv-form-group">
+                <label for="cv-headline">Career Headline</label>
+                <input type="text" id="cv-headline" class="cv-input" placeholder="e.g. Civil Engineering Student | Structural Analysis & Geomatics" oninput="CvBuilder.handleInputChange()" />
+              </div>
+
+              <div class="cv-form-group">
+                <label for="cv-summary">Professional Summary</label>
+                <textarea id="cv-summary" class="cv-input" rows="3" placeholder="Motivated engineering student with a strong background in problem solving..." oninput="CvBuilder.handleInputChange()"></textarea>
+              </div>
+
+              <div class="cv-form-group">
+                <label for="cv-skills">
+                  <span>Technical Skills & Tools</span>
+                  <span class="cv-field-hint">Click tags below to toggle</span>
+                </label>
+                <input type="text" id="cv-skills" class="cv-input" placeholder="AutoCAD, MATLAB, SolidWorks, Python" oninput="CvBuilder.handleInputChange()" />
+                <div class="editor-suggestion-row" id="skill-suggestions-container"></div>
+              </div>
+
+              <div class="cv-form-group">
+                <label for="cv-soft-skills">Core Competencies & Leadership</label>
+                <input type="text" id="cv-soft-skills" class="cv-input" placeholder="Project Budgeting, Technical Writing, Team Leadership" oninput="CvBuilder.handleInputChange()" />
+              </div>
+
+              <div class="cv-form-group">
+                <label for="cv-capstone-title">Capstone Design Project Title</label>
+                <input type="text" id="cv-capstone-title" class="cv-input" placeholder="Smart Structural Monitoring System" oninput="CvBuilder.handleInputChange()" />
+              </div>
+
+              <div class="cv-form-group">
+                <label for="cv-capstone-abstract">Capstone Abstract / Summary</label>
+                <textarea id="cv-capstone-abstract" class="cv-input" rows="2" placeholder="Brief description of engineering design project..." oninput="CvBuilder.handleInputChange()"></textarea>
+              </div>
+
+              <div class="locker-divider">
+                <span>Add Custom Role or Certification</span>
+              </div>
+
+              <div class="custom-entry-box">
+                <div class="cv-form-group">
+                  <label for="custom-entry-title">Role / Certification Title</label>
+                  <input type="text" id="custom-entry-title" class="cv-input" placeholder="e.g. Software Engineering Intern" />
+                </div>
+                <div class="cv-form-row">
+                  <div class="cv-form-group">
+                    <label for="custom-entry-org">Company / Organization</label>
+                    <input type="text" id="custom-entry-org" class="cv-input" placeholder="e.g. Tech Solutions Inc." />
+                  </div>
+                  <div class="cv-form-group">
+                    <label for="custom-entry-date">Date / Year</label>
+                    <input type="text" id="custom-entry-date" class="cv-input" placeholder="e.g. Summer 2025" />
+                  </div>
+                </div>
+                <div class="cv-form-row">
+                  <div class="cv-form-group">
+                    <label for="custom-entry-type">Section Category</label>
+                    <select id="custom-entry-type" class="cv-input">
+                      <option value="leadership">Leadership & Experience</option>
+                      <option value="seminar">Certification & Workshop</option>
+                    </select>
+                  </div>
+                  <div class="cv-form-group" style="justify-content:flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="CvBuilder.addCustomEntry()" style="margin-top:auto;padding:8px 12px;font-size:0.78rem;">
+                      <iconify-icon icon="solar:add-circle-linear"></iconify-icon> Add to CV
+                    </button>
+                  </div>
+                </div>
+                <div class="cv-form-group">
+                  <label for="custom-entry-desc">Bullet Description</label>
+                  <input type="text" id="custom-entry-desc" class="cv-input" placeholder="e.g. Developed real-time telemetry prototypes." />
+                </div>
+              </div>
+
+              <div class="cv-form-actions">
+                <button type="button" class="btn btn-primary cv-save-btn" id="cv-save-btn" onclick="CvBuilder.saveCv()">
+                  <iconify-icon icon="solar:diskette-bold"></iconify-icon>
+                  <span id="cv-save-text">Save Changes</span>
+                </button>
+                <span class="cv-autosave-hint" id="cv-autosave-hint">Auto-saved to browser</span>
+              </div>
+            </form>
+          </aside>
+
+          <!-- RIGHT PANE: Live Harvard Canvas -->
+          <main class="cv-preview-wrapper">
+            <div class="cv-toolbar">
+              <div class="cv-toolbar-title">
+                <iconify-icon icon="solar:document-text-bold" class="cv-toolbar-icon"></iconify-icon>
+                <span>Harvard Engineering CV Canvas</span>
+                <span class="cv-toolbar-badge">Preview</span>
+              </div>
+              <div class="cv-toolbar-buttons">
+                <button type="button" class="btn btn-secondary cv-toolbar-btn" onclick="CvBuilder.exportPdf()">
+                  <iconify-icon icon="solar:download-minimalistic-bold"></iconify-icon>
+                  <span>Download PDF</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Printable Harvard Paper Sheet -->
+            <div class="harvard-cv-paper" id="harvard-cv-canvas">
+              <!-- Rendered dynamically by CvBuilder.renderCvPreview() -->
+            </div>
+          </main>
         </div>
       </section>
 
@@ -1174,6 +1424,16 @@
             </div>
             <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
           </button>
+          <button type="button" class="mobile-sheet-row" data-view="cv" data-sheet-action="nav">
+            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(255,94,20,0.12);">
+              <iconify-icon icon="solar:diploma-linear"></iconify-icon>
+            </div>
+            <div class="mobile-sheet-row-content">
+              <span class="mobile-sheet-row-title">Career Passport (CV Builder)</span>
+              <span class="mobile-sheet-row-desc">Harvard-style resume & achievement locker</span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
+          </button>
         </div>
       </div>
 
@@ -1555,6 +1815,7 @@
   <script src="js/profile.js?v=5.3"></script>
   <script src="js/notifications.js?v=5.3"></script>
   <script src="js/enrollment.js?v=1.1"></script>
+  <script src="js/cv-builder.js?v=2.0"></script>
   <script src="js/app.js?v=6.5"></script>
   <script>
     // PWA: register the app-shell service worker (skipped in Electron's file:// windows)

@@ -566,7 +566,7 @@
     UI.showView(view);
 
     // Sync active class on both sidebar and bottom nav
-    const moreViews = ['income', 'units', 'enrollment', 'admin'];
+    const moreViews = ['income', 'units', 'enrollment', 'cv', 'admin'];
     const isMoreActive = moreViews.includes(view);
     const moreBtn = document.getElementById('bottom-nav-more-btn');
     if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
@@ -590,6 +590,7 @@
     }
     if (view === 'units')       Units.load();
     if (view === 'enrollment')  EnrollmentSection.load();
+    if (view === 'cv')          { if (typeof CvBuilder !== 'undefined') CvBuilder.loadData(); }
     if (view === 'admin')        Admin.init();
   }
 
