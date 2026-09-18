@@ -7,6 +7,7 @@ const CvBuilder = (() => {
   let lockerItems = [];
   let selectedItems = new Set();
   let activeFilter = 'all';
+  let profilePhotoDataUrl = null; // stores uploaded profile photo as data URL
 
   // CV fields are user-controlled - escape before any innerHTML insertion.
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
@@ -55,8 +56,8 @@ const CvBuilder = (() => {
     discipline: 'cpe',
     profile: {
       full_name: '',
-      course: 'Bachelor of Science in Computer Engineering',
-      enrollment_year: '2028',
+      course: '',
+      enrollment_year: '',
       email: ''
     },
     headline: '',
@@ -66,9 +67,9 @@ const CvBuilder = (() => {
     linkedin_url: '',
     github_url: '',
     portfolio_url: '',
-    coursework: 'Object-Oriented Programming, Computer Architecture, Embedded Systems, Data Structures & Algorithms, Computer Networks, Operating Systems',
-    technical_skills: ['C / C++', 'Python', 'Embedded Systems (ARM/ESP32)', 'Linux / Bash', 'Git / GitHub', 'AutoCAD', 'I2C / SPI Protocols', 'PostgreSQL'],
-    soft_skills: ['Team Leadership', 'Technical Documentation', 'Agile Project Tracking', 'Project Budgeting', 'Critical Problem Solving'],
+    coursework: '',
+    technical_skills: [],
+    soft_skills: [],
     capstone_project: {
       title: '',
       abstract: ''
@@ -157,15 +158,15 @@ const CvBuilder = (() => {
 
     const setVal = (id, val) => {
       const els = document.querySelectorAll(`#${id}`);
-      els.forEach(el => { el.value = val || ''; });
+      els.forEach(el => { el.value = val !== undefined && val !== null ? val : ''; });
     };
 
-    const prof = cvData.profile || defaultSampleData.profile;
+    const prof = cvData.profile || {};
     const initialDiscipline = ENGINEERING_PRESETS[cvData.discipline] ? cvData.discipline : 'cpe';
     setVal('cv-discipline', initialDiscipline);
     setVal('cv-name', prof.full_name);
     setVal('cv-course', prof.course);
-    setVal('cv-grad-year', prof.enrollment_year || '2028');
+    setVal('cv-grad-year', prof.enrollment_year);
     setVal('cv-email', cvData.contact_email || prof.email);
 
     setVal('cv-headline', cvData.headline);
@@ -175,7 +176,7 @@ const CvBuilder = (() => {
     setVal('cv-linkedin', cvData.linkedin_url);
     setVal('cv-github', cvData.github_url);
     setVal('cv-portfolio', cvData.portfolio_url);
-    setVal('cv-coursework', cvData.coursework || defaultSampleData.coursework);
+    setVal('cv-coursework', cvData.coursework);
     setVal('cv-skills', Array.isArray(cvData.technical_skills) ? cvData.technical_skills.join(', ') : (cvData.technical_skills || ''));
     setVal('cv-soft-skills', Array.isArray(cvData.soft_skills) ? cvData.soft_skills.join(', ') : (cvData.soft_skills || ''));
 
@@ -725,23 +726,23 @@ const CvBuilder = (() => {
     const canvases = document.querySelectorAll('#harvard-cv-canvas');
     if (!canvases || canvases.length === 0) return;
 
-    const getVal = (id, fallback) => {
+    const getVal = (id) => {
       const el = document.getElementById(id);
-      return el && el.value !== undefined && el.value.trim() !== '' ? el.value.trim() : (fallback || '');
+      return el && el.value !== undefined ? el.value.trim() : '';
     };
 
-    const currentProfile = cvData?.profile || defaultSampleData.profile;
-    const name      = getVal('cv-name',    currentProfile.full_name || '');
-    const course    = getVal('cv-course',  currentProfile.course || 'Bachelor of Science in Engineering');
-    const gradYear  = getVal('cv-grad-year', currentProfile.enrollment_year || '2028');
-    const email     = getVal('cv-email',   cvData?.contact_email || currentProfile.email || '');
-    const phone     = getVal('cv-phone',   cvData?.contact_phone || '');
-    const location  = getVal('cv-location', cvData?.location || '');
-    const linkedin  = getVal('cv-linkedin', cvData?.linkedin_url || '');
-    const github    = getVal('cv-github',  cvData?.github_url || '');
-    const portfolio = getVal('cv-portfolio', cvData?.portfolio_url || '');
-    const coursework = getVal('cv-coursework', cvData?.coursework || defaultSampleData.coursework);
-    const summary    = getVal('cv-summary', cvData?.summary || '');
+    const currentProfile = cvData?.profile || {};
+    const name      = getVal('cv-name') || currentProfile.full_name || '';
+    const course    = getVal('cv-course') || currentProfile.course || '';
+    const gradYear  = getVal('cv-grad-year') || currentProfile.enrollment_year || '';
+    const email     = getVal('cv-email') || cvData?.contact_email || currentProfile.email || '';
+    const phone     = getVal('cv-phone') || cvData?.contact_phone || '';
+    const location  = getVal('cv-location') || cvData?.location || '';
+    const linkedin  = getVal('cv-linkedin') || cvData?.linkedin_url || '';
+    const github    = getVal('cv-github') || cvData?.github_url || '';
+    const portfolio = getVal('cv-portfolio') || cvData?.portfolio_url || '';
+    const coursework = getVal('cv-coursework') || cvData?.coursework || '';
+    const summary    = getVal('cv-summary') || cvData?.summary || '';
     const shareToken = cvData?.share_token || 'VERIFY-COE';
 
     const selectedMilestones = lockerItems.filter(item => selectedItems.has(item.id));
@@ -762,31 +763,42 @@ const CvBuilder = (() => {
     const ce = (fieldId, val, placeholder) =>
       `<span contenteditable="true" data-field="${esc(fieldId)}" data-placeholder="${esc(placeholder)}" class="cv-paper-field">${esc(val)}</span>`;
 
+    const photoHtml = profilePhotoDataUrl
+      ? `<img src="${profilePhotoDataUrl}" class="cv-profile-photo" alt="Profile Photo" />`
+      : `<div class="cv-profile-photo cv-photo-placeholder"><iconify-icon icon="solar:user-circle-bold" style="font-size:2.2rem;color:#94A3B8;"></iconify-icon><span>Click to add photo</span></div>`;
+
     const htmlContent = `
       <!-- Harvard Header -->
       <div class="harvard-header">
-        <div class="harvard-name cv-paper-field"
-             contenteditable="true"
-             data-field="cv-name"
-             data-placeholder="YOUR FULL NAME">${esc(name)}</div>
-        <div class="harvard-contact-line">
-          <div class="harvard-contact-row">
-            ${ce('cv-location', location, 'City, Region')}
-            <span class="sep"> &bull; </span>
-            ${ce('cv-phone', phone, '+63 912 000 0000')}
-            <span class="sep"> &bull; </span>
-            ${ce('cv-email', email, 'you@school.edu.ph')}
-          </div>
-          <div class="harvard-contact-row">
-            LinkedIn:&nbsp;${ce('cv-linkedin', linkedin, 'linkedin.com/in/username')}
-            <span class="sep"> &bull; </span>
-            GitHub:&nbsp;${ce('cv-github', github, 'github.com/username')}
-            ${portfolio ? `<span class="sep"> &bull; </span>Portfolio:&nbsp;${ce('cv-portfolio', portfolio, 'your-portfolio.dev')}` : ''}
+        <div class="harvard-header-left">
+          <div class="harvard-name cv-paper-field"
+               contenteditable="true"
+               data-field="cv-name"
+               data-placeholder="YOUR FULL NAME">${esc(name)}</div>
+          <div class="harvard-contact-line">
+            <div class="harvard-contact-row">
+              ${ce('cv-location', location, 'City, Region')}
+              <span class="sep"> &bull; </span>
+              ${ce('cv-phone', phone, '+63 912 000 0000')}
+              <span class="sep"> &bull; </span>
+              ${ce('cv-email', email, 'you@school.edu.ph')}
+            </div>
+            <div class="harvard-contact-row">
+              LinkedIn:&nbsp;${ce('cv-linkedin', linkedin, 'linkedin.com/in/username')}
+              <span class="sep"> &bull; </span>
+              GitHub:&nbsp;${ce('cv-github', github, 'github.com/username')}
+              ${portfolio ? `<span class="sep"> &bull; </span>Portfolio:&nbsp;${ce('cv-portfolio', portfolio, 'your-portfolio.dev')}` : ''}
+            </div>
           </div>
         </div>
-        <div class="harvard-qr-box">
-          <img src="${qrApiUrl}" class="harvard-qr-img" alt="QR Verify" />
-          <div class="harvard-qr-label">Credential Verification</div>
+        <div class="harvard-header-right">
+          <div class="cv-photo-wrapper" id="cv-photo-wrapper" title="Click to upload profile photo" onclick="CvBuilder.triggerPhotoUpload()">
+            ${photoHtml}
+          </div>
+          <div class="harvard-qr-box">
+            <img src="${qrApiUrl}" class="harvard-qr-img" alt="QR Verify" />
+            <div class="harvard-qr-label">Credential Verification</div>
+          </div>
         </div>
       </div>
 
@@ -929,17 +941,54 @@ const CvBuilder = (() => {
   }
 
   /**
-   * Reset form and preview to a blank template
+   * Reset form and preview to a completely blank template.
+   * Also clears the profile photo.
    */
   function resetToSample() {
-    cvData = { ...defaultSampleData };
+    if (!confirm('Reset all CV fields? This cannot be undone.')) return;
+    cvData = {
+      discipline: 'cpe',
+      profile: { full_name: '', course: '', enrollment_year: '', email: '' },
+      headline: '', summary: '', contact_phone: '', location: '',
+      linkedin_url: '', github_url: '', portfolio_url: '', coursework: '',
+      technical_skills: [], soft_skills: [],
+      capstone_project: { title: '', abstract: '' },
+      locker_items: [], selected_locker_items: []
+    };
     lockerItems = [];
     selectedItems = new Set();
+    profilePhotoDataUrl = null;
     localStorage.removeItem('coe_cv_draft');
     populateFormInputs();
     renderLocker();
     renderCvPreview();
-    showToast('CV cleared — start fresh with your own details!', 'info');
+    showToast('CV reset — start fresh with your own details!', 'info');
+  }
+
+  /**
+   * Trigger file picker for profile photo upload.
+   */
+  function triggerPhotoUpload() {
+    let input = document.getElementById('cv-photo-file-input');
+    if (!input) {
+      input = document.createElement('input');
+      input.type = 'file';
+      input.id = 'cv-photo-file-input';
+      input.accept = 'image/*';
+      input.style.display = 'none';
+      document.body.appendChild(input);
+      input.addEventListener('change', () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          profilePhotoDataUrl = e.target.result;
+          renderCvPreview();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    input.click();
   }
 
   /**
@@ -972,6 +1021,7 @@ const CvBuilder = (() => {
     toggleCourseworkChip,
     saveCv,
     resetToSample,
-    exportPdf
+    exportPdf,
+    triggerPhotoUpload
   };
 })();

@@ -702,6 +702,7 @@ textarea.cv-input {
 .harvard-cv-paper {
   width: 100%;
   max-width: 800px;
+  min-width: 800px;
   min-height: 1030px;
   background: #FFFFFF !important;
   color: #000000 !important;
@@ -716,11 +717,24 @@ textarea.cv-input {
 }
 
 .harvard-header {
-  text-align: center;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
   margin-bottom: 18px;
-  position: relative;
-  /* Symmetrical 84px horizontal padding keeps centered name & contact rows strictly away from the 64px QR box */
-  padding: 0 84px;
+}
+
+.harvard-header-left {
+  flex: 1;
+  text-align: center;
+}
+
+.harvard-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .harvard-name {
@@ -757,11 +771,44 @@ textarea.cv-input {
   user-select: none;
 }
 
+/* Profile photo upload area */
+.cv-photo-wrapper {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px dashed #aaa;
+  flex-shrink: 0;
+}
+
+.cv-photo-wrapper:hover {
+  border-color: #555;
+}
+
+.cv-profile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cv-photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #f5f5f5;
+  font-size: 6.5pt;
+  color: #888;
+  font-family: sans-serif;
+  text-align: center;
+  gap: 2px;
+}
+
 .harvard-qr-box {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 64px;
   text-align: center;
 }
 
@@ -921,3 +968,4 @@ textarea.cv-input {
     display: none !important;
   }
 }
+
