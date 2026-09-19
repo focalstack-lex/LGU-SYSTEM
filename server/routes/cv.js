@@ -1,4 +1,5 @@
 const express = require('express');
+const { rateLimit } = require('express-rate-limit');
 const router  = express.Router();
 const supabase = require('../lib/supabase');
 const authMiddleware = require('../middleware/auth');
@@ -30,35 +31,109 @@ function cvEmail(value) {
   return (v.length <= 254 && EMAIL_RE.test(v)) ? v : '';
 }
 
+// Accepts what students actually type ("linkedin.com/in/juan") as well as full
+// URLs. Bare domains get https:// prepended; only http(s) URLs with a real
+// hostname survive, so javascript:/data: payloads are dropped.
 function cvUrl(value) {
   if (typeof value !== 'string') return '';
   const v = value.trim();
   if (!v || v.length > 300) return '';
+  const withScheme = /^[a-z][a-z0-9+.-]*:/i.test(v) ? v : `https://${v}`;
   try {
-    const u = new URL(v);
-    return (u.protocol === 'https:' || u.protocol === 'http:') ? v : '';
+    const u = new URL(withScheme);
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return '';
+    if (!u.hostname.includes('.')) return '';
+    return withScheme;
   } catch {
     return '';
   }
 }
 
-// Recursively sanitize unknown-shape structures (work_experience,
-// custom_sections): string values are cleaned, arrays/objects capped,
-// depth-limited to guard against pathological payloads.
-function cvDeep(value, depth = 0) {
-  if (depth > 4) return null;
-  if (typeof value === 'string') return cvClean(value, 2000);
-  if (Array.isArray(value)) return value.slice(0, 30).map((v) => cvDeep(v, depth + 1)).filter((v) => v !== null);
-  if (value && typeof value === 'object') {
-    const out = {};
-    for (const [k, v] of Object.entries(value).slice(0, 30)) {
-      out[String(k).replace(/[<>"'`]/g, '').slice(0, 60)] = cvDeep(v, depth + 1);
+function cvList(value, itemMax = 60, maxItems = 30) {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  const out = [];
+  for (const raw of value) {
+    const s = cvClean(raw, itemMax);
+    const key = s.toLowerCase();
+    if (s && !seen.has(key)) {
+      seen.add(key);
+      out.push(s);
     }
-    return out;
+    if (out.length >= maxItems) break;
   }
-  if (typeof value === 'number' && Number.isFinite(value)) return value;
-  if (typeof value === 'boolean') return value;
-  return null;
+  return out;
+}
+
+// ---------------------------------------------
+// CV entries (experience / leadership / certification / award)
+// ---------------------------------------------
+const ENTRY_TYPES = ['experience', 'leadership', 'certification', 'award'];
+const MAX_ENTRIES = 25;          // keeps a worst-case payload well under the 50kb JSON body limit
+const MAX_BULLETS = 4;
+const ENTRY_ID_RE = /^[\w-]{1,60}$/;
+
+function cvEntries(value) {
+  if (!Array.isArray(value)) return [];
+  const out = [];
+  for (const raw of value) {
+    if (!raw || typeof raw !== 'object') continue;
+    const title = cvClean(raw.title, 120);
+    if (!title) continue; // an entry without a title is an empty draft row - never stored
+    out.push({
+      id:           (typeof raw.id === 'string' && ENTRY_ID_RE.test(raw.id)) ? raw.id : `e-${out.length}-${Date.now().toString(36)}`,
+      type:         ENTRY_TYPES.includes(raw.type) ? raw.type : 'experience',
+      title,
+      organization: cvClean(raw.organization, 120),
+      date:         cvClean(raw.date, 40),
+      bullets:      Array.isArray(raw.bullets)
+        ? raw.bullets.map((b) => cvClean(b, 200)).filter(Boolean).slice(0, MAX_BULLETS)
+        : []
+    });
+    if (out.length >= MAX_ENTRIES) break;
+  }
+  return out;
+}
+
+// ---------------------------------------------
+// Education block
+// ---------------------------------------------
+const PROGRAMS = {
+  BSCoE: 'BS Computer Engineering',
+  BSCE:  'BS Civil Engineering',
+  BSECE: 'BS Electronics Engineering'
+};
+
+function cvYear(value) {
+  const s = String(value ?? '').trim();
+  if (!/^\d{4}$/.test(s)) return '';
+  const n = Number(s);
+  return (n >= 2000 && n <= 2100) ? s : '';
+}
+
+function cvEducation(value) {
+  const e = (value && typeof value === 'object') ? value : {};
+  const program = (e.program === 'OTHER' || PROGRAMS[e.program]) ? e.program : '';
+  return {
+    program,
+    degree:     cvClean(e.degree, 120),
+    grad_year:  cvYear(e.grad_year),
+    coursework: cvList(e.coursework, 80, 20)
+  };
+}
+
+// Pre-fill for a student who has never saved a CV. Only facts we actually have
+// on their profile - no invented content.
+function defaultEducation(profile) {
+  const course = String(profile?.course || '').trim();
+  const program = PROGRAMS[course] ? course : (course ? 'OTHER' : '');
+  const start = Number(profile?.enrollment_year);
+  return {
+    program,
+    degree:     PROGRAMS[course] || cvClean(course, 120),
+    grad_year:  Number.isInteger(start) ? cvYear(String(start + 4)) : '',
+    coursework: []
+  };
 }
 
 /**
@@ -138,7 +213,20 @@ async function fetchVerifiedMilestones(userId, userEmail) {
   return milestones;
 }
 
-// GET /api/cv/me - Fetch student's CV and available achievement locker items
+// Autosave means a busy student can PUT every few seconds. Limit per USER, not
+// per IP: campus Wi-Fi puts hundreds of students behind one NAT address, so an
+// IP-keyed bucket would be exhausted by a handful of people. Mounted after
+// authMiddleware so req.user is always set.
+const cvSaveLimiter = rateLimit({
+  windowMs:        5 * 60 * 1000,
+  max:             40,
+  standardHeaders: true,
+  legacyHeaders:   false,
+  message:         { error: 'Saving too frequently. Your changes are kept in this browser and will sync shortly.' },
+  keyGenerator:    (req) => req.user.id,
+});
+
+// GET /api/cv/me - Fetch student's CV and available verified college records
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -155,47 +243,40 @@ router.get('/me', authMiddleware, async (req, res) => {
       return res.status(500).json({ error: 'Failed to fetch CV profile.' });
     }
 
-    // Fetch available achievement locker items
+    // Verified college records the student may choose to include
     const lockerItems = await fetchVerifiedMilestones(userId, userEmail);
 
     // If CV exists, return it with populated locker items
     if (cv) {
       return res.json({
         ...cv,
+        education: cvEducation(cv.education),
         profile: req.profile,
         locker_items: lockerItems
       });
     }
 
-    // If CV doesn't exist yet, return a pre-filled default template
-    const defaultCv = {
+    // No CV yet: pre-fill only what the student's profile already states.
+    return res.json({
       user_id: userId,
-      headline: `${req.profile?.course || 'BS Engineering'} Candidate`,
-      summary: `Motivated engineering student with a strong background in problem solving, leadership, and project execution. Seeking opportunities to apply technical skills in professional engineering roles.`,
-      contact_email: userEmail,
+      exists: false,
+      full_name: cvClean(req.profile?.full_name, 100),
+      contact_email: userEmail || '',
       contact_phone: '',
-      location: 'Manila, Philippines',
+      location: '',
       linkedin_url: '',
       github_url: '',
       portfolio_url: '',
-      technical_skills: ['AutoCAD', 'MS Office', 'Problem Solving', 'Project Management'],
-      soft_skills: ['Leadership', 'Team Collaboration', 'Technical Writing'],
-      capstone_project: {
-        title: '',
-        abstract: '',
-        tech_stack: '',
-        advisor: ''
-      },
-      work_experience: [],
-      selected_locker_items: lockerItems.map(item => item.id), // Auto-select verified items
+      education: defaultEducation(req.profile),
+      summary: '',
+      technical_skills: [],
+      soft_skills: [],
+      capstone_project: { title: '', abstract: '', tech_stack: '' },
       custom_sections: [],
-      template_style: 'harvard',
-      is_public: true,
+      selected_locker_items: [],
       profile: req.profile,
       locker_items: lockerItems
-    };
-
-    return res.json(defaultCv);
+    });
   } catch (err) {
     console.error('[CV GET Error]:', err);
     return res.status(500).json({ error: 'Server error fetching CV data.' });
@@ -203,40 +284,33 @@ router.get('/me', authMiddleware, async (req, res) => {
 });
 
 // PUT /api/cv/me - Save or update student CV
-router.put('/me', authMiddleware, async (req, res) => {
+router.put('/me', authMiddleware, cvSaveLimiter, async (req, res) => {
   try {
     const userId = req.user.id;
     const body = req.body || {};
 
     const cvData = {
       user_id: userId,
-      headline:         cvClean(body.headline, 120),
-      summary:          cvClean(body.summary, 2000),
+      full_name:        cvClean(body.full_name, 100),
+      summary:          cvClean(body.summary, 1000),
       contact_email:    cvEmail(body.contact_email) || req.user.email,
       contact_phone:    cvClean(body.contact_phone, 40),
       location:         cvClean(body.location, 120),
       linkedin_url:     cvUrl(body.linkedin_url),
       github_url:       cvUrl(body.github_url),
       portfolio_url:    cvUrl(body.portfolio_url),
-      technical_skills: Array.isArray(body.technical_skills)
-        ? body.technical_skills.map((s) => cvClean(s, 60)).filter(Boolean).slice(0, 30)
-        : [],
-      soft_skills:      Array.isArray(body.soft_skills)
-        ? body.soft_skills.map((s) => cvClean(s, 60)).filter(Boolean).slice(0, 30)
-        : [],
+      education:        cvEducation(body.education),
+      technical_skills: cvList(body.technical_skills, 60, 30),
+      soft_skills:      cvList(body.soft_skills, 60, 30),
       capstone_project: {
         title:      cvClean(body.capstone_project?.title, 150),
-        abstract:   cvClean(body.capstone_project?.abstract, 2000),
-        tech_stack: cvClean(body.capstone_project?.tech_stack, 200),
-        advisor:    cvClean(body.capstone_project?.advisor, 120)
+        abstract:   cvClean(body.capstone_project?.abstract, 600),
+        tech_stack: cvClean(body.capstone_project?.tech_stack, 200)
       },
-      work_experience:  cvDeep(body.work_experience) || [],
+      custom_sections:  cvEntries(body.custom_sections),
       selected_locker_items: Array.isArray(body.selected_locker_items)
         ? body.selected_locker_items.filter((s) => typeof s === 'string' && /^[\w-]{1,80}$/.test(s)).slice(0, 50)
         : [],
-      custom_sections:  cvDeep(body.custom_sections) || [],
-      template_style:   ['harvard'].includes(body.template_style) ? body.template_style : 'harvard',
-      is_public: body.is_public !== undefined ? Boolean(body.is_public) : true,
       updated_at: new Date()
     };
 
@@ -248,10 +322,14 @@ router.put('/me', authMiddleware, async (req, res) => {
 
     if (error) {
       console.error('[CV PUT Supabase Error]:', error);
+      // 42703 / PGRST204: the columns added by migration 037 are missing.
+      if (error.code === '42703' || error.code === 'PGRST204') {
+        return res.status(503).json({ error: 'CV storage is being updated. Your changes are kept in this browser and will sync once it is done.' });
+      }
       return res.status(500).json({ error: 'Failed to save CV profile.' });
     }
 
-    return res.json(data);
+    return res.json({ ok: true, updated_at: data.updated_at });
   } catch (err) {
     console.error('[CV PUT Error]:', err);
     return res.status(500).json({ error: 'Server error updating CV.' });
