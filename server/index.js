@@ -165,6 +165,8 @@ const feedbackDir = path.join(__dirname, "../client/feedback");
 app.get(["/feedback", "/feedback/"],        (req, res) => res.sendFile(path.join(feedbackDir, "index.html")));
 app.get(["/feedback/view", "/feedback/view/"], (req, res) => res.sendFile(path.join(feedbackDir, "view", "index.html")));
 app.get(["/faculty", "/faculty/"],           (req, res) => res.sendFile(path.join(__dirname, "../client", "faculty.html")));
+app.get(["/cv-builder", "/cv-builder/"],     (req, res) => res.sendFile(path.join(__dirname, "../client", "cv-builder.html")));
+app.get(["/cv-verify", "/cv-verify/"],       (req, res) => res.sendFile(path.join(__dirname, "../client", "cv-verify.html")));
 
 // =============================================
 // Public Routes
@@ -188,7 +190,10 @@ app.use("/api/curriculum",    authMiddleware, onlyWrites(writeLimiter), curricul
 app.use("/api/enrollment",    authMiddleware, onlyWrites(writeLimiter), enrollmentRouter);
 app.use("/api/faculty",       authMiddleware, onlyWrites(writeLimiter), facultyRouter);
 app.use("/api/notifications", authMiddleware, onlyWrites(writeLimiter), notificationsRouter);
-app.use("/api/cv",            onlyWrites(writeLimiter), cvRouter);
+// CV routes authenticate per-route (the public /verify lookup has no auth) and
+// apply their own per-user save limiter - a mount-level writeLimiter would run
+// before auth and key on IP, i.e. one shared bucket for all of campus Wi-Fi.
+app.use("/api/cv",            cvRouter);
 
 // =============================================
 // SPA Fallback

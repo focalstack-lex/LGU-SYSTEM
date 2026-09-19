@@ -3,34 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Career Passport & Harvard CV Builder · College of Engineering</title>
+  <title>CV Builder · College of Engineering</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <!-- Iconify Icon Font -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.2/dist/iconify-icon.min.js"></script>
 
   <!-- Global Styles -->
   <link rel="stylesheet" href="styles/main.css?v=7.2" />
-  <link rel="stylesheet" href="styles/cv-builder.css?v=2.0" />
+  <link rel="stylesheet" href="styles/cv-builder.css?v=3.0" />
 
-  <!-- Supabase CDN / Vendor -->
+  <!-- Supabase (vendored) -->
   <script src="vendor/supabase.min.js"></script>
 
   <script>
     // Apply theme immediately to prevent flashing
     (function() {
-      const savedTheme = localStorage.getItem('theme') || 'dark';
+      var savedTheme = 'dark';
+      try { savedTheme = localStorage.getItem('theme') || 'dark'; } catch (e) { /* storage unavailable */ }
       document.documentElement.setAttribute('data-theme', savedTheme);
     })();
   </script>
 </head>
-<body class="cv-builder-body">
+<body class="cv-builder-body" data-pane="edit">
 
-  <!-- Top Navigation Header matching Portal theme -->
   <header class="cv-app-header">
     <div class="cv-header-inner">
       <div class="cv-header-left">
@@ -40,270 +40,189 @@
         </a>
         <div class="cv-header-sep"></div>
         <div class="cv-brand-group">
-          <img src="assets/coe-logo.png" alt="COE Logo" class="cv-brand-logo" />
+          <img src="assets/coe-logo.png" alt="" class="cv-brand-logo" />
           <div class="cv-brand-titles">
             <span class="cv-brand-portal">College of Engineering</span>
-            <div class="cv-brand-sub">
-              <span class="cv-brand-badge">Career Passport</span>
-              <span class="cv-brand-tag">Harvard CV Engine</span>
-            </div>
+            <span class="cv-brand-badge">CV Builder</span>
           </div>
         </div>
       </div>
 
       <div class="cv-header-right">
-        <span class="cv-live-badge">
-          <span class="cv-live-dot"></span>
-          <span>ATS 1-Page Standard</span>
-        </span>
-        <button type="button" class="btn btn-secondary cv-sample-btn" onclick="CvBuilder.resetToSample()" title="Clear all CV fields and start fresh">
-          <iconify-icon icon="solar:restart-linear"></iconify-icon>
-          <span>Reset CV</span>
+        <button type="button" class="cv-status" id="cv-status" data-state="loading" aria-live="polite">
+          <span class="cv-status-dot" aria-hidden="true"></span>
+          <span id="cv-status-text">Loading…</span>
         </button>
-        <button type="button" class="btn btn-primary cv-export-btn" onclick="CvBuilder.exportPdf()">
-          <iconify-icon icon="solar:printer-bold"></iconify-icon>
-          <span>Print / Download PDF</span>
+        <button type="button" class="btn btn-secondary cv-header-btn" id="cv-reset-btn" title="Clear every field and start over" aria-label="Reset CV">
+          <iconify-icon icon="solar:restart-linear"></iconify-icon>
+          <span class="cv-btn-label">Reset</span>
+        </button>
+        <button type="button" class="btn btn-primary cv-header-btn cv-export-btn" id="cv-print-btn" aria-label="Download PDF">
+          <iconify-icon icon="solar:download-minimalistic-bold"></iconify-icon>
+          <span class="cv-btn-label">Download PDF</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Main CV Builder Interface -->
+  <!-- Phone layout: one pane at a time -->
+  <div class="cv-mobile-tabs" role="tablist" aria-label="CV builder view">
+    <button type="button" role="tab" class="cv-mobile-tab active" data-pane="edit" aria-selected="true">Edit</button>
+    <button type="button" role="tab" class="cv-mobile-tab" data-pane="preview" aria-selected="false">Preview</button>
+  </div>
+
   <div class="cv-builder-container">
 
-    <!-- LEFT PANE: Achievement Locker ("The Store") & Career Details -->
-    <aside class="achievement-locker">
-      <div class="locker-header">
-        <div class="locker-header-icon">
-          <iconify-icon icon="solar:backpack-linear"></iconify-icon>
-        </div>
-        <div>
-          <h3>Achievement Locker</h3>
-          <p>Click items to add or remove verified badges from your CV.</p>
-        </div>
-      </div>
+    <!-- LEFT PANE: editor -->
+    <aside class="cv-editor" id="cv-editor">
+      <form class="cv-form" id="cv-form" onsubmit="return false;" autocomplete="off" novalidate>
 
-      <!-- Filter Chips -->
-      <div class="locker-filters">
-        <button type="button" class="locker-chip active" data-type="all" onclick="CvBuilder.filterLocker('all')">
-          <span>All Items</span>
-        </button>
-        <button type="button" class="locker-chip" data-type="leadership" onclick="CvBuilder.filterLocker('leadership')">
-          <span>Leadership</span>
-        </button>
-        <button type="button" class="locker-chip" data-type="seminar" onclick="CvBuilder.filterLocker('seminar')">
-          <span>Workshops</span>
-        </button>
-      </div>
-
-      <!-- Locker List -->
-      <div class="locker-items-list" id="locker-items-container">
-        <!-- Dynamically rendered by cv-builder.js -->
-      </div>
-
-      <div class="locker-divider">
-        <span>Personal & Career Details</span>
-      </div>
-
-      <!-- Form Edit Controls for Details & Technical Skills -->
-      <form class="cv-form-drawer" id="cv-details-form" onsubmit="return false;">
-        <!-- Engineering Discipline Quick Presets -->
-        <div class="cv-form-group" style="background:rgba(255,94,20,0.06); border:1px solid rgba(255,94,20,0.2); border-radius:8px; padding:10px 12px; margin-bottom:4px;">
-          <label for="cv-discipline" style="color:var(--primary); font-weight:700;">
-            <span>Engineering Discipline Preset</span>
-            <span class="cv-field-hint">Auto-configures skills & coursework</span>
-          </label>
-          <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
-            <select id="cv-discipline" class="cv-input" onchange="CvBuilder.applyDisciplinePreset(this.value)" style="flex:1;">
-              <option value="cpe">Computer Engineering (BSCPE)</option>
-              <option value="ece">Electronics Engineering (BSECE)</option>
-              <option value="ce">Civil Engineering (BSCE)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="cv-form-row">
+        <section class="cv-block">
+          <h3 class="cv-block-title">Personal details</h3>
           <div class="cv-form-group">
-            <label for="cv-name">Full Name</label>
-            <input type="text" id="cv-name" class="cv-input" placeholder="e.g. Juan M. Dela Cruz" oninput="CvBuilder.handleInputChange()" />
-          </div>
-          <div class="cv-form-group">
-            <label for="cv-email">Email Address</label>
-            <input type="email" id="cv-email" class="cv-input" placeholder="you@g.cjc.edu.ph" oninput="CvBuilder.handleInputChange()" />
-          </div>
-        </div>
-
-        <div class="cv-form-row">
-          <div class="cv-form-group">
-            <label for="cv-course">Degree & Major</label>
-            <input type="text" id="cv-course" class="cv-input" placeholder="e.g. BS Civil Engineering" oninput="CvBuilder.handleInputChange()" />
-          </div>
-          <div class="cv-form-group">
-            <label for="cv-grad-year">Candidate / Grad Year</label>
-            <input type="text" id="cv-grad-year" class="cv-input" placeholder="e.g. 2028" oninput="CvBuilder.handleInputChange()" />
-          </div>
-        </div>
-
-        <div class="cv-form-group">
-          <label for="cv-coursework">
-            <span>Relevant Coursework</span>
-            <span class="cv-field-hint">Click tags below to toggle</span>
-          </label>
-          <input type="text" id="cv-coursework" class="cv-input" placeholder="e.g. Engineering Mathematics, Fluid Mechanics, CAD" oninput="CvBuilder.handleInputChange()" />
-          <div class="editor-suggestion-row" id="coursework-suggestions-container"></div>
-        </div>
-
-        <div class="cv-form-row">
-          <div class="cv-form-group">
-            <label for="cv-phone">Contact Phone</label>
-            <input type="text" id="cv-phone" class="cv-input" placeholder="+63 912 345 6789" oninput="CvBuilder.handleInputChange()" />
-          </div>
-          <div class="cv-form-group">
-            <label for="cv-location">Location / City</label>
-            <input type="text" id="cv-location" class="cv-input" placeholder="Davao del Sur, Philippines" oninput="CvBuilder.handleInputChange()" />
-          </div>
-        </div>
-
-        <div class="cv-form-row">
-          <div class="cv-form-group">
-            <label for="cv-linkedin">LinkedIn Profile URL</label>
-            <input type="text" id="cv-linkedin" class="cv-input" placeholder="linkedin.com/in/username" oninput="CvBuilder.handleInputChange()" />
-          </div>
-          <div class="cv-form-group">
-            <label for="cv-github">GitHub / Portfolio Handle</label>
-            <input type="text" id="cv-github" class="cv-input" placeholder="github.com/username" oninput="CvBuilder.handleInputChange()" />
-          </div>
-        </div>
-
-        <div class="cv-form-group">
-          <label for="cv-portfolio">Personal Website / Portfolio URL</label>
-          <input type="text" id="cv-portfolio" class="cv-input" placeholder="username.dev or portfolio link" oninput="CvBuilder.handleInputChange()" />
-        </div>
-
-        <div class="cv-form-group">
-          <label for="cv-headline">Career Headline</label>
-          <input type="text" id="cv-headline" class="cv-input" placeholder="e.g. Civil Engineering Student | Structural Analysis & Geomatics" oninput="CvBuilder.handleInputChange()" />
-        </div>
-
-        <div class="cv-form-group">
-          <label for="cv-summary">Professional Summary</label>
-          <textarea id="cv-summary" class="cv-input" rows="3" placeholder="Motivated engineering student with a strong background in problem solving..." oninput="CvBuilder.handleInputChange()"></textarea>
-        </div>
-
-        <div class="cv-form-group">
-          <label for="cv-skills">
-            <span>Technical Skills & Tools</span>
-            <span class="cv-field-hint">Click tags below to toggle</span>
-          </label>
-          <input type="text" id="cv-skills" class="cv-input" placeholder="AutoCAD, MATLAB, SolidWorks, Python" oninput="CvBuilder.handleInputChange()" />
-          <div class="editor-suggestion-row" id="skill-suggestions-container"></div>
-        </div>
-
-        <div class="cv-form-group">
-          <label for="cv-soft-skills">Core Competencies & Leadership</label>
-          <input type="text" id="cv-soft-skills" class="cv-input" placeholder="Project Budgeting, Technical Writing, Team Leadership" oninput="CvBuilder.handleInputChange()" />
-        </div>
-
-        <div class="cv-form-group">
-          <label for="cv-capstone-title">Capstone Design Project Title</label>
-          <input type="text" id="cv-capstone-title" class="cv-input" placeholder="Smart Structural Monitoring System" oninput="CvBuilder.handleInputChange()" />
-        </div>
-
-        <div class="cv-form-group">
-          <label for="cv-capstone-abstract">Capstone Abstract / Summary</label>
-          <textarea id="cv-capstone-abstract" class="cv-input" rows="2" placeholder="Brief description of engineering design project..." oninput="CvBuilder.handleInputChange()"></textarea>
-        </div>
-
-        <div class="locker-divider">
-          <span>Add Custom Role or Certification</span>
-        </div>
-
-        <div class="custom-entry-box">
-          <div class="cv-form-group">
-            <label for="custom-entry-title">Role / Certification Title</label>
-            <input type="text" id="custom-entry-title" class="cv-input" placeholder="e.g. Software Engineering Intern" />
+            <label for="cv-name">Full name</label>
+            <input type="text" id="cv-name" class="cv-input" data-path="full_name" maxlength="100" placeholder="e.g. Juan M. Dela Cruz" autocomplete="name" />
           </div>
           <div class="cv-form-row">
             <div class="cv-form-group">
-              <label for="custom-entry-org">Company / Organization</label>
-              <input type="text" id="custom-entry-org" class="cv-input" placeholder="e.g. Tech Solutions Inc." />
+              <label for="cv-email">Email</label>
+              <input type="email" id="cv-email" class="cv-input" data-path="contact_email" maxlength="254" placeholder="you@g.cjc.edu.ph" autocomplete="email" />
             </div>
             <div class="cv-form-group">
-              <label for="custom-entry-date">Date / Year</label>
-              <input type="text" id="custom-entry-date" class="cv-input" placeholder="e.g. Summer 2025" />
+              <label for="cv-phone">Phone</label>
+              <input type="tel" id="cv-phone" class="cv-input" data-path="contact_phone" maxlength="40" placeholder="+63 912 345 6789" autocomplete="tel" />
             </div>
+          </div>
+          <div class="cv-form-group">
+            <label for="cv-location">City / Province</label>
+            <input type="text" id="cv-location" class="cv-input" data-path="location" maxlength="120" placeholder="e.g. Digos City, Davao del Sur" autocomplete="address-level2" />
           </div>
           <div class="cv-form-row">
             <div class="cv-form-group">
-              <label for="custom-entry-type">Section Category</label>
-              <select id="custom-entry-type" class="cv-input">
-                <option value="leadership">Leadership & Experience</option>
-                <option value="seminar">Certification & Workshop</option>
+              <label for="cv-linkedin">LinkedIn <span class="cv-field-hint">optional</span></label>
+              <input type="text" id="cv-linkedin" class="cv-input" data-path="linkedin_url" maxlength="300" placeholder="linkedin.com/in/username" inputmode="url" />
+            </div>
+            <div class="cv-form-group">
+              <label for="cv-github">GitHub <span class="cv-field-hint">optional</span></label>
+              <input type="text" id="cv-github" class="cv-input" data-path="github_url" maxlength="300" placeholder="github.com/username" inputmode="url" />
+            </div>
+          </div>
+          <div class="cv-form-group">
+            <label for="cv-portfolio">Portfolio / website <span class="cv-field-hint">optional</span></label>
+            <input type="text" id="cv-portfolio" class="cv-input" data-path="portfolio_url" maxlength="300" placeholder="username.dev" inputmode="url" />
+          </div>
+        </section>
+
+        <section class="cv-block">
+          <h3 class="cv-block-title">Education</h3>
+          <div class="cv-form-row">
+            <div class="cv-form-group">
+              <label for="cv-program">Program</label>
+              <select id="cv-program" class="cv-input" data-path="education.program">
+                <option value="">Select program…</option>
+                <option value="BSCoE">BS Computer Engineering</option>
+                <option value="BSCE">BS Civil Engineering</option>
+                <option value="BSECE">BS Electronics Engineering</option>
+                <option value="OTHER">Other</option>
               </select>
             </div>
-            <div class="cv-form-group" style="justify-content:flex-end;">
-              <button type="button" class="btn btn-secondary" onclick="CvBuilder.addCustomEntry()" style="margin-top:auto;padding:8px 12px;font-size:0.78rem;">
-                <iconify-icon icon="solar:add-circle-linear"></iconify-icon> Add to CV
-              </button>
+            <div class="cv-form-group">
+              <label for="cv-grad-year">Expected graduation</label>
+              <input type="text" id="cv-grad-year" class="cv-input" data-path="education.grad_year" maxlength="4" inputmode="numeric" placeholder="e.g. 2028" />
             </div>
           </div>
           <div class="cv-form-group">
-            <label for="custom-entry-desc">Bullet Description</label>
-            <input type="text" id="custom-entry-desc" class="cv-input" placeholder="e.g. Developed real-time telemetry prototypes." />
+            <label for="cv-degree">Degree as it should appear</label>
+            <input type="text" id="cv-degree" class="cv-input" data-path="education.degree" maxlength="120" placeholder="e.g. Bachelor of Science in Civil Engineering" />
           </div>
-        </div>
+          <div class="cv-form-group">
+            <label for="cv-coursework">Relevant coursework <span class="cv-field-hint">comma-separated</span></label>
+            <input type="text" id="cv-coursework" class="cv-input" data-path="education.coursework" data-type="list" maxlength="400" placeholder="e.g. Fluid Mechanics, Structural Theory" />
+            <div class="cv-chip-row" id="coursework-chips"></div>
+          </div>
+        </section>
 
-        <div class="cv-form-actions">
-          <button type="button" class="btn btn-primary cv-save-btn" id="cv-save-btn" onclick="CvBuilder.saveCv()">
-            <iconify-icon icon="solar:diskette-bold"></iconify-icon>
-            <span id="cv-save-text">Save Changes</span>
-          </button>
-          <span class="cv-autosave-hint" id="cv-autosave-hint">Auto-saved to browser</span>
-        </div>
+        <section class="cv-block">
+          <h3 class="cv-block-title">Summary <span class="cv-field-hint">optional, 2–3 lines</span></h3>
+          <div class="cv-form-group">
+            <label for="cv-summary" class="sr-only">Professional summary</label>
+            <textarea id="cv-summary" class="cv-input" data-path="summary" rows="3" maxlength="600" placeholder="Who you are, what you're strongest at, and the role you're after."></textarea>
+            <span class="cv-counter" data-counter-for="cv-summary"></span>
+          </div>
+        </section>
+
+        <section class="cv-block">
+          <h3 class="cv-block-title">Skills</h3>
+          <div class="cv-form-group">
+            <label for="cv-skills">Technical skills &amp; software <span class="cv-field-hint">comma-separated</span></label>
+            <input type="text" id="cv-skills" class="cv-input" data-path="technical_skills" data-type="list" maxlength="600" placeholder="e.g. AutoCAD, MATLAB, Python" />
+            <div class="cv-chip-row" id="skill-chips"></div>
+          </div>
+          <div class="cv-form-group">
+            <label for="cv-other-skills">Other skills &amp; languages <span class="cv-field-hint">comma-separated</span></label>
+            <input type="text" id="cv-other-skills" class="cv-input" data-path="soft_skills" data-type="list" maxlength="600" placeholder="e.g. English (fluent), Filipino, Cebuano, Technical writing" />
+          </div>
+        </section>
+
+        <section class="cv-block">
+          <h3 class="cv-block-title">Capstone / design project <span class="cv-field-hint">optional</span></h3>
+          <div class="cv-form-group">
+            <label for="cv-capstone-title">Project title</label>
+            <input type="text" id="cv-capstone-title" class="cv-input" data-path="capstone_project.title" maxlength="150" placeholder="Project title" />
+          </div>
+          <div class="cv-form-group">
+            <label for="cv-capstone-tech">Tools &amp; technologies</label>
+            <input type="text" id="cv-capstone-tech" class="cv-input" data-path="capstone_project.tech_stack" maxlength="200" placeholder="e.g. ESP32, LoRa, ETABS" />
+          </div>
+          <div class="cv-form-group">
+            <label for="cv-capstone-abstract">What it does and what you did</label>
+            <textarea id="cv-capstone-abstract" class="cv-input" data-path="capstone_project.abstract" rows="3" maxlength="600" placeholder="Problem, your part in it, and the result."></textarea>
+            <span class="cv-counter" data-counter-for="cv-capstone-abstract"></span>
+          </div>
+        </section>
+
+        <!-- Verified college records (only shown when the student has any) -->
+        <section class="cv-block" id="verified-block" hidden>
+          <h3 class="cv-block-title">Verified college records</h3>
+          <p class="cv-block-note">Roles and events on file with the College of Engineering. Tick the ones you want on your CV.</p>
+          <div id="verified-root"></div>
+        </section>
+
+        <!-- Experience / Leadership / Certifications / Awards - generated by cv-builder.js -->
+        <div id="entries-root"></div>
+
       </form>
     </aside>
 
-    <!-- RIGHT PANE: Live Harvard Canvas -->
-    <main class="cv-preview-wrapper">
+    <!-- RIGHT PANE: live preview -->
+    <main class="cv-preview-wrapper" id="cv-preview">
       <div class="cv-toolbar">
         <div class="cv-toolbar-title">
           <iconify-icon icon="solar:document-text-bold" class="cv-toolbar-icon"></iconify-icon>
-          <span>Harvard Engineering CV Canvas</span>
-          <span class="cv-toolbar-badge">Preview</span>
+          <span>Preview</span>
+          <span class="cv-toolbar-badge">US Letter · 1 page</span>
         </div>
-        <div class="cv-toolbar-buttons">
-          <button type="button" class="btn btn-secondary cv-toolbar-btn" onclick="CvBuilder.exportPdf()">
-            <iconify-icon icon="solar:download-minimalistic-bold"></iconify-icon>
-            <span>Download PDF</span>
-          </button>
-        </div>
+        <span class="cv-length" id="cv-length" role="status"></span>
       </div>
 
-      <!-- Printable Harvard Paper Sheet (Exact standard paper styling) -->
-      <div class="harvard-cv-paper" id="harvard-cv-canvas">
-        <!-- Rendered dynamically by CvBuilder.renderCvPreview() -->
+      <div class="cv-paper-frame" id="cv-paper-frame">
+        <article class="cv-paper" id="cv-paper" aria-label="CV preview"></article>
       </div>
     </main>
 
   </div>
 
-  <!-- Global Toast Notification -->
   <div class="toast hidden" id="cv-toast" role="status" aria-live="polite">
     <span id="cv-toast-icon" aria-hidden="true"></span>
     <span id="cv-toast-message"></span>
   </div>
 
-  <!-- Scripts -->
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/cv-builder.js"></script>
-
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Boot CV Builder: uses active session if present, otherwise gracefully defaults to offline / demo mode
-      await CvBuilder.loadData();
-    });
+    document.addEventListener('DOMContentLoaded', function () { CvBuilder.init(); });
   </script>
 </body>
 </html>

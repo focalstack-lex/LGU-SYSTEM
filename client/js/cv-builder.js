@@ -1,1027 +1,847 @@
 // ==========================================================================
-// cv-builder.js - College of Engineering · Career Passport & Harvard CV Engine
+// cv-builder.js - College of Engineering CV Builder
+//
+// One state object (`cv`, shaped like the server document) drives both the
+// editor form and the read-only paper preview. Changes autosave to
+// PUT /api/cv/me; a per-user copy in localStorage keeps unsynced edits safe
+// across reloads, offline periods and failed saves.
 // ==========================================================================
 
 const CvBuilder = (() => {
-  let cvData = null;
-  let lockerItems = [];
-  let selectedItems = new Set();
-  let activeFilter = 'all';
-  let profilePhotoDataUrl = null; // stores uploaded profile photo as data URL
+  'use strict';
 
-  // CV fields are user-controlled - escape before any innerHTML insertion.
+  // ---------------- Constants ----------------
+  const INSTITUTION = 'College of Engineering, Cor Jesu College';
+  const PAPER_W = 816;              // US Letter width  @ 96dpi
+  const PAPER_PRINTABLE_H = 960;    // 11in page - 2 x 0.5in margins @ 96dpi
+  const PAPER_CHROME_H = 96;        // top + bottom paper padding on screen
+
+  const SAVE_DEBOUNCE_MS = 3000;    // wait for the student to pause typing
+  const MIN_SAVE_GAP_MS  = 8000;    // stay well under the server's 40 saves / 5 min
+  const MAX_ENTRIES = 25;           // mirrors server/routes/cv.js
+  const MAX_BULLETS = 4;
+  const MAX_BULLET_LEN = 200;
+
+  const LOCAL_KEY = (uid) => `coe_cv_draft_v2:${uid}`;
+  const LEGACY_LOCAL_KEY = 'coe_cv_draft';   // v1 key was shared by every account on the browser
+
+  const PROGRAMS = {
+    BSCoE: {
+      label: 'BS Computer Engineering',
+      coursework: ['Data Structures & Algorithms', 'Object-Oriented Programming', 'Computer Architecture', 'Operating Systems', 'Computer Networks', 'Embedded Systems', 'Digital Logic Design', 'Database Management Systems'],
+      skills: ['C / C++', 'Python', 'Java', 'Linux', 'Git / GitHub', 'Arduino / ESP32', 'PostgreSQL', 'Verilog / VHDL']
+    },
+    BSCE: {
+      label: 'BS Civil Engineering',
+      coursework: ['Theory of Structures', 'Fluid Mechanics', 'Geotechnical Engineering', 'Reinforced Concrete Design', 'Surveying', 'Construction Estimation', 'Highway Engineering', 'Hydrology'],
+      skills: ['AutoCAD', 'Civil 3D', 'ETABS', 'SAP2000', 'STAAD.Pro', 'Revit', 'Quantity Takeoff', 'MS Project']
+    },
+    BSECE: {
+      label: 'BS Electronics Engineering',
+      coursework: ['Signals & Systems', 'Electronic Circuits', 'Digital Signal Processing', 'Communications Systems', 'Electromagnetics', 'Microprocessors', 'Control Systems', 'Digital Logic Design'],
+      skills: ['MATLAB', 'Multisim', 'Proteus', 'KiCad', 'C / C++', 'Python', 'Oscilloscope & Logic Analyzer', 'PLC Programming']
+    }
+  };
+  const COMMON_SKILLS = ['MS Excel', 'MS Office', 'Technical Drafting'];
+
+  const SECTIONS = [
+    { type: 'experience',    title: 'Experience',               note: 'Internships, OJT, part-time and project work.',        add: 'Add experience',    titleHint: 'e.g. Site Engineering Intern', orgHint: 'e.g. Company / Agency' },
+    { type: 'leadership',    title: 'Leadership & Organizations', note: 'Officer roles, committees and student organizations.', add: 'Add leadership role', titleHint: 'e.g. Project Head', orgHint: 'e.g. COE Student Council' },
+    { type: 'certification', title: 'Certifications & Training', note: 'Seminars, workshops and licenses.',                     add: 'Add certification', titleHint: 'e.g. DOLE BOSH Safety Training', orgHint: 'e.g. Issuing body' },
+    { type: 'award',         title: 'Honors & Awards',           note: "Dean's list, scholarships and competitions.",           add: 'Add award',         titleHint: "e.g. Dean's Lister", orgHint: 'e.g. Awarding body' }
+  ];
+  const TYPE_LABEL = { leadership: 'Leadership', certification: 'Certification' };
+
+  const STATUS_TEXT = {
+    loading: 'Loading…',
+    saved:   'All changes saved',
+    saving:  'Saving…',
+    unsaved: 'Unsaved changes',
+    offline: 'Offline — kept in this browser',
+    error:   'Not saved — tap to retry'
+  };
+
+  // ---------------- State ----------------
+  let cv = emptyCv();
+  let verified = [];          // read-only college records for this student
+  let userId = null;
+  let dirty = false;          // local edits not yet confirmed by the server
+  let saving = false;
+  let loadFailed = false;     // never autosave over a server copy we could not read
+  let saveTimer = null;
+  let retryDelay = 0;
+  let lastSaveAt = 0;
+  let previewQueued = false;
+  let initialised = false;
+
+  // ---------------- Small helpers ----------------
+  const $ = (id) => document.getElementById(id);
+  const trim = (v) => String(v ?? '').trim();
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
   ));
 
-  // Engineering Discipline Presets for College of Engineering programs (CpE, ECE, CE)
-  const ENGINEERING_PRESETS = {
-    cpe: {
-      name: 'Computer Engineering (BSCPE)',
-      course: 'Bachelor of Science in Computer Engineering',
-      headline: 'Graduating Computer Engineering Student | Embedded Systems & Full-Stack Development',
-      summary: 'Diligent computer engineering student with demonstrated leadership in student council governance and practical experience in IoT architectures, real-time data telemetry, and modern web application development. Seeking engineering internships and technical associate roles.',
-      coursework: 'Object-Oriented Programming, Computer Architecture, Embedded Systems, Data Structures & Algorithms, Computer Networks, Operating Systems',
-      technical_skills: ['C / C++', 'Python', 'Embedded Systems (ARM/ESP32)', 'Linux / Bash', 'Git / GitHub', 'AutoCAD', 'I2C / SPI Protocols', 'PostgreSQL'],
-      soft_skills: ['Team Leadership', 'Technical Documentation', 'Agile Project Tracking', 'Project Budgeting', 'Critical Problem Solving'],
-      capstone_title: 'Smart Campus Environmental Telemetry & Structural Health Monitor',
-      capstone_abstract: 'Engineered a low-power wireless sensor network utilizing microcontroller nodes to track real-time ambient parameters and structural vibration data across campus engineering facilities, with an interactive web dashboard for facility administrators.'
-    },
-    ece: {
-      name: 'Electronics Engineering (BSECE)',
-      course: 'Bachelor of Science in Electronics Engineering',
-      headline: 'Electronics Engineering Student | Embedded Systems, RF Communications & Signal Processing',
-      summary: 'Analytical electronics engineering student experienced in circuit schematic capture, RF signal propagation modeling, and embedded firmware design. Focused on telecommunications infrastructure and IoT devices.',
-      coursework: 'Signals & Systems, Digital Signal Processing (DSP), Electronic Circuit Analysis, Telecommunications, Electromagnetics, Microprocessor Systems',
-      technical_skills: ['MATLAB', 'Proteus Design Suite', 'KiCAD / Eagle', 'Multisim', 'C/C++ for Embedded (STM32/ESP32)', 'RF Spectrum Analysis', 'Oscilloscope & Logic Analyzer'],
-      soft_skills: ['Hardware Debugging', 'Technical Presentation', 'Component Sourcing & BOM', 'System Integration', 'Collaborative Design'],
-      capstone_title: 'LoRaWAN-Based Wireless Early Warning Network for Environmental Hazard Telemetry',
-      capstone_abstract: 'Engineered a long-range, battery-efficient telemetry node deployment capable of transmitting real-time vibration and water-level telemetry across remote terrain to a centralized emergency gateway.'
-    },
-    ce: {
-      name: 'Civil Engineering (BSCE)',
-      course: 'Bachelor of Science in Civil Engineering',
-      headline: 'Civil Engineering Student | Structural Analysis, Geomatics & Construction Management',
-      summary: 'Focused civil engineering student with practical background in structural modeling, surveying data reduction, and site safety management. Experienced in parametric design and quantity takeoffs for infrastructure projects.',
-      coursework: 'Theory of Structures, Surveying & Geomatics, Fluid Mechanics, Geotechnical Engineering, Reinforced Concrete Design, Construction Estimation & Cost Engineering',
-      technical_skills: ['AutoCAD Civil 3D', 'ETABS', 'SAP2000', 'STAAD.Pro', 'Total Station & Levelling', 'Quantity Takeoff / BOQ', 'National Building Code (PD 1096)', 'DOLE BOSH Safety'],
-      soft_skills: ['Site Inspection & Coordination', 'Construction Project Scheduling', 'Technical Reporting', 'Team Leadership', 'Contractor Relations'],
-      capstone_title: 'Seismic Vulnerability Assessment & Structural Retrofit Scheme for Educational Buildings',
-      capstone_abstract: 'Conducted structural load and seismic analysis using 3D finite element simulation, proposing cost-effective structural member reinforcements conforming to national structural codes.'
-    }
-  };
-
-  // Default dataset — starts blank so students fill their own details
-  const defaultSampleData = {
-    discipline: 'cpe',
-    profile: {
-      full_name: '',
-      course: '',
-      enrollment_year: '',
-      email: ''
-    },
-    headline: '',
-    summary: '',
-    contact_phone: '',
-    location: '',
-    linkedin_url: '',
-    github_url: '',
-    portfolio_url: '',
-    coursework: '',
-    technical_skills: [],
-    soft_skills: [],
-    capstone_project: {
-      title: '',
-      abstract: ''
-    },
-    locker_items: [],
-    selected_locker_items: []
-  };
-
-  /**
-   * Helper: Show toast notification
-   */
-  function showToast(message, type = 'info') {
-    const toast = document.getElementById('cv-toast') || document.getElementById('toast');
-    const msgEl = document.getElementById('cv-toast-message') || document.getElementById('toast-message');
-    const iconEl = document.getElementById('cv-toast-icon') || document.getElementById('toast-icon');
-
-    if (!toast) return;
-
-    if (msgEl) msgEl.textContent = message;
-    if (iconEl) {
-      iconEl.innerHTML = type === 'success'
-        ? '<iconify-icon icon="solar:check-circle-bold" style="color:#22C55E;font-size:1.1rem;"></iconify-icon>'
-        : '<iconify-icon icon="solar:info-circle-bold" style="color:var(--primary);font-size:1.1rem;"></iconify-icon>';
-    }
-
-    toast.classList.remove('hidden');
-    setTimeout(() => {
-      toast.classList.add('hidden');
-    }, 3000);
+  function getPath(obj, path) {
+    return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
   }
-
-  /**
-   * Fetch student's CV data from API or localStorage fallback
-   */
-  async function loadData() {
-    try {
-      let remoteData = null;
-
-      // Try API if user is authenticated
-      if (typeof Api !== 'undefined' && Api.get) {
-        try {
-          remoteData = await Api.get('/cv/me');
-        } catch (apiErr) {
-          console.debug('[CvBuilder] Remote API unavailable, using local cache or defaults:', apiErr?.message);
-        }
-      }
-
-      if (remoteData && remoteData.profile) {
-        cvData = remoteData;
-      } else {
-        // Check localStorage cache
-        const cached = localStorage.getItem('coe_cv_draft');
-        if (cached) {
-          try {
-            cvData = JSON.parse(cached);
-          } catch (e) {
-            cvData = { ...defaultSampleData };
-          }
-        } else {
-          cvData = { ...defaultSampleData };
-        }
-      }
-
-      lockerItems = cvData.locker_items || defaultSampleData.locker_items;
-      selectedItems = new Set(cvData.selected_locker_items || ['item-1', 'item-3']);
-
-      populateFormInputs();
-      renderLocker();
-      renderCvPreview();
-    } catch (err) {
-      console.error('[CvBuilder] Load failed:', err);
-      cvData = { ...defaultSampleData };
-      lockerItems = defaultSampleData.locker_items;
-      selectedItems = new Set(defaultSampleData.selected_locker_items);
-      populateFormInputs();
-      renderLocker();
-      renderCvPreview();
-    }
+  function setPath(obj, path, value) {
+    const keys = path.split('.');
+    const last = keys.pop();
+    const target = keys.reduce((o, k) => (o[k] = o[k] || {}), obj);
+    target[last] = value;
   }
-
-  /**
-   * Populate form input fields with user's CV details
-   */
-  function populateFormInputs() {
-    if (!cvData) return;
-
-    const setVal = (id, val) => {
-      const els = document.querySelectorAll(`#${id}`);
-      els.forEach(el => { el.value = val !== undefined && val !== null ? val : ''; });
-    };
-
-    const prof = cvData.profile || {};
-    const initialDiscipline = ENGINEERING_PRESETS[cvData.discipline] ? cvData.discipline : 'cpe';
-    setVal('cv-discipline', initialDiscipline);
-    setVal('cv-name', prof.full_name);
-    setVal('cv-course', prof.course);
-    setVal('cv-grad-year', prof.enrollment_year);
-    setVal('cv-email', cvData.contact_email || prof.email);
-
-    setVal('cv-headline', cvData.headline);
-    setVal('cv-summary', cvData.summary);
-    setVal('cv-phone', cvData.contact_phone);
-    setVal('cv-location', cvData.location);
-    setVal('cv-linkedin', cvData.linkedin_url);
-    setVal('cv-github', cvData.github_url);
-    setVal('cv-portfolio', cvData.portfolio_url);
-    setVal('cv-coursework', cvData.coursework);
-    setVal('cv-skills', Array.isArray(cvData.technical_skills) ? cvData.technical_skills.join(', ') : (cvData.technical_skills || ''));
-    setVal('cv-soft-skills', Array.isArray(cvData.soft_skills) ? cvData.soft_skills.join(', ') : (cvData.soft_skills || ''));
-
-    if (cvData.capstone_project) {
-      setVal('cv-capstone-title', cvData.capstone_project.title);
-      setVal('cv-capstone-abstract', cvData.capstone_project.abstract);
-    }
-
-    renderSkillSuggestions();
-    renderCourseworkSuggestions();
-  }
-
-  /**
-   * Apply engineering major preset template
-   */
-  function applyDisciplinePreset(disciplineKey) {
-    const preset = ENGINEERING_PRESETS[disciplineKey] || ENGINEERING_PRESETS.cpe;
-
-    const setVal = (id, val) => {
-      const els = document.querySelectorAll(`#${id}`);
-      els.forEach(el => { el.value = val || ''; });
-    };
-
-    setVal('cv-discipline', disciplineKey);
-    setVal('cv-course', preset.course);
-    setVal('cv-headline', preset.headline);
-    setVal('cv-summary', preset.summary);
-    setVal('cv-coursework', preset.coursework);
-    setVal('cv-skills', preset.technical_skills.join(', '));
-    setVal('cv-soft-skills', preset.soft_skills.join(', '));
-    setVal('cv-capstone-title', preset.capstone_title);
-    setVal('cv-capstone-abstract', preset.capstone_abstract);
-
-    renderSkillSuggestions();
-    renderCourseworkSuggestions();
-    renderCvPreview();
-    saveToLocal();
-    showToast(`Applied ${preset.name} preset template!`, 'success');
-  }
-
-  /**
-   * Render clickable suggestion chips for technical skills
-   */
-  function renderSkillSuggestions() {
-    const container = document.getElementById('skill-suggestions-container');
-    if (!container) return;
-
-    const currentDiscipline = document.getElementById('cv-discipline')?.value || 'cpe';
-    const preset = ENGINEERING_PRESETS[currentDiscipline] || ENGINEERING_PRESETS.cpe;
-
-    const currentSkillsStr = document.getElementById('cv-skills')?.value || '';
-    const currentSkills = currentSkillsStr.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-
-    // Common versatile pool plus discipline-specific
-    const skillsToSuggest = Array.from(new Set([
-      ...preset.technical_skills,
-      'AutoCAD', 'MATLAB', 'MS Excel (Modeling)', 'Technical Drafting', 'DOLE BOSH Safety', 'QA/QC Inspection'
-    ]));
-
-    container.innerHTML = skillsToSuggest.map(skill => {
-      const isSelected = currentSkills.includes(skill.toLowerCase());
-      return `
-        <button type="button" class="suggestion-chip ${isSelected ? 'active' : ''}" onclick="CvBuilder.toggleSkillChip('${esc(skill)}')">
-          ${isSelected ? '✓ ' : '+ '}${esc(skill)}
-        </button>
-      `;
-    }).join('');
-  }
-
-  /**
-   * Render clickable suggestion chips for relevant coursework
-   */
-  function renderCourseworkSuggestions() {
-    const container = document.getElementById('coursework-suggestions-container');
-    if (!container) return;
-
-    const currentDiscipline = document.getElementById('cv-discipline')?.value || 'cpe';
-    const preset = ENGINEERING_PRESETS[currentDiscipline] || ENGINEERING_PRESETS.cpe;
-
-    const currentCoursesStr = document.getElementById('cv-coursework')?.value || '';
-    const currentCourses = currentCoursesStr.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-
-    const coursesToSuggest = preset.coursework.split(',').map(s => s.trim()).filter(Boolean);
-
-    container.innerHTML = coursesToSuggest.map(course => {
-      const isSelected = currentCourses.includes(course.toLowerCase());
-      return `
-        <button type="button" class="suggestion-chip ${isSelected ? 'active' : ''}" onclick="CvBuilder.toggleCourseworkChip('${esc(course)}')">
-          ${isSelected ? '✓ ' : '+ '}${esc(course)}
-        </button>
-      `;
-    }).join('');
-  }
-
-  /**
-   * Toggle a skill chip in the Technical Skills input
-   */
-  function toggleSkillChip(skill) {
-    const input = document.getElementById('cv-skills');
-    if (!input) return;
-
-    let skills = input.value.split(',').map(s => s.trim()).filter(Boolean);
-    const idx = skills.findIndex(s => s.toLowerCase() === skill.toLowerCase());
-
-    if (idx >= 0) {
-      skills.splice(idx, 1);
-    } else {
-      skills.push(skill);
-    }
-
-    input.value = skills.join(', ');
-    handleInputChange();
-    renderSkillSuggestions();
-  }
-
-  /**
-   * Toggle a coursework chip in the Relevant Coursework input
-   */
-  function toggleCourseworkChip(course) {
-    const input = document.getElementById('cv-coursework');
-    if (!input) return;
-
-    let courses = input.value.split(',').map(s => s.trim()).filter(Boolean);
-    const idx = courses.findIndex(s => s.toLowerCase() === course.toLowerCase());
-
-    if (idx >= 0) {
-      courses.splice(idx, 1);
-    } else {
-      courses.push(course);
-    }
-
-    input.value = courses.join(', ');
-    handleInputChange();
-    renderCourseworkSuggestions();
-  }
-
-  let editingItemId = null;
-  let draggedItemId = null;
-
-  /**
-   * Render Achievement Locker items (Left Pane) with Drag-and-Drop & Inline Editing
-   */
-  function renderLocker() {
-    const containers = document.querySelectorAll('#locker-items-container');
-    if (!containers || containers.length === 0) return;
-
-    const filtered = lockerItems.filter(item => {
-      if (activeFilter === 'all') return true;
-      if (activeFilter === 'leadership') return item.type === 'leadership';
-      if (activeFilter === 'seminar') return item.type === 'seminar';
+  function uniqueCI(list) {
+    const seen = new Set();
+    return list.filter((s) => {
+      const k = s.toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
       return true;
     });
+  }
+  const splitList = (s) => uniqueCI(String(s).split(',').map((x) => x.trim()).filter(Boolean));
+  const newId = () => `e${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
-    containers.forEach(container => {
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div style="text-align:center; padding:18px; color:var(--text-secondary); font-size:0.82rem;">
-            <iconify-icon icon="solar:folder-open-linear" style="font-size:1.6rem; margin-bottom:6px; color:var(--text-tertiary);"></iconify-icon>
-            <div>No items in this category yet.</div>
-            <div style="font-size:0.74rem; margin-top:3px; color:var(--text-tertiary);">Attend verified COE seminars or add custom items below!</div>
+  // Only http(s) links become clickable; anything else renders as plain text.
+  function safeHref(url) {
+    const v = trim(url);
+    if (!v) return '';
+    const withScheme = /^[a-z][a-z0-9+.-]*:/i.test(v) ? v : `https://${v}`;
+    try {
+      const u = new URL(withScheme);
+      return (u.protocol === 'https:' || u.protocol === 'http:') ? u.href : '';
+    } catch { return ''; }
+  }
+  const displayUrl = (url) => trim(url).replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '');
+
+  // ---------------- Data shape ----------------
+  function emptyCv() {
+    return {
+      full_name: '', contact_email: '', contact_phone: '', location: '',
+      linkedin_url: '', github_url: '', portfolio_url: '',
+      education: { program: '', degree: '', grad_year: '', coursework: [] },
+      summary: '',
+      technical_skills: [], soft_skills: [],
+      capstone_project: { title: '', abstract: '', tech_stack: '' },
+      custom_sections: [],
+      selected_locker_items: []
+    };
+  }
+
+  function normalizeEntries(list) {
+    if (!Array.isArray(list)) return [];
+    const types = SECTIONS.map((s) => s.type);
+    return list.filter((e) => e && typeof e === 'object').map((e) => ({
+      id: (typeof e.id === 'string' && e.id) ? e.id : newId(),
+      type: types.includes(e.type) ? e.type : 'experience',
+      title: typeof e.title === 'string' ? e.title : '',
+      organization: typeof e.organization === 'string' ? e.organization : '',
+      date: typeof e.date === 'string' ? e.date : '',
+      bullets: Array.isArray(e.bullets) ? e.bullets.filter((b) => typeof b === 'string') : []
+    })).slice(0, MAX_ENTRIES);
+  }
+
+  function normalizeCv(raw) {
+    const r = (raw && typeof raw === 'object') ? raw : {};
+    const str = (v) => (typeof v === 'string' ? v : '');
+    const list = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string' && x.trim()).map((x) => x.trim()) : []);
+    const ed = (r.education && typeof r.education === 'object') ? r.education : {};
+    const cp = (r.capstone_project && typeof r.capstone_project === 'object') ? r.capstone_project : {};
+    return {
+      full_name: str(r.full_name), contact_email: str(r.contact_email), contact_phone: str(r.contact_phone), location: str(r.location),
+      linkedin_url: str(r.linkedin_url), github_url: str(r.github_url), portfolio_url: str(r.portfolio_url),
+      education: { program: str(ed.program), degree: str(ed.degree), grad_year: String(ed.grad_year ?? ''), coursework: list(ed.coursework) },
+      summary: str(r.summary),
+      technical_skills: list(r.technical_skills), soft_skills: list(r.soft_skills),
+      capstone_project: { title: str(cp.title), abstract: str(cp.abstract), tech_stack: str(cp.tech_stack) },
+      custom_sections: normalizeEntries(r.custom_sections),
+      selected_locker_items: list(r.selected_locker_items)
+    };
+  }
+
+  function normalizeVerified(list) {
+    if (!Array.isArray(list)) return [];
+    return list.filter((i) => i && typeof i.id === 'string').map((i) => ({
+      id: i.id,
+      type: i.type === 'seminar' ? 'certification' : 'leadership',
+      title: trim(i.title),
+      organization: trim(i.organization),
+      date: trim(i.date_range),
+      bullets: trim(i.description) ? [trim(i.description)] : []
+    })).filter((i) => i.title);
+  }
+
+  // The exact document sent to the server (and used for change detection).
+  function payload() {
+    const c = cv;
+    return {
+      full_name: trim(c.full_name),
+      contact_email: trim(c.contact_email),
+      contact_phone: trim(c.contact_phone),
+      location: trim(c.location),
+      linkedin_url: trim(c.linkedin_url),
+      github_url: trim(c.github_url),
+      portfolio_url: trim(c.portfolio_url),
+      education: {
+        program: c.education.program,
+        degree: trim(c.education.degree),
+        grad_year: trim(c.education.grad_year),
+        coursework: c.education.coursework
+      },
+      summary: trim(c.summary),
+      technical_skills: c.technical_skills,
+      soft_skills: c.soft_skills,
+      capstone_project: {
+        title: trim(c.capstone_project.title),
+        abstract: trim(c.capstone_project.abstract),
+        tech_stack: trim(c.capstone_project.tech_stack)
+      },
+      custom_sections: c.custom_sections
+        .filter((e) => trim(e.title))
+        .map((e) => ({
+          id: e.id, type: e.type,
+          title: trim(e.title), organization: trim(e.organization), date: trim(e.date),
+          bullets: cleanBullets(e.bullets)
+        })),
+      selected_locker_items: c.selected_locker_items
+    };
+  }
+
+  const cleanBullets = (list) => (list || []).map((b) => trim(b).slice(0, MAX_BULLET_LEN)).filter(Boolean).slice(0, MAX_BULLETS);
+
+  // ---------------- Toast ----------------
+  let toastTimer = null;
+  function showToast(message, type = 'info') {
+    const toast = $('cv-toast');
+    if (!toast) return;
+    $('cv-toast-message').textContent = message;
+    $('cv-toast-icon').innerHTML = type === 'success'
+      ? '<iconify-icon icon="solar:check-circle-bold" style="color:#22C55E;font-size:1.1rem;"></iconify-icon>'
+      : (type === 'error'
+        ? '<iconify-icon icon="solar:danger-circle-bold" style="color:#EF4444;font-size:1.1rem;"></iconify-icon>'
+        : '<iconify-icon icon="solar:info-circle-bold" style="color:var(--primary);font-size:1.1rem;"></iconify-icon>');
+    toast.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.add('hidden'), 3500);
+  }
+
+  // ---------------- Save status ----------------
+  function setStatus(state, text) {
+    const el = $('cv-status');
+    if (!el) return;
+    el.dataset.state = state;
+    $('cv-status-text').textContent = text || STATUS_TEXT[state] || '';
+  }
+
+  // ---------------- Local draft cache ----------------
+  function persistLocal() {
+    if (!userId) return;
+    try {
+      localStorage.setItem(LOCAL_KEY(userId), JSON.stringify({ v: 2, dirty, savedAt: Date.now(), cv }));
+    } catch { /* storage full / blocked - the server copy is still authoritative */ }
+  }
+  function readLocal() {
+    if (!userId) return null;
+    try {
+      const parsed = JSON.parse(localStorage.getItem(LOCAL_KEY(userId)) || 'null');
+      return (parsed && parsed.v === 2 && parsed.cv) ? parsed : null;
+    } catch { return null; }
+  }
+
+  // ---------------- Autosave ----------------
+  function markDirty() {
+    dirty = true;
+    persistLocal();
+    setStatus(navigator.onLine === false ? 'offline' : 'unsaved');
+    scheduleSave();
+  }
+
+  function scheduleSave(minDelay = SAVE_DEBOUNCE_MS) {
+    clearTimeout(saveTimer);
+    const wait = Math.max(minDelay, lastSaveAt + MIN_SAVE_GAP_MS - Date.now());
+    saveTimer = setTimeout(save, wait);
+  }
+
+  async function save() {
+    clearTimeout(saveTimer);
+    if (!dirty || loadFailed) return;
+    if (saving) return;                      // finishing save re-checks for newer edits
+    if (navigator.onLine === false) { setStatus('offline'); return; }
+
+    saving = true;
+    setStatus('saving');
+    const body = payload();
+    const snapshot = JSON.stringify(body);
+    try {
+      await Api.request('PUT', '/cv/me', body);
+      lastSaveAt = Date.now();
+      retryDelay = 0;
+      if (JSON.stringify(payload()) === snapshot) {
+        dirty = false;
+        persistLocal();
+        setStatus('saved');
+      } else {
+        scheduleSave();                      // edited while the request was in flight
+      }
+    } catch (err) {
+      handleSaveError(err);
+    } finally {
+      saving = false;
+    }
+  }
+
+  function handleSaveError(err) {
+    const msg = String(err?.message || '');
+    persistLocal();
+    if (/session|log in/i.test(msg)) {
+      setStatus('error', 'Session expired — sign in again');
+      showToast('Your session expired. Your edits are kept — sign in and reopen the CV builder.', 'error');
+      setTimeout(toLogin, 3000);
+      return;
+    }
+    if (navigator.onLine === false || err instanceof TypeError) {
+      setStatus('offline');
+      return;                                // the 'online' event triggers a retry
+    }
+    setStatus('error');
+    retryDelay = Math.min((retryDelay || 15000) * 2, 120000);
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, retryDelay);
+  }
+
+  function toLogin() { window.location.replace('/index.html'); }
+
+  // ---------------- Form <-> state ----------------
+  function fillForm() {
+    document.querySelectorAll('#cv-form [data-path]').forEach((el) => {
+      const val = getPath(cv, el.dataset.path);
+      el.value = el.dataset.type === 'list' ? (val || []).join(', ') : (val ?? '');
+    });
+    updateCounters();
+  }
+
+  function updateCounters() {
+    document.querySelectorAll('[data-counter-for]').forEach((c) => {
+      const input = $(c.dataset.counterFor);
+      if (!input) return;
+      const max = Number(input.getAttribute('maxlength')) || 0;
+      c.textContent = max ? `${input.value.length} / ${max}` : '';
+    });
+  }
+
+  function onFormInput(e) {
+    const t = e.target;
+
+    if (t.dataset.verifiedId !== undefined) {
+      toggleVerified(t.dataset.verifiedId, t.checked);
+      return;
+    }
+
+    if (t.dataset.path) {
+      const path = t.dataset.path;
+      const prev = getPath(cv, path);
+      setPath(cv, path, t.dataset.type === 'list' ? splitList(t.value) : t.value);
+
+      if (path === 'education.program') onProgramChange(prev);
+      if (path === 'education.coursework' || path === 'technical_skills' || path === 'education.program') renderChips();
+      updateCounters();
+      markDirty();
+      queuePreview();
+      return;
+    }
+
+    const card = t.closest('[data-entry-id]');
+    if (card && t.dataset.entryKey) {
+      const entry = cv.custom_sections.find((x) => x.id === card.dataset.entryId);
+      if (!entry) return;
+      if (t.dataset.entryKey === 'bullets') {
+        entry.bullets = t.value.split('\n');
+        updateBulletHint(card, t.value);
+      } else {
+        entry[t.dataset.entryKey] = t.value;
+      }
+      markDirty();
+      queuePreview();
+    }
+  }
+
+  // Picking a program only fills the degree name when the student has not
+  // written their own; it never injects any other content.
+  function onProgramChange(prevProgram) {
+    const next = cv.education.program;
+    const prevLabel = PROGRAMS[prevProgram]?.label;
+    const degree = trim(cv.education.degree);
+    if (PROGRAMS[next] && (!degree || degree === prevLabel)) {
+      cv.education.degree = PROGRAMS[next].label;
+      $('cv-degree').value = cv.education.degree;
+    }
+  }
+
+  // ---------------- Suggestion chips ----------------
+  function renderChips() {
+    const program = PROGRAMS[cv.education.program];
+    renderChipRow('coursework-chips', program ? program.coursework : [], cv.education.coursework, 'education.coursework');
+    renderChipRow('skill-chips', uniqueCI([...(program ? program.skills : []), ...COMMON_SKILLS]), cv.technical_skills, 'technical_skills');
+  }
+
+  function renderChipRow(containerId, options, current, path) {
+    const el = $(containerId);
+    if (!el) return;
+    const active = new Set(current.map((s) => s.toLowerCase()));
+    el.innerHTML = options.map((opt) => {
+      const on = active.has(opt.toLowerCase());
+      return `<button type="button" class="cv-chip${on ? ' active' : ''}" data-chip="${esc(opt)}" data-chip-path="${esc(path)}" aria-pressed="${on}">${on ? '✓ ' : '+ '}${esc(opt)}</button>`;
+    }).join('');
+  }
+
+  function toggleChip(path, value) {
+    const list = getPath(cv, path) || [];
+    const idx = list.findIndex((s) => s.toLowerCase() === value.toLowerCase());
+    if (idx >= 0) list.splice(idx, 1); else list.push(value);
+    setPath(cv, path, list);
+    const input = document.querySelector(`#cv-form [data-path="${path}"]`);
+    if (input) input.value = list.join(', ');
+    renderChips();
+    markDirty();
+    queuePreview();
+  }
+
+  // ---------------- Verified college records ----------------
+  function renderVerified() {
+    const block = $('verified-block');
+    const root = $('verified-root');
+    if (!block || !root) return;
+    block.hidden = verified.length === 0;
+    const selected = new Set(cv.selected_locker_items);
+    root.innerHTML = verified.map((v) => `
+      <label class="cv-verified${selected.has(v.id) ? ' on' : ''}">
+        <input type="checkbox" data-verified-id="${esc(v.id)}" ${selected.has(v.id) ? 'checked' : ''} />
+        <span class="cv-verified-main">
+          <span class="cv-verified-title">${esc(v.title)}</span>
+          <span class="cv-verified-sub">${esc(v.organization)}${v.date ? ' · ' + esc(v.date) : ''}</span>
+        </span>
+        <span class="cv-verified-tag">${esc(TYPE_LABEL[v.type] || '')}</span>
+      </label>`).join('');
+  }
+
+  function toggleVerified(id, on) {
+    const set = new Set(cv.selected_locker_items);
+    if (on) set.add(id); else set.delete(id);
+    cv.selected_locker_items = Array.from(set);
+    renderVerified();
+    markDirty();
+    queuePreview();
+  }
+
+  // ---------------- Entries (experience / leadership / certifications / awards) ----------------
+  function renderEntries() {
+    const root = $('entries-root');
+    if (!root) return;
+    root.innerHTML = SECTIONS.map((sec) => {
+      const items = cv.custom_sections.filter((e) => e.type === sec.type);
+      return `
+        <section class="cv-block" data-section="${sec.type}">
+          <h3 class="cv-block-title">${esc(sec.title)}</h3>
+          <p class="cv-block-note">${esc(sec.note)}</p>
+          <div class="cv-entry-list">
+            ${items.map((e, i) => entryCardHtml(e, sec, i, items.length)).join('')}
           </div>
-        `;
+          <button type="button" class="cv-add-btn" data-action="add" data-type="${sec.type}">
+            <iconify-icon icon="solar:add-circle-linear"></iconify-icon> ${esc(sec.add)}
+          </button>
+        </section>`;
+    }).join('');
+    root.querySelectorAll('[data-entry-id] textarea').forEach((ta) => updateBulletHint(ta.closest('[data-entry-id]'), ta.value));
+  }
+
+  function entryCardHtml(e, sec, index, total) {
+    return `
+      <div class="cv-entry" data-entry-id="${esc(e.id)}">
+        <div class="cv-entry-head">
+          <span class="cv-entry-num">${esc(sec.title.split(' ')[0])} ${index + 1}</span>
+          <div class="cv-entry-actions">
+            <button type="button" class="cv-icon-btn" data-action="up" data-id="${esc(e.id)}" aria-label="Move up" ${index === 0 ? 'disabled' : ''}><iconify-icon icon="solar:arrow-up-linear"></iconify-icon></button>
+            <button type="button" class="cv-icon-btn" data-action="down" data-id="${esc(e.id)}" aria-label="Move down" ${index === total - 1 ? 'disabled' : ''}><iconify-icon icon="solar:arrow-down-linear"></iconify-icon></button>
+            <button type="button" class="cv-icon-btn danger" data-action="remove" data-id="${esc(e.id)}" aria-label="Remove entry"><iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon></button>
+          </div>
+        </div>
+        <div class="cv-form-group">
+          <label>Title / role</label>
+          <input type="text" class="cv-input" data-entry-key="title" maxlength="120" value="${esc(e.title)}" placeholder="${esc(sec.titleHint)}" />
+        </div>
+        <div class="cv-form-row">
+          <div class="cv-form-group">
+            <label>Organization</label>
+            <input type="text" class="cv-input" data-entry-key="organization" maxlength="120" value="${esc(e.organization)}" placeholder="${esc(sec.orgHint)}" />
+          </div>
+          <div class="cv-form-group">
+            <label>Date</label>
+            <input type="text" class="cv-input" data-entry-key="date" maxlength="40" value="${esc(e.date)}" placeholder="e.g. Jun – Aug 2025" />
+          </div>
+        </div>
+        <div class="cv-form-group">
+          <label>Details <span class="cv-field-hint">one point per line</span></label>
+          <textarea class="cv-input" data-entry-key="bullets" rows="3" placeholder="What you did and what came of it">${esc((e.bullets || []).join('\n'))}</textarea>
+          <span class="cv-counter cv-bullet-hint"></span>
+        </div>
+      </div>`;
+  }
+
+  function updateBulletHint(card, value) {
+    const hint = card && card.querySelector('.cv-bullet-hint');
+    if (!hint) return;
+    const lines = value.split('\n').map((l) => l.trim()).filter(Boolean);
+    const tooLong = lines.some((l) => l.length > MAX_BULLET_LEN);
+    const over = lines.length > MAX_BULLETS;
+    hint.classList.toggle('warn', over || tooLong);
+    hint.textContent = over
+      ? `Only the first ${MAX_BULLETS} lines appear on your CV`
+      : (tooLong ? `Lines are cut at ${MAX_BULLET_LEN} characters` : `${lines.length} / ${MAX_BULLETS} lines`);
+  }
+
+  function onEntriesClick(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+
+    if (action === 'add') {
+      if (cv.custom_sections.length >= MAX_ENTRIES) {
+        showToast(`You can add up to ${MAX_ENTRIES} entries.`, 'error');
         return;
       }
-
-      container.innerHTML = filtered.map((item, filteredIndex) => {
-        const isAdded = selectedItems.has(item.id);
-        const isCustom = item.is_custom;
-        const isEditing = editingItemId === item.id;
-
-        if (isEditing) {
-          return `
-            <div class="locker-card in-cart" id="locker-card-${esc(item.id)}">
-              <div class="locker-card-edit-form">
-                <div class="edit-field-group">
-                  <label>Title / Role / Activity</label>
-                  <input type="text" id="edit-title-${esc(item.id)}" class="cv-mini-input" value="${esc(item.title)}" placeholder="Role or Achievement Title" />
-                </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
-                  <div class="edit-field-group">
-                    <label>Organization / Issuer</label>
-                    <input type="text" id="edit-org-${esc(item.id)}" class="cv-mini-input" value="${esc(item.organization)}" placeholder="e.g. COE Council" />
-                  </div>
-                  <div class="edit-field-group">
-                    <label>Date / AY</label>
-                    <input type="text" id="edit-date-${esc(item.id)}" class="cv-mini-input" value="${esc(item.date_range)}" placeholder="e.g. AY 2025-2026" />
-                  </div>
-                </div>
-                <div class="edit-field-group">
-                  <label>Category</label>
-                  <select id="edit-type-${esc(item.id)}" class="cv-mini-select">
-                    <option value="leadership" ${item.type === 'leadership' ? 'selected' : ''}>Leadership & Campus Affiliations</option>
-                    <option value="seminar" ${item.type === 'seminar' ? 'selected' : ''}>Certifications & Professional Workshops</option>
-                  </select>
-                </div>
-                <div class="edit-field-group">
-                  <label>Description / Responsibilities</label>
-                  <textarea id="edit-desc-${esc(item.id)}" class="cv-mini-textarea" placeholder="Key responsibilities and engineering achievements...">${esc(item.description)}</textarea>
-                </div>
-                <div class="edit-form-btns">
-                  <button type="button" class="btn-mini-cancel" onclick="CvBuilder.cancelEditingItem()">Cancel</button>
-                  <button type="button" class="btn-mini-save" onclick="CvBuilder.saveEditingItem('${esc(item.id)}')">Save Changes</button>
-                </div>
-              </div>
-            </div>
-          `;
-        }
-
-        return `
-          <div class="locker-card ${isAdded ? 'in-cart' : ''}" 
-               id="locker-card-${esc(item.id)}"
-               draggable="true"
-               ondragstart="CvBuilder.handleDragStart(event, '${esc(item.id)}')"
-               ondragover="CvBuilder.handleDragOver(event, '${esc(item.id)}')"
-               ondragleave="CvBuilder.handleDragLeave(event, '${esc(item.id)}')"
-               ondrop="CvBuilder.handleDrop(event, '${esc(item.id)}')"
-               ondragend="CvBuilder.handleDragEnd(event, '${esc(item.id)}')">
-            <div class="locker-card-title">
-              <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:0;">
-                <span class="locker-drag-handle" title="Drag to reorder"><iconify-icon icon="solar:menu-dots-bold"></iconify-icon></span>
-                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;" title="${esc(item.title)}">${esc(item.title)}</span>
-              </div>
-              <div class="locker-card-header-actions">
-                <span class="badge-verified">${isCustom ? 'Custom' : 'COE'}</span>
-                <button type="button" class="btn-card-icon btn-edit-item" onclick="CvBuilder.startEditingItem('${esc(item.id)}')" title="Edit this entry">
-                  <iconify-icon icon="solar:pen-linear"></iconify-icon>
-                </button>
-                <button type="button" class="btn-card-icon" onclick="CvBuilder.moveItem('${esc(item.id)}', -1)" title="Move Up" ${filteredIndex === 0 ? 'disabled' : ''}>
-                  <iconify-icon icon="solar:arrow-up-linear"></iconify-icon>
-                </button>
-                <button type="button" class="btn-card-icon" onclick="CvBuilder.moveItem('${esc(item.id)}', 1)" title="Move Down" ${filteredIndex === filtered.length - 1 ? 'disabled' : ''}>
-                  <iconify-icon icon="solar:arrow-down-linear"></iconify-icon>
-                </button>
-                <button type="button" class="btn-card-icon btn-delete-item" onclick="CvBuilder.deleteItem('${esc(item.id)}')" title="Delete Entry">
-                  <iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon>
-                </button>
-              </div>
-            </div>
-            <div class="locker-card-sub">${esc(item.organization)} &bull; ${esc(item.date_range)}</div>
-            <div class="locker-card-actions">
-              <span style="font-size:0.73rem; color:var(--text-secondary); line-height:1.35; flex:1;">${esc(item.description)}</span>
-              <button type="button" class="btn-add-cart ${isAdded ? 'added' : ''}" onclick="CvBuilder.toggleItem('${esc(item.id)}')">
-                ${isAdded ? '✓ Added' : '+ Add to CV'}
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    });
-  }
-
-  /**
-   * Start editing a locker item
-   */
-  function startEditingItem(itemId) {
-    editingItemId = itemId;
-    renderLocker();
-  }
-
-  /**
-   * Cancel editing a locker item
-   */
-  function cancelEditingItem() {
-    editingItemId = null;
-    renderLocker();
-  }
-
-  /**
-   * Save changes to an edited locker item
-   */
-  function saveEditingItem(itemId) {
-    const item = lockerItems.find(i => i.id === itemId);
-    if (!item) return;
-
-    const getVal = (id) => {
-      const el = document.getElementById(id);
-      return el ? el.value.trim() : '';
-    };
-
-    const title = getVal(`edit-title-${itemId}`);
-    if (!title) {
-      showToast('Title cannot be empty.', 'error');
+      const entry = { id: newId(), type: btn.dataset.type, title: '', organization: '', date: '', bullets: [] };
+      cv.custom_sections.push(entry);
+      renderEntries();
+      const input = document.querySelector(`[data-entry-id="${entry.id}"] [data-entry-key="title"]`);
+      if (input) input.focus();
       return;
     }
 
-    item.title = title;
-    item.organization = getVal(`edit-org-${itemId}`) || item.organization;
-    item.date_range = getVal(`edit-date-${itemId}`) || item.date_range;
-    item.type = getVal(`edit-type-${itemId}`) || item.type;
-    item.description = getVal(`edit-desc-${itemId}`) || item.description;
+    const id = btn.dataset.id;
+    const idx = cv.custom_sections.findIndex((x) => x.id === id);
+    if (idx === -1) return;
 
-    editingItemId = null;
-    renderLocker();
-    renderCvPreview();
-    saveToLocal();
-    showToast('Entry updated successfully!', 'success');
-  }
-
-  /**
-   * Move locker item up or down
-   */
-  function moveItem(itemId, direction) {
-    const index = lockerItems.findIndex(i => i.id === itemId);
-    if (index === -1) return;
-
-    const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= lockerItems.length) return;
-
-    const [moved] = lockerItems.splice(index, 1);
-    lockerItems.splice(targetIndex, 0, moved);
-
-    renderLocker();
-    renderCvPreview();
-    saveToLocal();
-    showToast('Item moved!', 'info');
-  }
-
-  /**
-   * Drag & Drop event handlers
-   */
-  function handleDragStart(e, itemId) {
-    draggedItemId = itemId;
-    if (e.dataTransfer) {
-      e.dataTransfer.effectAllowed = 'move';
-      try {
-        e.dataTransfer.setData('text/plain', itemId);
-      } catch (_) {}
-    }
-    const card = document.getElementById(`locker-card-${itemId}`);
-    if (card) {
-      setTimeout(() => card.classList.add('dragging'), 0);
-    }
-  }
-
-  function handleDragOver(e, targetId) {
-    e.preventDefault();
-    if (e.dataTransfer) {
-      e.dataTransfer.dropEffect = 'move';
-    }
-    if (!draggedItemId || draggedItemId === targetId) return;
-    const card = document.getElementById(`locker-card-${targetId}`);
-    if (card) {
-      card.classList.add('drag-over');
-    }
-  }
-
-  function handleDragLeave(e, targetId) {
-    const card = document.getElementById(`locker-card-${targetId}`);
-    if (card) {
-      card.classList.remove('drag-over');
-    }
-  }
-
-  function handleDrop(e, targetId) {
-    e.preventDefault();
-    e.stopPropagation();
-    const targetCard = document.getElementById(`locker-card-${targetId}`);
-    if (targetCard) targetCard.classList.remove('drag-over');
-
-    if (!draggedItemId || draggedItemId === targetId) return;
-
-    const fromIndex = lockerItems.findIndex(i => i.id === draggedItemId);
-    const toIndex = lockerItems.findIndex(i => i.id === targetId);
-
-    if (fromIndex !== -1 && toIndex !== -1) {
-      const [moved] = lockerItems.splice(fromIndex, 1);
-      lockerItems.splice(toIndex, 0, moved);
-      renderLocker();
-      renderCvPreview();
-      saveToLocal();
-      showToast('Items reordered successfully!', 'success');
-    }
-    draggedItemId = null;
-  }
-
-  function handleDragEnd(e, itemId) {
-    const card = document.getElementById(`locker-card-${itemId}`);
-    if (card) card.classList.remove('dragging');
-    document.querySelectorAll('.locker-card').forEach(c => c.classList.remove('drag-over', 'dragging'));
-    draggedItemId = null;
-  }
-
-  /**
-   * Toggle item in/out of CV
-   */
-  function toggleItem(itemId) {
-    if (selectedItems.has(itemId)) {
-      selectedItems.delete(itemId);
+    if (action === 'remove') {
+      cv.custom_sections.splice(idx, 1);
     } else {
-      selectedItems.add(itemId);
+      // Swap with the neighbouring entry of the SAME section.
+      const type = cv.custom_sections[idx].type;
+      const step = action === 'up' ? -1 : 1;
+      let j = idx + step;
+      while (j >= 0 && j < cv.custom_sections.length && cv.custom_sections[j].type !== type) j += step;
+      if (j < 0 || j >= cv.custom_sections.length) return;
+      [cv.custom_sections[idx], cv.custom_sections[j]] = [cv.custom_sections[j], cv.custom_sections[idx]];
     }
-    renderLocker();
-    renderCvPreview();
-    saveToLocal();
+    renderEntries();
+    markDirty();
+    queuePreview();
   }
 
-  /**
-   * Filter Locker items by type chip
-   */
-  function filterLocker(type) {
-    activeFilter = type;
-    document.querySelectorAll('.locker-chip').forEach(chip => {
-      chip.classList.toggle('active', chip.dataset.type === type);
+  // ---------------- Paper preview ----------------
+  function entryHtml(e) {
+    const bullets = cleanBullets(e.bullets);
+    return `
+      <div class="cv-item">
+        <div class="cv-row">
+          <span class="cv-item-title">${esc(e.title)}</span>
+          ${trim(e.date) ? `<span class="cv-item-date">${esc(e.date)}</span>` : ''}
+        </div>
+        ${trim(e.organization) ? `<div class="cv-item-org">${esc(e.organization)}</div>` : ''}
+        ${bullets.length ? `<ul class="cv-bullets">${bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>` : ''}
+      </div>`;
+  }
+
+  const sectionHtml = (title, body) =>
+    `<section class="cv-sec"><h2 class="cv-sec-title">${esc(title)}</h2>${body}</section>`;
+
+  function linkHtml(label, url) {
+    const text = displayUrl(url);
+    const href = safeHref(url);
+    const body = href ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(text)}</a>` : esc(text);
+    return `<span>${esc(label)}: ${body}</span>`;
+  }
+
+  function entriesFor(type) {
+    const own = cv.custom_sections.filter((e) => e.type === type && trim(e.title));
+    const selected = new Set(cv.selected_locker_items);
+    const official = verified.filter((v) => v.type === type && selected.has(v.id));
+    return [...own, ...official];
+  }
+
+  function paperHtml() {
+    const c = cv;
+    const parts = [];
+
+    // Header
+    const contact = [c.location, c.contact_phone, c.contact_email].map(trim).filter(Boolean);
+    const links = [['LinkedIn', c.linkedin_url], ['GitHub', c.github_url], ['Portfolio', c.portfolio_url]].filter(([, u]) => trim(u));
+    const name = trim(c.full_name);
+    parts.push(`
+      <header class="cv-head">
+        ${name ? `<h1 class="cv-name">${esc(name)}</h1>` : '<h1 class="cv-name cv-screen-only cv-name-empty">Your Name</h1>'}
+        ${contact.length ? `<div class="cv-contact">${contact.map((x) => `<span>${esc(x)}</span>`).join('<i class="cv-sep">•</i>')}</div>` : ''}
+        ${links.length ? `<div class="cv-contact">${links.map(([l, u]) => linkHtml(l, u)).join('<i class="cv-sep">•</i>')}</div>` : ''}
+      </header>`);
+
+    // Education
+    const ed = c.education;
+    if (trim(ed.degree) || trim(ed.grad_year) || ed.coursework.length) {
+      parts.push(sectionHtml('Education', `
+        <div class="cv-item">
+          <div class="cv-row">
+            <span class="cv-item-title">${esc(trim(ed.degree) || 'Bachelor of Science in Engineering')}</span>
+            ${trim(ed.grad_year) ? `<span class="cv-item-date">Expected ${esc(trim(ed.grad_year))}</span>` : ''}
+          </div>
+          <div class="cv-item-org">${esc(INSTITUTION)}</div>
+          ${ed.coursework.length ? `<ul class="cv-bullets"><li><strong>Relevant Coursework:</strong> ${esc(ed.coursework.join(', '))}</li></ul>` : ''}
+        </div>`));
+    }
+
+    if (trim(c.summary)) parts.push(sectionHtml('Summary', `<p class="cv-para">${esc(trim(c.summary))}</p>`));
+
+    const exp = entriesFor('experience');
+    if (exp.length) parts.push(sectionHtml('Experience', exp.map(entryHtml).join('')));
+
+    const cp = c.capstone_project;
+    if (trim(cp.title)) {
+      parts.push(sectionHtml('Capstone Project', `
+        <div class="cv-item">
+          <div class="cv-row"><span class="cv-item-title">${esc(trim(cp.title))}</span></div>
+          ${trim(cp.tech_stack) ? `<div class="cv-item-org">${esc(trim(cp.tech_stack))}</div>` : ''}
+          ${trim(cp.abstract) ? `<ul class="cv-bullets"><li>${esc(trim(cp.abstract))}</li></ul>` : ''}
+        </div>`));
+    }
+
+    const lead = entriesFor('leadership');
+    if (lead.length) parts.push(sectionHtml('Leadership & Organizations', lead.map(entryHtml).join('')));
+
+    const certs = entriesFor('certification');
+    if (certs.length) parts.push(sectionHtml('Certifications & Training', certs.map(entryHtml).join('')));
+
+    const awards = entriesFor('award');
+    if (awards.length) parts.push(sectionHtml('Honors & Awards', awards.map(entryHtml).join('')));
+
+    if (c.technical_skills.length || c.soft_skills.length) {
+      parts.push(sectionHtml('Skills', `<ul class="cv-bullets">
+        ${c.technical_skills.length ? `<li><strong>Technical Skills:</strong> ${esc(c.technical_skills.join(', '))}</li>` : ''}
+        ${c.soft_skills.length ? `<li><strong>Other Skills &amp; Languages:</strong> ${esc(c.soft_skills.join(', '))}</li>` : ''}
+      </ul>`));
+    }
+
+    if (parts.length === 1 && !name) {
+      parts.push('<p class="cv-paper-empty cv-screen-only">Your CV appears here as you fill in the form.</p>');
+    }
+    return parts.join('');
+  }
+
+  function hasContent() {
+    const p = payload();
+    return !!(p.full_name || p.summary || p.education.degree || p.education.coursework.length ||
+      p.technical_skills.length || p.soft_skills.length || p.capstone_project.title ||
+      p.custom_sections.length || p.selected_locker_items.length);
+  }
+
+  function renderPaper() {
+    const paper = $('cv-paper');
+    if (!paper) return;
+    paper.innerHTML = paperHtml();
+    fitPaper();
+    updateLength();
+  }
+
+  function queuePreview() {
+    if (previewQueued) return;
+    previewQueued = true;
+    requestAnimationFrame(() => {
+      previewQueued = false;
+      renderPaper();
     });
-    renderLocker();
   }
 
-  /**
-   * Add a custom experience or certification manually
-   */
-  function addCustomEntry() {
-    const getVal = (id) => {
-      const el = document.getElementById(id);
-      return el ? el.value.trim() : '';
-    };
+  // Scale the fixed-size sheet down to the space available (phones, narrow panes).
+  function fitPaper() {
+    const frame = $('cv-paper-frame');
+    const paper = $('cv-paper');
+    if (!frame || !paper) return;
+    const avail = frame.clientWidth;
+    if (!avail) return;                      // pane is hidden (mobile edit tab)
+    const scale = Math.min(1, avail / PAPER_W);
+    paper.style.transform = scale < 1 ? `scale(${scale})` : '';
+    frame.style.height = `${Math.ceil(paper.offsetHeight * scale)}px`;
+  }
 
-    const title = getVal('custom-entry-title');
-    const org = getVal('custom-entry-org') || 'College of Engineering';
-    const date = getVal('custom-entry-date') || '2025';
-    const type = getVal('custom-entry-type') || 'leadership';
-    const desc = getVal('custom-entry-desc') || 'Participated actively and fulfilled engineering responsibilities.';
+  function updateLength() {
+    const paper = $('cv-paper');
+    const out = $('cv-length');
+    if (!paper || !out) return;
+    const pages = Math.max(1, Math.ceil((paper.offsetHeight - PAPER_CHROME_H) / PAPER_PRINTABLE_H));
+    out.classList.toggle('warn', pages > 1);
+    out.textContent = pages > 1
+      ? `Runs to ${pages} pages — trim to fit one page`
+      : 'Fits on one page';
+  }
 
-    if (!title) {
-      showToast('Please enter a Title for your custom entry.', 'error');
+  // ---------------- Actions ----------------
+  function exportPdf() {
+    if (!hasContent()) {
+      showToast('Add some details before downloading.', 'info');
       return;
     }
-
-    const newId = 'custom-' + Date.now();
-    const newItem = {
-      id: newId,
-      title,
-      organization: org,
-      date_range: date,
-      type,
-      description: desc,
-      is_custom: true
+    const previousTitle = document.title;
+    const name = trim(cv.full_name);
+    document.title = name ? `${name} - CV` : 'CV';   // becomes the default PDF filename
+    const restore = () => {
+      document.title = previousTitle;
+      window.removeEventListener('afterprint', restore);
     };
-
-    lockerItems.unshift(newItem);
-    selectedItems.add(newId);
-
-    // Clear inputs
-    ['custom-entry-title', 'custom-entry-org', 'custom-entry-date', 'custom-entry-desc'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
-
-    renderLocker();
-    renderCvPreview();
-    saveToLocal();
-    showToast(`Added "${title}" to your CV!`, 'success');
-  }
-
-  /**
-   * Delete an entry (custom or default)
-   */
-  function deleteItem(itemId) {
-    lockerItems = lockerItems.filter(i => i.id !== itemId);
-    selectedItems.delete(itemId);
-    if (editingItemId === itemId) editingItemId = null;
-    renderLocker();
-    renderCvPreview();
-    saveToLocal();
-    showToast('Item removed.', 'info');
-  }
-
-  const deleteCustomEntry = deleteItem;
-
-  /**
-   * Handle real-time input change from form fields
-   */
-  let debounceTimer = null;
-  function handleInputChange() {
-    renderCvPreview();
-    renderSkillSuggestions();
-    renderCourseworkSuggestions();
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      saveToLocal();
-      document.querySelectorAll('#cv-autosave-hint').forEach(hint => {
-        hint.textContent = 'Auto-saved to browser';
-        hint.style.color = '#22C55E';
-        setTimeout(() => { hint.style.color = ''; }, 2000);
-      });
-    }, 500);
-  }
-
-  /**
-   * Build the current CV data object from the form inputs
-   */
-  function buildPayload() {
-    const getVal = (id, fallback = '') => {
-      const el = document.getElementById(id);
-      return el && el.value !== undefined ? el.value.trim() : fallback;
-    };
-
-    const techSkillsStr = getVal('cv-skills', '');
-    const softSkillsStr = getVal('cv-soft-skills', '');
-
-    return {
-      discipline: getVal('cv-discipline', cvData?.discipline || 'cpe'),
-      profile: {
-        full_name: getVal('cv-name', cvData?.profile?.full_name || defaultSampleData.profile.full_name),
-        course: getVal('cv-course', cvData?.profile?.course || defaultSampleData.profile.course),
-        enrollment_year: getVal('cv-grad-year', cvData?.profile?.enrollment_year || defaultSampleData.profile.enrollment_year),
-        email: getVal('cv-email', cvData?.contact_email || cvData?.profile?.email || defaultSampleData.profile.email)
-      },
-      headline: getVal('cv-headline', cvData?.headline || ''),
-      summary: getVal('cv-summary', cvData?.summary || ''),
-      contact_phone: getVal('cv-phone', cvData?.contact_phone || ''),
-      contact_email: getVal('cv-email', cvData?.contact_email || ''),
-      location: getVal('cv-location', cvData?.location || ''),
-      linkedin_url: getVal('cv-linkedin', cvData?.linkedin_url || ''),
-      github_url: getVal('cv-github', cvData?.github_url || ''),
-      portfolio_url: getVal('cv-portfolio', cvData?.portfolio_url || ''),
-      coursework: getVal('cv-coursework', cvData?.coursework || defaultSampleData.coursework),
-      technical_skills: techSkillsStr.split(',').map(s => s.trim()).filter(Boolean),
-      soft_skills: softSkillsStr.split(',').map(s => s.trim()).filter(Boolean),
-      capstone_project: {
-        title: getVal('cv-capstone-title', cvData?.capstone_project?.title || ''),
-        abstract: getVal('cv-capstone-abstract', cvData?.capstone_project?.abstract || '')
-      },
-      selected_locker_items: Array.from(selectedItems),
-      locker_items: lockerItems,
-      share_token: cvData?.share_token || 'VERIFY-COE-OFFICIAL'
-    };
-  }
-
-  /**
-   * Save draft to localStorage
-   */
-  function saveToLocal() {
-    const payload = buildPayload();
-    cvData = payload;
-    try {
-      localStorage.setItem('coe_cv_draft', JSON.stringify(payload));
-    } catch (e) {
-      console.warn('[CvBuilder] LocalStorage save warning:', e);
-    }
-  }
-
-  /**
-   * Render Live Harvard CV Preview (Right Canvas) with WYSIWYG direct editing.
-   * Every field is contenteditable — edits on the paper sync back to the form inputs.
-   */
-  function renderCvPreview() {
-    const canvases = document.querySelectorAll('#harvard-cv-canvas');
-    if (!canvases || canvases.length === 0) return;
-
-    const getVal = (id) => {
-      const el = document.getElementById(id);
-      return el && el.value !== undefined ? el.value.trim() : '';
-    };
-
-    const currentProfile = cvData?.profile || {};
-    const name      = getVal('cv-name') || currentProfile.full_name || '';
-    const course    = getVal('cv-course') || currentProfile.course || '';
-    const gradYear  = getVal('cv-grad-year') || currentProfile.enrollment_year || '';
-    const email     = getVal('cv-email') || cvData?.contact_email || currentProfile.email || '';
-    const phone     = getVal('cv-phone') || cvData?.contact_phone || '';
-    const location  = getVal('cv-location') || cvData?.location || '';
-    const linkedin  = getVal('cv-linkedin') || cvData?.linkedin_url || '';
-    const github    = getVal('cv-github') || cvData?.github_url || '';
-    const portfolio = getVal('cv-portfolio') || cvData?.portfolio_url || '';
-    const coursework = getVal('cv-coursework') || cvData?.coursework || '';
-    const summary    = getVal('cv-summary') || cvData?.summary || '';
-    const shareToken = cvData?.share_token || 'VERIFY-COE';
-
-    const selectedMilestones = lockerItems.filter(item => selectedItems.has(item.id));
-    const leadershipItems = selectedMilestones.filter(i => i.type === 'leadership');
-    const seminarItems    = selectedMilestones.filter(i => i.type === 'seminar');
-
-    const techSkillsStr  = getVal('cv-skills',      (cvData?.technical_skills || []).join(', '));
-    const techSkillsList = techSkillsStr.split(',').map(s => s.trim()).filter(Boolean);
-    const softSkillsStr  = getVal('cv-soft-skills', (cvData?.soft_skills || []).join(', '));
-    const softSkillsList = softSkillsStr.split(',').map(s => s.trim()).filter(Boolean);
-    const capTitle    = getVal('cv-capstone-title',    cvData?.capstone_project?.title    || '');
-    const capAbstract = getVal('cv-capstone-abstract', cvData?.capstone_project?.abstract || '');
-
-    const verifyUrl = `${window.location.origin}/cv-verify.html?token=${encodeURIComponent(shareToken)}`;
-    const qrApiUrl  = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(verifyUrl)}`;
-
-    // Shorthand: inline contenteditable span that syncs to a form input
-    const ce = (fieldId, val, placeholder) =>
-      `<span contenteditable="true" data-field="${esc(fieldId)}" data-placeholder="${esc(placeholder)}" class="cv-paper-field">${esc(val)}</span>`;
-
-    const photoHtml = profilePhotoDataUrl
-      ? `<img src="${profilePhotoDataUrl}" class="cv-profile-photo" alt="Profile Photo" />`
-      : `<div class="cv-profile-photo cv-photo-placeholder"><iconify-icon icon="solar:user-circle-bold" style="font-size:2.2rem;color:#94A3B8;"></iconify-icon><span>Click to add photo</span></div>`;
-
-    const htmlContent = `
-      <!-- Harvard Header -->
-      <div class="harvard-header">
-        <div class="harvard-header-left">
-          <div class="harvard-name cv-paper-field"
-               contenteditable="true"
-               data-field="cv-name"
-               data-placeholder="YOUR FULL NAME">${esc(name)}</div>
-          <div class="harvard-contact-line">
-            <div class="harvard-contact-row">
-              ${ce('cv-location', location, 'City, Region')}
-              <span class="sep"> &bull; </span>
-              ${ce('cv-phone', phone, '+63 912 000 0000')}
-              <span class="sep"> &bull; </span>
-              ${ce('cv-email', email, 'you@school.edu.ph')}
-            </div>
-            <div class="harvard-contact-row">
-              LinkedIn:&nbsp;${ce('cv-linkedin', linkedin, 'linkedin.com/in/username')}
-              <span class="sep"> &bull; </span>
-              GitHub:&nbsp;${ce('cv-github', github, 'github.com/username')}
-              ${portfolio ? `<span class="sep"> &bull; </span>Portfolio:&nbsp;${ce('cv-portfolio', portfolio, 'your-portfolio.dev')}` : ''}
-            </div>
-          </div>
-        </div>
-        <div class="harvard-header-right">
-          <div class="cv-photo-wrapper" id="cv-photo-wrapper" title="Click to upload profile photo" onclick="CvBuilder.triggerPhotoUpload()">
-            ${photoHtml}
-          </div>
-          <div class="harvard-qr-box">
-            <img src="${qrApiUrl}" class="harvard-qr-img" alt="QR Verify" />
-            <div class="harvard-qr-label">Credential Verification</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Education -->
-      <div class="harvard-section">
-        <div class="harvard-section-title">Education</div>
-        <div class="harvard-row">
-          <span class="harvard-title-left cv-paper-field"
-                contenteditable="true"
-                data-field="cv-course"
-                data-placeholder="Degree &amp; Major">${esc(course)}</span>
-          <span class="harvard-date-right">Candidate&nbsp;<span class="cv-paper-field"
-                contenteditable="true"
-                data-field="cv-grad-year"
-                data-placeholder="2028">${esc(gradYear)}</span></span>
-        </div>
-        <div class="harvard-sub-left">College of Engineering &bull; Official Student Portal Partner Institution</div>
-        <ul class="harvard-bullets">
-          <li>Verified Enrolled Engineering Student in Official College Registry.</li>
-          <li><strong>Relevant Coursework:</strong> ${ce('cv-coursework', coursework, 'e.g. Calculus, Fluid Mechanics, CAD')}</li>
-        </ul>
-      </div>
-
-      <!-- Professional Summary -->
-      <div class="harvard-section">
-        <div class="harvard-section-title">Professional Summary</div>
-        <ul class="harvard-bullets">
-          <li>${ce('cv-summary', summary, 'Click here to write your professional summary \u2014 describe your engineering focus, key strengths, and career goals...')}</li>
-        </ul>
-      </div>
-
-      <!-- Technical Skills -->
-      <div class="harvard-section">
-        <div class="harvard-section-title">Technical Skills &amp; Competencies</div>
-        <ul class="harvard-bullets">
-          <li><strong>Engineering Software &amp; Tools:</strong>&nbsp;${ce('cv-skills', techSkillsList.join(', '), 'AutoCAD, MATLAB, Python, SolidWorks...')}</li>
-          <li><strong>Core Competencies:</strong>&nbsp;${ce('cv-soft-skills', softSkillsList.join(', '), 'Team Leadership, Technical Writing, Project Management...')}</li>
-        </ul>
-      </div>
-
-      <!-- Leadership & Campus Affiliations -->
-      ${leadershipItems.length > 0 ? `
-      <div class="harvard-section">
-        <div class="harvard-section-title">Leadership &amp; Campus Affiliations</div>
-        ${leadershipItems.map(item => `
-          <div class="harvard-row">
-            <span class="harvard-title-left">${esc(item.title)}</span>
-            <span class="harvard-date-right">${esc(item.date_range)}</span>
-          </div>
-          <div class="harvard-sub-left">${esc(item.organization)}</div>
-          <ul class="harvard-bullets"><li>${esc(item.description)}</li></ul>
-        `).join('')}
-      </div>` : ''}
-
-      <!-- Capstone Project -->
-      <div class="harvard-section">
-        <div class="harvard-section-title">Engineering Capstone Design Project</div>
-        <div class="harvard-row">
-          <span class="harvard-title-left cv-paper-field"
-                contenteditable="true"
-                data-field="cv-capstone-title"
-                data-placeholder="Click to enter your capstone project title...">${esc(capTitle)}</span>
-          <span class="harvard-date-right">Design Project</span>
-        </div>
-        <ul class="harvard-bullets">
-          <li>${ce('cv-capstone-abstract', capAbstract, 'Describe your capstone project \u2014 problem statement, methods, and outcomes...')}</li>
-        </ul>
-      </div>
-
-      <!-- Certifications & Seminars -->
-      ${seminarItems.length > 0 ? `
-      <div class="harvard-section">
-        <div class="harvard-section-title">Certifications &amp; Professional Workshops</div>
-        ${seminarItems.map(item => `
-          <div class="harvard-row">
-            <span class="harvard-title-left">${esc(item.title)}</span>
-            <span class="harvard-date-right">${esc(item.date_range)}</span>
-          </div>
-          <div class="harvard-sub-left">${esc(item.organization)}</div>
-          <ul class="harvard-bullets"><li>${esc(item.description)}</li></ul>
-        `).join('')}
-      </div>` : ''}
-    `;
-
-    canvases.forEach(canvas => {
-      canvas.innerHTML = htmlContent;
-      // Wire up each contenteditable field to sync back to its form input
-      canvas.querySelectorAll('[contenteditable="true"][data-field]').forEach(el => {
-        el.addEventListener('input', () => {
-          const formEl = document.getElementById(el.dataset.field);
-          if (formEl) formEl.value = el.innerText.trim();
-          clearTimeout(debounceTimer);
-          debounceTimer = setTimeout(() => saveToLocal(), 600);
-        });
-        // Prevent Enter from inserting block elements — keep fields single-line
-        el.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            document.execCommand('insertText', false, ' ');
-          }
-        });
-      });
-    });
-  }
-
-  /**
-   * Save CV data to API and local storage
-   */
-  async function saveCv() {
-    saveToLocal();
-    const payload = buildPayload();
-
-    const saveBtns = document.querySelectorAll('#cv-save-btn');
-    const saveTexts = document.querySelectorAll('#cv-save-text');
-
-    saveBtns.forEach(b => { b.disabled = true; });
-    saveTexts.forEach(t => { t.textContent = 'Saving...'; });
-
-    try {
-      if (typeof Api !== 'undefined' && Api.put) {
-        try {
-          const updated = await Api.put('/cv/me', payload);
-          if (updated) {
-            cvData = { ...cvData, ...updated };
-          }
-        } catch (apiErr) {
-          console.debug('[CvBuilder] Remote save skipped (using local cache):', apiErr?.message);
-        }
-      }
-
-      showToast('CV draft and preferences saved successfully!', 'success');
-    } catch (err) {
-      console.error('[CvBuilder] Save error:', err);
-      showToast('Saved to browser cache.', 'info');
-    } finally {
-      saveBtns.forEach(b => { b.disabled = false; });
-      saveTexts.forEach(t => { t.textContent = 'Save Changes'; });
-      renderCvPreview();
-    }
-  }
-
-  /**
-   * Reset form and preview to a completely blank template.
-   * Also clears the profile photo.
-   */
-  function resetToSample() {
-    if (!confirm('Reset all CV fields? This cannot be undone.')) return;
-    cvData = {
-      discipline: 'cpe',
-      profile: { full_name: '', course: '', enrollment_year: '', email: '' },
-      headline: '', summary: '', contact_phone: '', location: '',
-      linkedin_url: '', github_url: '', portfolio_url: '', coursework: '',
-      technical_skills: [], soft_skills: [],
-      capstone_project: { title: '', abstract: '' },
-      locker_items: [], selected_locker_items: []
-    };
-    lockerItems = [];
-    selectedItems = new Set();
-    profilePhotoDataUrl = null;
-    localStorage.removeItem('coe_cv_draft');
-    populateFormInputs();
-    renderLocker();
-    renderCvPreview();
-    showToast('CV reset — start fresh with your own details!', 'info');
-  }
-
-  /**
-   * Trigger file picker for profile photo upload.
-   */
-  function triggerPhotoUpload() {
-    let input = document.getElementById('cv-photo-file-input');
-    if (!input) {
-      input = document.createElement('input');
-      input.type = 'file';
-      input.id = 'cv-photo-file-input';
-      input.accept = 'image/*';
-      input.style.display = 'none';
-      document.body.appendChild(input);
-      input.addEventListener('change', () => {
-        const file = input.files && input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          profilePhotoDataUrl = e.target.result;
-          renderCvPreview();
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-    input.click();
-  }
-
-  /**
-   * Print / Download PDF
-   */
-  function exportPdf() {
+    window.addEventListener('afterprint', restore);
     window.print();
   }
 
-  return {
-    loadData,
-    toggleItem,
-    filterLocker,
-    addCustomEntry,
-    deleteCustomEntry,
-    deleteItem,
-    startEditingItem,
-    cancelEditingItem,
-    saveEditingItem,
-    moveItem,
-    handleDragStart,
-    handleDragOver,
-    handleDragLeave,
-    handleDrop,
-    handleDragEnd,
-    handleInputChange,
-    renderCvPreview,
-    applyDisciplinePreset,
-    toggleSkillChip,
-    toggleCourseworkChip,
-    saveCv,
-    resetToSample,
-    exportPdf,
-    triggerPhotoUpload
-  };
+  function resetCv() {
+    if (!confirm('Clear every field and start over? This also removes your saved CV.')) return;
+    cv = emptyCv();
+    fillForm();
+    renderChips();
+    renderVerified();
+    renderEntries();
+    renderPaper();
+    markDirty();
+    showToast('CV cleared.', 'info');
+  }
+
+  function setPane(pane) {
+    document.body.dataset.pane = pane;
+    document.querySelectorAll('.cv-mobile-tab').forEach((t) => {
+      const on = t.dataset.pane === pane;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', String(on));
+    });
+    if (pane === 'preview') requestAnimationFrame(() => { fitPaper(); updateLength(); });
+  }
+
+  // ---------------- Load ----------------
+  function showLoadError() {
+    loadFailed = true;
+    document.body.dataset.loadError = '1';
+    setStatus('error', 'Could not load your CV');
+    if (!$('cv-load-error')) {
+      const box = document.createElement('div');
+      box.id = 'cv-load-error';
+      box.className = 'cv-load-error';
+      box.innerHTML = `
+        <strong>We couldn't load your saved CV.</strong>
+        <p>To protect what you've already saved, editing is paused until it loads.</p>
+        <button type="button" class="btn btn-primary" id="cv-load-retry">Try again</button>`;
+      $('cv-editor').prepend(box);
+      $('cv-load-retry').addEventListener('click', () => window.location.reload());
+    }
+  }
+
+  async function loadData() {
+    setStatus('loading');
+    let remote = null;
+    let remoteErr = null;
+    try {
+      remote = await Api.request('GET', '/cv/me');
+    } catch (err) {
+      remoteErr = err;
+    }
+
+    if (remoteErr && /session|log in/i.test(String(remoteErr.message || ''))) {
+      toLogin();
+      return false;
+    }
+
+    const local = readLocal();
+
+    if (remote) {
+      verified = normalizeVerified(remote.locker_items);
+      if (local && local.dirty) {
+        cv = normalizeCv(local.cv);          // unsynced edits win over the older server copy
+        dirty = true;
+      } else {
+        cv = normalizeCv(remote);
+        dirty = false;
+      }
+    } else if (local) {
+      cv = normalizeCv(local.cv);            // offline / server down: work from the browser copy
+      dirty = !!local.dirty;
+    } else {
+      showLoadError();
+      return false;
+    }
+
+    fillForm();
+    renderChips();
+    renderVerified();
+    renderEntries();
+    renderPaper();
+
+    if (dirty) {
+      setStatus(remote ? 'unsaved' : 'offline');
+      if (remote) scheduleSave(1000);
+    } else {
+      setStatus('saved');
+    }
+    return true;
+  }
+
+  // ---------------- Wiring ----------------
+  function bindEvents() {
+    const form = $('cv-form');
+    // 'input' fires for text fields, selects and checkboxes alike. Do not also
+    // listen for 'change': it fires on blur and its handler re-renders the
+    // suggestion chips, which swallows the click that caused the blur.
+    form.addEventListener('input', onFormInput);
+    form.addEventListener('click', (e) => {
+      const chip = e.target.closest('.cv-chip');
+      if (chip) { toggleChip(chip.dataset.chipPath, chip.dataset.chip); return; }
+      if (e.target.closest('#entries-root')) onEntriesClick(e);
+    });
+
+    $('cv-print-btn').addEventListener('click', exportPdf);
+    $('cv-reset-btn').addEventListener('click', resetCv);
+    $('cv-status').addEventListener('click', () => {
+      const state = $('cv-status').dataset.state;
+      if (dirty && (state === 'error' || state === 'offline' || state === 'unsaved')) {
+        retryDelay = 0;
+        save();
+      }
+    });
+
+    document.querySelectorAll('.cv-mobile-tab').forEach((t) => {
+      t.addEventListener('click', () => setPane(t.dataset.pane));
+    });
+
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(() => fitPaper()).observe($('cv-preview'));
+    }
+    window.addEventListener('resize', fitPaper);
+    window.addEventListener('online', () => { if (dirty) { retryDelay = 0; save(); } });
+    window.addEventListener('offline', () => { if (dirty) setStatus('offline'); });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden' && dirty) save();
+    });
+    window.addEventListener('beforeunload', (e) => {
+      if (dirty && !loadFailed) { e.preventDefault(); e.returnValue = ''; }
+    });
+  }
+
+  async function init() {
+    if (initialised) return;
+    initialised = true;
+
+    bindEvents();
+    renderPaper();
+
+    const session = await Auth.getSession();
+    if (!session) { toLogin(); return; }
+    userId = session.user.id;
+    try { localStorage.removeItem(LEGACY_LOCAL_KEY); } catch { /* storage unavailable */ }
+
+    await loadData();
+  }
+
+  return { init };
 })();
