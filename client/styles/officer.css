@@ -113,22 +113,37 @@ html, body {
   overflow-x: hidden;
 }
 
+/* GPU-Accelerated Executive View Transitions */
+@keyframes ofViewEnterMicro {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .of-view {
   display: none;
   padding: 0 2rem 2rem;
-  animation: ofFade 0.3s ease;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  will-change: opacity, transform;
 }
 
 .of-view.active {
   display: block;
+  animation: ofViewEnterMicro 140ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes ofFade {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* Executive Content Visibility List Optimization */
+.of-announce-item,
+.of-table tbody tr {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 54px;
 }
 
 /* =============================================
