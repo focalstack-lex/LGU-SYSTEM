@@ -563,7 +563,18 @@
 
   // ---- Navigation (sidebar + bottom nav) ----
   function navigateTo(view) {
+    const mainContainer = document.querySelector('.main-content') || document.querySelector('.app-screen');
+    const activeViewEl = document.querySelector('.view.active');
+    if (activeViewEl && mainContainer && window.SWRCache) {
+      window.SWRCache.saveScroll(activeViewEl.id, mainContainer.scrollTop);
+    }
+
     UI.showView(view);
+
+    if (mainContainer && window.SWRCache) {
+      const savedTop = window.SWRCache.getScroll(`view-${view}`);
+      mainContainer.scrollTop = savedTop;
+    }
 
     // Sync active class on both sidebar and bottom nav
     const moreViews = ['income', 'transactions', 'enrollment', 'admin'];

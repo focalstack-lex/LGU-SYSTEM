@@ -514,6 +514,12 @@ const OfficerApp = (() => {
     // Curriculum Manager is admin-only: fall back for non-admin deep links
     if (section === 'curriculum' && (!(_profile) || _profile.role !== 'admin')) section = 'overview';
 
+    const prevActive = document.querySelector('.of-view.active');
+    const mainEl = document.querySelector('.main-content') || document.querySelector('.of-content');
+    if (prevActive && mainEl && window.SWRCache) {
+      window.SWRCache.saveScroll(prevActive.id, mainEl.scrollTop);
+    }
+
     const moreSections = ['roster', 'people', 'announcements', 'curriculum'];
     const isMoreActive = moreSections.includes(section);
     const moreBtn = $('of-bottom-nav-more-btn');
@@ -524,6 +530,11 @@ const OfficerApp = (() => {
       if (b !== moreBtn) b.classList.toggle('active', b.dataset.of === section);
     });
     $(`of-view-${section}`).classList.add('active');
+
+    if (mainEl && window.SWRCache) {
+      const savedTop = window.SWRCache.getScroll(`of-view-${section}`);
+      mainEl.scrollTop = savedTop;
+    }
 
     // Glide the liquid pill to the newly active icon
     if (typeof UI !== 'undefined' && UI.moveNavIndicator) UI.moveNavIndicator($('of-bottom-nav'));
