@@ -1304,9 +1304,24 @@
   <script src="vendor/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <!-- Skeleton Loading Screen (replaces logo splash) -->
+  <!-- Skeleton Loading Screen (mirrors real dashboard hierarchy) -->
   <div id="splash-screen" class="splash-screen hidden" aria-hidden="true">
-    <!-- Skeleton Sidebar -->
+    <!-- Skeleton Top Mobile Header (<= 480px) -->
+    <div class="sk-mobile-header">
+      <div class="sk-mobile-brand">
+        <div class="sk-bone sk-circle" style="width:36px;height:36px;flex-shrink:0;"></div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div class="sk-bone" style="height:14px;width:105px;border-radius:4px;"></div>
+          <div class="sk-bone" style="height:12px;width:72px;border-radius:999px;"></div>
+        </div>
+      </div>
+      <div class="sk-mobile-actions">
+        <div class="sk-bone" style="width:34px;height:34px;border-radius:8px;"></div>
+        <div class="sk-bone" style="width:34px;height:34px;border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Skeleton Sidebar (Desktop & Tablet) -->
     <div class="sk-sidebar">
       <div class="sk-sidebar-brand">
         <div class="sk-bone sk-circle" style="width:36px;height:36px;flex-shrink:0;"></div>
@@ -1331,60 +1346,113 @@
         <div class="sk-bone" style="width:30px;height:30px;border-radius:6px;flex-shrink:0;"></div>
       </div>
     </div>
+
     <!-- Skeleton Main Content -->
     <div class="sk-main">
       <!-- Default shape (dashboard / reports): header + stats + content cards -->
       <div class="sk-splash-default">
         <div class="sk-header">
-          <div class="sk-bone" style="height:26px;width:220px;border-radius:6px;"></div>
-          <div class="sk-bone" style="height:14px;width:280px;border-radius:4px;margin-top:8px;"></div>
+          <div class="sk-bone" style="height:24px;width:180px;border-radius:6px;"></div>
+          <div class="sk-bone" style="height:13px;width:240px;border-radius:4px;margin-top:6px;"></div>
         </div>
-        <!-- Stat cards row -->
-        <div class="sk-stats-grid">
-          <div class="sk-stat-card">
-            <div class="sk-bone sk-circle" style="width:38px;height:38px;flex-shrink:0;"></div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
-              <div class="sk-bone" style="height:10px;width:60%;border-radius:4px;"></div>
-              <div class="sk-bone" style="height:22px;width:80%;border-radius:5px;"></div>
+
+        <!-- Featured Financial Stats Hierarchy -->
+        <div class="sk-stats-summary-wrapper">
+          <!-- Hero Card: Available General Fund -->
+          <div class="sk-stat-card-hero">
+            <div class="sk-hero-header">
+              <div class="sk-bone sk-circle" style="width:18px;height:18px;flex-shrink:0;"></div>
+              <div class="sk-bone" style="height:11px;width:150px;border-radius:3px;"></div>
+            </div>
+            <div class="sk-hero-body">
+              <div class="sk-bone" style="height:32px;width:190px;border-radius:6px;margin:2px 0;"></div>
+              <div class="sk-bone" style="height:11px;width:270px;max-width:90%;border-radius:3px;"></div>
             </div>
           </div>
-          <div class="sk-stat-card">
-            <div class="sk-bone sk-circle" style="width:38px;height:38px;flex-shrink:0;"></div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
-              <div class="sk-bone" style="height:10px;width:60%;border-radius:4px;"></div>
-              <div class="sk-bone" style="height:22px;width:80%;border-radius:5px;"></div>
+
+          <!-- Secondary Metrics Grid -->
+          <div class="sk-stats-secondary-grid">
+            <div class="sk-stat-card-secondary">
+              <div class="sk-stat-sec-icon-label">
+                <div class="sk-bone" style="width:24px;height:24px;border-radius:6px;flex-shrink:0;"></div>
+                <div class="sk-bone" style="height:10px;width:75px;border-radius:3px;"></div>
+              </div>
+              <div class="sk-bone" style="height:20px;width:105px;border-radius:4px;margin:2px 0;"></div>
+              <div class="sk-bone" style="height:9px;width:80px;border-radius:3px;"></div>
             </div>
-          </div>
-          <div class="sk-stat-card">
-            <div class="sk-bone sk-circle" style="width:38px;height:38px;flex-shrink:0;"></div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
-              <div class="sk-bone" style="height:10px;width:60%;border-radius:4px;"></div>
-              <div class="sk-bone" style="height:22px;width:80%;border-radius:5px;"></div>
+
+            <div class="sk-stat-card-secondary">
+              <div class="sk-stat-sec-icon-label">
+                <div class="sk-bone" style="width:24px;height:24px;border-radius:6px;flex-shrink:0;"></div>
+                <div class="sk-bone" style="height:10px;width:80px;border-radius:3px;"></div>
+              </div>
+              <div class="sk-bone" style="height:20px;width:95px;border-radius:4px;margin:2px 0;"></div>
+              <div class="sk-bone" style="height:9px;width:65px;border-radius:3px;"></div>
             </div>
-          </div>
-          <div class="sk-stat-card">
-            <div class="sk-bone sk-circle" style="width:38px;height:38px;flex-shrink:0;"></div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
-              <div class="sk-bone" style="height:10px;width:60%;border-radius:4px;"></div>
-              <div class="sk-bone" style="height:22px;width:80%;border-radius:5px;"></div>
+
+            <div class="sk-stat-card-secondary sk-stat-card-donations">
+              <div class="sk-stat-sec-icon-label">
+                <div class="sk-bone" style="width:24px;height:24px;border-radius:6px;flex-shrink:0;"></div>
+                <div class="sk-bone" style="height:10px;width:90px;border-radius:3px;"></div>
+              </div>
+              <div class="sk-bone" style="height:20px;width:110px;border-radius:4px;margin:2px 0;"></div>
+              <div class="sk-bone" style="height:9px;width:75px;border-radius:3px;"></div>
             </div>
           </div>
         </div>
+
         <!-- Content cards row -->
         <div class="sk-cards-grid">
+          <!-- Recent Transactions Card -->
           <div class="sk-content-card">
-            <div class="sk-bone" style="height:14px;width:40%;border-radius:4px;margin-bottom:18px;"></div>
-            <div class="sk-bone sk-list-row"></div>
-            <div class="sk-bone sk-list-row"></div>
-            <div class="sk-bone sk-list-row"></div>
-            <div class="sk-bone sk-list-row"></div>
-            <div class="sk-bone sk-list-row" style="width:70%;"></div>
+            <div class="sk-bone" style="height:15px;width:140px;border-radius:4px;margin-bottom:8px;"></div>
+            <div class="sk-tx-item">
+              <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+                <div class="sk-bone" style="height:13px;width:130px;border-radius:3px;"></div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="sk-bone" style="height:14px;width:52px;border-radius:999px;"></div>
+                  <div class="sk-bone" style="height:10px;width:70px;border-radius:3px;"></div>
+                </div>
+              </div>
+              <div class="sk-bone" style="height:16px;width:65px;border-radius:4px;"></div>
+            </div>
+            <div class="sk-tx-item">
+              <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+                <div class="sk-bone" style="height:13px;width:95px;border-radius:3px;"></div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="sk-bone" style="height:14px;width:52px;border-radius:999px;"></div>
+                  <div class="sk-bone" style="height:10px;width:70px;border-radius:3px;"></div>
+                </div>
+              </div>
+              <div class="sk-bone" style="height:16px;width:65px;border-radius:4px;"></div>
+            </div>
+            <div class="sk-tx-item">
+              <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+                <div class="sk-bone" style="height:13px;width:75px;border-radius:3px;"></div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="sk-bone" style="height:14px;width:52px;border-radius:999px;"></div>
+                  <div class="sk-bone" style="height:10px;width:70px;border-radius:3px;"></div>
+                </div>
+              </div>
+              <div class="sk-bone" style="height:16px;width:65px;border-radius:4px;"></div>
+            </div>
+            <div class="sk-tx-item">
+              <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+                <div class="sk-bone" style="height:13px;width:125px;border-radius:3px;"></div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="sk-bone" style="height:14px;width:58px;border-radius:999px;"></div>
+                  <div class="sk-bone" style="height:10px;width:70px;border-radius:3px;"></div>
+                </div>
+              </div>
+              <div class="sk-bone" style="height:16px;width:75px;border-radius:4px;"></div>
+            </div>
           </div>
-          <div class="sk-content-card">
-            <div class="sk-bone" style="height:14px;width:50%;border-radius:4px;margin-bottom:18px;"></div>
+          <!-- Announcements Card -->
+          <div class="sk-content-card sk-announcements-card">
+            <div class="sk-bone" style="height:15px;width:120px;border-radius:4px;margin-bottom:8px;"></div>
             <div class="sk-bone sk-list-row"></div>
             <div class="sk-bone sk-list-row"></div>
-            <div class="sk-bone sk-list-row" style="width:60%;"></div>
+            <div class="sk-bone sk-list-row" style="width:65%;"></div>
           </div>
         </div>
       </div>
@@ -1392,8 +1460,8 @@
       <!-- Units shape: graduation progress card + subject checklist -->
       <div class="sk-splash-units">
         <div class="sk-header">
-          <div class="sk-bone" style="height:26px;width:220px;border-radius:6px;"></div>
-          <div class="sk-bone" style="height:14px;width:280px;border-radius:4px;margin-top:8px;"></div>
+          <div class="sk-bone" style="height:24px;width:180px;border-radius:6px;"></div>
+          <div class="sk-bone" style="height:13px;width:240px;border-radius:4px;margin-top:6px;"></div>
         </div>
         <div class="sk-units">
           <div class="sk-content-card">
@@ -1427,8 +1495,8 @@
       <!-- List shape (events / transactions / income / admin): one long list -->
       <div class="sk-splash-list">
         <div class="sk-header">
-          <div class="sk-bone" style="height:26px;width:200px;border-radius:6px;"></div>
-          <div class="sk-bone" style="height:14px;width:260px;border-radius:4px;margin-top:8px;"></div>
+          <div class="sk-bone" style="height:24px;width:180px;border-radius:6px;"></div>
+          <div class="sk-bone" style="height:13px;width:240px;border-radius:4px;margin-top:6px;"></div>
         </div>
         <div class="sk-content-card">
           <div class="sk-bone sk-list-row"></div>
@@ -1445,7 +1513,7 @@
 
     <!-- Skeleton Bottom Nav (mobile only, mirrors #bottom-nav) -->
     <div class="sk-bottom-nav">
-      <div class="sk-bone sk-nav-btn"></div>
+      <div class="sk-bone sk-nav-btn sk-nav-btn--active"></div>
       <div class="sk-bone sk-nav-btn"></div>
       <div class="sk-bone sk-nav-btn"></div>
       <div class="sk-bone sk-nav-btn"></div>

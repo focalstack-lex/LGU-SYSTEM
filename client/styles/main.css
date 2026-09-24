@@ -4629,13 +4629,40 @@ html body.is-admin th.admin-only {
   border-radius: 4px;
 }
 
+html[data-theme="light"] .sk-bone {
+  background: linear-gradient(
+    90deg,
+    #E2E8F0 25%,
+    #F1F5F9 50%,
+    #E2E8F0 75%
+  );
+  background-size: 600px 100%;
+}
+
 .sk-circle {
   border-radius: 50%;
 }
 
+/* ---- Skeleton Mobile Header (<= 480px) ---- */
+.sk-mobile-header {
+  display: none;
+}
+
+.sk-mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sk-mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 /* ---- Skeleton Sidebar ---- */
 .sk-sidebar {
-  width: var(--sidebar-w);
+  width: var(--sidebar-w, 240px);
   height: 100vh;
   background: var(--bg-surface);
   border-right: 1px solid var(--border-default);
@@ -4643,7 +4670,7 @@ html body.is-admin th.admin-only {
   flex-direction: column;
   padding: 1.5rem 1rem;
   flex-shrink: 0;
-  overflow-x: hidden; /* clips like the real .sidebar when narrowed to the 60px rail */
+  overflow-x: hidden;
 }
 
 .sk-sidebar-brand {
@@ -4668,8 +4695,8 @@ html body.is-admin th.admin-only {
 }
 
 .sk-nav-item--active {
-  background: var(--bg-surface-raised) !important; /* dark slate - mirrors the real active nav item */
-  animation: none; /* active item is a flat tint, not shimmer */
+  background: var(--bg-surface-raised) !important;
+  animation: none;
 }
 
 .sk-sidebar-footer {
@@ -4686,7 +4713,7 @@ html body.is-admin th.admin-only {
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 1.25rem;
   overflow: hidden;
 }
 
@@ -4696,24 +4723,71 @@ html body.is-admin th.admin-only {
   gap: 0;
 }
 
-/* Stat cards - 4 columns matching the real dashboard */
-.sk-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+/* ---- Skeleton Financial Stats Hierarchy (Mirrors .stats-summary-wrapper) ---- */
+.sk-stats-summary-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
 }
 
-.sk-stat-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  border-radius: 8px;
-  padding: 1.5rem;
+.sk-stat-card-hero {
+  background: #1E1E24;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg, 16px);
+  padding: 1.15rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="light"] .sk-stat-card-hero {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.09);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.sk-hero-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.55rem;
 }
 
-/* Content cards - 1.6fr / 1fr matching the real dashboard grid */
+.sk-hero-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sk-stats-secondary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.sk-stat-card-secondary {
+  background: var(--surface, #1C1C20);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-lg, 16px);
+  padding: 0.95rem 1.05rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+html[data-theme="light"] .sk-stat-card-secondary {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.09);
+}
+
+.sk-stat-sec-icon-label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+/* ---- Content cards - 1.6fr / 1fr matching real dashboard grid ---- */
 .sk-cards-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
@@ -4723,8 +4797,8 @@ html body.is-admin th.admin-only {
 .sk-content-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
-  border-radius: 8px;
-  padding: 1.5rem;
+  border-radius: var(--radius-lg, 16px);
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
@@ -4736,20 +4810,30 @@ html body.is-admin th.admin-only {
   border-radius: 6px;
 }
 
-/* ---- Splash view variants ----
-   The boot skeleton matches the view being restored: the default shape
-   (dashboard / reports) uses display:contents so its children keep flowing
-   straight into .sk-main; the units and list shapes swap in instead. */
+/* Skeleton Transaction Row Item */
+.sk-tx-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border-default, rgba(255, 255, 255, 0.05));
+}
+
+.sk-tx-item:last-child {
+  border-bottom: none;
+}
+
+/* ---- Splash view variants ---- */
 .sk-splash-default { display: contents; }
 .sk-splash-units,
 .sk-splash-list   { display: none; }
 
 .splash-view-units .sk-splash-default { display: none; }
-.splash-view-units .sk-splash-units   { display: flex; flex-direction: column; gap: 1.75rem; }
+.splash-view-units .sk-splash-units   { display: flex; flex-direction: column; gap: 1.5rem; }
 .splash-view-list  .sk-splash-default { display: none; }
-.splash-view-list  .sk-splash-list    { display: flex; flex-direction: column; gap: 1.75rem; }
+.splash-view-list  .sk-splash-list    { display: flex; flex-direction: column; gap: 1.5rem; }
 
-/* Units shape - progress card beside the subject checklist, like the view */
+/* Units shape - progress card beside the subject checklist */
 .sk-units {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -4765,15 +4849,12 @@ html body.is-admin th.admin-only {
 .sk-tab-pill       { height: 38px; border-radius: 999px; }
 
 /* ---- Reports skeleton ---- */
-/* Stack the skeleton sections with the same vertical rhythm as the real
-   reports page (stats → charts → table). */
 .sk-reports {
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 1.5rem;
 }
 
-/* Chart placeholder - matches the 260px real chart canvases */
 .sk-chart {
   height: 260px;
   border-radius: 8px;
@@ -4781,76 +4862,134 @@ html body.is-admin th.admin-only {
 
 /* ---- Skeleton Bottom Nav (mobile only, mirrors floating island pill) ---- */
 .sk-bottom-nav {
-  display: none; /* Hidden on desktop, like the real .bottom-nav */
+  display: none;
   position: fixed;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  left: 12px;
-  right: 12px;
-  max-width: 440px;
+  bottom: max(env(safe-area-inset-bottom, 0px), 10px);
+  left: 10px;
+  right: 10px;
+  max-width: 480px;
   margin: 0 auto;
-  height: 56px;
+  height: 58px;
   background: #18181B;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 30px;
+  border-radius: 20px;
   align-items: center;
   justify-content: space-around;
-  padding: 6px 12px;
+  padding: 5px 6px;
+  gap: 4px;
   z-index: 1000;
-  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.5);
-}
-.sk-nav-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  flex-shrink: 0;
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.65), 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
+html[data-theme="light"] .sk-bottom-nav {
+  background: #FFFFFF;
+  border-color: #D5DBE2;
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.12);
+}
+
+.sk-nav-btn {
+  flex: 1 1 0%;
+  min-width: 44px;
+  height: 48px;
+  border-radius: 14px;
+}
+
+.sk-nav-btn--active {
+  background: #232328 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  animation: none;
+}
+
+html[data-theme="light"] .sk-nav-btn--active {
+  background: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+}
 
 /* =============================================
    SKELETON RESPONSIVE OVERRIDES
-   Must stay after every .sk-* base rule: the base
-   rules live above the main responsive section, so
-   equal-specificity overrides here win the cascade.
-   Mirrors the real app breakpoints (sidebar/bottom-nav
-   swap at 480px, 60px rail at 768px).
    ============================================= */
 
-/* ≤1024px - content cards stack 2-up like .dashboard-grid; the units
-   skeleton stacks its progress card above the checklist like the view */
+/* ≤1024px - content cards stack 2-up */
 @media (max-width: 1024px) {
   .sk-cards-grid { grid-template-columns: repeat(2, 1fr); }
   .sk-units { grid-template-columns: 1fr; }
 }
 
-/* ≤768px - skeleton mirrors the 60px sidebar rail */
+/* ≤768px - skeleton mirrors 60px sidebar rail */
 @media (max-width: 768px) {
   .sk-sidebar-brand,
   .sk-sidebar-footer { justify-content: center; }
   .sk-sidebar-brand .sk-rail-text,
   .sk-sidebar-footer .sk-rail-text { display: none; }
-  .sk-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-  .sk-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sk-cards-grid { grid-template-columns: 1fr; gap: 0.85rem; }
   .sk-main { padding: 1.25rem 1rem; }
 }
 
-/* ≤480px - hide sidebar shell, show bottom nav shell (mirrors real app) */
+/* ≤640px - secondary stats wrap to 2 cols + full width donations */
+@media (max-width: 640px) {
+  .sk-stats-summary-wrapper {
+    gap: 0.55rem;
+  }
+  .sk-stat-card-hero {
+    padding: 0.95rem 1.1rem;
+    gap: 0.45rem;
+  }
+  .sk-stats-secondary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+  .sk-stat-card-donations {
+    grid-column: 1 / -1;
+  }
+  .sk-stat-card-secondary {
+    padding: 0.75rem 0.75rem;
+    gap: 0.35rem;
+  }
+}
+
+/* ≤480px - mobile layout: top header, column flow, bottom nav */
 @media (max-width: 480px) {
-  .sk-sidebar { display: none; }
+  .splash-screen {
+    flex-direction: column !important;
+  }
+  .sk-sidebar {
+    display: none;
+  }
+  .sk-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0.95rem;
+    min-height: 58px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-default);
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
   .sk-bottom-nav {
     display: flex;
-    height: 56px;
-    padding: 6px 12px;
-    justify-content: space-evenly;
   }
-  .sk-main { padding: 0.75rem 0.75rem calc(88px + env(safe-area-inset-bottom, 0px)); }
-  .sk-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
-  .sk-stat-card { padding: 0.9rem; gap: 0.6rem; }
-  .sk-stat-card .sk-circle { width: 26px !important; height: 26px !important; } /* inline-sized bones: matches the 26px mobile stat icon */
-  .sk-cards-grid { grid-template-columns: 1fr; gap: 0.6rem; }
-  .sk-content-card { padding: 0.9rem; }
-  .sk-header { border-bottom: 1px solid var(--border-default); margin-bottom: 0.75rem; padding-bottom: 0.5rem; }
-  .sk-header .sk-bone:first-child { height: 18px !important; }   /* matches mobile view-title size */
-  .sk-header .sk-bone:nth-child(2) { height: 11px !important; }  /* matches mobile view-subtitle size */
+  .sk-main {
+    padding: 0.85rem 0.85rem calc(88px + env(safe-area-inset-bottom, 0px));
+    gap: 0.85rem;
+    overflow-y: auto;
+  }
+  .sk-content-card {
+    padding: 1rem;
+  }
+  .sk-header {
+    margin-bottom: 0.15rem;
+  }
+  .sk-header .sk-bone:first-child {
+    height: 20px !important;
+    width: 170px !important;
+  }
+  .sk-header .sk-bone:nth-child(2) {
+    height: 12px !important;
+    width: 220px !important;
+    margin-top: 4px !important;
+  }
 }
 
 /* =============================================
