@@ -292,5 +292,27 @@ const UI = (() => {
     window.addEventListener('pageshow', e => { if (e.persisted) kickViewportRelayout(); });
   }
 
-  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators };
+  // ---- Scrollbar Lock Management (prevents layout jump when modals open) ----
+  function lockScrollbar() {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      const stickyHeaders = document.querySelectorAll('.app-mobile-header, .sticky-top');
+      stickyHeaders.forEach(el => {
+        el.style.paddingRight = `calc(1rem + ${scrollbarWidth}px)`;
+      });
+    }
+    document.body.classList.add('modal-open');
+  }
+
+  function unlockScrollbar() {
+    document.body.style.paddingRight = '';
+    const stickyHeaders = document.querySelectorAll('.app-mobile-header, .sticky-top');
+    stickyHeaders.forEach(el => {
+      el.style.paddingRight = '';
+    });
+    document.body.classList.remove('modal-open');
+  }
+
+  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators, lockScrollbar, unlockScrollbar };
 })();
