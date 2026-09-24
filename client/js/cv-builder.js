@@ -845,3 +845,8 @@ const CvBuilder = (() => {
 
   return { init };
 })();
+
+document.addEventListener('DOMContentLoaded', function () {
+  CvBuilder.init();
+});
+

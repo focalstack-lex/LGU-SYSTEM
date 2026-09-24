@@ -35,21 +35,22 @@ if (typeof supabase === 'undefined') {
 }
 
 // =============================================
-// Enrollment pilot allowlist (Phase B/C rollout, spec 2026-09-08).
-// Server mirror: server/middleware/roles.js PILOT_DEFAULT.
+// Enrollment pilot status check
+// Evaluated server-side via authenticated API gate.
 // =============================================
-window.ENROLLMENT_PILOT_EMAILS = [
-  'lexmatondo@g.cjc.edu.ph',   // admin / developer
-  'test.newuser@g.cjc.edu.ph', // student: Alex Rivera (BSCoE, Yr 2)
-  'bsce.test@g.cjc.edu.ph',    // student: Maria Santos (BSCE, seeded submitted load)
-  'head.test@g.cjc.edu.ph',    // program head (BSCoE)
-  'dean.test@g.cjc.edu.ph',    // dean
-  'sa.test@g.cjc.edu.ph',      // student assistant (faculty role)
-  'klydemodina@g.cjc.edu.ph',  // real student account for live testing
-];
-window.isEnrollmentPilot = function (email) {
-  const v = String(email || '').trim().toLowerCase();
-  return (window.ENROLLMENT_PILOT_EMAILS || []).some(e => String(e).trim().toLowerCase() === v);
+let _pilotStatusCache = null;
+window.isEnrollmentPilot = async function () {
+  if (_pilotStatusCache !== null) return _pilotStatusCache;
+  try {
+    const res = await (window.Api && window.Api.enrollment && window.Api.enrollment.pilotStatus
+      ? window.Api.enrollment.pilotStatus()
+      : fetch('/api/enrollment/pilot-status', { headers: { Authorization: `Bearer ${(await window.Auth?.getToken()) || ''}` } }).then(r => r.json()));
+    _pilotStatusCache = !!(res && res.pilot);
+    return _pilotStatusCache;
+  } catch {
+    return false;
+  }
 };
+
 
 

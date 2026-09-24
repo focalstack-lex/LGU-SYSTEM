@@ -44,3 +44,13 @@ All UI modifications MUST strictly obey the project's design system tokens in [`
    - Always test functionality and run `node check_txs.js` before committing/pushing changes.
 
 ---
+
+## 4. Security Hardening Directive (mandatory)
+
+- **Canonical spec:** [`docs/SECURITY_HARDENING.md`](file:///c:/Users/User/Documents/LGU%20System/docs/SECURITY_HARDENING.md) is the single authoritative work order for security hardening (findings, required changes, acceptance criteria, verification commands, and prohibited actions). Read it in full before making any security-related change. Do not reconstruct it from memory and do not substitute a generic checklist for it.
+- **Scope clarification:** Section 3.1 above forbids altering Supabase client queries, backend routing, and database schemas during **UI enhancement** work. Security hardening is a separate, explicitly authorized workstream: it may modify `server/`, `supabase/migrations/`, and security-relevant client configuration, but only where the spec directs, one finding per change set.
+- **Branch policy:** Security work must NOT run on `redesign/ui-enhancement`. Use a dedicated branch (for example `security/hardening-<finding-id>`) and never commit directly to `main`, per Section 1.
+- **Non-negotiable rules**, overriding convenience: never print, log, or commit a secret; never weaken a control (RLS, rate limits, CORS, CSP) to make something pass; run write or account-creation tests against staging only; journal every change in `journal/YYYY-MM-DD.md`.
+- **Verification:** a finding is complete only with real command output pasted into the report. Section 7 of the spec holds the shell commands and the SQL invariant queries.
+
+---

@@ -24,9 +24,10 @@ const keepAlive           = require("./lib/keepAlive");
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// Trust the first proxy hop (Render/Vercel) so req.ip reflects the real client
+// Trust the proxy hop (Render/Vercel) so req.ip reflects the real client
 // IP - required for per-IP rate limiting to work behind a reverse proxy.
-app.set('trust proxy', 1);
+// Configurable via TRUST_PROXY environment variable (defaults to 1).
+app.set('trust proxy', Number(process.env.TRUST_PROXY) || 1);
 
 // =============================================
 // Security: Helmet (sets 11+ security headers)
@@ -35,12 +36,13 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc:   ["'self'"],
-      scriptSrc:    ["'self'", "'unsafe-inline'",
+      scriptSrc:    ["'self'",
                      "https://cdn.jsdelivr.net",
                      "https://cdnjs.cloudflare.com",
                      "https://fonts.googleapis.com",
                      "https://apis.google.com",
                      "https://accounts.google.com"],
+      scriptSrcAttr: ["'none'"],
       styleSrc:     ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc:      ["'self'", "https://fonts.gstatic.com"],
       imgSrc:       ["'self'", "data:", "https://hchkfunaofyoualrdnkk.supabase.co", "https://lh3.googleusercontent.com"],

@@ -25,7 +25,7 @@ window.ENROLLMENT_PILOT_EMAILS = [
   'head.test@g.cjc.edu.ph',    // program head (BSCoE)
   'dean.test@g.cjc.edu.ph',    // dean
   'sa.test@g.cjc.edu.ph',      // student assistant (faculty role)
-  'klydemodina@g.cjc.edu.ph',  // real student account for live testing
+  'student.pilot@g.cjc.edu.ph', // synthetic student account for testing
 ];
 window.isEnrollmentPilot = function (email) {
   const v = String(email || '').trim().toLowerCase();

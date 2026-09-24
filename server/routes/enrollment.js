@@ -16,6 +16,17 @@ const router = express.Router();
 const SCHOOL_YEAR_RE = /^\d{4}-\d{4}$/;
 const ORIGINS = ['grizz', 'manual'];
 
+// GET /pilot-status - check if current authenticated user is allowlisted for pilot enrollment
+router.get('/pilot-status', (req, res) => {
+  const raw = process.env.ENROLLMENT_PILOT_EMAILS;
+  if (!raw || !raw.trim()) {
+    return res.json({ pilot: false });
+  }
+  const list = raw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  const email = String(req.user?.email || '').trim().toLowerCase();
+  res.json({ pilot: Boolean(email && list.includes(email)) });
+});
+
 // Students only — staff use /api/faculty.
 function requireStudent(req, res, next) {
   if (req.profile?.role !== 'student') {

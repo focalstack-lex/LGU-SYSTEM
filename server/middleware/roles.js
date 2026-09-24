@@ -43,30 +43,22 @@ function requireProgramHead(req, res, next) {
   next();
 }
 
-// Enrollment pilot allowlist (Phase B/C rollout gate, spec 2026-09-08).
-// Client mirror: client/js/config.js window.ENROLLMENT_PILOT_EMAILS.
-// Override with ENROLLMENT_PILOT_EMAILS="a@x.com, b@x.com" on the server.
-const PILOT_DEFAULT = [
-  'lexmatondo@g.cjc.edu.ph',
-  'test.newuser@g.cjc.edu.ph',
-  'bsce.test@g.cjc.edu.ph',
-  'head.test@g.cjc.edu.ph',
-  'dean.test@g.cjc.edu.ph',
-  'sa.test@g.cjc.edu.ph',
-  'klydemodina@g.cjc.edu.ph',
-];
-
+// Enrollment pilot allowlist (Phase B/C rollout gate).
+// Configured strictly via ENROLLMENT_PILOT_EMAILS="a@x.com, b@x.com" on the server.
+// Fails closed if the environment variable is unset or empty.
 function pilotGate(req, res, next) {
   const raw = process.env.ENROLLMENT_PILOT_EMAILS;
-  const list = raw
-    ? raw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
-    : PILOT_DEFAULT;
+  if (!raw || !raw.trim()) {
+    return res.status(403).json({ error: 'This feature is currently disabled in this environment.' });
+  }
+  const list = raw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
   const email = String(req.user?.email || '').trim().toLowerCase();
-  if (!list.includes(email)) {
+  if (!email || !list.includes(email)) {
     return res.status(403).json({ error: 'This feature is still under development.' });
   }
   next();
 }
 
 module.exports = { OFFICER_ROLES, GOVERNOR_ROLES, FACULTY_ROLES, requireAdmin, requireGovernorOrAdmin, requireOfficer, requireFaculty, requireProgramHead, pilotGate };
+
 

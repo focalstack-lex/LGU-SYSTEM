@@ -21,14 +21,7 @@
   <!-- Supabase (vendored) -->
   <script src="vendor/supabase.min.js"></script>
 
-  <script>
-    // Apply theme immediately to prevent flashing
-    (function() {
-      var savedTheme = 'dark';
-      try { savedTheme = localStorage.getItem('theme') || 'dark'; } catch (e) { /* storage unavailable */ }
-      document.documentElement.setAttribute('data-theme', savedTheme);
-    })();
-  </script>
+  <script src="js/init-theme.js"></script>
 </head>
 <body class="cv-builder-body" data-pane="edit">
 
@@ -222,8 +215,5 @@
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/cv-builder.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () { CvBuilder.init(); });
-  </script>
 </body>
 </html>

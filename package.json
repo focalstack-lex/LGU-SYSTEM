@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "nodemon server/index.js",
-    "build": "npm install"
+    "build": "npm install",
+    "map:code": "node scripts/generate-code-map.mjs",
+    "map:code:check": "node scripts/generate-code-map.mjs --check"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.8",

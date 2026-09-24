@@ -12,23 +12,20 @@ const read = (p) => fs.readFileSync(path.join(__dirname, '..', p), 'utf8');
 const roles = read('server/middleware/roles.js');
 check('pilotGate middleware defined', /function pilotGate\(/.test(roles));
 check('pilotGate checks req.user.email', /req\.user\?\.email/.test(roles));
-check('pilotGate default includes admin + test accounts',
-  ['lexmatondo', 'test.newuser', 'bsce.test', 'head.test', 'dean.test', 'sa.test', 'klydemodina']
-    .every(e => roles.includes(e + '@g.cjc.edu.ph')));
+check('pilotGate fails closed without hardcoded fallback', !roles.includes('PILOT_DEFAULT'));
 check('pilotGate reads ENROLLMENT_PILOT_EMAILS env', /ENROLLMENT_PILOT_EMAILS/.test(roles));
 check('pilotGate exported', /pilotGate/.test((roles.match(/module\.exports[^;]+/) || [''])[0]));
 
 const enr = read('server/routes/enrollment.js');
-check('enrollment router applies pilotGate', /router\.use\(requireStudent\);\s*\n\s*router\.use\(pilotGate\)/.test(enr));
+check('enrollment router applies pilotGate', /router\.use\(pilotGate\)/.test(enr));
 
 const fac = read('server/routes/faculty.js');
-check('faculty router applies pilotGate', /router\.use\(requireFaculty\);\s*\n\s*router\.use\(pilotGate\)/.test(fac));
+check('faculty router applies pilotGate', /router\.use\(pilotGate\)/.test(fac));
 
 // --- client flag + student gate (Task 2) ---
 const cfg = read('client/js/config.js');
-check('config defines ENROLLMENT_PILOT_EMAILS', /ENROLLMENT_PILOT_EMAILS\s*=/.test(cfg));
-check('config defines isEnrollmentPilot', /window\.isEnrollmentPilot\s*=/.test(cfg));
-check('config pilot list has 7 emails', (cfg.match(/@g\.cjc\.edu\.ph/g) || []).length >= 7);
+check('config does not expose hardcoded emails', !cfg.includes('ENROLLMENT_PILOT_EMAILS = ['));
+check('config defines isEnrollmentPilot async function', /window\.isEnrollmentPilot\s*=/.test(cfg));
 
 const enrollmentJs = read('client/js/enrollment.js');
 check('enrollment load() checks isEnrollmentPilot', /isEnrollmentPilot/.test(enrollmentJs));

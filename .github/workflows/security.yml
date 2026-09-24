@@ -1,0 +1,54 @@
+name: Security Verification and Invariants
+
+on:
+  push:
+    branches: [main, redesign/ui-enhancement, security/hardening]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  secret-scan:
+    name: Secret Detection (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependency-audit:
+    name: Dependency Vulnerability Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run npm audit (Production dependencies)
+        run: npm audit --audit-level=high --omit=dev
+
+  sql-invariants:
+    name: Database SQL Invariants & Search Path Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify SQL Migrations and Invariants
+        run: node scripts/lint-sql-invariants.mjs
+
+  security-tests:
+    name: Security Hardening Automated Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Run Security Verification Tests
+        run: node scripts/test-security-hardening.mjs
