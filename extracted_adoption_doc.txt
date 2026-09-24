@@ -1,0 +1,1272 @@
+
+
+
+
+INSTITUTIONAL ADOPTION PROPOSAL
+Financial Transparency
+and Student Academic
+Portal
+A Formal Proposal for Institutional Adoption and Deployment
+Submitted to: The Administration of 【Name of Adopting Institution】
+Submitted by: College of Engineering Local Government Unit, Cor Jesu College
+Date of Submission: 24 September 2026
+Reference No.: 【Reference Number】
+
+
+College of Engineering Local Government Unit          For Institutional Review
+
+Letter of Transmittal
+24 September 2026
+THE OFFICE OF THE PRESIDENT / SCHOOL HEAD
+【Name of Adopting Institution】
+【Complete Address of Adopting Institution】
+Dear Sir / Madam:
+Greetings. We respectfully transmit herewith our proposal for the institutional adoption of the Financial Transparency and Student Academic Portal, a web-based system developed for and currently operating within the College of Engineering Local Government Unit of Cor Jesu College.
+The system consolidates two concerns that institutions commonly manage through separate, manual processes: the recording, monitoring, and disclosure of organizational and student funds, and the maintenance, verification, and reporting of student academic records. It is in active production use and is supported by a documented schema, deployment procedure, and audit layer.
+We submit this proposal because the system was designed to be transferable and requires no software development by the adopting institution. It does require a configuration workstream, because the identifiers that make it institution-specific, such as the school name and seal, the student email domain, the degree programs and curriculum, the student roster, and the document letterheads, are currently defined in the source code and the institutional database. Section 5 sets out that work.
+We would welcome the opportunity to demonstrate the system to your office using live data from its present deployment. We respectfully request the designation of a focal person or office for the technical evaluation, and a preliminary indication of whether the institution wishes to proceed to the pilot phase described in Section 5.
+Respectfully yours,
+【Name of Proponent】
+【Position / Designation】
+College of Engineering Local Government Unit
+Noted by:
+【Name of Endorsing Officer】
+【Position / Designation】
+Table of Contents
+TOC \h \o "1-3"
+Letter of Transmittal PAGEREF _Toc100000 \h 1
+1. Executive Summary PAGEREF _Toc100001 \h 3
+2. Current State and Problem Analysis PAGEREF _Toc100002 \h 4
+2.1 Financial Records Held Across Disconnected Tools PAGEREF _Toc100003 \h 4
+2.2 Limited Visibility of Funds for Students and Stakeholders PAGEREF _Toc100004 \h 5
+2.3 Academic Records Maintained Outside a Single System PAGEREF _Toc100005 \h 5
+2.4 Reporting, Liquidation, and Audit Preparation PAGEREF _Toc100006 \h 5
+2.5 Summary of Identified Gaps PAGEREF _Toc100007 \h 6
+3. Objectives and Expected Outcomes PAGEREF _Toc100008 \h 6
+3.1 General Objective PAGEREF _Toc100009 \h 6
+3.2 Specific Objectives PAGEREF _Toc100010 \h 6
+3.3 Expected Outcomes PAGEREF _Toc100011 \h 8
+4. The Proposed Solution: System Description PAGEREF _Toc100012 \h 8
+4.1 System Overview PAGEREF _Toc100013 \h 8
+4.2 Financial Transparency Modules PAGEREF _Toc100014 \h 8
+4.3 Academic Records and Enrollment Modules PAGEREF _Toc100015 \h 10
+4.4 Student Services and Communication Modules PAGEREF _Toc100016 \h 10
+4.5 Administrative Console and Role-Based Access Control PAGEREF _Toc100017 \h 11
+4.6 Access Channels PAGEREF _Toc100018 \h 11
+4.7 Security, Privacy, and Audit Design PAGEREF _Toc100019 \h 11
+4.8 Present Operational Status PAGEREF _Toc100020 \h 12
+5. Implementation Roadmap and Milestones PAGEREF _Toc100021 \h 12
+5.1 Phased Delivery Approach PAGEREF _Toc100022 \h 12
+5.2 Institutional Responsibilities and Decision Points PAGEREF _Toc100023 \h 13
+5.3 Acceptance Criteria PAGEREF _Toc100024 \h 14
+6. Resource Requirements PAGEREF _Toc100025 \h 15
+6.1 Technical Infrastructure PAGEREF _Toc100026 \h 15
+6.2 Human Resources PAGEREF _Toc100027 \h 16
+6.3 Indicative Cost Structure PAGEREF _Toc100028 \h 16
+7. Risk Analysis and Mitigation PAGEREF _Toc100029 \h 16
+8. Expected Benefits and Evaluation PAGEREF _Toc100030 \h 17
+8.1 Benefits by Stakeholder PAGEREF _Toc100031 \h 17
+8.2 Evaluation Framework PAGEREF _Toc100032 \h 17
+9. Governance, Data Ownership, and Compliance PAGEREF _Toc100033 \h 17
+9.1 Ownership of Data and Infrastructure PAGEREF _Toc100034 \h 18
+9.2 Data Processing and Data Sharing PAGEREF _Toc100035 \h 18
+9.3 Access Control and Segregation of Duties PAGEREF _Toc100036 \h 18
+9.4 Retention, Backup, and Deletion PAGEREF _Toc100037 \h 18
+9.5 Compliance Responsibilities PAGEREF _Toc100038 \h 19
+9.6 Support and Escalation PAGEREF _Toc100039 \h 19
+10. Recommendation and Request for Approval PAGEREF _Toc100040 \h 19
+Appendix A: Role and Permission Matrix PAGEREF _Toc100041 \h 20
+Appendix B: Module Inventory PAGEREF _Toc100042 \h 21
+Appendix C: Institutional Configuration Checklist PAGEREF _Toc100043 \h 21
+Appendix D: Technical Requirements and Deployment PAGEREF _Toc100044 \h 22
+D.1 User Requirements PAGEREF _Toc100045 \h 22
+D.2 Institutional Requirements PAGEREF _Toc100046 \h 22
+D.3 Deployment Architecture PAGEREF _Toc100047 \h 22
+D.4 Provisioning and Recovery PAGEREF _Toc100048 \h 22
+Appendix E: Known Limitations and Planned Enhancements PAGEREF _Toc100049 \h 23
+Appendix F: Glossary PAGEREF _Toc100050 \h 23
+Appendix G: Review and Acceptance PAGEREF _Toc100051 \h 23
+
+Note: This Table of Contents is generated via field codes. To ensure page number accuracy after editing, please right-click the Table of Contents and select Update Field.
+
+1. Executive Summary
+This document proposes the institutional adoption of the Financial Transparency and Student Academic Portal, a web-based information system developed for the College of Engineering Local Government Unit of Cor Jesu College. The system is operational and consolidates two functions that institutions typically administer through separate, manual processes: the recording, monitoring, and disclosure of organizational and student funds, and the maintenance, verification, and reporting of student academic records.
+The system addresses four recurring operational gaps: financial records held in spreadsheets and paper receipts that cannot be reconciled on demand; limited visibility of fund balances for students and stakeholders; academic records maintained outside any single authoritative system; and the clerical effort required to prepare liquidation and audit documentation. These gaps are described in Section 2.
+The proposed solution comprises forty-one functional modules across four domains: a financial domain covering the transaction ledger, activity budgets, receipt management, and exportable liquidation reports in Portable Document Format (PDF) and Microsoft Excel; an academic domain covering curriculum and prospectus management, credit-unit tracking, enrollment verification with program-head approval, and academic standing transcripts; a student services domain covering notifications, structured feedback, and a verifiable curriculum vitae facility with public token-based validation; and an administration domain providing the executive console, role-based access control, and an append-only audit log. The complete inventory is provided in Appendix B.
+The system is supported by implemented security controls, including row-level security on all application tables, server-side token verification and role enforcement on every protected route, database triggers that prevent privilege escalation, a private receipt storage bucket with file-type and size restrictions, request rate limiting, and a weekly automated database backup with ninety-day retention. Section 4.7 states these controls precisely, including the areas identified for strengthening.
+Adoption does not require the institution to develop software, but it does require a configuration workstream, because institution-specific identifiers are currently defined in the source code and the institutional database. Section 5 proposes a five-phase schedule of approximately eleven to fourteen weeks, beginning with a discovery phase and a limited pilot in one degree program. Sections 6 and 7 set out the resource requirements, an indicative cost structure, and the associated risks. Section 10 requests the designation of a focal person, approval of the pilot, and the execution of a data processing and data sharing agreement.
+2. Current State and Problem Analysis
+This section describes the operational conditions that the proposed system is intended to address. The conditions are drawn from the administrative circumstances the system was built to resolve and are stated in general terms so that the adopting institution may confirm which of them apply to its own operations.
+2.1 Financial Records Held Across Disconnected Tools
+Organizational funds are commonly tracked through a combination of spreadsheet workbooks, handwritten cash books, and physical receipt files. Each expense is recorded in the workbook by one officer, the corresponding receipt is filed separately, and the reconciliation between the two is performed only when required. Under this arrangement the record of a single transaction is distributed across at least two independent artifacts, and the accuracy of the fund balance depends on the discipline of the person performing the entry.
+The practical consequence is that a balance cannot be confirmed at the moment it is requested. An enquiry received during an activity, such as whether a particular event still holds sufficient funds for a planned purchase, cannot be answered without locating the workbook and manually recomputing the affected line items. Discrepancies are discovered late, frequently at the point of liquidation, when supporting documents are already difficult to retrieve.
+2.2 Limited Visibility of Funds for Students and Stakeholders
+Students who contribute to collection drives, and donors who extend support, generally receive no direct view of how the funds they provided were used. Summaries may be presented at the end of a term or an academic year, but they are usually aggregate in nature and cannot be traced to individual transactions. Where disclosure is delayed, the absence of information is readily interpreted as an absence of accountability, regardless of the actual integrity of the records.
+This matters most where the funds are drawn from students themselves. A collection that cannot be traced to a specific disbursement weakens the credibility of the collecting body and increases the effort required to answer questions about it.
+2.3 Academic Records Maintained Outside a Single System
+The verification of a student's academic load, the tracking of completed subjects against curriculum requirements, and the preparation of standing transcripts involve several independent records: the official curriculum, the student's proposed or enrolled load, the grades earned per subject, and the catalogue of prerequisites governing which subjects may be taken together. When these are maintained separately, three recurring problems arise.
+First, prerequisite compliance cannot be validated reliably at the point of enrollment, and the error surfaces only when a subject is taken out of sequence. Second, a student's progress toward graduation must be reconstructed manually, which is time-consuming and prone to inconsistency between one student and the next. Third, a student who is not registered in the official roster cannot be distinguished from one who is, creating a gap in identity verification that affects every subsequent record.
+2.4 Reporting, Liquidation, and Audit Preparation
+Liquidation and audit preparation are assembly tasks rather than analysis tasks under a manual system. Preparing a report for a single activity requires locating every receipt associated with it, transcribing the amounts, recomputing the totals, and formatting the result for submission. The work scales with the number of transactions rather than with their value, and each report is produced independently even when the underlying data overlaps with a report already prepared.
+The absence of a durable audit trail compounds the problem. When a figure is corrected in a workbook, the original entry is lost, and the person reviewing the record cannot determine what changed, when, or on whose authority.
+2.5 Summary of Identified Gaps
+Table 1: Operational gaps addressed by the proposed system
+
+
+Operational Area
+
+Gap Under Manual Administration
+
+System Capability Proposed
+
+Transaction recording
+
+Entries distributed across workbooks and paper files; no single authoritative ledger
+
+Central transaction ledger with receipt attachment and overdraft validation
+
+Fund visibility
+
+Balances cannot be confirmed on demand; disclosure delayed to end of period
+
+Live dashboard with per-event budget envelopes and an optional public summary view
+
+Document retrieval
+
+Receipts located physically; retrieval time grows with volume
+
+Receipts stored digitally and linked to the originating transaction, openable from the record
+
+Liquidation reporting
+
+Each report assembled independently from source documents
+
+Per-event liquidation report generated on demand in PDF and Excel
+
+Audit trail
+
+Corrections overwrite prior entries; changes unattribributable
+
+Append-only audit log recording actor, action, and timestamp for financial and administrative changes
+
+Curriculum compliance
+
+Prerequisites and unit requirements checked manually at enrollment
+
+Structured prerequisite rules and unit requirements validated against each proposed load
+
+Enrollment verification
+
+Identity and load verified across separate lists and forms
+
+Roster-based identity verification with a formal load submission and approval workflow
+
+Academic progress
+
+Progress toward graduation reconstructed per student on request
+
+Cumulative unit tracking per student against program requirements, with an exportable transcript
+Both columns describe conditions observed in manual administration generally; the institution is invited to confirm their applicability during the discovery phase described in Section 5.
+3. Objectives and Expected Outcomes
+3.1 General Objective
+To establish a single, institutionally controlled system providing an accurate and auditable record of organizational funds and student academic data, available to the appropriate audience when required rather than at the end of a reporting period.
+3.2 Specific Objectives
+To record every transaction in a single ledger, each entry linked to its supporting receipt and attributed to its recording officer.
+To compute fund balances, per-activity budget positions, and consolidated summaries automatically, so that these figures are available continuously rather than on request.
+To restrict each function to the role responsible for it, so that approval authority, data entry, and read access are separated and recorded.
+To maintain a permanent audit record of financial and administrative changes, including the actor's identity and the reason for any correction.
+To validate each proposed load against curriculum and prerequisite rules.
+To maintain a single verified student roster for account and enrollment verification.
+To generate liquidation, standing, and summary reports directly from system data, in formats suitable for institutional filing and external submission.
+To provide students with direct access to their own financial and academic records through a web browser, an installed mobile application, and an optional desktop application.
+3.3 Expected Outcomes
+The expected outcome is that routine enquiries about fund status and academic standing are answered from the system rather than reconstructed from source documents, and that the documentation required for liquidation, internal review, and audit is produced from records captured when each transaction occurred. The proposal does not assert quantified improvements in processing time or error rates, because no controlled measurement of the manual baseline exists at the adopting institution; Section 8.2 specifies the indicators and the baselines to be established before any improvement is claimed.
+4. The Proposed Solution: System Description
+4.1 System Overview
+The Financial Transparency and Student Academic Portal is a web-based application that presents a different interface to each class of user while operating on a single shared database. It comprises a student portal, an executive console for officers and administrators, a faculty and program-head portal for load verification, a public curriculum vitae verification page, and a structured feedback facility.
+The application is built as a client-server system. The interface is rendered with standard web technologies and requires no installation on the user's device. The server component handles authentication verification, role enforcement, report generation, and email dispatch. Data is stored in a managed PostgreSQL database with row-level security policies, and receipts are held in private file storage whose contents are never exposed as public links.
+Two properties of the architecture are material to this proposal. First, the system is delivered as a Progressive Web Application: a student who opens it once on a mobile device may install it to the home screen, where it then opens full-screen with its own icon, without submission to any application store. Second, the system includes an optional desktop application for administrators, built on the same web interface, which provides a system tray presence and native window behaviour for office use.
+4.2 Financial Transparency Modules
+The financial domain comprises the modules listed in Table 2. Each module is implemented and in production use at the present deployment.
+Table 2: Financial transparency modules
+
+
+Module
+
+Function
+
+Primary Users
+
+Live dashboard
+
+Consolidated income, expenditure, remaining balance, and donation figures with drill-down breakdowns and automatic refresh
+
+All authenticated users
+
+Events and budget envelopes
+
+Per-activity budget allocation, funding source, status lifecycle, and computed remaining budget
+
+Officers; visible to all users
+
+Transaction ledger
+
+Recording of expenses, donations, collections, allocations, and transfers, with balance validation preventing overdraft
+
+Officers and cashiers
+
+Receipt management
+
+Private upload of receipt images against a transaction, or reference to an approved external document link
+
+Officers and cashiers
+
+Income and donations
+
+Dedicated monitoring of general-fund inflows by source and period
+
+Officers and administrators
+
+Budget transfer
+
+Paired transfer entries between the general fund and an activity, with recorded justification and balance verification
+
+Governor and administrator
+
+Liquidation reports
+
+Per-activity report generated directly from ledger data, with receipt references, issued as PDF and Excel
+
+Officers and administrators
+
+Public transparency view
+
+Optional unauthenticated read-only summary of aggregate funds and activity budgets, excluding personal and receipt data
+
+Public, when enabled
+
+Audit log
+
+Append-only record of financial and administrative actions, with actor, action, and timestamp
+
+Officers and administrators
+
+
+Figure 1: Student and officer dashboard showing consolidated fund position and recent activity.
+
+
+Figure 2: Transaction ledger with linked receipt access and per-activity attribution.
+
+
+Figure 3: Reporting module with per-activity summaries and export in PDF and Excel formats.
+4.3 Academic Records and Enrollment Modules
+The academic domain maintains the relationship between the official curriculum and each student's individual record. The curriculum is defined once, at the level of program, year, and semester, with each subject carrying a lecture and laboratory unit split, a total unit value, and structured prerequisite rules. Three prerequisite relationships are supported: a prerequisite subject that must be completed beforehand, a co-requisite subject that must be taken concurrently, and a minimum year standing.
+The present deployment holds the complete prospectus of three degree programs, comprising one hundred eighty-nine units across sixty-seven subjects for the Bachelor of Science in Computer Engineering, two hundred four units across sixty-eight subjects for the Bachelor of Science in Electronics Engineering, and two hundred thirteen units across seventy-five subjects for the Bachelor of Science in Civil Engineering. The curriculum data for the adopting institution would be entered from its own official prospectus during the configuration phase described in Section 5.
+Table 3: Academic records and enrollment modules
+
+
+Module
+
+Function
+
+Primary Users
+
+Curriculum and prospectus
+
+Program, year, and semester structure with subjects, lecture and laboratory unit splits, and prerequisite rules
+
+Administrator (maintained); read by all
+
+Credit-unit tracker
+
+Per-subject status and grade recording, including separate lecture and laboratory outcomes, and cumulative progress against unit requirements
+
+Students; reviewed by faculty
+
+Academic standing transcript
+
+Year-by-year standing report generated on institutional letterhead with progress summary and signature block
+
+Students
+
+Enrollment verification
+
+Drafting, submission, and tracking of a proposed academic load through a defined approval lifecycle
+
+Students; program heads
+
+Load approval
+
+Evaluation of submitted loads against curriculum and prerequisites, with subject additions or removals, approval, return, or rejection, each with a recorded reason
+
+Program heads
+
+Automatic enrollment
+
+Post-approval enrollment of the approved subjects into the student's cumulative record
+
+System, on approval
+
+Encoding queue
+
+Queue of approved loads awaiting encoding into the institutional record, with export
+
+Faculty and student assistants
+
+Dean overview
+
+Read-only consolidated view of submissions across all programs
+
+Dean
+
+Student roster
+
+Official roster of enrolled students used for identity verification at registration, with import and export
+
+Administrator
+
+Enrollment verification requests
+
+Formal request and review process for applicants not present in the official roster
+
+Students; officers
+
+
+Figure 4: Program-head load verification portal showing submission queue and evaluation detail.
+4.4 Student Services and Communication Modules
+Table 4: Student services and communication modules
+
+
+Module
+
+Function
+
+Primary Users
+
+Notifications
+
+Targeted in-app notifications by individual user or by role, with read tracking and unread indicators
+
+All users
+
+Email dispatch
+
+Transactional email for account approval, activity creation, and load status changes, issued through a configured sending domain
+
+All users
+
+Announcements
+
+Publication of announcements to the student body, with automatic notification distribution
+
+Governor and administrator
+
+Feedback facility
+
+Structured evaluation questionnaire with response rate limiting and a restricted reviewer dashboard
+
+Students; designated reviewers
+
+Curriculum vitae builder
+
+Student-maintained record of achievements, involvement, and verified participation in activities, with export to a formatted document
+
+Students
+
+Curriculum vitae verification
+
+Public, token-based validation of a submitted curriculum vitae, displaying verified milestones to an external party
+
+Public, on token presentation
+
+Assistant interface
+
+Guidance interface offering predefined prompts on academic and financial matters, including proposed subject selection, operating entirely offline against locally available data
+
+Students
+
+Profile management
+
+Maintenance of personal and academic details, avatar selection, and password change
+
+All users
+4.5 Administrative Console and Role-Based Access Control
+The system distinguishes eight roles. Four are operational roles within the organizational unit, namely officer, cashier, governor, and administrator. Three are academic roles, namely faculty, program head, and dean. One is the student role held by the general student body. Every protected operation is authorised on the server against the acting user's role before it is performed; the interface additionally hides actions that a role may not perform, but that concealment is a convenience and not the control.
+The separation of duties is deliberate. Officers and cashiers may record transactions and manage receipts but may not create or modify activities, transfer budgets, or alter the ledger after posting. The governor may create and edit activities, post announcements, and transfer budgets. The administrator alone may assign roles, correct or delete a posted transaction, perform bulk import, and maintain the curriculum. Within the academic domain, the program head may act only on submissions belonging to the program they head, and the dean holds a read-only view of all programs. The complete role and permission matrix is provided in Appendix A.
+Financial corrections follow a controlled path. A posted transaction may be edited or deleted only by an administrator, only with a recorded reason, and only in a manner that writes an entry to the audit log identifying the actor, the affected record, the reason given, and the time of the change.
+4.6 Access Channels
+Table 5: Access channels
+
+
+Channel
+
+Description
+
+Intended Use
+
+Web browser
+
+Primary interface, requiring no installation; served over HTTPS
+
+All users, on desktop and mobile
+
+Installed web application
+
+Installable to a mobile home screen from the browser, opening full-screen with a dedicated icon and no browser interface; available on Android and iOS
+
+Students, on personal devices
+
+Desktop application
+
+Optional native application for administrators providing a system tray presence, native menus, and window management
+
+Administrators and officers, in office use
+
+Public verification page
+
+Unauthenticated page that validates a presented curriculum vitae token
+
+External parties, on token presentation
+The installed web application is served with a service worker that always retrieves the current application files from the server and retains a cached copy solely so that the interface opens when the device is offline. Data requests and authentication traffic are never cached.
+4.7 Security, Privacy, and Audit Design
+The controls below are implemented in the current deployment and were verified against the production environment. They are stated with the same precision as the limitations that follow, so that the institution may assess them without overstatement.
+Table 6: Implemented security and audit controls
+
+
+Control Area
+
+Implementation
+
+Identity and authentication
+
+Managed authentication service issuing time-limited tokens; the server verifies each token on every protected request and loads the caller's role before authorising the operation
+
+Institutional account restriction
+
+Registration restricted to the institution's student email domain, enforced both at the authentication provider and by a database trigger
+
+Account verification
+
+New accounts are created unverified with the lowest role; an officer must verify the account against the official roster before access is granted
+
+Authorisation
+
+Role guards applied per route on the server, with ownership and program scoping enforced inside the handlers for academic and personal records
+
+Privilege escalation prevention
+
+Database policies and triggers that reject any attempt by an authenticated user to alter their own role or verification status
+
+Row-level security
+
+Enabled on all application tables, with direct anonymous access revoked on personal, financial, and feedback data
+
+Receipt confidentiality
+
+Private storage bucket with file-type and size restrictions; receipts are served through authenticated access only and are never exposed as public links
+
+Audit logging
+
+Append-only log of financial and administrative actions, including transaction corrections with the reason recorded, readable by officers
+
+Input validation
+
+Server-side validation of every external input at the boundary, including type, range, enumerated values, and identifier format, with markup stripped from free text
+
+Request limits
+
+Tiered rate limiting applied globally, to sensitive operations, to write operations per user, and specifically to the public feedback form
+
+Transport and headers
+
+HTTPS enforced in production, with security headers, a content security policy, and an explicit list of permitted origins for cross-origin requests
+
+Backup and recovery
+
+Automated weekly database backup with retention of ninety days, executed by a scheduled workflow that refuses to run where repository visibility would expose the data
+
+Verification testing
+
+An automated security test suite exercised against the production deployment, covering authentication enforcement, token tampering, identifier validation, and injection attempts, together with a post-deployment interface smoke test
+Four limitations in the present security posture are disclosed for completeness, and their remediation is scheduled within the implementation roadmap. First, the content security policy permits inline scripts, which is a recognised weakening that should be removed. Second, the public transparency view is controlled by a single deployment-wide setting rather than by per-institution or per-record configuration. Third, the audit log table is present and in use but was created directly in the database and is not yet represented in the versioned schema; a consolidated baseline schema is planned so that a new deployment can be provisioned entirely from versioned files. Fourth, the feedback facility links each response to the account of the respondent; an institution intending anonymous evaluation should reconfigure this, because the current design does not provide anonymity. Section 7 treats the first and fourth items as risks with assigned mitigations, and Appendix E provides the full list of known limitations.
+The institution that adopts the system becomes the controller of the personal data held within it. The system is designed to support compliance with the Data Privacy Act of 2012 and its implementing rules by providing role-restricted access, purpose limitation by module, an audit trail of access to and change of records, and a defined retention period for backups. Formal compliance, including any registration or notification obligations of the institution, remains the responsibility of the institution.
+4.8 Present Operational Status
+The system is not a proposal-stage design. It is in production use, supported by a versioned database schema comprising thirty-two migration files, a documented deployment and recovery procedure, an automated backup schedule, and a test suite of automated interface checks. The adopting institution is invited to examine the running system and its documentation directly during the discovery phase, and to conduct its own testing rather than rely on the statements in this document.
+5. Implementation Roadmap and Milestones
+5.1 Phased Delivery Approach
+Adoption is proposed in five phases over approximately eleven to fourteen weeks. The schedule is deliberately front-loaded with discovery, so that the extent of institutional configuration is established before any commitment to a full rollout is made. The pilot phase limits exposure: the system is used with real data by one degree program and its officers before it is extended to the institution as a whole.
+Table 7: Implementation phases, activities, and responsibilities
+
+
+Phase
+
+Duration
+
+Principal Activities
+
+Responsible
+
+Phase 0: Discovery and agreement
+
+Weeks 1-2
+
+Demonstration of the operating system using live data; confirmation of which modules the institution will adopt; identification of the degree programs, curriculum sources, roster source, and email domain; execution of a data processing and data sharing agreement; designation of an institutional focal person
+
+Adopting institution and proponent
+
+Phase 1: Environment and institutional configuration
+
+Weeks 2-4
+
+Provisioning of the institutional database and hosting; configuration of institutional identity, including name, seal, and letterheads; restriction of registration to the institutional email domain; import of the official curriculum and prospectus; import of the student roster; creation of the initial administrator account
+
+Proponent, with institutional data provided by the adopting institution
+
+Phase 2: Verification and acceptance testing
+
+Weeks 4-6
+
+Functional verification of each adopted module against the institution's own processes; validation of reported figures against source records for a selected period; confirmation of role assignments and approval hierarchies; corrections applied and re-verified
+
+Adopting institution, supported by the proponent
+
+Phase 3: Pilot in one degree program
+
+Weeks 6-10
+
+Operation with real data in one program; registration of students and verification against the roster; use of the load submission and approval workflow for one term; recording of financial transactions and issuance of at least one liquidation report; structured feedback collected from participants
+
+Adopting institution, supported by the proponent
+
+Phase 4: Institutional rollout and handover
+
+Weeks 10-14
+
+Extension to all programs and offices; training of officers, faculty, and administrators by role; issuance of administrator and user documentation; transfer of administrative credentials and hosting ownership to the institution; formal acceptance and closure
+
+Adopting institution and proponent
+Training is delivered by role rather than as a single general session, because the interface and the permitted actions differ substantially between a recording officer, a program head, and an administrator. Each role receives a focused session on the functions it will use, together with written reference material.
+5.2 Institutional Responsibilities and Decision Points
+The schedule depends on decisions and data that only the adopting institution can supply. The following items are the critical dependencies, and delays in any of them move the corresponding phase.
+Designation of a focal person or office authorised to coordinate the evaluation and to provide institutional data.
+Provision of the official prospectus for each degree program in a structured or machine-readable form, or acceptance of transcription from the printed prospectus with institutional verification of the result.
+Provision of the official student roster, and confirmation of the institutional email domain to which registration will be restricted.
+Confirmation of the approval hierarchy: which offices approve student loads, which roles may record and approve financial transactions, and who holds administrator authority.
+Decision on whether the public transparency view will be enabled, and if so, which figures may be disclosed publicly.
+Decision on the handling of the feedback facility, specifically whether responses will be linked to accounts or reconfigured to be unattributed.
+Execution of the data processing and data sharing agreement, and confirmation of the office that will own the institutional deployment after handover.
+5.3 Acceptance Criteria
+The pilot is considered successful, and the rollout proceeds, when all of the following have been demonstrated with the institution's own data:
+Every role can perform its permitted functions and is refused the functions it is not permitted to perform, as verified by direct testing rather than by inspection of the interface.
+The financial figures reported by the system for a selected period agree with the institution's source records for that period, with any difference explained and resolved.
+A complete liquidation report for one activity is generated from the system, with its associated receipts, without manual assembly.
+A student's proposed load is submitted, evaluated against curriculum and prerequisite rules, approved, and recorded in the cumulative record without manual transcription.
+The institution's appointed administrators can provision accounts, assign roles, and locate an audit entry for a selected change without assistance.
+6. Resource Requirements
+6.1 Technical Infrastructure
+The system requires three managed service components and one registered domain name. The database, authentication, and receipt storage are provided by a managed PostgreSQL platform offering row-level security. The application server is hosted on a platform that supports a continuously running service, which is required for report generation and email dispatch. The web interface is served over HTTPS from the same origin. Transactional email is dispatched through a transactional email service configured with the institutional sender identity.
+Table 8: Infrastructure components and responsibilities
+
+
+Component
+
+Purpose
+
+Owner After Handover
+
+Managed database and authentication
+
+Application data, user accounts, row-level security policies, receipt storage
+
+Adopting institution
+
+Application server hosting
+
+Interface delivery, report generation, email dispatch, scheduled keep-alive
+
+Adopting institution
+
+Transactional email service
+
+Account approval, load status, and activity notifications
+
+Adopting institution
+
+Domain name and TLS certificate
+
+Institutional address for the system and secure transport
+
+Adopting institution
+
+Source repository
+
+Versioned source code, database migrations, and deployment documentation
+
+Adopting institution, with proponent access for support
+Provisioning during the evaluation and pilot phases is arranged by the proponent. From the commencement of Phase 4, all accounts, credentials, and hosting ownership are transferred to the adopting institution, and the proponent retains access only as an authorised maintainer for the support period agreed in the data processing arrangement.
+6.2 Human Resources
+The proponent supplies the technical work: environment provisioning, institutional configuration, data import, testing support, defect correction, and training delivery. The adopting institution supplies three things: a designated focal person with authority to obtain institutional data, personnel from each user role to participate in verification and training, and a designated officer to accept administrative ownership of the deployment at handover. No software development capacity is required from the institution.
+6.3 Indicative Cost Structure
+No licence fee is proposed for the use of the system. The recurring cost of operation is the cost of the managed services listed in Table 8. Each of these providers offers an entry-level or free tier and a paid tier; free tiers are adequate for evaluation and adequate for a pilot, but a full institutional rollout should budget for paid tiers, because the free tiers impose limits on storage, on the number of monthly email dispatches, and on service availability. Table 9 identifies the cost components to be budgeted. Amounts are not quoted in this document because they depend on the tier selected and on provider pricing at the time of procurement; the institution should obtain current quotations during the discovery phase.
+Table 9: Recurring cost components to be budgeted
+
+
+Cost Component
+
+Basis of Charge
+
+Indicative Amount
+
+Managed database and authentication
+
+Subscription tier, by storage and monthly active users
+
+【To be quoted at procurement】
+
+Application server hosting
+
+Subscription tier, by service availability and usage
+
+【To be quoted at procurement】
+
+Transactional email service
+
+Subscription tier, by monthly dispatch volume
+
+【To be quoted at procurement】
+
+Domain name
+
+Annual registration
+
+【To be quoted at procurement】
+
+Optional: institutional support and maintenance
+
+Annual arrangement, if continued maintenance is required after handover
+
+【To be agreed】
+Two cost characteristics are worth noting. The charges are proportional to configuration and usage rather than to the number of student records, so the addition of a program or an academic year does not ordinarily require a change in plan. And because the institution owns the accounts from Phase 4 onward, it retains the ability to change service tiers or providers without renegotiating the use of the system itself.
+7. Risk Analysis and Mitigation
+This section states the risks that the proponent considers material to the success of adoption. They are presented with an explicit assessment of likelihood and impact, and each carries a mitigation that is actionable within the schedule set out in Section 5. The most significant risk is stated first.
+Table 10: Risk register
+
+
+Risk
+
+Likelihood / Impact
+
+Mitigation
+
+Institutional configuration effort exceeds estimate. The system is presently configured for a single institution; institutional identity, programs, curriculum, roster, and email domain are defined in source and database, so adaptation requires a defined workstream rather than a setting change.
+
+High / High
+
+Discovery phase conducted before any rollout commitment; institutional data requested in structured form to avoid transcription; curriculum and roster import performed and verified against source records in Phase 2; configuration checklist maintained as a tracked deliverable (Appendix C)
+
+Data migration defects. Imported curriculum, prerequisites, or roster may contain errors that propagate into enrollment and academic records.
+
+Medium / High
+
+Automated validation of curriculum data, including consistency between total units and the sum of lecture and laboratory components; verification of imported records against source documents by institutional personnel; correction before the pilot begins; retention of source records for reconciliation
+
+Adoption failure at the user level. Officers or faculty may continue to maintain parallel manual records, undermining the single-source objective.
+
+Medium / High
+
+Role-specific training rather than a single general session; written reference material per role; pilot confined to one program so that difficulties are identified and resolved at small scale; acceptance criteria that require the pilot records to be produced from the system itself
+
+Feedback facility does not provide anonymity. Responses are linked to the respondent's account, so an institution intending anonymous evaluation would collect data that does not meet that expectation.
+
+High / Medium
+
+Decision required before enabling the module; the facility is reconfigured during Phase 1 to store responses without the account identifier where anonymity is required; the restriction is stated to respondents on the form itself
+
+Content security policy permits inline scripts. This is a recognised weakening that could increase the consequence of a separate injection defect.
+
+Medium / Medium
+
+Refactor templates to remove inline scripts and tighten the policy, scheduled as a configuration-phase task and verified by re-running the security test suite
+
+Service dependency. Operation depends on third-party managed services; an outage interrupts access.
+
+Low / Medium
+
+Services selected for availability commitments; application server configured to remain warm; weekly backups retained for ninety days with a documented restoration procedure; the institution may relocate to another provider because it owns the accounts and the source code
+
+Schema consolidation outstanding. The audit log table exists and is in use but is not yet represented in the versioned schema, so a new deployment cannot be provisioned entirely from versioned files.
+
+High / Low
+
+Consolidated baseline schema produced during the configuration phase and verified by provisioning the institutional environment from it; this becomes a handover acceptance item
+
+Data privacy non-compliance. The institution is the controller of personal data held in the system and carries the corresponding statutory obligations.
+
+Medium / High
+
+Data processing and data sharing agreement executed before any personal data is transferred; role-restricted access and audit logging configured before the pilot; institution retains responsibility for its own registration and notification obligations under the Data Privacy Act
+
+Key-person dependency on the proponent. Technical knowledge concentrated in the original developer.
+
+Medium / Medium
+
+Documentation delivered with the system, including deployment, database, and administration guides; institution appoints its own administrator who performs the operational tasks during the pilot and at handover; source code and infrastructure ownership transferred at Phase 4
+
+Connectivity limitations for students. Students may lack reliable data access at the point of use.
+
+Medium / Low
+
+Interface installable to the mobile home screen and operable from the cached application shell when offline; page weight kept low; no external analytics or third-party scripts on the student interface
+8. Expected Benefits and Evaluation
+8.1 Benefits by Stakeholder
+Table 11: Expected benefits by stakeholder group
+
+
+Stakeholder
+
+Expected Benefit
+
+Students
+
+Direct access to the fund position and to individual transactions; a permanent record of academic progress; a single formal process for load submission and approval; an installable mobile interface requiring no application store; a verifiable curriculum vitae for external use
+
+Organizational officers
+
+One ledger rather than several; balances computed continuously; receipts attached to the transaction they support; liquidation reports generated instead of assembled; corrections recorded with a reason
+
+Faculty and program heads
+
+A single queue of submitted loads with curriculum and prerequisite information presented alongside; identical rules applied to every submission; approval recorded with its reason and notified to the student automatically
+
+Administration and finance office
+
+Documentation available on demand for liquidation, internal review, and audit; a durable audit trail; fund movements attributable to an identified officer; reports exportable in formats used for institutional filing
+
+Auditors and reviewing bodies
+
+Traceability from a reported total to the individual transaction and its receipt, with the identity of the recording officer and a record of any subsequent correction
+
+The institution generally
+
+Reduced clerical effort in reporting; a documented, transferable system; institutional ownership of its own data and infrastructure; alignment with disclosure expectations placed on student organizations
+8.2 Evaluation Framework
+The pilot should be evaluated against indicators that the institution measures before and during the pilot. Baselines must be established before the system is introduced, because the manual baseline cannot be reconstructed afterwards. The indicators below are stated as measurements to be taken, not as results achieved; no quantified improvement is claimed in this proposal.
+Table 12: Evaluation indicators and method of measurement
+
+
+Indicator
+
+Unit of Measure
+
+Method
+
+Baseline
+
+Time to answer a fund balance enquiry
+
+Elapsed time, in minutes
+
+Timed observation of a representative enquiry, before and after introduction
+
+【To be established in Phase 0】
+
+Time to prepare a liquidation report for one activity
+
+Elapsed time, in hours
+
+Timed from the request for the report to its issuance in final form
+
+【To be established in Phase 0】
+
+Proportion of transactions with a receipt attached
+
+Percentage of posted transactions
+
+Reported by the system for a defined period
+
+【To be established in Phase 0】
+
+Discrepancies found during reconciliation against source records
+
+Count per reconciliation
+
+Reconciliation of a defined period between the system and source records
+
+【To be established in Phase 0】
+
+Load submission to approval cycle
+
+Elapsed time, in days
+
+Measured from submission to decision within the system
+
+【To be established in Phase 0】
+
+Prerequisite rule violations detected before enrollment
+
+Count per term
+
+System validation results for the term, reviewed against prior practice
+
+【To be established in Phase 0】
+
+User acceptance by role
+
+Proportion of respondents rating the system usable
+
+Structured feedback collected from pilot participants
+
+Not applicable
+
+Audit readiness
+
+Time to produce a complete transaction history for a selected activity
+
+Timed retrieval, including receipt references and correction history
+
+【To be established in Phase 0】
+9. Governance, Data Ownership, and Compliance
+9.1 Ownership of Data and Infrastructure
+All data entered into the institutional deployment is owned by the adopting institution. The institution holds the accounts for the database, the application hosting, the email service, and the domain, and becomes the sole controller and custodian of the personal data held within the system. The proponent retains no independent right of access and holds no copy of institutional data after handover.
+9.2 Data Processing and Data Sharing
+No personal data is transferred to the institutional environment before the execution of a written data processing and data sharing agreement between the institution and the proponent. That agreement defines the personal data to be processed, the purpose and legal basis of processing, the security measures applied, the retention period, the arrangements for deletion at the end of the arrangement, and the point at which the proponent ceases to act as a personal information processor. Where the proponent processes personal data on the institution's behalf during configuration and the pilot, it acts only on the institution's documented instructions.
+9.3 Access Control and Segregation of Duties
+Access is granted by role and by necessity. Administrative authority is held by a small number of named individuals designated by the institution. The recording of transactions, the approval of activities, the correction of posted entries, and the review of audit records are assigned to different roles so that no single account can complete a financial cycle without a second participant. Program heads act only within their own program. The institution may revise these assignments at any time through the administrative console.
+9.4 Retention, Backup, and Deletion
+Automated backups are taken weekly and retained for ninety days. The retention period for application data is set by the institution in accordance with its own records retention policy. At the conclusion of the arrangement, the institution exports the data it wishes to retain and the deployment is decommissioned, with verification that the proponent retains no residual copy.
+9.5 Compliance Responsibilities
+The system is designed to support compliance with the Data Privacy Act of 2012 and its implementing rules. Compliance itself remains the responsibility of the adopting institution as personal information controller. This includes determining whether registration or notification with the National Privacy Commission is required for its processing activities, appointing a Data Protection Officer where required, establishing a procedure for responding to data subject requests, and incorporating the system into its records retention, incident response, and internal audit arrangements.
+9.6 Support and Escalation
+During the implementation and pilot phases, the proponent provides technical support and defect correction. The support arrangement after handover, including its scope, its duration, and the point of contact on each side, is defined in the data processing and support agreement executed in Phase 0. The institution's designated administrator is the first point of contact for user enquiries, and escalates technical matters to the proponent for the duration of the agreed support period.
+10. Recommendation and Request for Approval
+The Financial Transparency and Student Academic Portal is a completed, operating system that addresses a set of recurring administrative gaps with a single, auditable record. It is offered for adoption without licence fee. Its adoption does not require the institution to employ software developers, to purchase equipment, or to interrupt existing operations, because implementation proceeds through a pilot confined to one degree program and is evaluated before any institution-wide commitment is made.
+The proposal is also candid about what adoption requires. The system is configured for a single institution at the level of source code and database, so a configuration workstream is necessary, and the institution should treat that workstream, not the software itself, as the principal item of effort and risk. The pilot is structured so that this work is completed and verified before the institution commits to a full rollout. The security posture is stated in full, including four disclosed limitations, and no quantified improvement in processing time or error rate is claimed in advance of measurement.
+On the basis of the foregoing, it is respectfully recommended that the institution approve the following:
+Approval in principle of the adoption of the Financial Transparency and Student Academic Portal, subject to satisfactory completion of the pilot described in Section 5.
+Designation of a focal person or office authorised to coordinate the evaluation and to provide the institutional data listed in Section 5.2.
+Approval of the pilot phase in one degree program for the duration of one academic term, with the module scope and acceptance criteria set out in Sections 5.1 and 5.3.
+Authorization to execute a data processing and data sharing agreement covering the configuration and pilot phases.
+Approval of the recurring infrastructure cost identified in Table 9, following the submission of current quotations, effective from the commencement of Phase 4.
+Upon approval, the proponent will schedule the discovery demonstration within ten working days and will submit a detailed configuration plan, derived from the institution's own answers to the checklist in Appendix C, within five working days of that demonstration.
+Appendix A: Role and Permission Matrix
+The table below states the principal permissions of each role. Every protected operation is verified against the acting user's role on the server before it is performed. Where a role is described as excluded from an operation, the exclusion is enforced on the server and does not depend on the interface.
+Table A-1: Role and permission matrix
+
+
+Role
+
+Financial Permissions
+
+Academic Permissions
+
+Administrative Permissions
+
+Student
+
+Read-only access to the dashboard, activity budgets, transaction records, reports, and announcements
+
+Own curriculum and progress records; submission of proposed load; own curriculum vitae; feedback submission
+
+Own profile and password
+
+Officer
+
+Record transactions; manage receipts; view reports; export liquidation reports; view audit log
+
+Read-only
+
+View user list; verify accounts; dispatch notifications
+
+Cashier
+
+As officer: record transactions and manage receipts
+
+Read-only
+
+As officer
+
+Governor
+
+All officer permissions, plus budget transfer between funds and activities
+
+Read-only
+
+Create and edit activities; post announcements; archive activities; view audit log
+
+Administrator
+
+All governor permissions, plus correction or deletion of posted transactions with a recorded reason, and bulk import
+
+Maintain curriculum, unit structure, and prerequisite rules
+
+Assign operational roles; verify accounts; roster maintenance; full audit log access
+
+Faculty
+
+Read-only
+
+View approved load submissions awaiting encoding; export the encoding queue
+
+Own profile and password
+
+Program Head
+
+Read-only
+
+All faculty permissions, plus evaluation of submissions within the program headed: add or remove subjects with a recorded note, approve, return, or reject
+
+Own profile and password
+
+Dean
+
+Read-only
+
+Read-only consolidated view of submissions across all programs
+
+Own profile and password
+Academic roles are currently assigned directly in the institutional database rather than through the administrative console. During configuration, an administrative interface for academic role assignment is to be added so that the institution can maintain these assignments without technical assistance. This is recorded as a configuration deliverable rather than presented as an existing capability.
+Appendix B: Module Inventory
+The system comprises forty-one functional modules. Table B-1 lists them by domain for reference during the discovery phase, so that the institution can indicate which modules it wishes to adopt. The pilot proposed in Section 5 exercises all four domains in a limited scope rather than adopting every module at once.
+Table B-1: Complete module inventory
+
+
+Domain
+
+Modules
+
+Financial
+
+Live dashboard; events and budget envelopes; transaction ledger; receipt upload and viewing; income monitoring; donation and collection monitoring; budget transfer; liquidation reports in PDF and Excel; monthly cash-flow reporting; public transparency view; audit log
+
+Academic
+
+Curriculum and prospectus management; lecture and laboratory unit structure; structured prerequisite rules; per-subject status and grade recording; component level outcomes; cumulative unit tracking; academic standing transcript; enrollment verification; load approval workflow; automatic enrollment on approval; encoding queue with export; dean overview; student roster maintenance; enrollment verification requests
+
+Student Services
+
+Notifications; transactional email dispatch; announcements; structured feedback; feedback review dashboard; curriculum vitae builder; curriculum vitae verification; assistant interface; profile management
+
+Administration
+
+Executive console; role assignment; account verification; user management; bulk transaction import; scheduled database backup; post-deployment interface verification
+Appendix C: Institutional Configuration Checklist
+Adopting the system requires the items below to be defined or supplied. They are listed here so that the institution can assess the effort involved before committing to implementation, and so that the discovery phase produces a work plan grounded in the institution's actual data. Items marked as critical must be completed before the pilot can begin.
+Table C-1: Configuration checklist
+
+
+Item
+
+Description and Source
+
+Priority
+
+Institutional name and seal
+
+Official name, abbreviation, and seal or logo image files, to replace those used in the interface, reports, and the installed application icon
+
+Critical
+
+Document letterhead
+
+Banner and seal artwork used on transcripts and standing reports, together with the signature block text
+
+Critical
+
+Student email domain
+
+The institutional domain to which registration will be restricted, and verification that Google Workspace or equivalent restricts accounts to that domain
+
+Critical
+
+Degree programs
+
+The programs to be supported, their official names and codes, and the departments or units that administer them
+
+Critical
+
+Official prospectus
+
+Structured curriculum data per program, year, and semester: subject codes, titles, lecture and laboratory units, total units, and prerequisite rules
+
+Critical
+
+Unit requirements
+
+Total units required for graduation per program, used for progress computation
+
+Critical
+
+Student roster
+
+The official roster of enrolled students, with full names, programs, and year levels, used for identity verification at registration
+
+Critical
+
+Approval hierarchy
+
+Which office or role approves student loads; which roles record and approve financial transactions; who holds administrator authority
+
+Critical
+
+Committee and roleholders
+
+The positions to be recognised in the activity and financial modules, including the organizational officers and their tenure
+
+High
+
+Public disclosure policy
+
+Whether the public transparency view is enabled, and which figures may be disclosed publicly without exposing personal data
+
+High
+
+Feedback handling decision
+
+Whether feedback responses will be linked to respondent accounts or stored without the account identifier
+
+High
+
+Installed application identity
+
+Application name and icon used when students install the interface to a mobile home screen
+
+Medium
+
+Accrued records
+
+Whether prior financial and academic records are to be imported for continuity, and for which period
+
+Medium
+
+Retention policy
+
+The retention period for application data and for backups, consistent with the institution's records policy
+
+Medium
+
+Notification identity
+
+The sender name and address used for automated notifications, and confirmation of the dispatch domain
+
+Medium
+
+Service accounts
+
+Creation of institutional accounts with the database, hosting, email, and domain providers, and designation of the officer who will hold them
+
+Critical
+Appendix D: Technical Requirements and Deployment
+D.1 User Requirements
+Users require only a current web browser and an internet connection. No software installation, plug-in, or dedicated device is required. The interface is designed to remain usable on entry-level mobile devices and on shared or public networks, and it installs to a mobile home screen as described in Section 4.6. Permission to install the home-screen application must be available to students, since the interface is self-hosted and does not pass through an application store.
+D.2 Institutional Requirements
+Table D-1: Institutional technical requirements
+
+
+Requirement
+
+Specification
+
+Managed database and authentication account
+
+PostgreSQL-based managed service with row-level security, authentication, and private file storage
+
+Application hosting account
+
+Service supporting a continuously running Node.js application and HTTPS with a managed certificate
+
+Transactional email account
+
+Service supporting a verified sending domain and a monthly dispatch volume sufficient for institutional notifications
+
+Domain and TLS
+
+A domain name administered by the institution, with a certificate issued and renewed automatically by the hosting platform
+
+Administrative workstation
+
+Any current desktop operating system with a web browser; the optional desktop application supports Windows, macOS, and Linux
+
+Network
+
+Outbound HTTPS access from user devices; no inbound ports are required to be opened on the institutional network
+
+Institutional data in structured form
+
+Curriculum, roster, and unit requirements supplied as spreadsheets or delimited text files where available, or as printed documents for transcription and institutional verification
+D.3 Deployment Architecture
+The interface and the application server are served from a single origin over HTTPS. The server verifies authentication tokens, applies role-based authorisation, generates reports, and dispatches email. Database access is mediated entirely by the server for protected operations, with row-level security policies applied at the database level as a second layer. Receipt files are held in private storage and are served only to authenticated users with the appropriate role; they are never exposed as public links.
+D.4 Provisioning and Recovery
+The institutional environment is provisioned from the versioned database schema and the deployment documentation delivered with the source code. Backups are taken weekly by an automated scheduled process and retained for ninety days. Restoration is performed by applying the most recent backup to a new database instance and repointing the application server, a procedure documented in the deployment guide and rehearsed during Phase 2 so that the institution can perform it independently. As noted in Section 4.7 and Appendix E, a consolidated baseline schema is being produced during configuration so that a new environment can be provisioned entirely from versioned files; this is an acceptance item for handover.
+Appendix E: Known Limitations and Planned Enhancements
+This appendix lists the limitations of the current implementation that are material to an adopting institution. They are disclosed so that the institution may plan for them rather than discover them after implementation. Each item is assigned a treatment and an expected phase in which it is addressed.
+Table E-1: Known limitations and planned treatment
+
+
+Limitation
+
+Effect on the Adopting Institution
+
+Planned Treatment
+
+Single-institution configuration
+
+Institutional identity, programs, curriculum, roster, and email domain are defined in the source code and database; adaptation requires a configuration workstream rather than a settings change
+
+Addressed by the configuration phase in the roadmap (Section 5.1, Phase 1), with the effort enumerated in Appendix C
+
+Academic role assignment requires database access
+
+Faculty, program-head, and dean roles must currently be assigned directly in the database rather than through the console
+
+An administrative interface for academic role assignment is a configuration-phase deliverable, recorded as a handover acceptance item
+
+Audit log table absent from versioned schema
+
+A new environment cannot be provisioned entirely from versioned files, since the audit log table was created directly in the database
+
+Consolidated baseline schema to be produced during configuration and verified by provisioning the institutional environment from it
+
+Content security policy permits inline scripts
+
+A recognised weakening that raises the consequence of any separate injection defect
+
+Templates refactored to remove inline scripts and the policy tightened during configuration, verified by re-running the security test suite
+
+Feedback responses linked to accounts
+
+The feedback module does not provide anonymity, although anonymity is often expected of student evaluation
+
+Decision required in Phase 0; the module is reconfigured to omit the respondent identifier where anonymity is required, and the form states the arrangement to respondents
+
+Public transparency view has no per-record control
+
+The public summary view is governed by a single deployment-wide setting rather than by configuration per activity or per institution
+
+Administrator control over public disclosure is scheduled for the configuration phase, with the institution's disclosure policy applied before the view is enabled
+
+Enrollment workflow uses short-interval refresh
+
+Enrollment status changes are reflected on a short refresh interval rather than by immediate push, unlike the dashboard and notifications which update live
+
+Acceptable for the proposed pilot; real-time notification for the enrollment workflow is scheduled as a post-handover enhancement
+
+No formal accessibility conformance assessment
+
+The interface has been developed to be operable on mobile devices and has not been assessed against WCAG 2.1 Level AA in a formal audit
+
+A conformance review is recommended during the pilot, with any resulting corrections applied before institutional rollout
+Items in the table are stated as known limitations of the present implementation and are not represented as already resolved. The institutional deployment will be assessed against this list at handover, and the disposition of each item will be recorded in the handover documentation.
+Appendix F: Glossary
+Table F-1: Terms used in this proposal
+
+
+Term
+
+Definition
+
+Ledger
+
+The complete record of financial transactions, in which each entry states its type, amount, activity, and supporting receipt
+
+Activity budget envelope
+
+The allocation assigned to one activity, against which its expenses are charged and its balance computed.
+
+Liquidation report
+
+The statement of income and expenditure for an activity, prepared to account for funds received and disbursed, issued from system data
+
+Load
+
+The set of subjects a student proposes or is approved to take in a given academic term
+
+Load approval workflow
+
+The sequence by which a student submits a proposed load and a program head evaluates, approves, returns, or rejects it
+
+Prerequisite rule
+
+A condition for taking a subject: a completed subject, a concurrent subject, or a year standing.
+
+Row-level security
+
+A database mechanism restricting the rows a user may read or modify, applied independently of the application
+
+Audit log
+
+An append-only record of actions taken in the system, stating the actor, the action, and the time, and the reason where a correction was made
+
+Progressive Web Application
+
+A web interface installable to a device home screen and opened without browser controls, outside any application store.
+
+Public transparency view
+
+An optional unauthenticated summary of aggregate funds, from which personal and receipt data are excluded
+
+Personal information controller
+
+Under the Data Privacy Act of 2012, the entity that controls the collection, holding, and processing of personal data; upon adoption, this is the adopting institution
+Appendix G: Review and Acceptance
+This proposal is submitted for the consideration of the adopting institution. It does not by itself constitute an agreement; any implementation proceeds only under a separate agreement executed by both parties.
+Table G-1: Disposition
+
+
+Disposition
+
+Instruction
+
+Approved
+
+Approves the proposal and authorises the pilot phase.
+
+Approved with modification
+
+Approves subject to the modifications stated below.
+
+Deferred
+
+Requires further information or consultation before deciding.
+
+Not approved
+
+Does not wish to proceed; the reason is stated below.
+Modifications, further information required, or reason for non-approval:
+
+
+For the adopting institution:
+
+
+Name and Designation
+
+Signature
+
+Date
+
+【Name of Authorised Officer】
+【Position / Designation】
+
+
+
+
+
+【Name of Focal Person Designated】
+【Position / Designation】
+
+
+
+
+For the proponent:
+
+
+Name and Designation
+
+Signature
+
+Date
+
+【Name of Proponent】
+【Position / Designation】
+
+
+

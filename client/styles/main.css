@@ -1533,7 +1533,7 @@ html[data-theme="light"] .auth-divider span {
 .onboarding-card .form-group select,
 .onboarding-card .dd-trigger {
   padding: 0.55rem 0.75rem !important;
-  font-size: 0.85rem !important;
+  font-size: 16px !important;
   height: auto;
 }
 
@@ -1614,7 +1614,7 @@ html[data-theme="light"] .auth-divider span {
   .onboarding-card .form-group select,
   .onboarding-card .dd-trigger {
     padding: 0.62rem 0.75rem !important;
-    font-size: 0.86rem !important;
+    font-size: 16px !important;
     height: auto;
   }
 
@@ -2950,6 +2950,8 @@ html[data-theme="light"] .tx-date {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .announce-body.expanded {
   -webkit-line-clamp: unset;
@@ -3560,7 +3562,26 @@ iconify-icon:not(:defined) {
 
   .sidebar-header { justify-content: center; }
   .nav-item { justify-content: center; padding: 0.7rem; }
-  .sidebar-footer { justify-content: center; }
+  .sidebar-footer {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    padding-top: 0.75rem !important;
+    width: 100% !important;
+  }
+  .sidebar-footer .user-pill {
+    justify-content: center !important;
+    padding: 0 !important;
+    width: auto !important;
+    flex: none !important;
+  }
+  .sidebar-footer .sidebar-actions {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+  }
 
   .form-row { grid-template-columns: 1fr; }
   .stats-grid { 
@@ -3635,6 +3656,51 @@ iconify-icon:not(:defined) {
     margin-top: 0.5rem !important;
     max-height: none !important;
     overflow: visible !important;
+  }
+
+  /* Mobile/Tablet Data Cards (<768px) */
+  .data-card {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 0.85rem !important;
+    box-shadow: none !important;
+    position: relative !important;
+  }
+  .data-card-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .data-card-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.3rem !important;
+  }
+  .data-card-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: baseline !important;
+    gap: 0.75rem !important;
+    font-size: 0.78rem !important;
+  }
+  .data-card-label {
+    color: var(--text-secondary) !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+  .data-card-row span:last-child {
+    text-align: right !important;
+    min-width: 0 !important;
+  }
+  .data-card-actions {
+    margin-top: 0.65rem !important;
+    padding-top: 0.5rem !important;
+    border-top: 1px solid var(--border-default) !important;
+    display: flex !important;
+    gap: 0.4rem !important;
+    justify-content: flex-end !important;
   }
 
   /* Chart.js canvases must never exceed their card on small phones */
@@ -7675,7 +7741,6 @@ body.more-sheet-open .main-content {
 body .bottom-nav-more-trigger,
 #of-bottom-nav-more-btn {
   transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease !important;
-}
 }
 
 body .bottom-nav-more-trigger:active {

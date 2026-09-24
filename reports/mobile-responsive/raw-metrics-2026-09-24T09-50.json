@@ -1,0 +1,1731 @@
+{
+  "base": "http://localhost:3000",
+  "generatedAt": "2026-09-24T09:50:52.388Z",
+  "results": [
+    {
+      "viewport": "320x568-phone-small",
+      "docScrollWidth": 320,
+      "docClientWidth": 320,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "student-portal (auth)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "320x568-phone-small",
+      "docScrollWidth": 320,
+      "docClientWidth": 320,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [
+        {
+          "el": "div.app-mobile-brand",
+          "w": 151,
+          "h": 37,
+          "hasAriaLabel": false,
+          "text": "Student Portal\n         "
+        },
+        {
+          "el": "button.btn-icon",
+          "w": 36,
+          "h": 36,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#app-mobile-logout-btn.btn-icon",
+          "w": 36,
+          "h": 36,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#ursa-launcher-btn.grizz-launcher.ursa-launcher",
+          "w": 42,
+          "h": 42,
+          "hasAriaLabel": true,
+          "text": "Ask Grizz \n        Your "
+        }
+      ],
+      "smallTargetCount": 4,
+      "page": "student-portal (app shell forced)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "320x568-phone-small",
+      "docScrollWidth": 320,
+      "docClientWidth": 320,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-verify",
+      "path": "/cv-verify",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "320x568-phone-small",
+      "docScrollWidth": 320,
+      "docClientWidth": 320,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-builder",
+      "path": "/cv-builder",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "320x568-phone-small",
+      "docScrollWidth": 320,
+      "docClientWidth": 320,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fb-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fb-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [
+        {
+          "el": "a",
+          "w": 79,
+          "h": 15,
+          "hasAriaLabel": false,
+          "text": "Privacy Policy"
+        }
+      ],
+      "smallTargetCount": 1,
+      "page": "feedback",
+      "path": "/feedback/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "320x568-phone-small",
+      "docScrollWidth": 320,
+      "docClientWidth": 320,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fbv-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fbv-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "feedback-view",
+      "path": "/feedback/view/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "320x568-phone-small",
+      "docScrollWidth": 320,
+      "docClientWidth": 320,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "faculty",
+      "path": "/faculty",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "360x640-android",
+      "docScrollWidth": 360,
+      "docClientWidth": 360,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "student-portal (auth)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "360x640-android",
+      "docScrollWidth": 360,
+      "docClientWidth": 360,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [
+        {
+          "el": "div.app-mobile-brand",
+          "w": 151,
+          "h": 37,
+          "hasAriaLabel": false,
+          "text": "Student Portal\n         "
+        },
+        {
+          "el": "button.btn-icon",
+          "w": 36,
+          "h": 36,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#app-mobile-logout-btn.btn-icon",
+          "w": 36,
+          "h": 36,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#ursa-launcher-btn.grizz-launcher.ursa-launcher",
+          "w": 42,
+          "h": 42,
+          "hasAriaLabel": true,
+          "text": "Ask Grizz \n        Your "
+        }
+      ],
+      "smallTargetCount": 4,
+      "page": "student-portal (app shell forced)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "360x640-android",
+      "docScrollWidth": 360,
+      "docClientWidth": 360,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-verify",
+      "path": "/cv-verify",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "360x640-android",
+      "docScrollWidth": 360,
+      "docClientWidth": 360,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-builder",
+      "path": "/cv-builder",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "360x640-android",
+      "docScrollWidth": 360,
+      "docClientWidth": 360,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fb-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fb-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [
+        {
+          "el": "a",
+          "w": 79,
+          "h": 15,
+          "hasAriaLabel": false,
+          "text": "Privacy Policy"
+        }
+      ],
+      "smallTargetCount": 1,
+      "page": "feedback",
+      "path": "/feedback/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "360x640-android",
+      "docScrollWidth": 360,
+      "docClientWidth": 360,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fbv-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fbv-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "feedback-view",
+      "path": "/feedback/view/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "360x640-android",
+      "docScrollWidth": 360,
+      "docClientWidth": 360,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "faculty",
+      "path": "/faculty",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "390x844-iphone14",
+      "docScrollWidth": 390,
+      "docClientWidth": 390,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "student-portal (auth)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "390x844-iphone14",
+      "docScrollWidth": 390,
+      "docClientWidth": 390,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [
+        {
+          "el": "div.app-mobile-brand",
+          "w": 151,
+          "h": 37,
+          "hasAriaLabel": false,
+          "text": "Student Portal\n         "
+        },
+        {
+          "el": "button.btn-icon",
+          "w": 36,
+          "h": 36,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#app-mobile-logout-btn.btn-icon",
+          "w": 36,
+          "h": 36,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#ursa-launcher-btn.grizz-launcher.ursa-launcher",
+          "w": 42,
+          "h": 42,
+          "hasAriaLabel": true,
+          "text": "Ask Grizz \n        Your "
+        }
+      ],
+      "smallTargetCount": 4,
+      "page": "student-portal (app shell forced)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "390x844-iphone14",
+      "docScrollWidth": 390,
+      "docClientWidth": 390,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-verify",
+      "path": "/cv-verify",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "390x844-iphone14",
+      "docScrollWidth": 390,
+      "docClientWidth": 390,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-builder",
+      "path": "/cv-builder",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "390x844-iphone14",
+      "docScrollWidth": 390,
+      "docClientWidth": 390,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fb-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fb-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [
+        {
+          "el": "a",
+          "w": 79,
+          "h": 15,
+          "hasAriaLabel": false,
+          "text": "Privacy Policy"
+        }
+      ],
+      "smallTargetCount": 1,
+      "page": "feedback",
+      "path": "/feedback/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "390x844-iphone14",
+      "docScrollWidth": 390,
+      "docClientWidth": 390,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fbv-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fbv-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "feedback-view",
+      "path": "/feedback/view/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "390x844-iphone14",
+      "docScrollWidth": 390,
+      "docClientWidth": 390,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "faculty",
+      "path": "/faculty",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "414x896-iphone-xr",
+      "docScrollWidth": 414,
+      "docClientWidth": 414,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "student-portal (auth)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "414x896-iphone-xr",
+      "docScrollWidth": 414,
+      "docClientWidth": 414,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [
+        {
+          "el": "div.app-mobile-brand",
+          "w": 151,
+          "h": 37,
+          "hasAriaLabel": false,
+          "text": "Student Portal\n         "
+        },
+        {
+          "el": "button.btn-icon",
+          "w": 36,
+          "h": 36,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#app-mobile-logout-btn.btn-icon",
+          "w": 36,
+          "h": 36,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#ursa-launcher-btn.grizz-launcher.ursa-launcher",
+          "w": 42,
+          "h": 42,
+          "hasAriaLabel": true,
+          "text": "Ask Grizz \n        Your "
+        }
+      ],
+      "smallTargetCount": 4,
+      "page": "student-portal (app shell forced)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "414x896-iphone-xr",
+      "docScrollWidth": 414,
+      "docClientWidth": 414,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-verify",
+      "path": "/cv-verify",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "414x896-iphone-xr",
+      "docScrollWidth": 414,
+      "docClientWidth": 414,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-builder",
+      "path": "/cv-builder",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "414x896-iphone-xr",
+      "docScrollWidth": 414,
+      "docClientWidth": 414,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fb-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fb-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [
+        {
+          "el": "a",
+          "w": 79,
+          "h": 15,
+          "hasAriaLabel": false,
+          "text": "Privacy Policy"
+        }
+      ],
+      "smallTargetCount": 1,
+      "page": "feedback",
+      "path": "/feedback/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "414x896-iphone-xr",
+      "docScrollWidth": 414,
+      "docClientWidth": 414,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fbv-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fbv-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "feedback-view",
+      "path": "/feedback/view/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "414x896-iphone-xr",
+      "docScrollWidth": 414,
+      "docClientWidth": 414,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "faculty",
+      "path": "/faculty",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "844x390-phone-landscape",
+      "docScrollWidth": 844,
+      "docClientWidth": 844,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [
+        {
+          "el": "div.auth-brand-content",
+          "right": 451,
+          "left": -29,
+          "width": 480,
+          "overhangPx": 30,
+          "scrollAncestor": null,
+          "nowrap": false
+        }
+      ],
+      "overflowCount": 1,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "student-portal (auth)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "844x390-phone-landscape",
+      "docScrollWidth": 844,
+      "docClientWidth": 844,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [
+        {
+          "el": "a#nav-dashboard.nav-item.active",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Dashboard"
+        },
+        {
+          "el": "a#nav-events.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Events"
+        },
+        {
+          "el": "a#nav-transactions.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Transactions"
+        },
+        {
+          "el": "a#nav-income.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Total Income"
+        },
+        {
+          "el": "a#nav-reports.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Reports"
+        },
+        {
+          "el": "a#nav-units.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Academic Progress"
+        },
+        {
+          "el": "a#nav-enrollment.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Enrollment Verification"
+        },
+        {
+          "el": "a#nav-cv.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Career Passport"
+        },
+        {
+          "el": "button#theme-toggle-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#profile-settings-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#logout-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        }
+      ],
+      "smallTargetCount": 11,
+      "page": "student-portal (app shell forced)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "844x390-phone-landscape",
+      "docScrollWidth": 844,
+      "docClientWidth": 844,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-verify",
+      "path": "/cv-verify",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "844x390-phone-landscape",
+      "docScrollWidth": 844,
+      "docClientWidth": 844,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [
+        {
+          "el": "div.auth-brand-content",
+          "right": 451,
+          "left": -29,
+          "width": 480,
+          "overhangPx": 30,
+          "scrollAncestor": null,
+          "nowrap": false
+        }
+      ],
+      "overflowCount": 1,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-builder",
+      "path": "/cv-builder",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "844x390-phone-landscape",
+      "docScrollWidth": 844,
+      "docClientWidth": 844,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fb-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fb-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [
+        {
+          "el": "a",
+          "w": 79,
+          "h": 15,
+          "hasAriaLabel": false,
+          "text": "Privacy Policy"
+        }
+      ],
+      "smallTargetCount": 1,
+      "page": "feedback",
+      "path": "/feedback/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "844x390-phone-landscape",
+      "docScrollWidth": 844,
+      "docClientWidth": 844,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fbv-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fbv-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "feedback-view",
+      "path": "/feedback/view/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "844x390-phone-landscape",
+      "docScrollWidth": 844,
+      "docClientWidth": 844,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "faculty",
+      "path": "/faculty",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "768x1024-ipad-portrait",
+      "docScrollWidth": 768,
+      "docClientWidth": 768,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "student-portal (auth)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "768x1024-ipad-portrait",
+      "docScrollWidth": 768,
+      "docClientWidth": 768,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [
+        {
+          "el": "div#user-pill.user-pill",
+          "right": -20,
+          "left": -36,
+          "width": 16,
+          "overhangPx": 36,
+          "scrollAncestor": null,
+          "nowrap": false
+        },
+        {
+          "el": "div#user-avatar.user-avatar",
+          "right": 6,
+          "left": -28,
+          "width": 34,
+          "overhangPx": 28,
+          "scrollAncestor": null,
+          "nowrap": false
+        },
+        {
+          "el": "div.sidebar-actions",
+          "right": 95,
+          "left": -12,
+          "width": 107,
+          "overhangPx": 12,
+          "scrollAncestor": null,
+          "nowrap": false
+        },
+        {
+          "el": "button#theme-toggle-btn.btn-icon",
+          "right": 22,
+          "left": -12,
+          "width": 34,
+          "overhangPx": 12,
+          "scrollAncestor": null,
+          "nowrap": false
+        },
+        {
+          "el": "iconify-icon#theme-icon",
+          "right": 14,
+          "left": -3,
+          "width": 18,
+          "overhangPx": 4,
+          "scrollAncestor": null,
+          "nowrap": false
+        }
+      ],
+      "overflowCount": 5,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [
+        {
+          "el": "a#nav-dashboard.nav-item.active",
+          "w": 29,
+          "h": 40,
+          "hasAriaLabel": false,
+          "text": "Dashboard"
+        },
+        {
+          "el": "a#nav-events.nav-item",
+          "w": 29,
+          "h": 40,
+          "hasAriaLabel": false,
+          "text": "Events"
+        },
+        {
+          "el": "a#nav-transactions.nav-item",
+          "w": 29,
+          "h": 40,
+          "hasAriaLabel": false,
+          "text": "Transactions"
+        },
+        {
+          "el": "a#nav-income.nav-item",
+          "w": 29,
+          "h": 40,
+          "hasAriaLabel": false,
+          "text": "Total Income"
+        },
+        {
+          "el": "a#nav-reports.nav-item",
+          "w": 29,
+          "h": 40,
+          "hasAriaLabel": false,
+          "text": "Reports"
+        },
+        {
+          "el": "a#nav-units.nav-item",
+          "w": 29,
+          "h": 40,
+          "hasAriaLabel": false,
+          "text": "Academic Progress"
+        },
+        {
+          "el": "a#nav-enrollment.nav-item",
+          "w": 29,
+          "h": 40,
+          "hasAriaLabel": false,
+          "text": "Enrollment Verification"
+        },
+        {
+          "el": "a#nav-cv.nav-item",
+          "w": 29,
+          "h": 40,
+          "hasAriaLabel": false,
+          "text": "Career Passport"
+        },
+        {
+          "el": "div#user-pill.user-pill",
+          "w": 16,
+          "h": 47,
+          "hasAriaLabel": false,
+          "text": "?\n          \n           "
+        },
+        {
+          "el": "button#theme-toggle-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#profile-settings-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#logout-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        }
+      ],
+      "smallTargetCount": 12,
+      "page": "student-portal (app shell forced)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "768x1024-ipad-portrait",
+      "docScrollWidth": 768,
+      "docClientWidth": 768,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-verify",
+      "path": "/cv-verify",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "768x1024-ipad-portrait",
+      "docScrollWidth": 768,
+      "docClientWidth": 768,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-builder",
+      "path": "/cv-builder",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "768x1024-ipad-portrait",
+      "docScrollWidth": 768,
+      "docClientWidth": 768,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fb-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fb-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [
+        {
+          "el": "a",
+          "w": 79,
+          "h": 15,
+          "hasAriaLabel": false,
+          "text": "Privacy Policy"
+        }
+      ],
+      "smallTargetCount": 1,
+      "page": "feedback",
+      "path": "/feedback/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "768x1024-ipad-portrait",
+      "docScrollWidth": 768,
+      "docClientWidth": 768,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fbv-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fbv-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "feedback-view",
+      "path": "/feedback/view/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "768x1024-ipad-portrait",
+      "docScrollWidth": 768,
+      "docClientWidth": 768,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "faculty",
+      "path": "/faculty",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1024x768-ipad-landscape",
+      "docScrollWidth": 1024,
+      "docClientWidth": 1024,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "student-portal (auth)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1024x768-ipad-landscape",
+      "docScrollWidth": 1024,
+      "docClientWidth": 1024,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [
+        {
+          "el": "a#nav-dashboard.nav-item.active",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Dashboard"
+        },
+        {
+          "el": "a#nav-events.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Events"
+        },
+        {
+          "el": "a#nav-transactions.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Transactions"
+        },
+        {
+          "el": "a#nav-income.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Total Income"
+        },
+        {
+          "el": "a#nav-reports.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Reports"
+        },
+        {
+          "el": "a#nav-units.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Academic Progress"
+        },
+        {
+          "el": "a#nav-enrollment.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Enrollment Verification"
+        },
+        {
+          "el": "a#nav-cv.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Career Passport"
+        },
+        {
+          "el": "button#theme-toggle-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#profile-settings-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#logout-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        }
+      ],
+      "smallTargetCount": 11,
+      "page": "student-portal (app shell forced)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1024x768-ipad-landscape",
+      "docScrollWidth": 1024,
+      "docClientWidth": 1024,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-verify",
+      "path": "/cv-verify",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1024x768-ipad-landscape",
+      "docScrollWidth": 1024,
+      "docClientWidth": 1024,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-builder",
+      "path": "/cv-builder",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1024x768-ipad-landscape",
+      "docScrollWidth": 1024,
+      "docClientWidth": 1024,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fb-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fb-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [
+        {
+          "el": "a",
+          "w": 79,
+          "h": 15,
+          "hasAriaLabel": false,
+          "text": "Privacy Policy"
+        }
+      ],
+      "smallTargetCount": 1,
+      "page": "feedback",
+      "path": "/feedback/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1024x768-ipad-landscape",
+      "docScrollWidth": 1024,
+      "docClientWidth": 1024,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fbv-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fbv-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "feedback-view",
+      "path": "/feedback/view/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1024x768-ipad-landscape",
+      "docScrollWidth": 1024,
+      "docClientWidth": 1024,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "faculty",
+      "path": "/faculty",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1280x800-desktop-ref",
+      "docScrollWidth": 1280,
+      "docClientWidth": 1280,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "student-portal (auth)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1280x800-desktop-ref",
+      "docScrollWidth": 1280,
+      "docClientWidth": 1280,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [
+        {
+          "el": "a#nav-dashboard.nav-item.active",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Dashboard"
+        },
+        {
+          "el": "a#nav-events.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Events"
+        },
+        {
+          "el": "a#nav-transactions.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Transactions"
+        },
+        {
+          "el": "a#nav-income.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Total Income"
+        },
+        {
+          "el": "a#nav-reports.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Reports"
+        },
+        {
+          "el": "a#nav-units.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Academic Progress"
+        },
+        {
+          "el": "a#nav-enrollment.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Enrollment Verification"
+        },
+        {
+          "el": "a#nav-cv.nav-item",
+          "w": 221,
+          "h": 38,
+          "hasAriaLabel": false,
+          "text": "Career Passport"
+        },
+        {
+          "el": "button#theme-toggle-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#profile-settings-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        },
+        {
+          "el": "button#logout-btn.btn-icon",
+          "w": 34,
+          "h": 34,
+          "hasAriaLabel": true,
+          "text": ""
+        }
+      ],
+      "smallTargetCount": 11,
+      "page": "student-portal (app shell forced)",
+      "path": "/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1280x800-desktop-ref",
+      "docScrollWidth": 1280,
+      "docClientWidth": 1280,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-verify",
+      "path": "/cv-verify",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1280x800-desktop-ref",
+      "docScrollWidth": 1280,
+      "docClientWidth": 1280,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "cv-builder",
+      "path": "/cv-builder",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1280x800-desktop-ref",
+      "docScrollWidth": 1280,
+      "docClientWidth": 1280,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fb-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fb-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [
+        {
+          "el": "a",
+          "w": 79,
+          "h": 15,
+          "hasAriaLabel": false,
+          "text": "Privacy Policy"
+        }
+      ],
+      "smallTargetCount": 1,
+      "page": "feedback",
+      "path": "/feedback/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1280x800-desktop-ref",
+      "docScrollWidth": 1280,
+      "docClientWidth": 1280,
+      "bodyOverflowX": "visible",
+      "htmlOverflowX": "visible",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [
+        {
+          "el": "input#fbv-email",
+          "fontSizePx": 15,
+          "type": "email",
+          "inputmode": null
+        },
+        {
+          "el": "input#fbv-password",
+          "fontSizePx": 15,
+          "type": "password",
+          "inputmode": null
+        }
+      ],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "feedback-view",
+      "path": "/feedback/view/",
+      "note": null,
+      "pageErrors": []
+    },
+    {
+      "viewport": "1280x800-desktop-ref",
+      "docScrollWidth": 1280,
+      "docClientWidth": 1280,
+      "bodyOverflowX": "hidden",
+      "htmlOverflowX": "hidden",
+      "overflow": [],
+      "overflowCount": 0,
+      "nowrapOverflowCount": 0,
+      "zoomInputs": [],
+      "smallTargets": [],
+      "smallTargetCount": 0,
+      "page": "faculty",
+      "path": "/faculty",
+      "note": null,
+      "pageErrors": []
+    }
+  ]
+}

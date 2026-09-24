@@ -157,13 +157,15 @@ button:focus-visible {
 }
 
 select,
-textarea {
+textarea,
+input {
   width: 100%;
   background: var(--field);
   border: 1px solid var(--line);
   border-radius: 3px;
   color: var(--ink);
   font: inherit;
+  font-size: 16px;
   padding: 0.65rem 0.7rem;
 }
 

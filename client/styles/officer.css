@@ -249,7 +249,7 @@ html, body {
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .of-stat:hover {
@@ -1810,7 +1810,6 @@ html, body {
   }
   .of-bottom-nav > a.of-nav-link-main:active {
     background: #26262E !important;
-  }
   }
 
   /* Tap Interaction */
