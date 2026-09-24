@@ -16,20 +16,20 @@
   <link rel="icon" type="image/png" href="assets/coe-logo.png" />
   <meta name="description" content="Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=7.2" />
-  <link rel="stylesheet" href="styles/ai.css?v=6.5" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css?v=7.6" />
+  <link rel="stylesheet" href="styles/ai.css?v=6.6" />
   <script src="vendor/supabase.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="vendor/chart.umd.min.js"></script>
   <script src="vendor/iconify-icon.min.js"></script>
+  <script src="vendor/icons-bundle.js"></script>
   <script>
-    // Apply theme immediately to prevent flashing
+    // Apply theme immediately to prevent flashing: default is ALWAYS dark mode
     (function() {
       const savedTheme = localStorage.getItem('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', savedTheme);
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', savedTheme === 'dark' ? '#0B0F14' : '#F8FAFC');
+      if (meta) meta.setAttribute('content', '#0B0F14');
     })();
   </script>
 </head>
@@ -49,7 +49,7 @@
           <p class="auth-subtitle">OFFICIAL STUDENT PORTAL</p>
         </div>
         <p class="auth-brand-desc">
-          Your central hub for financial records, event budgets, and council announcements.
+          Empowering engineering students through open finances, academic tracking, and transparent governance.
         </p>
       </div>
     </div>
@@ -299,7 +299,7 @@
           <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span><span>Academic Progress</span>
         </a>
         <a href="#" class="nav-item" data-view="enrollment" id="nav-enrollment">
-          <span class="nav-icon"><iconify-icon icon="solar:clipboard-check-linear"></iconify-icon></span><span>Load Verification</span>
+          <span class="nav-icon"><iconify-icon icon="solar:clipboard-check-linear"></iconify-icon></span><span>Enrollment Verification</span>
         </a>
         <a href="/cv-builder" class="nav-item" id="nav-cv">
           <span class="nav-icon"><iconify-icon icon="solar:diploma-linear"></iconify-icon></span><span>Career Passport</span>
@@ -332,71 +332,73 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <div id="offline-banner" class="hidden" style="background:#b45309;color:#ffffff;padding:0.6rem 1rem;font-size:0.85rem;font-weight:600;display:flex;align-items:center;gap:0.5rem;border-radius:6px;margin:0 0 1rem 0;">
-        <iconify-icon icon="solar:cloud-cross-linear" style="font-size:18px"></iconify-icon>
+      <div id="offline-banner" class="offline-banner hidden">
+        <iconify-icon icon="solar:cloud-cross-linear" class="offline-banner-icon"></iconify-icon>
         <span>Offline — reconnect to refresh financial data</span>
       </div>
 
       <!-- DASHBOARD -->
       <section class="view active" id="view-dashboard">
-        <div class="view-header">
+        <div class="view-header view-header-compact">
           <div>
             <h2>Financial Dashboard</h2>
-            <p class="view-sub">Real-time overview of COE LGU funds &bull; <span style="color:var(--text-secondary);font-size:0.82rem;">Available General Fund = Net Cash Balance − unspent event envelopes</span></p>
+            <p class="view-sub">Real-time overview of COE LGU funds</p>
           </div>
         </div>
 
-        <!-- URSA AI Mascot Quick-Prompt Bar -->
-        <div id="dashboard-ursa-container"></div>
-
-        <div class="stats-grid">
-          <div class="stat-card stat-income" data-nav="income" role="button" tabindex="0" title="Open Total Income Tracker">
-            <div class="stat-icon"><iconify-icon icon="solar:chart-2-linear"></iconify-icon></div>
-            <div class="stat-body">
-              <div class="stat-label-row">
-                <p class="stat-label">Total Income</p>
-                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+        <div class="stats-summary-wrapper">
+          <!-- PRIMARY FEATURED METRIC: Available General Fund -->
+          <div class="stat-card stat-card-hero stat-balance" data-nav="reports" role="button" tabindex="0" title="Open Financial Reports & Breakdown">
+            <div class="stat-hero-header">
+              <div class="stat-hero-title-group">
+                <span class="stat-icon stat-icon-hero"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></span>
+                <p class="stat-label stat-label-hero">Available General Fund</p>
               </div>
-              <h3 class="stat-value" id="stat-income">₱0.00</h3>
-              <p class="stat-sublabel">All received funds</p>
             </div>
-            <div class="stat-popover" id="pop-income"></div>
-          </div>
-          <div class="stat-card stat-expense" data-nav="transactions" role="button" tabindex="0" title="Open Transactions Ledger">
-            <div class="stat-icon"><iconify-icon icon="solar:chart-square-linear"></iconify-icon></div>
-            <div class="stat-body">
-              <div class="stat-label-row">
-                <p class="stat-label">Total Expenses</p>
-                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
-              </div>
-              <h3 class="stat-value" id="stat-expense">₱0.00</h3>
-              <p class="stat-sublabel">Total spent</p>
-            </div>
-            <div class="stat-popover" id="pop-expense"></div>
-          </div>
-          <div class="stat-card stat-balance" data-nav="reports" role="button" tabindex="0" title="Open Financial Reports">
-            <div class="stat-icon"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></div>
-            <div class="stat-body">
-              <div class="stat-label-row">
-                <p class="stat-label">Available General Fund</p>
-                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
-              </div>
-              <h3 class="stat-value" id="stat-balance">₱0.00</h3>
-              <p class="stat-sublabel">Unreserved funds</p>
+            <div class="stat-body stat-hero-body">
+              <h3 class="stat-value stat-value-hero" id="stat-balance">₱0.00</h3>
+              <p class="stat-sublabel">Immediately unreserved cash balance for LGU operations</p>
             </div>
             <div class="stat-popover" id="pop-balance"></div>
           </div>
-          <div class="stat-card stat-donations" data-nav="income" role="button" tabindex="0" title="View Donations in Income Tracker">
-            <div class="stat-icon"><iconify-icon icon="solar:hand-money-linear"></iconify-icon></div>
-            <div class="stat-body">
-              <div class="stat-label-row">
-                <p class="stat-label">Total Donations</p>
-                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+
+          <!-- SECONDARY METRICS GRID: Income, Expenses, Donations -->
+          <div class="stats-secondary-grid">
+            <div class="stat-card stat-income" data-nav="income" role="button" tabindex="0" title="Open Total Income Tracker">
+              <div class="stat-icon"><iconify-icon icon="solar:chart-2-linear"></iconify-icon></div>
+              <div class="stat-body">
+                <div class="stat-label-row">
+                  <p class="stat-label">Total Income</p>
+                </div>
+                <h3 class="stat-value" id="stat-income">₱0.00</h3>
+                <p class="stat-sublabel">All received funds</p>
               </div>
-              <h3 class="stat-value" id="stat-donations">₱0.00</h3>
-              <p class="stat-sublabel">Sponsor gifts</p>
+              <div class="stat-popover" id="pop-income"></div>
             </div>
-            <div class="stat-popover" id="pop-donations"></div>
+
+            <div class="stat-card stat-expense" data-nav="transactions" role="button" tabindex="0" title="Open Transactions Ledger">
+              <div class="stat-icon"><iconify-icon icon="solar:chart-square-linear"></iconify-icon></div>
+              <div class="stat-body">
+                <div class="stat-label-row">
+                  <p class="stat-label">Total Expenses</p>
+                </div>
+                <h3 class="stat-value" id="stat-expense">₱0.00</h3>
+                <p class="stat-sublabel">Total spent</p>
+              </div>
+              <div class="stat-popover" id="pop-expense"></div>
+            </div>
+
+            <div class="stat-card stat-donations" data-nav="income" role="button" tabindex="0" title="View Donations in Income Tracker">
+              <div class="stat-icon"><iconify-icon icon="solar:hand-money-linear"></iconify-icon></div>
+              <div class="stat-body">
+                <div class="stat-label-row">
+                  <p class="stat-label">Total Donations</p>
+                </div>
+                <h3 class="stat-value" id="stat-donations">₱0.00</h3>
+                <p class="stat-sublabel">Sponsor gifts</p>
+              </div>
+              <div class="stat-popover" id="pop-donations"></div>
+            </div>
           </div>
         </div>
 
@@ -531,6 +533,7 @@
                 </tbody>
               </table>
             </div>
+            <div id="income-mobile-cards" class="mobile-cards-container"></div>
           </div>
 
           <!-- Right: Add Income Card (Admin Only) -->
@@ -579,6 +582,14 @@
             <h2>Financial Reports</h2>
             <p class="view-sub">Monthly summaries and breakdowns</p>
           </div>
+          <div class="filter-bar reports-filter-bar">
+            <select id="reports-range-filter" aria-label="Select report range" style="padding:0.55rem 1rem;background:var(--surface, #1C1C20);border:1px solid var(--border-default, rgba(255,255,255,0.08));border-radius:var(--radius-sm, 12px);color:var(--text-primary, #FFFFFF);font-size:0.87rem;">
+              <option value="all">All Time</option>
+              <option value="year">This Academic Year</option>
+              <option value="semester">This Semester</option>
+              <option value="month">This Month</option>
+            </select>
+          </div>
         </div>
         <div id="reports-content">
           <div class="loading-state">Loading reports…</div>
@@ -609,7 +620,7 @@
           <!-- Left: Graduation progress -->
           <aside class="units-progress-card" id="units-progress-card">
             <div class="units-progress-head">
-              <h3>Graduation Progress</h3>
+              <h3><iconify-icon icon="solar:academic-cap-linear" class="units-head-icon"></iconify-icon>Graduation Progress</h3>
               <div class="units-progress-pct" id="units-progress-pct">0%</div>
             </div>
             <div class="units-progress-track">
@@ -641,8 +652,9 @@
               <button type="button" class="units-tab-btn" data-year="3">Year 3</button>
               <button type="button" class="units-tab-btn" data-year="4">Year 4</button>
             </div>
-            <button class="btn btn-ghost" id="units-download-pdf" type="button">
-              <iconify-icon icon="solar:download-linear" style="font-size:1rem; margin-right:.35rem; vertical-align:middle;"></iconify-icon>Download Standing (PDF)
+            <button class="units-download-btn" id="units-download-pdf" type="button">
+              <iconify-icon icon="solar:download-linear"></iconify-icon>
+              <span>Download Standing (PDF)</span>
             </button>
           </aside>
 
@@ -653,30 +665,55 @@
         </div>
       </section>
 
-      <!-- Load Verification (Phase B) -->
+      <!-- Enrollment Verification (Phase B) -->
       <section class="view" id="view-enrollment">
         <div class="view-header">
           <div>
-            <h2>Load Verification</h2>
-            <p class="view-sub">Build your proposed load and send it to your Program Head for evaluation</p>
+            <h2>Enrollment Verification</h2>
+            <p class="view-sub">Build your proposed load, send it to your Program Head for review, and get it encoded by the SA.</p>
           </div>
         </div>
 
         <div class="enrollment-grid">
-          <div class="enrollment-card" id="enrollment-draft-card">
-            <h3>Proposed Load</h3>
-            <p class="enrollment-note" id="enrollment-term-line"></p>
-            <div id="enrollment-items"></div>
-            <div class="enrollment-picker">
-              <select id="enrollment-subject-select" aria-label="Choose a subject"></select>
-              <button type="button" class="btn btn-primary" id="enrollment-add-btn">Add Subject</button>
+          <!-- Left: Journey & status (persistent anchor) -->
+          <div class="enrollment-column-left">
+            <div class="enrollment-card" id="enrollment-journey-card">
+              <h3><iconify-icon icon="solar:route-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Enrollment Status</h3>
+              <ol class="ev-track" id="enrollment-journey-track" aria-label="Enrollment steps"></ol>
+              <div id="enrollment-status-body"></div>
+              <div class="ev-action-area" id="enrollment-action-area"></div>
             </div>
-            <div class="auth-error hidden" id="enrollment-error"></div>
-            <button type="button" class="btn btn-primary" id="enrollment-submit-btn">Submit for Verification</button>
           </div>
-          <div class="enrollment-card" id="enrollment-status-card">
-            <h3>Submission Status</h3>
-            <div id="enrollment-status-body"><p class="enrollment-empty">No submission for this term yet.</p></div>
+
+          <!-- Right: Workspace (editable states) / read-only summary (locked states) -->
+          <div class="enrollment-column-right">
+            <div class="enrollment-card" id="enrollment-draft-card">
+              <h3><iconify-icon icon="solar:document-text-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Proposed Load</h3>
+              <p class="enrollment-note" id="enrollment-term-line"></p>
+              <div id="enrollment-items"></div>
+              <div class="ev-locked-note hidden" id="enrollment-locked-note"></div>
+              <div class="auth-error hidden" id="enrollment-error"></div>
+            </div>
+
+            <div class="enrollment-card" id="enrollment-eligible-card">
+              <div class="enrollment-eligible-header">
+                <h3><iconify-icon icon="solar:book-bookmark-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Eligible Courses for this Semester</h3>
+                <p class="enrollment-note" style="margin:0.25rem 0 0.85rem;">Pick the subjects you need — Grizz's recommendations are a great starting point.</p>
+              </div>
+              <div class="enrollment-filter-toolbar">
+                <div class="enrollment-select-wrapper">
+                  <iconify-icon icon="solar:calendar-linear" class="filter-select-icon"></iconify-icon>
+                  <select id="enrollment-sem-select" class="enrollment-filter-select" aria-label="Filter by Semester"></select>
+                </div>
+                <div class="enrollment-select-wrapper">
+                  <iconify-icon icon="solar:academic-cap-linear" class="filter-select-icon"></iconify-icon>
+                  <select id="enrollment-year-select" class="enrollment-filter-select" aria-label="Filter by Year Level"></select>
+                </div>
+              </div>
+              <div id="enrollment-eligible-list" class="enrollment-eligible-grid">
+                <div class="loading-state">Loading eligible courses…</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1129,9 +1166,9 @@
       <span class="nav-icon"><iconify-icon icon="solar:calendar-date-linear"></iconify-icon></span>
       <span>Events</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="transactions" title="Transactions Ledger">
-      <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span>
-      <span>Ledger</span>
+    <a href="#" class="bottom-nav-item" data-view="units" title="Academic Progress">
+      <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span>
+      <span>Academic</span>
     </a>
     <a href="#" class="bottom-nav-item" data-view="reports" title="Financial Reports">
       <span class="nav-icon"><iconify-icon icon="solar:document-text-linear"></iconify-icon></span>
@@ -1167,13 +1204,13 @@
       <div class="mobile-sheet-section">
         <span class="mobile-sheet-section-label">Academic</span>
         <div class="mobile-sheet-group">
-          <button type="button" class="mobile-sheet-row" data-view="units" data-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:#38BDF8; background:rgba(56,189,248,0.12);">
-              <iconify-icon icon="solar:diploma-verified-linear"></iconify-icon>
+          <button type="button" class="mobile-sheet-row" id="bottom-nav-enrollment" data-view="enrollment" data-sheet-action="nav">
+            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(255,85,51,0.12);">
+              <iconify-icon icon="solar:clipboard-check-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
-              <span class="mobile-sheet-row-title">Academic Progress (Units)</span>
-              <span class="mobile-sheet-row-desc">Engineering curriculum checklist</span>
+              <span class="mobile-sheet-row-title">Enrollment</span>
+              <span class="mobile-sheet-row-desc">Build &amp; track your proposed load</span>
             </div>
             <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
           </button>
@@ -1194,6 +1231,16 @@
       <div class="mobile-sheet-section">
         <span class="mobile-sheet-section-label">Finance</span>
         <div class="mobile-sheet-group">
+          <button type="button" class="mobile-sheet-row" data-view="transactions" data-sheet-action="nav">
+            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(255,85,51,0.12);">
+              <iconify-icon icon="solar:card-transfer-linear"></iconify-icon>
+            </div>
+            <div class="mobile-sheet-row-content">
+              <span class="mobile-sheet-row-title">Transactions Ledger</span>
+              <span class="mobile-sheet-row-desc">Recent transactions & financial records</span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
+          </button>
           <button type="button" class="mobile-sheet-row" data-view="income" data-sheet-action="nav">
             <div class="mobile-sheet-row-icon" style="color:var(--status-positive); background:rgba(34,197,94,0.12);">
               <iconify-icon icon="solar:wallet-money-linear"></iconify-icon>
@@ -1553,8 +1600,8 @@
   <script src="js/roster.js?v=5.4"></script>
   <script src="js/auth.js?v=5.4"></script>
   <script src="js/api.js?v=5.3"></script>
-  <script src="js/ui.js?v=5.7"></script>
-  <script src="js/dashboard.js?v=5.3"></script>
+  <script src="js/ui.js?v=5.8"></script>
+  <script src="js/dashboard.js?v=5.4"></script>
   <script src="js/events.js?v=5.3"></script>
   <script src="js/transactions.js?v=5.3"></script>
   <script src="js/reports.js?v=5.3"></script>
@@ -1564,10 +1611,12 @@
   <script src="js/receipt-modal.js?v=5.4"></script>
   <script src="js/dropdown.js?v=5.3"></script>
   <script src="js/admin.js?v=5.3"></script>
-  <script src="js/ai-assistant.js?v=5.5"></script>
+  <script src="js/grizz-recommend.js?v=1.6"></script>
+  <script src="js/ai-assistant.js?v=6.1"></script>
   <script src="js/profile.js?v=5.3"></script>
   <script src="js/notifications.js?v=5.3"></script>
-  <script src="js/enrollment.js?v=1.1"></script>
+  <script src="js/enrollment-journey.js?v=1.1"></script>
+  <script src="js/enrollment.js?v=1.6"></script>
   <script src="js/app.js?v=6.5"></script>
   <script>
     // PWA: register the app-shell service worker (skipped in Electron's file:// windows)

@@ -558,11 +558,21 @@ const OfficerApp = (() => {
 
   function renderChartInstance(canvasId, config) {
     const canvas = $(canvasId);
-    if (!canvas || !window.Chart) return;
-    if (_chartInstances[canvasId]) {
-      _chartInstances[canvasId].destroy();
+    if (!canvas) return;
+    if (!window.Chart) {
+      window.addEventListener('load', () => renderChartInstance(canvasId, config), { once: true });
+      return;
     }
-    _chartInstances[canvasId] = new Chart(canvas, config);
+    requestAnimationFrame(() => {
+      try {
+        if (_chartInstances[canvasId]) {
+          _chartInstances[canvasId].destroy();
+        }
+        _chartInstances[canvasId] = new Chart(canvas, config);
+      } catch (err) {
+        console.warn('Failed rendering chart for ' + canvasId, err);
+      }
+    });
   }
 
   function drawMonthlyChart(canvasId, monthly) {
@@ -2035,7 +2045,7 @@ const OfficerApp = (() => {
       <div class="of-announce-item">
         <strong>${esc(a.title)}</strong>
         <p>${esc(a.body)}</p>
-        <span class="of-when">${UI.dateStr(a.created_at)}</span>
+        <span class="of-when">${esc(a.author || 'COE LGU')} · ${UI.dateStr(a.created_at)}</span>
       </div>`).join('')
       : '<p style="font-size:0.82rem;color:var(--text-secondary)">No announcements yet.</p>';
   }

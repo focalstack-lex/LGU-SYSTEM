@@ -78,6 +78,20 @@ async function initReports() {
       renderBreakdownChart(summary.breakdown);
     });
 
+    // Wire up range filter dropdown if present in the header
+    const rangeFilter = document.getElementById('reports-range-filter');
+    if (rangeFilter && !rangeFilter.dataset.bound) {
+      rangeFilter.dataset.bound = 'true';
+      rangeFilter.addEventListener('change', () => {
+        const val = rangeFilter.value;
+        let filteredMonthly = _lastMonthlyData || monthly;
+        if (val === 'month') filteredMonthly = filteredMonthly.slice(-1);
+        else if (val === 'semester') filteredMonthly = filteredMonthly.slice(-6);
+        else if (val === 'year') filteredMonthly = filteredMonthly.slice(-12);
+        renderMonthlyChart(filteredMonthly);
+      });
+    }
+
     // Wire up download buttons
     container.querySelectorAll('[data-pdf]').forEach(btn => {
       btn.addEventListener('click', () => downloadReport('pdf', btn.dataset.pdf, btn.dataset.name));
@@ -132,7 +146,13 @@ function buildReportsHTML(summary, monthly, events) {
       </div>
       <div class="stat-card stat-donations">
         <div class="stat-icon"><iconify-icon icon="solar:pie-chart-2-linear"></iconify-icon></div>
-        <div class="stat-body"><p class="stat-label">Budget Utilized</p><h3 class="stat-value">${utilized}%</h3></div>
+        <div class="stat-body">
+          <p class="stat-label">Budget Utilized</p>
+          <h3 class="stat-value">${utilized}%</h3>
+          <div class="reports-util-track">
+            <div class="reports-util-fill" style="width:${Math.min(utilized, 100)}%;"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -264,8 +284,8 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Income',
           data: monthly.map(m => m.income),
-          backgroundColor: '#F97316',
-          hoverBackgroundColor: '#FB923C',
+          backgroundColor: isLight ? '#059669' : '#10B981',
+          hoverBackgroundColor: isLight ? '#047857' : '#059669',
           borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: 'bottom',
           maxBarThickness: isMobile ? 18 : 32,
@@ -275,8 +295,8 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Expenses',
           data: monthly.map(m => m.expense),
-          backgroundColor: isLight ? '#94A3B8' : '#475569',
-          hoverBackgroundColor: isLight ? '#CBD5E1' : '#64748B',
+          backgroundColor: isLight ? '#DC2626' : '#EF4444',
+          hoverBackgroundColor: isLight ? '#B91C1C' : '#F87171',
           borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: 'bottom',
           maxBarThickness: isMobile ? 18 : 32,
@@ -362,17 +382,27 @@ function renderBreakdownChart(breakdown) {
   if (!canvas || !window.Chart) return;
   if (_breakdownChart) _breakdownChart.destroy();
 
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+
   const typeMap = [
-    { key: 'expense',    label: 'Expenses',   color: '#EF4444' },
-    { key: 'allocation', label: 'Allocation', color: '#64748B' },
-    { key: 'donation',   label: 'Donations',  color: '#10B981' },
-    { key: 'collection', label: 'Collection', color: '#F97316' },
+    { key: 'expense',    label: 'Expenses',   color: isLight ? '#DC2626' : '#EF4444' },
+    { key: 'allocation', label: 'Allocation', color: isLight ? '#4F46E5' : '#6366F1' },
+    { key: 'donation',   label: 'Donations',  color: isLight ? '#059669' : '#10B981' },
+    { key: 'collection', label: 'Collection', color: isLight ? '#0284C7' : '#0EA5E9' },
   ];
 
   const active = typeMap.filter(t => (breakdown[t.key] || 0) > 0);
   const hasData = active.length > 0;
+  const totalVal = active.reduce((sum, t) => sum + (breakdown[t.key] || 0), 0);
 
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const labels = hasData
+    ? active.map(t => {
+        const val = breakdown[t.key] || 0;
+        const pct = totalVal > 0 ? Math.round((val / totalVal) * 100) : 0;
+        return `${t.label} (${pct}%)`;
+      })
+    : ['No Data'];
+
   const textColor = isLight ? '#64748B' : '#94A3B8';
   const tooltipBg = isLight ? '#FFFFFF' : '#0F172A';
   const tooltipText = isLight ? '#0F172A' : '#F8FAFC';
@@ -381,7 +411,7 @@ function renderBreakdownChart(breakdown) {
   _breakdownChart = new Chart(canvas, {
     type: 'doughnut',
     data: {
-      labels: hasData ? active.map(t => t.label) : ['No Data'],
+      labels,
       datasets: [{
         data: hasData ? active.map(t => breakdown[t.key]) : [1],
         backgroundColor: hasData ? active.map(t => t.color) : ['#334155'],
@@ -394,7 +424,7 @@ function renderBreakdownChart(breakdown) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '74%',
+      cutout: '78%',
       plugins: {
         legend: {
           position: 'bottom',
@@ -419,7 +449,11 @@ function renderBreakdownChart(breakdown) {
           titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
           bodyFont: { family: 'Inter, sans-serif', size: 12 },
           callbacks: {
-            label: ctx => ` ${ctx.label}: ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+            label: ctx => {
+              const val = ctx.raw || 0;
+              const pct = totalVal > 0 ? Math.round((val / totalVal) * 100) : 0;
+              return ` ${ctx.label.split(' (')[0]}: ₱${Number(val).toLocaleString('en-PH', { minimumFractionDigits: 2 })} (${pct}%)`;
+            }
           }
         }
       }

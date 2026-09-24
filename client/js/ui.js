@@ -18,7 +18,7 @@ const UI = (() => {
     // Remember the last navigable view so a page refresh returns the user
     // here instead of resetting to the dashboard. Sub-views that need their
     // own state (e.g. event-detail) are not stored.
-    const NAV_VIEWS = ['dashboard', 'events', 'transactions', 'income', 'reports', 'units', 'enrollment', 'cv', 'admin'];
+    const NAV_VIEWS = ['dashboard', 'events', 'transactions', 'income', 'reports', 'units', 'enrollment', 'admin'];
     if (NAV_VIEWS.includes(viewId)) {
       try { sessionStorage.setItem('lastView', viewId); } catch { /* storage unavailable */ }
     }
@@ -29,10 +29,14 @@ const UI = (() => {
     const screen = document.getElementById(`${screenId}-screen`);
     if (screen) screen.classList.add('active');
 
-    // If switching to auth, strip all admin privileges and app state
+    // If switching to auth, strip all admin privileges and app state, lock theme-color to dark
     if (screenId === 'auth') {
       setAdminVisibility(false);
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      syncThemeColor('dark');
+    } else if (screenId === 'app') {
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      syncThemeColor(currentTheme);
     }
 
     // Show bottom nav only when app is active (mobile only via CSS)
@@ -196,15 +200,19 @@ const UI = (() => {
             return;
           }
 
+          const launcher = document.getElementById('ursa-launcher-btn');
           if (currentScrollTop <= 25 || isAtBottom) {
-            // At the top OR reached the bottom -> Always reveal floating bottom nav!
+            // At the top OR reached the bottom -> Always reveal floating bottom nav and launcher!
             bottomNav.classList.remove('nav-hidden');
+            if (launcher) launcher.classList.remove('launcher-hidden');
           } else if (diff > HIDE_THRESHOLD) {
-            // Scrolling DOWN -> Hide floating nav
+            // Scrolling DOWN -> Hide floating nav and launcher for unobstructed view
             bottomNav.classList.add('nav-hidden');
+            if (launcher) launcher.classList.add('launcher-hidden');
           } else if (diff < -SHOW_THRESHOLD) {
-            // Scrolling UP -> Reveal floating nav
+            // Scrolling UP -> Reveal floating nav and launcher
             bottomNav.classList.remove('nav-hidden');
+            if (launcher) launcher.classList.remove('launcher-hidden');
           }
 
           lastScrollTop = Math.max(0, currentScrollTop);
@@ -221,13 +229,12 @@ const UI = (() => {
     document.querySelectorAll('.bottom-nav-item, .nav-item').forEach(btn => {
       btn.addEventListener('click', () => {
         bottomNav.classList.remove('nav-hidden');
+        const launcher = document.getElementById('ursa-launcher-btn');
+        if (launcher) launcher.classList.remove('launcher-hidden');
       });
     });
   }
 
-  // ---- Sliding Active Indicator (liquid pill that glides between icons) ----
-  // One absolutely-positioned pill per bottom nav; instead of each item
-  // painting its own background, the pill physically travels to the item
   // Clean nav indicator handler: indicator pill removed, only the icon is orange on click
   function moveNavIndicator(nav, previewTarget) {
     if (!nav) return;

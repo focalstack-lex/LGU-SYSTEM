@@ -216,6 +216,21 @@ const GrizzAI = (() => {
       }
     });
 
+    // Release behavior: settle the launcher against the nearest horizontal edge
+    // so it never rests over mid-screen content (stat cards, lists).
+    const snapToEdge = () => {
+      const rect = launcher.getBoundingClientRect();
+      const pad = 8;
+      const maxLeft = window.innerWidth - launcher.offsetWidth - pad;
+      const targetLeft = (rect.left + rect.width / 2) < (window.innerWidth / 2) ? pad : maxLeft;
+
+      launcher.classList.add('is-snapping');
+      launcher.style.left = `${targetLeft}px`;
+      launcher.style.right = 'auto';
+      launcher.style.bottom = 'auto';
+      setTimeout(() => launcher.classList.remove('is-snapping'), 300);
+    };
+
     const endDrag = (e) => {
       if (!isPointerDown) return;
       isPointerDown = false;
@@ -226,6 +241,7 @@ const GrizzAI = (() => {
       } catch (err) {}
 
       if (hasMoved) {
+        snapToEdge();
         setTimeout(() => {
           dragOccurred = false;
         }, 150);
@@ -768,36 +784,6 @@ const GrizzAI = (() => {
     }
   }
 
-  // Structured prerequisite evaluation (migration 031 rows).
-  // Legacy free-text fallback keeps the old regex path when the table is empty
-  // for a subject, so Grizz never regresses before the migration lands.
-  function evaluatePrereqs(subject, prereqsBySubject, passedCodes, enrolledCodes, currentYear) {
-    const rows = prereqsBySubject.get(subject.id) || [];
-    if (!rows.length) return null; // signal: caller falls back to legacy parsing
-
-    let satisfied = true;
-    const missing = [];
-    const notes = [];
-    for (const row of rows) {
-      const depCode = row.depends_code;
-      if ((row.kind === 'prerequisite' || row.kind === 'corequisite') && depCode) {
-        if (!passedCodes.has(depCode) && !enrolledCodes.has(depCode)) {
-          satisfied = false;
-          missing.push(depCode);
-        }
-      } else if (row.kind === 'year_standing' && row.detail) {
-        const requiredYr = Number((row.detail.match(/(\d+)/) || [])[1] || 0);
-        if (currentYear < requiredYr) {
-          satisfied = false;
-          missing.push(row.detail);
-        }
-      } else if (row.kind === 'special' && row.detail) {
-        notes.push(row.detail);
-      }
-    }
-    return { satisfied, missing, notes };
-  }
-
   // Lecture/lab-aware unit label for recommendation cards ("3+1 units" when lab > 0).
   function unitsLabel(s) {
     return Number(s.lab_units) > 0 ? `${s.lec_units}+${s.lab_units} units` : `${s.units} unit${s.units === 1 ? "" : "s"}`;
@@ -833,101 +819,40 @@ const GrizzAI = (() => {
   }
 
   // 1. Next Semester Subject Recommendations
+  // Curriculum logic now lives in the tested engine grizz-recommend.js: term
+  // resolution, term-scoped candidates (target slot + backlog), prereq/co-req
+  // gates, and the 5-subject / 24-unit load cap.
   async function handleNextSemRecommendations() {
-    const prog = profile?.course || 'BSCoE';
-    const progTitle = PROGRAM_NAMES[prog] || prog;
-
-    // Partial-pass records do not satisfy prerequisites (handled inside
-    // classifyPasses); the Component Backlog note for them is rendered by
-    // the Academic Progress summary.
-    const { passedCodes, enrolledCodes } = classifyPasses(myUnits);
-
-    const currentYear = Number(profile?.year_level) || 1;
-
-    // Build once per recommendation run, from the checklists payload captured in loadData():
-    const prereqsBySubject = new Map();
-    for (const r of (prereqRows || [])) {
-      if (!prereqsBySubject.has(r.subject_id)) prereqsBySubject.set(r.subject_id, []);
-      prereqsBySubject.get(r.subject_id).push(r);
-    }
-
-    // Find uncompleted subjects (exclude both PASSED and CURRENTLY ENROLLED subjects)
-    const uncompleted = subjects.filter(s => {
-      const c = s.code.trim().toUpperCase();
-      return !passedCodes.has(c) && !enrolledCodes.has(c);
+    const plan = window.GrizzRecommend.buildRecommendations({
+      subjects,
+      prereqRows,
+      myUnits,
+      profileYear: Number(profile?.year_level) || 1,
+      activeTerm: window.Enrollment?.activeTerm?.() || null,
     });
 
-    const eligible = [];
-    const blockedByPrereq = [];
-
-    uncompleted.forEach(s => {
-      const prereqStr = (s.prerequisites || '').trim();
-
-      const verdict = evaluatePrereqs(s, prereqsBySubject, passedCodes, enrolledCodes, currentYear);
-      if (verdict) {
-        if (verdict.satisfied) {
-          eligible.push({ ...s, missingPrereq: null, prereqNotes: verdict.notes });
-        } else {
-          blockedByPrereq.push({ ...s, reason: `Missing prerequisite: ${verdict.missing.join(', ')}` });
-        }
-        return;
-      }
-
-      // ---- legacy fallback (subjects with no structured rows yet) ----
-      if (!prereqStr || prereqStr === 'None' || prereqStr === '-') {
-        eligible.push({ ...s, missingPrereq: null });
-        return;
-      }
-
-      const standingMatch = prereqStr.match(/(\d+)(?:st|nd|rd|th)?\s*Yr\s*Standing/i);
-      if (standingMatch) {
-        const requiredYr = Number(standingMatch[1]);
-        if (currentYear < requiredYr) {
-          blockedByPrereq.push({ ...s, reason: `Requires Year ${requiredYr} standing` });
-          return;
-        }
-      }
-
-      const rawTokens = prereqStr.split(/[;,/]/).map(t => t.replace(/co-req/i, '').trim()).filter(Boolean);
-      let satisfies = true;
-      let missing = [];
-
-      rawTokens.forEach(token => {
-        const normToken = token.trim().toUpperCase();
-        // Prerequisite is satisfied if passed or currently enrolled in active semester
-        if (normToken && !normToken.includes('STANDING') && !passedCodes.has(normToken) && !enrolledCodes.has(normToken)) {
-          if (/^[A-Z0-9\s-]+$/.test(normToken)) {
-            satisfies = false;
-            missing.push(token.trim());
-          }
-        }
-      });
-
-      if (satisfies) {
-        eligible.push({ ...s, missingPrereq: null });
-      } else {
-        blockedByPrereq.push({ ...s, reason: `Missing prerequisite: ${missing.join(', ')}` });
-      }
-    });
-
-    eligible.sort((a, b) => a.year_level - b.year_level || a.semester - b.semester);
-
-    let totalUnits = 0;
-    const recommended = [];
-    for (const s of eligible) {
-      if (totalUnits + s.units <= 24 || recommended.length < 5) {
-        recommended.push(s);
-        totalUnits += s.units;
-      }
-    }
+    const recommended = plan.recommended.map(c => Object.assign({}, c.subject, {
+      kind: c.kind,
+      retake: c.retake,
+      prereqNotes: (c.notes || []).concat(c.retake ? ['Retake: you attempted this before.'] : []),
+    }));
+    const totalUnits = plan.totalUnits;
+    const blocked = plan.blocked || [];
+    const remainder = plan.remainder || [];
+    const standing = plan.standing;
+    const ord = (y) => y + (y === 1 ? 'st' : y === 2 ? 'nd' : y === 3 ? 'rd' : 'th');
 
     if (recommended.length === 0) {
+      const blockedNote = blocked.length
+        ? `<p>${blocked.length} course${blocked.length === 1 ? ' is' : 's are'} still locked by prerequisites: ${esc(blocked.slice(0, 5).map(b => b.subject.code).join(', '))}${blocked.length > 5 ? '…' : ''}.</p>`
+        : '';
       appendBotMessage(
         'Curriculum Recommendations',
-        `<p>You have completed or are currently enrolled in all available prerequisite-cleared courses for <strong>${esc(progTitle)}</strong>.</p>`,
+        `<p>No open courses can be added right now: every course within your <strong>${ord(standing.yearLevel)} Year standing</strong> is cleared or currently being taken${standing.basis === 'records' ? ` (${standing.completedUnits} of ${standing.totalUnits} units completed)` : ''}.</p>${blockedNote}`,
         [
           { action: 'academic-progress', label: 'View Academic Progress', icon: 'solar:diploma-verified-linear' },
-        ]
+          blocked.length ? { action: 'check-prereq', label: 'Check Prerequisites', icon: 'solar:branching-paths-down-linear' } : null,
+        ].filter(Boolean)
       );
       return;
     }
@@ -946,44 +871,83 @@ const GrizzAI = (() => {
     }
 
     const addButtonFor = (s) => inLoad.has(s.id)
-      ? '<span class="ursa-subject-tag active">In your load ✓</span>'
-      : `<button type="button" class="ursa-add-btn"${canEdit ? '' : ' disabled'} data-grizz-add="${esc(s.id)}">+ Add</button>`;
+      ? '<span class="ursa-subject-tag active"><iconify-icon icon="solar:check-circle-bold"></iconify-icon> In your load</span>'
+      : `<button type="button" class="ursa-add-btn"${canEdit ? '' : ' disabled'} data-grizz-add="${esc(s.id)}"><iconify-icon icon="solar:add-circle-linear"></iconify-icon> Add to Load</button>`;
 
     const cardsHtml = recommended.map(s => `
       <div class="ursa-subject-item">
-        <div class="ursa-subject-meta">
-          <span class="ursa-subject-code">${esc(s.code)} <span class="ursa-units-badge">${unitsLabel(s)}</span></span>
-          <span class="ursa-subject-title" title="${esc(s.title)}">${esc(s.title)}</span>
+        <div class="ursa-subject-header">
+          <div class="ursa-subject-code-group">
+            <span class="ursa-subject-code">${esc(s.code)}</span>
+            <span class="ursa-units-badge">${unitsLabel(s)}</span>
+          </div>
+          <span class="ursa-subject-term-tag">
+            <iconify-icon icon="solar:calendar-linear"></iconify-icon> Yr ${s.year_level} • Sem ${s.semester}
+          </span>
         </div>
-        <span class="ursa-subject-tag">
-          Yr ${s.year_level} · Sem ${s.semester}
-        </span>
-        ${(s.prereqNotes || []).length ? `<span class="ursa-subject-tag req">Note: ${esc(s.prereqNotes.join(', '))}</span>` : ''}
-        ${pilot ? addButtonFor(s) : ''}
+        <div class="ursa-subject-title" title="${esc(s.title)}">${esc(s.title)}</div>
+        ${(s.prereqNotes || []).length ? `
+          <div class="ursa-subject-note">
+            <iconify-icon icon="solar:info-circle-linear"></iconify-icon> ${esc(s.prereqNotes.join(', '))}
+          </div>` : ''}
+        ${pilot ? `
+          <div class="ursa-subject-footer">
+            ${addButtonFor(s)}
+          </div>` : ''}
       </div>
     `).join('');
 
     const addAllHtml = pilot ? `
-      <div class="ursa-response-actions" style="margin-top:0.6rem;">
+      <div class="ursa-response-actions" style="margin-top:0.75rem;">
         <button type="button" class="ursa-chip-action" data-grizz-add-all
           ${(!canEdit || !recommended.some(s => !inLoad.has(s.id))) ? 'disabled' : ''}>
           <iconify-icon icon="solar:cart-plus-linear"></iconify-icon> Add all recommended
         </button>
       </div>
-      <p class="ursa-note-text" data-grizz-lock ${canEdit ? 'hidden' : ''}>🔒 Your load is ${esc(lockNote || 'not editable right now')} — subjects can be added once it's back in draft.</p>` : '';
+      <p class="ursa-note-text" data-grizz-lock ${canEdit ? 'hidden' : ''}>
+        <iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon> Your load is ${esc(lockNote || 'not editable right now')}: you can add subjects only while you're still building it.
+      </p>` : '';
 
     const jumpHtml = pilot ? `
-      <p style="margin:0.6rem 0 0;"><a href="#" class="ursa-nav-link" data-view="enrollment" style="color:var(--primary);font-weight:600;">Open Load Verification →</a></p>` : '';
+      <p style="margin:0.75rem 0 0;">
+        <a href="#" class="ursa-nav-link" data-view="enrollment" style="color:var(--primary);font-weight:600;display:inline-flex;align-items:center;gap:0.3rem;">
+          <span>Open Enrollment Verification</span>
+          <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
+        </a>
+      </p>` : '';
+
+    const retakesInLoad = recommended.filter(r => r.kind === 'retake').length;
+    const openNote = plan.openCount
+      ? ` · ${plan.openCount} course${plan.openCount === 1 ? '' : 's'} still open`
+      : '';
+    const ctxHtml = standing.basis === 'records'
+      ? `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Based on your records · <strong>${ord(standing.yearLevel)} Year standing</strong> · ${standing.completedUnits} of ${standing.totalUnits} units${openNote}${retakesInLoad ? ` · ${retakesInLoad} retake${retakesInLoad === 1 ? '' : 's'}` : ''}</p>`
+      : `<p class="grizz-term-ctx"><iconify-icon icon="solar:calendar-linear"></iconify-icon> Nothing on record yet: starting with your earliest open courses.</p>`;
+    const remUnits = remainder.reduce((sum, c) => sum + (Number(c.subject.units) || 0), 0);
+    const overflowHtml = remainder.length
+      ? `<p class="ursa-note-text">+ ${remainder.length} more cleared course${remainder.length === 1 ? '' : 's'} (${remUnits} units) can be added if your office allows a heavier load (Grizz already includes your earliest required courses in full).</p>`
+      : '';
+    const blockedHtml = blocked.length
+      ? `<div class="grizz-locked">
+           <p class="grizz-locked-head">Locked by prerequisites (${blocked.length})</p>
+           ${blocked.slice(0, 6).map(b => `
+             <div class="grizz-locked-row">
+               <span class="ursa-subject-code">${esc(b.subject.code)}</span>
+               <span class="grizz-locked-reason">${esc(b.reason)}</span>
+             </div>`).join('')}
+         </div>`
+      : '';
 
     const html = `
+      ${ctxHtml}
       <div class="ursa-summary-bar">
         <div class="ursa-summary-item">
-          <span class="ursa-summary-val">${recommended.length} Subjects</span>
+          <span class="ursa-summary-val"><iconify-icon icon="solar:book-bookmark-linear" style="color:var(--primary);margin-right:0.3rem;vertical-align:middle;"></iconify-icon>${recommended.length} Subjects</span>
           <span class="ursa-summary-label">Recommended</span>
         </div>
         <div class="ursa-summary-divider"></div>
         <div class="ursa-summary-item">
-          <span class="ursa-summary-val">${totalUnits} Units</span>
+          <span class="ursa-summary-val"><iconify-icon icon="solar:diploma-linear" style="color:var(--primary);margin-right:0.3rem;vertical-align:middle;"></iconify-icon>${totalUnits} Units</span>
           <span class="ursa-summary-label">Total Load</span>
         </div>
       </div>
@@ -992,6 +956,8 @@ const GrizzAI = (() => {
         ${cardsHtml}
       </div>
 
+      ${overflowHtml}
+      ${blockedHtml}
       ${addAllHtml}
       ${jumpHtml}
       <p class="ursa-note-text" data-grizz-result hidden></p>
@@ -1017,7 +983,7 @@ const GrizzAI = (() => {
         const done = ids.has(b.dataset.grizzAdd);
         b.disabled = done || !editable;
         b.classList.toggle('added', done);
-        b.textContent = done ? '✓ Added' : '+ Add';
+        b.innerHTML = done ? '<iconify-icon icon="solar:check-circle-bold"></iconify-icon> Added' : '<iconify-icon icon="solar:add-circle-linear"></iconify-icon> Add to Load';
       });
       const allBtn = msg.querySelector('[data-grizz-add-all]');
       if (allBtn) allBtn.disabled = !editable || recommended.every(s => ids.has(s.id));
@@ -1027,7 +993,7 @@ const GrizzAI = (() => {
       btn.disabled = true;
       const res = await window.Enrollment.addFromGrizz(subject, 'Recommended by Grizz')
         .catch(err => ({ ok: false, error: err.message }));
-      showResult(res?.ok ? `✓ Added ${subject.code} to your proposed load.` : (res?.error || 'Could not add the subject.'));
+      showResult(res?.ok ? `Added ${subject.code} to your proposed load.` : (res?.error || 'Could not add the subject.'));
       syncButtons();
     };
 

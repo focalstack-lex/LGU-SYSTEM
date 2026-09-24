@@ -242,13 +242,18 @@ const Dashboard = (() => {
 
       container.innerHTML = txs.map(tx => `
         <div class="tx-item">
-          ${UI.renderStatusBadge(tx.type)}
-          <span class="tx-desc" title="${tx.description}">${tx.description}</span>
-          <div>
+          <div class="tx-item-left">
+            <div class="tx-title" title="${tx.description}">${tx.description}</div>
+            <div class="tx-sub-info">
+              <span class="tx-type-pill tx-type-${tx.type}">${UI.capitalize(tx.type)}</span>
+              ${tx.event_name ? `<span class="tx-event-name">&bull; ${tx.event_name}</span>` : ''}
+              <span class="tx-date">&bull; ${UI.dateStr(tx.transaction_date)}</span>
+            </div>
+          </div>
+          <div class="tx-item-right">
             <div class="tx-amount ${tx.type}">
               ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
             </div>
-            <div class="tx-meta">${UI.dateStr(tx.transaction_date)}</div>
           </div>
         </div>
       `).join('');
@@ -257,31 +262,55 @@ const Dashboard = (() => {
     }
   }
 
+  function formatTitle(title) {
+    if (!title) return '';
+    if (title === title.toUpperCase() && title.length > 3) {
+      return title.toLowerCase().replace(/(?:^|\s|-|:\s*)\w/g, m => m.toUpperCase());
+    }
+    return title;
+  }
+
   async function loadAnnouncements() {
     const container = document.getElementById('announcement-list');
     try {
-      const { data } = await window.supabaseClient
-        .from('announcements')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
+      const list = await Api.announcements.list();
+      const data = (list || []).slice(0, 5);
 
-      if (!data?.length) { UI.setEmpty('announcement-list', 'solar:bell-linear', 'No announcements yet.'); return; }
+      if (!data.length) { UI.setEmpty('announcement-list', 'solar:bell-linear', 'No announcements yet.'); return; }
 
-      container.innerHTML = data.map(a => `
-        <div class="announce-item">
-          <h4>${a.title}</h4>
-          <p class="announce-body">${a.body.replace(/\n/g, '<br>')}</p>
-          ${a.body.length > 200 ? '<button class="announce-expand-btn" type="button">Show more</button>' : ''}
-          <div class="announce-date">${UI.dateStr(a.created_at)}</div>
-        </div>
-      `).join('');
+      container.innerHTML = data.map((a) => {
+        const title = formatTitle(a.title);
+        const author = a.author || 'COE LGU';
+        const body = a.body || '';
+        const hasLongBody = body.length > 180;
+
+        return `
+          <div class="announce-item">
+            <h4 class="announce-title">${title}</h4>
+            <p class="announce-body">${body.replace(/\n/g, '<br>')}</p>
+            ${hasLongBody ? `
+              <button class="announce-expand-btn" type="button">
+                <span>Show more</span>
+                <iconify-icon icon="solar:alt-arrow-down-linear"></iconify-icon>
+              </button>` : ''}
+            <div class="announce-meta">
+              <span>${author}</span>
+              <span class="announce-meta-dot">•</span>
+              <span>${UI.dateStr(a.created_at)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
 
       container.querySelectorAll('.announce-expand-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          const bodyEl = btn.closest('.announce-item').querySelector('.announce-body');
+          const item = btn.closest('.announce-item');
+          const bodyEl = item.querySelector('.announce-body');
+          const textSpan = btn.querySelector('span');
+          const iconEl = btn.querySelector('iconify-icon');
           const expanded = bodyEl.classList.toggle('expanded');
-          btn.textContent = expanded ? 'Show less' : 'Show more';
+          if (textSpan) textSpan.textContent = expanded ? 'Show less' : 'Show more';
+          if (iconEl) iconEl.setAttribute('icon', expanded ? 'solar:alt-arrow-up-linear' : 'solar:alt-arrow-down-linear');
         });
       });
     } catch (err) {

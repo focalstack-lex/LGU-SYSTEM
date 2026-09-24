@@ -187,13 +187,36 @@ router.patch('/submissions/:id/items/:itemId', requireProgramHead, async (req, r
 function termLabel(s) { return `${s.school_year} Sem ${s.semester}`; }
 
 async function notifyStudent(submission, status, extraChanges = []) {
-  const lines = (submission.enrollment_submission_items || [])
-    .filter(i => i.item_state !== 'removed_by_head')
-    .map(i => `${i.subjects.code} - ${i.subjects.title}${i.item_state === 'added_by_head' ? ' (added by Program Head)' : ''}`);
+  const activeItems = (submission.enrollment_submission_items || [])
+    .filter(i => i.item_state !== 'removed_by_head');
+  const lines = activeItems.map(i => `${i.subjects.code} - ${i.subjects.title}${i.item_state === 'added_by_head' ? ' (added by Program Head)' : ''}`);
+  const items = activeItems.map(i => ({
+    code: i.subjects?.code,
+    title: i.subjects?.title,
+    units: i.subjects?.units,
+    addedByHead: i.item_state === 'added_by_head'
+  }));
+  const totalUnits = activeItems.reduce((sum, i) => sum + (Number(i.subjects?.units) || 0), 0);
+
   const changes = (submission.enrollment_submission_items || [])
     .filter(i => i.item_state !== 'submitted' && i.head_note)
     .map(i => `${i.item_state === 'removed_by_head' ? 'Removed' : 'Added'} ${i.subjects.code}: ${i.head_note}`)
     .concat(extraChanges);
+
+  // Journey-language notification titles (spec §8.1). In-app notification
+  // fires on every decision; email fires ONLY at the two milestones below.
+  const TITLES = {
+    approved: 'Load Verified — Final List',
+    encoded: 'Load Encoded',
+    returned: 'Load Returned',
+    rejected: 'Load Rejected',
+  };
+  const MESSAGES = {
+    approved: `Your Program Head verified your load for ${termLabel(submission)}. These are the final subjects you will enroll.`,
+    encoded: `Your load for ${termLabel(submission)} has been encoded by the Student Assistant. Proceed to the University Registrar for assessment.`,
+    returned: `Your load for ${termLabel(submission)} was returned for changes.`,
+    rejected: `Your load for ${termLabel(submission)} was rejected.`,
+  };
   createNotification({
     userId: submission.student_id,
     // 'faculty' is outside every role broadcast filter, so delivery is
@@ -201,16 +224,26 @@ async function notifyStudent(submission, status, extraChanges = []) {
     targetRole: 'faculty',
     type: 'units',
     category: 'units',
-    title: `Load ${status.charAt(0).toUpperCase()}${status.slice(1)}`,
-    message: `Your load for ${termLabel(submission)} was ${status}.`,
+    title: TITLES[status] || `Load ${status.charAt(0).toUpperCase()}${status.slice(1)}`,
+    message: MESSAGES[status] || `Your load for ${termLabel(submission)} was ${status}.`,
     link: '/',
   });
-  sendLoadStatusEmail({
-    to: submission.student?.email,
-    name: submission.student?.full_name || 'COE Student',
-    status, studentName: submission.student?.full_name || 'COE Student',
-    term: termLabel(submission), lines, changes: changes.length ? changes : null,
-  });
+
+  if (status === 'approved' || status === 'encoded') {
+    sendLoadStatusEmail({
+      to: submission.student?.email,
+      name: submission.student?.full_name || 'COE Student',
+      status,
+      milestone: status === 'approved' ? 'verified' : 'encoded',
+      studentName: submission.student?.full_name || 'COE Student',
+      course: submission.student?.course || null,
+      term: termLabel(submission),
+      lines,
+      items,
+      totalUnits,
+      changes: changes.length ? changes : null,
+    });
+  }
 }
 
 // POST /submissions/:id/approve - idempotent auto-enroll

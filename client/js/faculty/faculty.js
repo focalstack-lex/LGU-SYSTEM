@@ -9,8 +9,8 @@ const FacultyPortal = (() => {
   const STATUS_LABELS = {
     draft: 'Draft',
     submitted: 'Submitted',
-    under_review: 'Under evaluation',
-    approved: 'Approved',
+    under_review: 'Under review',
+    approved: 'Verified',
     returned: 'Returned',
     rejected: 'Rejected',
   };
@@ -73,7 +73,7 @@ const FacultyPortal = (() => {
       return showGate('This portal is for program heads, faculty staff, and the dean only.');
     }
     if (!window.isEnrollmentPilot?.(profile.email)) {
-      return showGate('🚧 The enrollment verification portal is still under development. It will open for your role soon.');
+      return showGate('The enrollment verification portal is still in a controlled pilot. It will open for your role soon.');
     }
 
     $('faculty-gate').hidden = true;
@@ -96,26 +96,146 @@ const FacultyPortal = (() => {
       $('faculty-dean').hidden = false;
       await guard('loadDean', loadDean);
     }
+    subscribeRealtime();
+  }
+
+  let realtimeChannel = null;
+  function subscribeRealtime() {
+    if (!window.supabaseClient || typeof window.supabaseClient.channel !== 'function') return;
+    if (realtimeChannel) return;
+
+    realtimeChannel = window.supabaseClient
+      .channel('enrollment-faculty-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'enrollment_submissions' }, async (payload) => {
+        if (isHead()) guard('loadQueue', loadQueue);
+        guard('loadApproved', loadApproved);
+        if (isDean()) guard('loadDean', loadDean);
+        if (currentSubmission && payload.new && payload.new.id === currentSubmission.id) {
+          openEvaluation(currentSubmission.id);
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'enrollment_submission_items' }, async (payload) => {
+        if (isHead()) guard('loadQueue', loadQueue);
+        guard('loadApproved', loadApproved);
+        if (currentSubmission && ((payload.new && payload.new.submission_id === currentSubmission.id) || (payload.old && payload.old.submission_id === currentSubmission.id))) {
+          openEvaluation(currentSubmission.id);
+        }
+      })
+      .subscribe();
   }
 
   // ---------- Evaluation queue (program head) ----------
 
+  const QUEUE_YEARS = [1, 2, 3, 4];
+  const QUEUE_YEAR_NAMES = ['', '1st', '2nd', '3rd', '4th'];
+  let queueList = [];
+  let queueYearFilter = 'all';
+
   async function loadQueue() {
     const { submissions } = await Api.faculty.submissions('submitted');
     const { submissions: reviewing } = await Api.faculty.submissions('under_review');
-    renderQueueList([...(submissions || []), ...(reviewing || [])]);
+    // Oldest submission first inside each year group (first-come first-served).
+    queueList = [...(submissions || []), ...(reviewing || [])].sort((a, b) => {
+      const ta = a.submitted_at ? new Date(a.submitted_at).getTime() : Number.MAX_SAFE_INTEGER;
+      const tb = b.submitted_at ? new Date(b.submitted_at).getTime() : Number.MAX_SAFE_INTEGER;
+      if (ta !== tb) return ta - tb;
+      return String(a.student?.full_name || '').localeCompare(String(b.student?.full_name || ''));
+    });
+    queueYearFilter = 'all';
+    renderQueueFilter();
+    renderQueueSections();
   }
 
-  function renderQueueList(list) {
+  function activeItems(s) {
+    return (s.enrollment_submission_items || []).filter(i => i.item_state !== 'removed_by_head');
+  }
+
+  function queueGroups() {
+    const groups = { 1: [], 2: [], 3: [], 4: [] };
+    const others = [];
+    queueList.forEach(s => {
+      const y = Number(s.student?.year_level) || 0;
+      if (y >= 1 && y <= 4) groups[y].push(s);
+      else others.push(s);
+    });
+    return { groups, others };
+  }
+
+  function renderQueueFilter() {
+    const el = $('faculty-queue-filter');
+    if (!el) return;
+    const { groups } = queueGroups();
+    const total = QUEUE_YEARS.reduce((a, y) => a + groups[y].length, 0);
+    const pills = [
+      { key: 'all', label: 'All', count: total },
+      ...QUEUE_YEARS.map(y => ({ key: String(y), label: `${QUEUE_YEAR_NAMES[y]} Yr`, count: groups[y].length })),
+    ];
+    el.innerHTML = pills.map(p => `
+      <button type="button" class="year-pill ${queueYearFilter === p.key ? 'active' : ''}" data-queue-year="${p.key}">
+        <span>${p.label}</span>
+        <span class="year-pill-count">${p.count}</span>
+      </button>`).join('');
+    el.querySelectorAll('[data-queue-year]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        queueYearFilter = btn.dataset.queueYear;
+        renderQueueFilter();
+        renderQueueSections();
+      });
+    });
+  }
+
+  function queueRow(s) {
+    const items = activeItems(s);
+    const units = items.reduce((a, i) => a + (Number(i.subjects?.units) || 0), 0);
+    const subjLabel = `${items.length} subject${items.length === 1 ? '' : 's'} · ${units} units`;
+    const timeLabel = s.submitted_at
+      ? `<span class="fq-time">Submitted ${esc(typeof UI !== 'undefined' && UI.dateStr ? UI.dateStr(s.submitted_at) : '')}</span>`
+      : '';
+    return `
+      <div class="faculty-row fq-row" data-open="${s.id}">
+        <span class="fq-row-main">
+          <strong>${esc(s.student?.full_name || 'Student')}</strong>
+          <span class="fq-meta">${esc(s.student?.course || '')} · ${subjLabel} · ${esc(STATUS_LABELS[s.status] || s.status)}</span>
+          ${timeLabel}
+        </span>
+        <span class="faculty-row-actions"><button type="button" class="btn btn-primary btn-sm">Review</button></span>
+      </div>`;
+  }
+
+  function renderQueueSections() {
     const el = $('faculty-queue-list');
-    el.innerHTML = list.length ? list.map(s => `
-      <div class="faculty-row" data-open="${s.id}">
-        <span><strong>${esc(s.student?.full_name || 'Student')}</strong> · ${esc(s.student?.course || '')} Yr ${esc(s.student?.year_level || '')}</span>
-        <span>${(s.enrollment_submission_items || []).filter(i => i.item_state !== 'removed_by_head').length} subjects · ${STATUS_LABELS[s.status] || esc(s.status)}</span>
-        <span class="faculty-row-actions"><button type="button" class="btn btn-primary btn-sm">Evaluate</button></span>
-      </div>`).join('') : '<p class="muted">The queue is empty.</p>';
-    el.querySelectorAll('[data-open]').forEach(row =>
-      row.addEventListener('click', () => guard('openEvaluation', () => openEvaluation(row.dataset.open))));
+    if (!el) return;
+    const { groups, others } = queueGroups();
+    const years = queueYearFilter === 'all' ? QUEUE_YEARS : [Number(queueYearFilter)];
+
+    let html = years.reduce((acc, y) => {
+      const rows = groups[y] || [];
+      if (!rows.length) return acc;
+      return acc + `
+        <div class="fq-group">
+          <div class="fq-group-head">
+            <h4>${QUEUE_YEAR_NAMES[y]} Year</h4>
+            <span class="fq-group-count">${rows.length} request${rows.length === 1 ? '' : 's'}</span>
+          </div>
+          ${rows.map(queueRow).join('')}
+        </div>`;
+    }, '');
+
+    if (queueYearFilter === 'all' && others.length) {
+      html += `
+        <div class="fq-group">
+          <div class="fq-group-head">
+            <h4>Year not set</h4>
+            <span class="fq-group-count">${others.length} request${others.length === 1 ? '' : 's'}</span>
+          </div>
+          ${others.map(queueRow).join('')}
+        </div>`;
+    }
+
+    el.innerHTML = html || '<p class="muted">The queue is empty.</p>';
+    el.querySelectorAll('[data-open]').forEach(row => {
+      row.addEventListener('click', () => guard('openEvaluation', () => openEvaluation(row.dataset.open)));
+    });
   }
 
   async function openEvaluation(id) {
@@ -127,7 +247,7 @@ const FacultyPortal = (() => {
     document.getElementById('faculty-queue').hidden = true;
     document.getElementById('faculty-eval').hidden = false;
     document.getElementById('faculty-eval-title').textContent =
-      `${s.student?.full_name || 'Student'} — ${s.school_year} Sem ${s.semester} (${STATUS_LABELS[s.status] || s.status})`;
+      `${s.student?.full_name || 'Student'} · ${s.school_year} Sem ${s.semester} (${STATUS_LABELS[s.status] || s.status})`;
 
     const itemsEl = document.getElementById('faculty-items-list');
     itemsEl.innerHTML = (s.enrollment_submission_items || []).map(i => `
@@ -156,27 +276,13 @@ const FacultyPortal = (() => {
     // Add-subject picker: same program's checklist subjects not already in the load
     fillAddPicker(s);
 
+    // Verify is the head's only decision: add/remove adjust the load, verify
+    // finalizes it (spec D8 — no reject, no return-for-changes).
     document.getElementById('faculty-approve-btn').onclick = async () => {
-      if (!confirm('Approving enrolls these subjects for the student now. Continue?')) return;
+      if (!confirm('Verify and finalize this load? The subjects are enrolled for the student now. Continue?')) return;
       await guard('approve', async () => {
         const r = await Api.faculty.approve(s.id);
-        if (r.alreadyApproved) { alert('Already approved.'); return; }
-        backToQueue();
-      });
-    };
-    document.getElementById('faculty-return-btn').onclick = async () => {
-      const notes = prompt('Notes for the student (required):');
-      if (!notes || !notes.trim()) return;
-      await guard('return', async () => {
-        await Api.faculty.return(s.id, notes.trim());
-        backToQueue();
-      });
-    };
-    document.getElementById('faculty-reject-btn').onclick = async () => {
-      const notes = prompt('Reason for rejection (required):');
-      if (!notes || !notes.trim()) return;
-      await guard('reject', async () => {
-        await Api.faculty.reject(s.id, notes.trim());
+        if (r.alreadyApproved) { alert('This load is already verified.'); return; }
         backToQueue();
       });
     };
@@ -186,7 +292,7 @@ const FacultyPortal = (() => {
   // in the load (any item state — the server rejects duplicate inserts).
   async function fillAddPicker(s) {
     const sel = document.getElementById('faculty-add-subject');
-    sel.innerHTML = '<option value="">— subject —</option>';
+    sel.innerHTML = '<option value="">Select subject</option>';
     const program = programKey(s.student?.course);
     if (!program) return;
     await guard('fillAddPicker', async () => {
@@ -195,7 +301,7 @@ const FacultyPortal = (() => {
       const options = (checklists.subjects || [])
         .filter(sub => !inLoad.has(sub.id))
         .sort((a, b) => (a.year_level - b.year_level) || String(a.code).localeCompare(String(b.code)))
-        .map(sub => `<option value="${sub.id}">${esc(sub.code)} — ${esc(sub.title)} (${esc(sub.units)}u)</option>`)
+        .map(sub => `<option value="${sub.id}">${esc(sub.code)}: ${esc(sub.title)} (${esc(sub.units)}u)</option>`)
         .join('');
       if (options) sel.insertAdjacentHTML('beforeend', options);
       else sel.insertAdjacentHTML('beforeend', '<option value="">Every program subject is in the load</option>');
@@ -311,12 +417,12 @@ const FacultyPortal = (() => {
     const byProgram = {};
     for (const s of submissions || []) {
       by[s.status] = (by[s.status] || 0) + 1;
-      const p = s.student?.course || '—';
+      const p = s.student?.course || 'N/A';
       byProgram[p] = byProgram[p] || {};
       byProgram[p][s.status] = (byProgram[p][s.status] || 0) + 1;
     }
     document.getElementById('faculty-dean-body').innerHTML = `
-      <p>Submitted: ${by.submitted || 0} · Under evaluation: ${by.under_review || 0} · Approved: ${by.approved || 0} · Returned: ${by.returned || 0} · Rejected: ${by.rejected || 0}</p>
+      <p>${['submitted', 'under_review', 'approved', 'returned', 'rejected'].map(k => `${STATUS_LABELS[k]} ${by[k] || 0}`).join(' · ')}</p>
       ${Object.entries(byProgram).map(([p, counts]) =>
         `<p><strong>${esc(p)}</strong>: ${Object.entries(counts).map(([k, v]) => `${STATUS_LABELS[k] || k} ${v}`).join(', ')}</p>`).join('')}`;
   }

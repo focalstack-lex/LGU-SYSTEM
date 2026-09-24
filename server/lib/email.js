@@ -49,9 +49,12 @@ async function getAllStudentEmails() {
 }
 
 /**
- * Wraps email contents into a minimalist COE Orange Palette template.
+ * Wraps email contents into an official institutional COE Redesign template.
+ * Minimalist, high-contrast, document-style layout without unnecessary cards or glows.
  */
 function buildEmailTemplate({ subject, preheader, content }) {
+  const logoUrl = `${APP_URL}/assets/coe-logo.png`;
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,47 +62,60 @@ function buildEmailTemplate({ subject, preheader, content }) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${subject}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#fff7ed;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;-webkit-font-smoothing:antialiased;">
-  <div style="display:none;max-height:0;overflow:hidden;">${preheader}</div>
+<body style="margin:0;padding:0;background-color:#F8FAFC;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;-webkit-font-smoothing:antialiased;color:#0F172A;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${preheader}</div>
   
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fff7ed;padding:36px 16px;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8FAFC;padding:32px 16px;">
     <tr>
       <td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:500px;margin:0 auto;background:#ffffff;border-radius:12px;border:1px solid #fed7aa;overflow:hidden;box-shadow:0 6px 24px rgba(234, 88, 12, 0.12);">
+        <!-- Main Institutional Container: Clean 1px border, 8px radius, NO box shadow -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;margin:0 auto;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;">
           
-          <!-- COE Orange Top Header -->
+          <!-- Official COE Institutional Header (Clean White Letterhead) -->
           <tr>
-            <td style="background:linear-gradient(135deg, #ea580c 0%, #c2410c 100%);padding:22px 24px;text-align:left;">
-              <span style="color:#ffedd5;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;display:block;margin-bottom:2px;">COR JESU COLLEGE</span>
-              <h1 style="margin:0;color:#ffffff;font-size:16px;font-weight:700;letter-spacing:0.2px;">College of Engineering LGU Portal</h1>
+            <td style="background:#FFFFFF;padding:26px 28px 20px;border-top:4px solid #FF5533;border-bottom:1px solid #E2E8F0;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="54" style="vertical-align:middle;">
+                    <img src="${logoUrl}" alt="COE Logo" width="50" height="50" style="display:block;width:50px;height:50px;object-fit:contain;" />
+                  </td>
+                  <td style="vertical-align:middle;padding-left:16px;text-align:left;">
+                    <span style="color:#64748B;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:3px;">COR JESU COLLEGE</span>
+                    <h1 style="margin:0;color:#0F172A;font-size:20px;font-weight:800;letter-spacing:-0.3px;line-height:1.15;">College of Engineering</h1>
+                    <span style="color:#FF5533;font-size:12px;font-weight:600;display:block;margin-top:4px;letter-spacing:0.2px;">Local Government Unit & Academic Portal</span>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 
-          <!-- Main Content -->
+          <!-- Main Email Body -->
           <tr>
-            <td style="padding:32px 24px;text-align:center;">
+            <td style="padding:28px 24px;text-align:left;background:#FFFFFF;">
               ${content}
             </td>
           </tr>
 
-          <!-- Orange Minimalist Footer -->
+          <!-- Department Footer -->
           <tr>
-            <td style="background:#fff7ed;border-top:1px solid #ffedd5;padding:18px 24px;text-align:center;">
-              <p style="margin:0;font-size:12px;color:#c2410c;font-weight:700;line-height:1.5;">
-                College of Engineering Local Government Unit<br/>
-                <span style="color:#9a3412;font-weight:400;">Cor Jesu College, Digos City</span>
+            <td style="background:#FFFFFF;border-top:1px solid #E2E8F0;padding:20px 24px;text-align:left;">
+              <p style="margin:0 0 3px;font-size:12px;color:#0F172A;font-weight:700;">
+                College of Engineering Local Government Unit
+              </p>
+              <p style="margin:0;font-size:11px;color:#64748B;">
+                Cor Jesu College, Inc. • Sacred Heart Avenue, Digos City
               </p>
             </td>
           </tr>
 
         </table>
 
-        <!-- Outer Sub-footer -->
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:500px;margin:14px auto 0;">
+        <!-- Sub-footer Automated Notice -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;margin:12px auto 0;">
           <tr>
-            <td align="center">
-              <p style="margin:0;font-size:11px;color:#9a3412;opacity:0.8;">
-                Automated notification from COE Transparency Portal.
+            <td align="left" style="padding:0 4px;">
+              <p style="margin:0;font-size:11px;color:#94A3B8;line-height:1.4;">
+                This is an official automated notification from the COE Academic & Transparency Portal.
               </p>
             </td>
           </tr>
@@ -129,15 +145,16 @@ async function sendAnnouncementEmail(title, body) {
       subject: `Announcement: ${title}`,
       preheader: body.slice(0, 100),
       content: `
-        <div style="margin-bottom:18px;">
-          <span style="display:inline-block;background:#ffedd5;color:#c2410c;border:1px solid #fed7aa;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">Announcement</span>
+        <div style="margin-bottom:16px;padding-left:12px;border-left:3px solid #FF5533;">
+          <span style="display:block;font-size:10px;font-weight:700;color:#64748B;letter-spacing:1px;text-transform:uppercase;">NOTICE</span>
+          <span style="font-size:14px;font-weight:700;color:#FF5533;">ANNOUNCEMENT</span>
         </div>
-        <h2 style="margin:0 0 16px;color:#7c2d12;font-size:20px;font-weight:700;line-height:1.3;">${title}</h2>
-        <div style="background:#fff7ed;border-radius:8px;padding:18px;margin-bottom:24px;border:1px solid #ffedd5;text-align:left;">
-          <p style="margin:0;color:#431407;line-height:1.6;white-space:pre-wrap;font-size:14px;">${body}</p>
+        <h2 style="margin:0 0 12px;color:#0F172A;font-size:18px;font-weight:700;line-height:1.3;">${title}</h2>
+        <div style="margin-bottom:20px;border-top:1px solid #E2E8F0;padding-top:14px;">
+          <p style="margin:0;color:#334155;line-height:1.6;white-space:pre-wrap;font-size:14px;">${body}</p>
         </div>
-        <div>
-          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;box-shadow:0 3px 12px rgba(234, 88, 12, 0.25);">Open Portal</a>
+        <div style="margin-top:24px;">
+          <a href="${APP_URL}" style="display:inline-block;background:#FF5533;color:#FFFFFF;padding:10px 24px;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;">Open Portal</a>
         </div>
       `
     });
@@ -182,33 +199,34 @@ async function sendNewEventEmail(event) {
       subject: `New Event: ${event.event_name}`,
       preheader: `A new event has been scheduled: ${event.event_name}.`,
       content: `
-        <div style="margin-bottom:18px;">
-          <span style="display:inline-block;background:#ffedd5;color:#c2410c;border:1px solid #fed7aa;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">New Event</span>
+        <div style="margin-bottom:16px;padding-left:12px;border-left:3px solid #0284C7;">
+          <span style="display:block;font-size:10px;font-weight:700;color:#64748B;letter-spacing:1px;text-transform:uppercase;">EVENT</span>
+          <span style="font-size:14px;font-weight:700;color:#0284C7;">NEW EVENT SCHEDULED</span>
         </div>
-        <h2 style="margin:0 0 8px;color:#7c2d12;font-size:20px;font-weight:700;line-height:1.3;">${event.event_name}</h2>
-        <p style="margin:0 0 20px;color:#9a3412;font-size:13px;">A new event has been posted to the council calendar.</p>
+        <h2 style="margin:0 0 6px;color:#0F172A;font-size:18px;font-weight:700;line-height:1.3;">${event.event_name}</h2>
+        <p style="margin:0 0 16px;color:#64748B;font-size:13px;">A new event has been posted to the council calendar.</p>
 
-        <div style="background:#fff7ed;border-radius:8px;padding:20px;margin-bottom:24px;border:1px solid #ffedd5;text-align:left;">
+        <div style="margin-bottom:20px;border-top:1px solid #E2E8F0;padding-top:14px;text-align:left;">
           ${formattedDate ? `
             <div style="margin-bottom:12px;">
-              <span style="display:block;font-size:11px;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Scheduled Date</span>
-              <span style="font-size:14px;font-weight:600;color:#431407;">${formattedDate}</span>
+              <span style="display:block;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Scheduled Date</span>
+              <span style="font-size:14px;font-weight:600;color:#0F172A;">${formattedDate}</span>
             </div>
           ` : ''}
           <div style="margin-bottom:${event.description ? '12px' : '0'};">
-            <span style="display:block;font-size:11px;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Allocated Budget</span>
-            <span style="font-size:18px;font-weight:700;color:#ea580c;">PHP ${formattedBudget}</span>
+            <span style="display:block;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Allocated Budget</span>
+            <span style="font-size:16px;font-weight:700;color:#FF5533;">PHP ${formattedBudget}</span>
           </div>
           ${event.description ? `
-            <div style="border-top:1px solid #fed7aa;padding-top:12px;margin-top:12px;">
-              <span style="display:block;font-size:11px;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Description</span>
-              <p style="margin:0;font-size:13px;color:#431407;line-height:1.5;">${event.description}</p>
+            <div style="border-top:1px solid #F1F5F9;padding-top:12px;margin-top:12px;">
+              <span style="display:block;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Description</span>
+              <p style="margin:0;font-size:13px;color:#334155;line-height:1.5;">${event.description}</p>
             </div>
           ` : ''}
         </div>
 
-        <div>
-          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;box-shadow:0 3px 12px rgba(234, 88, 12, 0.25);">View Event Details</a>
+        <div style="margin-top:24px;">
+          <a href="${APP_URL}" style="display:inline-block;background:#FF5533;color:#FFFFFF;padding:10px 24px;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;">View Event Details</a>
         </div>
       `
     });
@@ -245,13 +263,14 @@ async function sendAccountApprovalEmail(userEmail, userName = 'COE Member') {
       subject: `Account Verified`,
       preheader: `Your account has been verified by the admin. You can now log into the portal.`,
       content: `
-        <div style="margin-bottom:18px;">
-          <span style="display:inline-block;background:#ffedd5;color:#c2410c;border:1px solid #fed7aa;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">Account Verified</span>
+        <div style="margin-bottom:16px;padding-left:12px;border-left:3px solid #16A34A;">
+          <span style="display:block;font-size:10px;font-weight:700;color:#64748B;letter-spacing:1px;text-transform:uppercase;">ACCOUNT</span>
+          <span style="font-size:14px;font-weight:700;color:#16A34A;">VERIFIED & ACTIVE</span>
         </div>
-        <h2 style="margin:0 0 10px;color:#7c2d12;font-size:20px;font-weight:700;line-height:1.3;">Welcome, ${userName}</h2>
-        <p style="margin:0 0 28px;color:#431407;font-size:14px;line-height:1.6;max-width:420px;margin-left:auto;margin-right:auto;">Your account has been verified by the council admin. You may now log in to access the student portal.</p>
-        <div>
-          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;box-shadow:0 3px 12px rgba(234, 88, 12, 0.25);">Log In to Portal</a>
+        <h2 style="margin:0 0 8px;color:#0F172A;font-size:18px;font-weight:700;line-height:1.3;text-align:left;">Welcome, ${userName}</h2>
+        <p style="margin:0 0 20px;color:#475569;font-size:14px;line-height:1.6;text-align:left;">Your account has been verified by the council administration. You may now log in to access the COE student & academic portal.</p>
+        <div style="margin-top:24px;">
+          <a href="${APP_URL}" style="display:inline-block;background:#FF5533;color:#FFFFFF;padding:10px 24px;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;">Log In to Portal</a>
         </div>
       `
     });
@@ -272,44 +291,140 @@ async function sendAccountApprovalEmail(userEmail, userName = 'COE Member') {
 }
 
 /**
- * Sends a load approval status email to a student via Brevo API (HTTP).
- * status: 'approved' | 'returned' | 'rejected' | 'encoded'
+ * Sends an enrollment status email to a student via Brevo API (HTTP).
+ * Minimalist institutional format with clean left-accent status lines,
+ * student metadata, per-subject unit counts, and total units calculation.
  */
-async function sendLoadStatusEmail({ to, name = 'COE Student', status, studentName, term, lines = [], changes = null }) {
+async function sendLoadStatusEmail({ to, name = 'COE Student', status, milestone, studentName, course = null, term, lines = [], items = null, totalUnits = null, changes = null }) {
   try {
     const apiInstance = getBrevoApi();
     if (!apiInstance) return { sent: 0, reason: 'Brevo API key missing' };
     if (!to) return { sent: 0, reason: 'No recipient email provided' };
 
-    const headlines = {
-      approved: 'Load Approved',
-      returned: 'Load Returned for Changes',
-      rejected: 'Load Rejected',
-      encoded:  'Load Encoded',
+    const statusConfig = {
+      approved: { label: 'LOAD VERIFIED', color: '#16A34A' },
+      encoded:  { label: 'LOAD ENCODED', color: '#FF5533' },
+      returned: { label: 'LOAD RETURNED', color: '#D97706' },
+      rejected: { label: 'LOAD REJECTED', color: '#DC2626' },
     };
-    const changeHtml = changes
-      ? `<p style="margin:8px 0;"><strong>Changes by your Program Head:</strong></p>
-         <ul style="margin:8px 0;padding-left:20px;">${changes.map(c => `<li>${c}</li>`).join('')}</ul>`
+
+    const phase = milestone === 'encoded' ? 'encoded' : (status === 'approved' ? 'verified' : status);
+    const cfg = statusConfig[phase] || statusConfig[status] || { label: 'LOAD UPDATE', color: '#FF5533' };
+
+    const heading = phase === 'verified'
+      ? `Your Program Head has <strong>verified</strong> your load for <strong>${term}</strong>.`
+      : phase === 'encoded'
+        ? `Your submitted load for <strong>${term}</strong> was <strong>Load Encoded</strong>.`
+        : `Your load for <strong>${term}</strong> has been marked ${cfg.label.toLowerCase()}.`;
+    const subline = phase === 'verified'
+      ? 'These are the final subjects you will enroll this semester.'
+      : phase === 'encoded'
+        ? 'Your enrollment inside this system is complete. The next step — assessment and claiming — happens at the University Registrar, outside this system.'
+        : '';
+    const listHeader = phase === 'encoded' ? 'Encoded Course Load' : (phase === 'verified' ? 'Final Verified Course Load' : 'Submitted Course Load');
+
+    // Build structured items list
+    let itemList = [];
+    if (items && Array.isArray(items) && items.length) {
+      itemList = items;
+    } else if (lines && Array.isArray(lines) && lines.length) {
+      itemList = lines.map(lineStr => {
+        const parts = String(lineStr).split(' - ');
+        return {
+          code: parts[0] || lineStr,
+          title: parts.slice(1).join(' - ') || '',
+          units: null,
+        };
+      });
+    }
+
+    // Calculate total units if not explicitly passed
+    let calculatedUnits = totalUnits;
+    if (calculatedUnits === null || calculatedUnits === undefined) {
+      const sum = itemList.reduce((acc, i) => acc + (Number(i.units) || 0), 0);
+      if (sum > 0) calculatedUnits = sum;
+    }
+
+    const changeHtml = changes && changes.length
+      ? `<div style="margin:16px 0;padding:12px;border-left:3px solid #D97706;background:#FFFBEB;text-align:left;">
+           <div style="font-size:11px;font-weight:700;color:#B45309;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Changes by Program Head</div>
+           <ul style="margin:0;padding-left:18px;color:#78350F;font-size:13px;line-height:1.5;">${changes.map(c => `<li style="margin-bottom:3px;">${c}</li>`).join('')}</ul>
+         </div>`
       : '';
-    const listHtml = lines.length
-      ? `<ul style="margin:8px 0;padding-left:20px;">${lines.map(l => `<li>${l}</li>`).join('')}</ul>`
+
+    // Metadata summary table (Student, Program, Term, Total Units)
+    const metaHtml = `
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:12px 14px;text-align:left;">
+        <tr>
+          <td style="padding:3px 0;font-size:12px;color:#64748B;">Student:</td>
+          <td align="right" style="padding:3px 0;font-size:12px;font-weight:700;color:#0F172A;">${studentName}</td>
+        </tr>
+        ${course ? `
+          <tr>
+            <td style="padding:3px 0;font-size:12px;color:#64748B;">Program:</td>
+            <td align="right" style="padding:3px 0;font-size:12px;font-weight:700;color:#0F172A;">${course}</td>
+          </tr>
+        ` : ''}
+        <tr>
+          <td style="padding:3px 0;font-size:12px;color:#64748B;">Academic Term:</td>
+          <td align="right" style="padding:3px 0;font-size:12px;font-weight:700;color:#0F172A;">${term}</td>
+        </tr>
+        ${calculatedUnits !== null ? `
+          <tr>
+            <td style="padding:3px 0;font-size:12px;color:#64748B;">Total Units Enrolled:</td>
+            <td align="right" style="padding:3px 0;font-size:13px;font-weight:800;color:#FF5533;">${calculatedUnits} Units</td>
+          </tr>
+        ` : ''}
+      </table>
+    `;
+
+    const listHtml = itemList && itemList.length
+      ? `<div style="margin:20px 0 24px;border-top:1px solid #E2E8F0;padding-top:16px;text-align:left;">
+           <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
+             <tr>
+               <td style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.8px;">${listHeader}</td>
+               ${calculatedUnits !== null ? `<td align="right" style="font-size:11px;font-weight:700;color:#FF5533;text-transform:uppercase;letter-spacing:0.5px;">Total: ${calculatedUnits} Units</td>` : ''}
+             </tr>
+           </table>
+           <table width="100%" cellpadding="0" cellspacing="0" border="0">
+             ${itemList.map(i => `
+               <tr>
+                 <td style="padding:6px 0;border-bottom:1px solid #F1F5F9;color:#1E293B;font-size:13px;line-height:1.5;">
+                   <span style="color:#FF5533;font-weight:700;margin-right:6px;">•</span> <strong>${i.code || ''}</strong>${i.title ? ` - ${i.title}` : ''}${i.addedByHead ? ' <span style="color:#D97706;font-size:11px;">(added by Program Head)</span>' : ''}
+                 </td>
+                 ${i.units ? `<td width="65" align="right" style="padding:6px 0;border-bottom:1px solid #F1F5F9;color:#64748B;font-size:12px;font-weight:600;white-space:nowrap;">${i.units} units</td>` : ''}
+               </tr>
+             `).join('')}
+           </table>
+           ${calculatedUnits !== null ? `
+             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:10px;border-top:2px solid #E2E8F0;padding-top:8px;">
+               <tr>
+                 <td style="font-size:13px;font-weight:700;color:#0F172A;">Total Academic Load</td>
+                 <td align="right" style="font-size:14px;font-weight:800;color:#FF5533;">${calculatedUnits} Units</td>
+               </tr>
+             </table>
+           ` : ''}
+         </div>`
       : '';
 
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sendSmtpEmail.subject = `${headlines[status] || 'Load Update'}: COE LGU Portal`;
+    sendSmtpEmail.subject = `[COE Portal] ${cfg.label} - ${term}`;
     sendSmtpEmail.htmlContent = buildEmailTemplate({
-      subject: headlines[status] || 'Load Update',
-      preheader: `${studentName} - load for ${term}`,
+      subject: `${cfg.label}: COE LGU Portal`,
+      preheader: `${studentName} — ${calculatedUnits ? `${calculatedUnits} Units — ` : ''}${term}`,
       content: `
-        <div style="margin-bottom:18px;">
-          <span style="display:inline-block;background:#ffedd5;color:#c2410c;border:1px solid #fed7aa;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">${headlines[status] || 'Load Update'}</span>
+        <div style="margin-bottom:16px;padding-left:12px;border-left:3px solid ${cfg.color};text-align:left;">
+          <span style="display:block;font-size:10px;font-weight:700;color:#64748B;letter-spacing:1px;text-transform:uppercase;">ENROLLMENT STATUS</span>
+          <span style="font-size:14px;font-weight:700;color:${cfg.color};">${cfg.label}</span>
         </div>
-        <p style="margin:0 0 12px;color:#431407;font-size:14px;">Hi ${studentName},</p>
-        <p style="margin:0 0 12px;color:#431407;font-size:14px;line-height:1.6;">Your submitted load for <strong>${term}</strong> was <strong>${headlines[status] || status}</strong>.</p>
+        <p style="margin:0 0 8px;color:#0F172A;font-size:15px;font-weight:600;text-align:left;">Hi ${studentName},</p>
+        <p style="margin:0 0 12px;color:#334155;font-size:14px;line-height:1.6;text-align:left;">${heading}</p>
+        ${subline ? `<p style="margin:0 0 14px;color:#64748B;font-size:13px;line-height:1.6;text-align:left;">${subline}</p>` : ''}
+        ${metaHtml}
         ${changeHtml}
         ${listHtml}
-        <div style="margin-top:16px;">
-          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;box-shadow:0 3px 12px rgba(234, 88, 12, 0.25);">Open the portal</a>
+        <div style="margin-top:24px;">
+          <a href="${APP_URL}" style="display:inline-block;background:#FF5533;color:#FFFFFF;padding:10px 24px;border-radius:6px;text-decoration:none;font-weight:600;font-size:13px;">Open the portal</a>
         </div>`
     });
 
@@ -320,7 +435,7 @@ async function sendLoadStatusEmail({ to, name = 'COE Student', status, studentNa
     sendSmtpEmail.to = [{ email: to, name }];
 
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log(`[Email] Load status email (${status}) sent to ${to} via Brevo: ${data.messageId}`);
+    console.log(`[Email] Load status email (${phase}) sent to ${to} via Brevo: ${data.messageId}`);
     return { sent: 1, messageId: data.messageId };
   } catch (err) {
     logError('Email Load Status Error', err);
@@ -328,4 +443,4 @@ async function sendLoadStatusEmail({ to, name = 'COE Student', status, studentNa
   }
 }
 
-module.exports = { sendAnnouncementEmail, sendNewEventEmail, sendAccountApprovalEmail, sendLoadStatusEmail };
+module.exports = { buildEmailTemplate, sendAnnouncementEmail, sendNewEventEmail, sendAccountApprovalEmail, sendLoadStatusEmail };
