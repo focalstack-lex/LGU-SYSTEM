@@ -1,0 +1,402 @@
+[
+ {
+  "view": "nav",
+  "kind": "info",
+  "text": "sidebar items: Dashboard | Events | Transactions | Total Income | Reports | Academic Progress | Enrollment Verification | Career Passport"
+ },
+ {
+  "view": "dashboard",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "dashboard",
+  "kind": "copy",
+  "text": "12 em/en dash(es) in visible copy"
+ },
+ {
+  "view": "dashboard",
+  "kind": "type",
+  "text": "18 text node(s) under 11px"
+ },
+ {
+  "view": "dashboard",
+  "kind": "info",
+  "text": "headings: Financial Dashboard | ₱94,685.00 | ₱191,300.00 | ₱84,315.00 | ₱20,000.00 | Recent Transactions | Announcements"
+ },
+ {
+  "view": "keyboard",
+  "kind": "info",
+  "text": "first nav item reached after 1 Tabs (Dashboard); first main-content control after 13 Tabs (AVAILABLE GENERAL FUND\n\n₱94,68)"
+ },
+ {
+  "view": "dashboard",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "dashboard",
+  "kind": "copy",
+  "text": "12 em/en dash(es) in visible copy"
+ },
+ {
+  "view": "dashboard",
+  "kind": "type",
+  "text": "18 text node(s) under 11px"
+ },
+ {
+  "view": "dashboard",
+  "kind": "info",
+  "text": "buttons: AVAILABLE GENERAL FUND ₱94,685.00 Immedi | TOTAL INCOME ₱191,300.00 All received fu | TOTAL EXPENSES ₱84,315.00 Total spent | TOTAL DONATIONS ₱20,000.00 Sponsor gifts"
+ },
+ {
+  "view": "events",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "events",
+  "kind": "copy",
+  "text": "2 em/en dash(es) in visible copy"
+ },
+ {
+  "view": "event-detail",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "event-detail",
+  "kind": "empty",
+  "text": "No transactions recorded yet."
+ },
+ {
+  "view": "event-detail",
+  "kind": "info",
+  "text": "headings: Engineering Week 2026 | ₱85,000.00 | ₱71,400.00 | ₱71,400.00 | Transaction History | buttons: Back"
+ },
+ {
+  "view": "event-detail",
+  "kind": "info",
+  "text": "back link present"
+ },
+ {
+  "view": "transactions",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "transactions",
+  "kind": "copy",
+  "text": "12 em/en dash(es) in visible copy"
+ },
+ {
+  "view": "transactions",
+  "kind": "flow",
+  "text": "search with no match shows: \"Aug 26, 2026\tEngineering Week 2026\t\nExpense\n\tStage & sounds rental — Engineering Week\t-₱18,500.00\t\nView\n\tM. Santos\nAug 2\""
+ },
+ {
+  "view": "transactions",
+  "kind": "info",
+  "text": "receipt viewer: {\"shown\":true,\"text\":\"Official Receipt Stage & sounds rental — Engineering Week Receipt preview unavailable The document or image could not be loaded. Please check your connection or try again. Retry ₱18,500.00 Aug 26, 202\"}"
+ },
+ {
+  "view": "transactions",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "transactions",
+  "kind": "copy",
+  "text": "12 em/en dash(es) in visible copy"
+ },
+ {
+  "view": "transactions",
+  "kind": "info",
+  "text": "edit/delete buttons visible to student: 0"
+ },
+ {
+  "view": "income",
+  "kind": "stuck",
+  "text": "1 loader(s) still showing after wait"
+ },
+ {
+  "view": "income",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "reports",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "reports",
+  "kind": "copy",
+  "text": "1 em/en dash(es) in visible copy"
+ },
+ {
+  "view": "reports",
+  "kind": "info",
+  "text": "buttons: All Time"
+ },
+ {
+  "view": "units",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "units",
+  "kind": "type",
+  "text": "2 text node(s) under 11px"
+ },
+ {
+  "view": "units",
+  "kind": "info",
+  "text": "headings: Student Dashboard | Graduation Progress | buttons: Computer Engineering | All | Year 1 | Year 2 | Year 3 | Year 4 | Download Standing (PDF) | Enrolled This Semester 1st Sem, AY 2026- | Select Multiple | Edit record | Remove record | Edit record | Remove record | Edit record | Remove record"
+ },
+ {
+  "view": "units",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "units",
+  "kind": "type",
+  "text": "2 text node(s) under 11px"
+ },
+ {
+  "view": "units",
+  "kind": "flow",
+  "text": "log subject modal: {\"visible\":true,\"fields\":[\"SCHOOL YEAR\",\"SEMESTER\",\"STATUS\",\"GRADE (1.0 - 5.0)\",\"Laboratory Status\",\"Laboratory Grade (1.0 - 5.0)\",\"SCHEDULE (OPTIONAL)\",\"INSTRUCTOR (OPTIONAL)\"]}"
+ },
+ {
+  "view": "units",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "units",
+  "kind": "type",
+  "text": "2 text node(s) under 11px"
+ },
+ {
+  "view": "enrollment",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "enrollment",
+  "kind": "type",
+  "text": "5 text node(s) under 11px"
+ },
+ {
+  "view": "enrollment",
+  "kind": "info",
+  "text": "headings: Enrollment Verification | Enrollment Status | Proposed Load | Eligible Courses for this Semester | buttons: Submit to Program Head | Remove CPE 312 | Both Semesters (5) | 3rd Year (5) | Add to Load | Add to Load | Add to Load | Add to Load"
+ },
+ {
+  "view": "enrollment",
+  "kind": "action",
+  "text": "POST item CPE 313"
+ },
+ {
+  "view": "enrollment",
+  "kind": "flow",
+  "text": "after Add to Load: 2 item(s) in proposed load"
+ },
+ {
+  "view": "enrollment",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "enrollment",
+  "kind": "type",
+  "text": "5 text node(s) under 11px"
+ },
+ {
+  "view": "enrollment",
+  "kind": "action",
+  "text": "DELETE item it-sub-313"
+ },
+ {
+  "view": "enrollment",
+  "kind": "flow",
+  "text": "after Remove: 1 item(s)"
+ },
+ {
+  "view": "enrollment",
+  "kind": "flow",
+  "text": "native confirm: \"Submit 1 subject (3 units) to the BSCoE Program Head?\""
+ },
+ {
+  "view": "enrollment",
+  "kind": "action",
+  "text": "POST submit"
+ },
+ {
+  "view": "enrollment",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "enrollment",
+  "kind": "type",
+  "text": "5 text node(s) under 11px"
+ },
+ {
+  "view": "enrollment",
+  "kind": "flow",
+  "text": "after submit, status copy: Build your load With your Program Head Verified: Final Load Encoded: Complete"
+ },
+ {
+  "view": "notifications",
+  "kind": "flow",
+  "text": "no notification bell found"
+ },
+ {
+  "view": "profile",
+  "kind": "info",
+  "text": "{\"fields\":[\"FULL NAME\",\"DEGREE PROGRAM\",\"YEAR LEVEL\",\"ENROLLMENT YEAR\",\"AVATAR INITIAL\",\"New Password\",\"Confirm New Password\"],\"disabled\":[],\"tabs\":[\"Personal & Academic\",\"Security & Password\"]}"
+ },
+ {
+  "view": "profile",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "profile",
+  "kind": "type",
+  "text": "5 text node(s) under 11px"
+ },
+ {
+  "view": "grizz",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "grizz",
+  "kind": "type",
+  "text": "5 text node(s) under 11px"
+ },
+ {
+  "view": "grizz",
+  "kind": "info",
+  "text": "prompts: Next Sem Recommendations View eligible subjects ba | Current Subjects Overview Review enrolled subjects | Academic Progress Tally Check completed units towa | Prerequisites Check Verify subject standing and co"
+ },
+ {
+  "view": "theme",
+  "kind": "flow",
+  "text": "no visible theme toggle on desktop"
+ },
+ {
+  "view": "career",
+  "kind": "info",
+  "text": "Career Passport nav href: /cv-builder"
+ },
+ {
+  "view": "network",
+  "kind": "error",
+  "text": "401 GET /api/cv/me"
+ },
+ {
+  "view": "cv-builder",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: nav-income"
+ },
+ {
+  "view": "cv-builder",
+  "kind": "type",
+  "text": "5 text node(s) under 11px"
+ },
+ {
+  "view": "errors",
+  "kind": "error",
+  "text": "console: Failed to load resource: net::ERR_FAILED"
+ },
+ {
+  "view": "errors",
+  "kind": "error",
+  "text": "console: Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+ },
+ {
+  "view": "mobile-dashboard",
+  "kind": "copy",
+  "text": "12 em/en dash(es) in visible copy"
+ },
+ {
+  "view": "mobile-dashboard",
+  "kind": "type",
+  "text": "24 text node(s) under 11px"
+ },
+ {
+  "view": "mobile-nav",
+  "kind": "info",
+  "text": "bottom nav: Home 68x48 | Events 68x48 | Academic 68x48 | Reports 68x48 | More 68x48"
+ },
+ {
+  "view": "mobile-events",
+  "kind": "copy",
+  "text": "2 em/en dash(es) in visible copy"
+ },
+ {
+  "view": "mobile-transactions",
+  "kind": "copy",
+  "text": "11 em/en dash(es) in visible copy"
+ },
+ {
+  "view": "mobile-transactions",
+  "kind": "touch",
+  "text": "targets under 32px: Receipt 65x15, Receipt 65x15, Receipt 65x15, Receipt 65x15, Receipt 50x15, Receipt 50x15, Receipt 50x15, Receipt 50x15, Receipt 50x15, Previous 95x32, Next 67x32"
+ },
+ {
+  "view": "mobile-reports",
+  "kind": "copy",
+  "text": "1 em/en dash(es) in visible copy"
+ },
+ {
+  "view": "mobile-reports",
+  "kind": "type",
+  "text": "11 text node(s) under 11px"
+ },
+ {
+  "view": "mobile-units",
+  "kind": "type",
+  "text": "2 text node(s) under 11px"
+ },
+ {
+  "view": "mobile-units",
+  "kind": "touch",
+  "text": "targets under 32px: All 60x27, Year 1 60x27, Year 2 60x27, Year 3 60x27, Year 4 60x27, Edit record 26x24, Remove record 26x24, Edit record 26x24, Remove record 26x24, Edit record 26x24, Remove record 26x24, Edit record 26x24"
+ },
+ {
+  "view": "mobile-enrollment",
+  "kind": "type",
+  "text": "5 text node(s) under 11px"
+ },
+ {
+  "view": "mobile-enrollment",
+  "kind": "touch",
+  "text": "targets under 32px: Add to Load 97x25, Add to Load 97x25, Add to Load 97x25, Add to Load 97x25"
+ },
+ {
+  "view": "mobile-more",
+  "kind": "leak",
+  "text": "staff-only UI visible to student: bottom-nav-executive-portal"
+ },
+ {
+  "view": "mobile-more",
+  "kind": "type",
+  "text": "5 text node(s) under 11px"
+ },
+ {
+  "view": "mobile-more",
+  "kind": "info",
+  "text": "sheet rows: Enrollment Build & track your proposed l | Career Passport (CV Builder) Harvard-sty | Transactions Ledger Recent transactions  | Total Income Tracker Breakdown & incomin | Executive Portal Officer fund administra | Profile & Settings Avatar, degree progra"
+ },
+ {
+  "view": "mobile-errors",
+  "kind": "error",
+  "text": "console: Failed to load resource: net::ERR_FAILED"
+ }
+]

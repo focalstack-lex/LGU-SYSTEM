@@ -219,6 +219,9 @@ export async function routeMocks(page, receipt, { verbose = false } = {}) {
   await page.route(/\/api\/events\/[^/]+$/, r => { hit('api/events/detail'); reply(r, json(EVENTS[0])); });
   await page.route(/\/api\/events(\?.*)?$/, r => { hit('api/events'); reply(r, json(EVENTS)); });
   await page.route(/\/api\/announcements/, r => { hit('api/announcements'); reply(r, json(ANNOUNCEMENTS)); });
+  await page.route(/\/api\/notifications\/read/, r => { hit('api/notifications/read'); reply(r, json({ ok: true })); });
+  await page.route(/\/api\/notifications/, r => { hit('api/notifications'); reply(r, json({ total_unread: 0, unread_by_category: { events: 0, transactions: 0, reports: 0, announcements: 0, units: 0, system: 0 }, notifications: [] })); });
+  await page.route(/\/api\/enrollment\/pilot-status/, r => { hit('api/enrollment/pilot-status'); reply(r, json({ pilot: true })); });
   await page.route(/\/api\/units\/my/, r => { hit('api/units/my'); reply(r, json({ subjects: [] })); });
   await page.route(/\/api\/units\/checklists/, r => { hit('api/units/checklists'); reply(r, json({ subjects: [], requirements: [] })); });
   await page.route(/\/api\/admin\/users/, r => { hit('api/admin/users'); reply(r, json(ADMIN_USERS)); });

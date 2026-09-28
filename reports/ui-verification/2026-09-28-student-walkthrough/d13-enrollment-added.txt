@@ -1,0 +1,34 @@
+{
+ "headings": [
+  "Enrollment Verification",
+  "Enrollment Status",
+  "Proposed Load",
+  "Eligible Courses for this Semester"
+ ],
+ "buttons": [
+  "Submit to Program Head",
+  "Remove CPE 312",
+  "Remove CPE 313",
+  "Both Semesters (5)",
+  "3rd Year (5)",
+  "Add to Load",
+  "Add to Load",
+  "Add to Load"
+ ],
+ "loaders": 0,
+ "empties": [],
+ "staffLeak": [
+  "nav-income"
+ ],
+ "overflow": false,
+ "dashes": 0,
+ "tiny": 5,
+ "smallTargets": [
+  "Remove CPE 312 31x20",
+  "Remove CPE 313 31x20",
+  "Add to Load 111x25",
+  "Add to Load 111x25",
+  "Add to Load 111x25"
+ ],
+ "text": "Enrollment Verification\nBuild your proposed load, send it to your Program Head for review, and get it encoded by the SA.\nEnrollment Status\nBuild your load\nWith your Program Head\nVerified: Final Load\nEncoded: Complete\nBuild your load\n2 subjects (7 units) in your proposed load. When it's ready, submit it to your BSCoE Program Head for review.\nSubmit to Program Head\nProposed Load\n2026-2027 · Semester 1 · 2 subjects · 7 units\nCPE 312\nPhysics 3.1\nCPE 313\nProgramming 3.1\nEligible Courses for this Semester\nPick the subjects you need. Grizz's recommendations are a great starting point.\nBoth Semesters (5)\n3rd Year (5)\nCPE 312\n3 Units\nPhysics 3.1\nYr 3 • Sem 1\nAdded\nCPE 313\n4 Units\nProgramming 3.1\nYr 3 • Sem 1\nAdded\nCPE 321\n3 Units\nCircuits 3.2\nYr 3 • Sem 2\nAdd to Load\nCPE 322\n3 Units\nDigital Logic 3.2\nYr 3 • Sem 2\nAdd to Load\nCPE 323\n4 Units\nData Structures 3.2\nYr 3 • Sem 2\nAdd to Load"
+}

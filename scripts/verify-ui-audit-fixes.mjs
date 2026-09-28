@@ -247,8 +247,13 @@ async function portal(extraRoutes) {
   const btn = page.locator('#enrollment-submit-btn');
   if (await btn.count()) {
     await btn.dblclick();
+    await page.waitForTimeout(400);
+    // Submit now confirms through the in-app dialog: a double click must open
+    // exactly one dialog, and confirming it must send exactly one request.
+    const dialogs = await page.locator('.modal-overlay [role="alertdialog"]').count();
+    await page.click('.modal-overlay [data-action="confirm"]');
     await page.waitForTimeout(1500);
-    check('enrollment double click sends exactly one submit', submitHits === 1, `submit requests: ${submitHits}`);
+    check('enrollment double click opens one dialog and sends exactly one submit', dialogs === 1 && submitHits === 1, `dialogs: ${dialogs}, submit requests: ${submitHits}`);
   } else {
     check('enrollment submit button rendered', false, 'button not found');
   }

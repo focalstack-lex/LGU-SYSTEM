@@ -11,6 +11,10 @@ const EnrollmentSection = (() => {
   const EJ = window.EnrollmentJourney;
 
   let subjects = [];
+  let records = [];         // the student's subject records (newest first)
+  let prereqRows = [];      // structured subject_prerequisites rows
+  let yearLevel = 0;        // 0 = no year window
+  let maxUnits = null;      // curriculum_requirements.max_units_per_term, null = no cap
   let passedCodes = new Set();
   let enrolledCodes = new Set();
   let current = null; // active submission (with items)
@@ -60,12 +64,17 @@ const EnrollmentSection = (() => {
       Api.enrollment.my().catch(() => ({ submissions: [] })),
       Api.units.my().catch(() => []),
     ]);
-    subjects = (checklists.subjects || []).filter(s => !year || s.year_level >= year - 1);
+    // The eligibility window (one year below, retakes from any year) is
+    // applied per render by EJ.eligibleSubjects, so keep the whole checklist.
+    subjects = checklists.subjects || [];
+    records = Array.isArray(myUnits) ? myUnits : [];
+    yearLevel = year;
+    prereqRows = checklists.prerequisites || [];
+    const req = (checklists.requirements || []).find(r => r.program === program);
+    maxUnits = req && req.max_units_per_term != null ? Number(req.max_units_per_term) : null;
 
-    // Eligible courses must exclude anything already passed or currently
-    // enrolled — otherwise completed subjects keep showing as addable.
     const passes = (window.GrizzRecommend && window.GrizzRecommend.classifyPasses)
-      ? window.GrizzRecommend.classifyPasses(myUnits)
+      ? window.GrizzRecommend.classifyPasses(records)
       : null;
     passedCodes = passes ? passes.passedCodes : new Set();
     enrolledCodes = passes ? passes.enrolledCodes : new Set();
@@ -75,6 +84,8 @@ const EnrollmentSection = (() => {
     if (!current) {
       try { current = (await Api.enrollment.createTerm(sy, 1)).submission; } catch { current = null; }
     }
+    // A load belongs to one semester: start the picker on that semester.
+    if (current && current.semester) activeSemFilter = String(current.semester);
 
     fillPicker();
     renderAll();
@@ -114,9 +125,10 @@ const EnrollmentSection = (() => {
   let activeYearFilter = 'all';
   let activeSemFilter = 'all';
 
-  // Curriculum subjects still open to the student (not passed, not enrolled).
+  // Curriculum subjects still open to the student: not passed, not enrolled,
+  // inside the year window, plus failed subjects from any year (retakes).
   function availableSubjects() {
-    return EJ.filterAvailable(subjects, passedCodes, enrolledCodes);
+    return EJ.eligibleSubjects(subjects, records, yearLevel);
   }
 
   function renderFilterSelects() {
@@ -177,13 +189,9 @@ const EnrollmentSection = (() => {
       return String(s.semester) === activeSemFilter;
     });
 
-    const yearCounts = {
-      'all': semFiltered.length,
-      '1': semFiltered.filter(s => Number(s.year_level) === 1).length,
-      '2': semFiltered.filter(s => Number(s.year_level) === 2).length,
-      '3': semFiltered.filter(s => Number(s.year_level) === 3).length,
-      '4': semFiltered.filter(s => Number(s.year_level) === 4).length,
-    };
+    // Retakes count under every year so the counts match what the list shows.
+    const inYear = y => semFiltered.filter(s => s.retake || Number(s.year_level) === y).length;
+    const yearCounts = { 'all': semFiltered.length, '1': inYear(1), '2': inYear(2), '3': inYear(3), '4': inYear(4) };
 
     const options = [
       { key: 'all', label: 'All Year Levels' },
@@ -236,8 +244,9 @@ const EnrollmentSection = (() => {
     const canEdit = EJ.canEdit(current);
     const pool = availableSubjects();
 
+    // A retake is a state, not a year: it stays visible under every year filter.
     const filtered = pool.filter(s => {
-      const matchYear = activeYearFilter === 'all' || String(s.year_level) === activeYearFilter;
+      const matchYear = s.retake || activeYearFilter === 'all' || String(s.year_level) === activeYearFilter;
       const matchSem = activeSemFilter === 'all' || String(s.semester) === activeSemFilter;
       return matchYear && matchSem;
     });
@@ -264,21 +273,31 @@ const EnrollmentSection = (() => {
     listEl.innerHTML = filtered.map(s => {
       const isAdded = taken.has(s.id);
       const unitsLabel = `${s.units || 3} Units`;
+      const unmet = EJ.unmetPrerequisites(s, prereqRows, passedCodes);
+      const blocked = unmet.length > 0;
+      const cardClass = ['eligible-course-card', isAdded ? 'course-is-added' : '', blocked ? 'course-is-blocked' : ''].join(' ').trim();
+      const note = blocked
+        ? `<p class="eligible-course-note"><iconify-icon icon="solar:lock-linear" aria-hidden="true"></iconify-icon> Needs ${unmet.map(esc).join(', ')}</p>`
+        : '';
 
       return `
-        <div class="eligible-course-card ${isAdded ? 'course-is-added' : ''}">
+        <div class="${cardClass}">
           <div class="eligible-course-head">
             <span class="eligible-course-code">${esc(s.code)}</span>
-            <span class="eligible-units-badge">${unitsLabel}</span>
+            <span class="eligible-course-badges">
+              ${s.retake ? '<span class="eligible-retake-badge">Retake</span>' : ''}
+              <span class="eligible-units-badge">${unitsLabel}</span>
+            </span>
           </div>
           <div class="eligible-course-title" title="${esc(s.title)}">${esc(s.title)}</div>
+          ${note}
           <div class="eligible-course-footer">
             <span class="eligible-course-term">
               <iconify-icon icon="solar:calendar-linear"></iconify-icon> Yr ${s.year_level} • Sem ${s.semester}
             </span>
             ${isAdded
               ? `<span class="course-added-tag"><iconify-icon icon="solar:check-circle-bold"></iconify-icon> Added</span>`
-              : `<button type="button" class="btn-add-course" data-add-subject="${s.id}" ${canEdit ? '' : 'disabled'}>
+              : `<button type="button" class="btn-add-course" data-add-subject="${s.id}" ${canEdit && !blocked ? '' : 'disabled'} aria-label="Add ${esc(s.code)} to load"${blocked ? ` title="Pass ${unmet.map(esc).join(', ')} first"` : ''}>
                   <iconify-icon icon="solar:add-circle-linear"></iconify-icon> Add to Load
                 </button>`
             }
@@ -289,8 +308,12 @@ const EnrollmentSection = (() => {
 
     listEl.querySelectorAll('[data-add-subject]').forEach(btn => {
       btn.addEventListener('click', async () => {
-        btn.disabled = true;
         const subjectId = btn.dataset.addSubject;
+        const subject = subjects.find(s => s.id === subjectId);
+        // Refuse the other semester's subject before any request is sent.
+        const mismatch = EJ.semesterMismatch(subject, current);
+        if (mismatch) { show(mismatch); return; }
+        btn.disabled = true;
         const res = await addItem(subjectId);
         if (!res.ok) {
           btn.disabled = false;
@@ -309,9 +332,13 @@ const EnrollmentSection = (() => {
 
     const termEl = document.getElementById('enrollment-term-line');
     if (termEl) {
+      const load = EJ.loadUnits(current, maxUnits);
+      const unitsText = load.cap != null ? `${load.total} of ${load.cap} units` : `${total} units`;
       termEl.textContent = current
-        ? `${current.school_year} · Semester ${current.semester} · ${items.length} subject${items.length === 1 ? '' : 's'} · ${total} units`
+        ? `${current.school_year} · Semester ${current.semester} · ${items.length} subject${items.length === 1 ? '' : 's'} · ${unitsText}`
         : '';
+      termEl.classList.toggle('is-over-cap', load.over);
+      if (load.over) termEl.textContent += ` (limit is ${load.cap})`;
     }
 
     itemsEl.innerHTML = items.map(i => `
@@ -329,7 +356,17 @@ const EnrollmentSection = (() => {
           : '<p class="enrollment-empty">No subjects in your proposed load.</p>');
 
     itemsEl.querySelectorAll('[data-remove-item]').forEach(btn =>
-      btn.addEventListener('click', () => removeItem(btn.dataset.removeItem)));
+      btn.addEventListener('click', async () => {
+        const item = items.find(i => i.id === btn.dataset.removeItem);
+        const code = item?.subjects?.code || 'this subject';
+        const ok = await UI.confirmDialog({
+          title: `Remove ${code} from your load?`,
+          message: 'You can add it back from the eligible courses while the load is still a draft.',
+          confirmLabel: 'Remove',
+          danger: true,
+        });
+        if (ok) removeItem(btn.dataset.removeItem);
+      }));
 
     // Locked hint under the draft list
     const lockedNote = document.getElementById('enrollment-locked-note');
@@ -485,7 +522,10 @@ const EnrollmentSection = (() => {
 
   function renderAction() {
     const action = EJ.actionFor(current);
-    const hint = action.hint ? `<p class="ev-action-hint">${esc(action.hint)}</p>` : '';
+    // The waiting states already say "you will be notified" in the status
+    // body above; repeating it here read as two identical sentences.
+    const waiting = current && (current.status === 'submitted' || current.status === 'under_review');
+    const hint = action.hint && !waiting ? `<p class="ev-action-hint">${esc(action.hint)}</p>` : '';
     if (action.kind === 'submit') {
       return `<button type="button" class="btn btn-primary" id="enrollment-submit-btn">
                 <iconify-icon icon="solar:plain-3-linear" style="font-size:1.1rem;"></iconify-icon>
@@ -525,14 +565,29 @@ const EnrollmentSection = (() => {
   }
 
   let _submitting = false;
+  let _confirming = false; // the confirm dialog is open: a second click must not open another
 
   async function submit() {
-    if (!current || !EJ.canEdit(current) || _submitting) return;
+    if (!current || !EJ.canEdit(current) || _submitting || _confirming) return;
     clearError();
     const items = EJ.activeItems(current);
     if (!items.length) { show('Add at least one subject before submitting.'); return; }
-    const total = items.reduce((sum, i) => sum + Number(i.subjects?.units || 0), 0);
-    const ok = window.confirm(`Submit ${items.length} subject${items.length === 1 ? '' : 's'} (${total} units) to the ${program} Program Head?`);
+    const load = EJ.loadUnits(current, maxUnits);
+    if (load.over) {
+      show(`Your load is ${load.total} units; the limit for ${program} is ${load.cap}. Remove a subject before submitting.`);
+      return;
+    }
+    _confirming = true;
+    let ok = false;
+    try {
+      ok = await UI.confirmDialog({
+        title: 'Submit your load for review?',
+        message: `${items.length} subject${items.length === 1 ? '' : 's'} (${load.total} units) will go to your ${program} Program Head. You cannot edit the load while they review it.`,
+        confirmLabel: 'Submit to Program Head',
+      });
+    } finally {
+      _confirming = false;
+    }
     if (!ok) return;
     // Lock before the await so a double click cannot send two submissions.
     _submitting = true;
@@ -542,6 +597,7 @@ const EnrollmentSection = (() => {
     try {
       const { submission } = await Api.enrollment.submit(current.id);
       current = submission;
+      fillPicker(); // course cards must re-render as locked
       renderAll();
       UI.toast('Load submitted for verification.', 'success');
     } catch (err) {

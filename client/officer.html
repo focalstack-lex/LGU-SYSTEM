@@ -17,13 +17,14 @@
   <link rel="icon" type="image/png" href="assets/coe-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=7.9" />
+  <link rel="stylesheet" href="styles/main.css?v=8.0" />
   <link rel="stylesheet" href="styles/officer.css?v=6.7" />
   <script src="vendor/iconify-icon.min.js"></script>
   <script src="vendor/icons-bundle.js?v=2"></script>
   <script src="js/init-theme.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
   <!-- Access gate: filled by officer-app.js; students/unauthenticated never see data -->
   <div id="of-gate" class="of-gate hidden">
@@ -119,7 +120,7 @@
     </aside>
 
     <!-- Main content -->
-    <main class="of-main">
+    <main class="of-main" id="main-content" tabindex="-1">
 
       <!-- 1. Fund Overview -->
       <section class="of-view active" id="of-view-overview">
@@ -1159,13 +1160,13 @@
   <script src="js/swr-cache.js"></script>
   <script src="js/roster.js?v=5.3"></script>
   <script src="js/auth.js?v=5.5"></script>
-  <script src="js/api.js?v=5.3"></script>
-  <script src="js/ui.js?v=5.9"></script>
+  <script src="js/api.js?v=5.4"></script>
+  <script src="js/ui.js?v=5.10"></script>
   <script src="js/receipt-capture.js?v=5.3"></script>
   <script src="js/receipt-modal.js?v=5.4"></script>
   <script src="js/dropdown.js?v=5.4"></script>
-  <script src="js/profile.js?v=5.4"></script>
-  <script src="js/notifications.js?v=5.3"></script>
+  <script src="js/profile.js?v=5.5"></script>
+  <script src="js/notifications.js?v=5.4"></script>
   <script src="js/officer/curriculum.js?v=1.1"></script>
   <script src="js/officer/officer-app.js?v=6.6"></script>
   <script src="js/sw-register.js"></script>

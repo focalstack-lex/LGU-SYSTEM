@@ -183,6 +183,12 @@ const Api = (() => {
     create: (body)   => _request('POST', '/announcements', body),
   };
 
+  // In-app notifications for the signed-in user (badges + the Notifications page).
+  const notifications = {
+    list:     () => _request('GET', '/notifications', null, false, 15000),
+    markRead: (category) => _request('POST', '/notifications/read', { category }),
+  };
+
   // Enrollment submissions (Phase B): student draft/submit flow.
   const enrollment = {
     my:        () => _request('GET', '/enrollment/submissions/my', null, false, 15000),
@@ -634,6 +640,7 @@ const Api = (() => {
   };
 
   return {
+    notifications,
     events,
     transactions,
     reports,

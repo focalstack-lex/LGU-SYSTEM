@@ -203,7 +203,7 @@ const Events = (() => {
             <div class="stat-icon"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></div>
             <div class="stat-body">
               <p class="stat-label">Budget Utilization</p>
-              <h3 class="stat-value">${UI.currency(Math.max(0, budget - Number(ev.computed_remaining)))}</h3>
+              <h3 class="stat-value">${budget > 0 ? Math.round((spent / budget) * 100) : 0}%</h3>
               <p class="stat-sublabel" style="font-size:0.75rem;color:var(--text-secondary)">Remaining: ${UI.currency(ev.computed_remaining)}</p>
             </div>
           </div>

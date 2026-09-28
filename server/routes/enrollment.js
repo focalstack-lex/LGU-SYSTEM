@@ -130,12 +130,17 @@ router.post('/submissions/:id/items', async (req, res) => {
 
     const { data: subject } = await supabase
       .from('subjects')
-      .select('id, code, program')
+      .select('id, code, program, semester')
       .eq('id', subject_id)
       .maybeSingle();
     if (!subject) return res.status(404).json({ error: 'Subject not found.' });
     if (subject.program !== req.profile.course) {
       return res.status(400).json({ error: `${subject.code} does not belong to your program.` });
+    }
+    // A load belongs to one semester; the client refuses this first, the
+    // server refuses it for any other caller.
+    if (subject.semester && submission.semester && Number(subject.semester) !== Number(submission.semester)) {
+      return res.status(400).json({ error: `${subject.code} is a Semester ${subject.semester} subject; this load is for Semester ${submission.semester}.` });
     }
 
     const itemOrigin = ORIGINS.includes(origin) ? origin : 'manual';
@@ -200,12 +205,27 @@ router.post('/submissions/:id/submit', async (req, res) => {
       return res.status(400).json({ error: `Cannot submit from ${submission.status}.` });
     }
 
-    const { count } = await supabase
+    const { data: items } = await supabase
       .from('enrollment_submission_items')
-      .select('id', { count: 'exact', head: true })
+      .select('id, item_state, subjects(units)')
       .eq('submission_id', submission.id);
-    if (!count) {
+    const active = (items || []).filter(i => i.item_state !== 'removed_by_head');
+    if (!active.length) {
       return res.status(400).json({ error: 'Add at least one subject before submitting.' });
+    }
+
+    // Unit cap per term from curriculum_requirements.max_units_per_term.
+    // A missing column (migration not applied yet) means no cap, not a crash.
+    const totalUnits = active.reduce((sum, i) => sum + (Number(i.subjects?.units) || 0), 0);
+    const { data: requirement, error: reqErr } = await supabase
+      .from('curriculum_requirements')
+      .select('*')
+      .eq('program', req.profile.course)
+      .maybeSingle();
+    if (reqErr) logError('enrollment/submit/requirements', reqErr);
+    const cap = requirement && requirement.max_units_per_term != null ? Number(requirement.max_units_per_term) : null;
+    if (cap != null && totalUnits > cap) {
+      return res.status(400).json({ error: `Your load is ${totalUnits} units; the limit for ${req.profile.course} is ${cap}.` });
     }
 
     const { data: updated, error } = await supabase

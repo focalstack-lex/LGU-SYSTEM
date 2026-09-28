@@ -96,12 +96,17 @@ const ProfileModal = (() => {
         close();
       }
 
-      // Avatar hero wrap click (toggle/scroll into picker)
-      if (e.target.closest('#avatar-hero-wrap')) {
+      // Avatar hero wrap or "Change avatar" opens the collapsed gallery
+      if (e.target.closest('#avatar-hero-wrap') || e.target.closest('#avatar-picker-toggle')) {
         const picker = document.getElementById('avatar-picker-section');
         if (picker) {
-          picker.classList.toggle('highlighted');
-          picker.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          const open = picker.classList.toggle('is-open');
+          const toggle = document.getElementById('avatar-picker-toggle');
+          if (toggle) {
+            toggle.setAttribute('aria-expanded', String(open));
+            toggle.querySelector('span').textContent = open ? 'Hide avatars' : 'Change avatar';
+          }
+          if (open) picker.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       }
 
@@ -377,6 +382,10 @@ const ProfileModal = (() => {
       Dropdowns.syncAll();
     }
 
+    // Verified students cannot change the fields that drive enrollment
+    // eligibility and roster matching; they ask for a correction instead.
+    setAcademicLock(roleKey === 'student' && !!profile?.is_verified);
+
     // Reset password inputs
     const newPass = document.getElementById('profile-new-password');
     const confPass = document.getElementById('profile-confirm-password');
@@ -393,6 +402,21 @@ const ProfileModal = (() => {
 
     renderAvatarGallery(_currentCategory);
     updateSaveButtonState();
+  }
+
+  let _academicLocked = false;
+  function setAcademicLock(locked) {
+    _academicLocked = locked;
+    const courseSelect = document.getElementById('profile-course-select');
+    const enrollInput = document.getElementById('profile-enrollment-year');
+    const note = document.getElementById('profile-lock-note');
+    if (courseSelect) {
+      courseSelect.disabled = locked;
+      const dd = courseSelect.parentElement?.querySelector('.dd');
+      if (dd) dd.classList.toggle('dd-disabled', locked);
+    }
+    if (enrollInput) enrollInput.readOnly = locked;
+    if (note) note.classList.toggle('hidden', !locked);
   }
 
   function renderAvatarElement(element, avatarUrl, fallbackText) {
@@ -444,11 +468,14 @@ const ProfileModal = (() => {
 
       const updates = {
         full_name: fullName,
-        course,
         year_level: yearLevel,
-        enrollment_year: enrollmentYear,
         avatar_url: _selectedAvatarUrl,
       };
+      // Locked fields are never sent, even if the DOM was tampered with.
+      if (!_academicLocked) {
+        updates.course = course;
+        updates.enrollment_year = enrollmentYear;
+      }
 
       const updated = await Auth.updateProfile(userId, updates);
       _currentProfile = updated;

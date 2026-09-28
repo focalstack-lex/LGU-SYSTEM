@@ -125,6 +125,8 @@ function fmt(n) {
 }
 
 function buildReportsHTML(summary, monthly, events) {
+  // Students get the per-event budget table without an export column.
+  const isAdmin = document.body.classList.contains('is-admin');
   const utilized = summary.totalIncome > 0
     ? Math.round((summary.totalExpense / summary.totalIncome) * 100)
     : 0;
@@ -179,8 +181,8 @@ function buildReportsHTML(summary, monthly, events) {
     <!-- Event Reports Table -->
     <div class="dashboard-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <h3 style="margin:0;"><iconify-icon icon="solar:document-text-linear" style="font-size:1.1rem; margin-right:.4rem; vertical-align:middle"></iconify-icon>Export Per-Event Reports</h3>
-        <span style="font-size:.8rem;color:var(--text-secondary);">Admin only</span>
+        <h3 style="margin:0;"><iconify-icon icon="solar:document-text-linear" style="font-size:1.1rem; margin-right:.4rem; vertical-align:middle"></iconify-icon>${isAdmin ? 'Export Per-Event Reports' : 'Per-Event Budgets'}</h3>
+        ${isAdmin ? '<span style="font-size:.8rem;color:var(--text-secondary);">PDF and Excel per event</span>' : ''}
       </div>
       ${events.length === 0
         ? `<div class="empty-state"><iconify-icon icon="solar:info-circle-linear"></iconify-icon> No events found.</div>`
@@ -192,7 +194,7 @@ function buildReportsHTML(summary, monthly, events) {
                 <th>Allocated</th>
                 <th>Remaining</th>
                 <th>Status</th>
-                <th style="text-align:center;">Export</th>
+                ${isAdmin ? '<th style="text-align:center;">Export</th>' : ''}
               </tr>
             </thead>
             <tbody>
@@ -202,7 +204,7 @@ function buildReportsHTML(summary, monthly, events) {
                   <td>${fmt(ev.allocated_budget)}</td>
                   <td>${fmt(ev.computed_remaining || 0)}</td>
                   <td>${UI.renderStatusBadge(ev.status)}</td>
-                  <td style="text-align:center;">
+                  ${isAdmin ? `<td style="text-align:center;">
                     <div style="display:inline-flex;gap:.5rem;">
                       <button class="tx-action-btn admin-only" style="font-size:.8rem;padding:.35rem .8rem;"
                         data-pdf="${ev.id}" data-name="${ev.event_name}">
@@ -213,7 +215,7 @@ function buildReportsHTML(summary, monthly, events) {
                         <iconify-icon icon="solar:clipboard-list-linear" style="font-size:.85rem; margin-right:.3rem"></iconify-icon>Excel
                       </button>
                     </div>
-                  </td>
+                  </td>` : ''}
                 </tr>
               `).join('')}
             </tbody>

@@ -1,0 +1,24 @@
+{
+ "headings": [
+  "Engineering Week 2026",
+  "₱85,000.00",
+  "₱71,400.00",
+  "₱71,400.00",
+  "Transaction History"
+ ],
+ "buttons": [
+  "Back"
+ ],
+ "loaders": 0,
+ "empties": [
+  "No transactions recorded yet."
+ ],
+ "staffLeak": [
+  "nav-income"
+ ],
+ "overflow": false,
+ "dashes": 0,
+ "tiny": 0,
+ "smallTargets": [],
+ "text": "Back\nOngoing\nSource: Student Council Allocation\nEngineering Week 2026\nAnnual week-long celebration with competitions, exhibits, and industry linkages.\nAug 24, 2026\nINITIAL ALLOCATION\n₱85,000.00\nTOTAL EVENT SPENDING\n₱71,400.00\nBUDGET UTILIZATION\n₱71,400.00\nRemaining: ₱13,600.00\nTransaction History\nNo transactions recorded yet."
+}
