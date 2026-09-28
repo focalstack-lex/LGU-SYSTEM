@@ -8,7 +8,9 @@
     "dev": "nodemon server/index.js",
     "build": "npm install",
     "map:code": "node scripts/generate-code-map.mjs",
-    "map:code:check": "node scripts/generate-code-map.mjs --check"
+    "map:code:check": "node scripts/generate-code-map.mjs --check",
+    "icons:bundle": "node scripts/generate-icon-bundle.mjs",
+    "icons:check": "node scripts/generate-icon-bundle.mjs --check"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.8",

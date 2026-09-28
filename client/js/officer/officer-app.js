@@ -1363,7 +1363,7 @@ const OfficerApp = (() => {
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
             ${UI.renderStatusBadge(ev.status)}
             <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-tertiary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
-              <iconify-icon icon="solar:vault-linear" style="font-size:12px;color:var(--accent-primary,#f97316)"></iconify-icon>
+              <iconify-icon icon="solar:safe-square-linear" style="font-size:12px;color:var(--accent-primary,#f97316)"></iconify-icon>
               ${ev.funding_source || 'General Fund'}
             </span>
           </div>

@@ -458,8 +458,8 @@ const EnrollmentSection = (() => {
       return `<ol class="${trackClass}" aria-label="Enrollment steps"></ol>`;
     }
     const iconFor = i => {
-      if (i < step.stepIndex) return 'solar:check-bold';
-      if (i === step.stepIndex) return 'solar:' + currentStepIcon();
+      if (i < step.stepIndex) return 'solar:check-circle-bold';
+      if (i === step.stepIndex) return currentStepIcon();
       return '';
     };
     return `<ol class="${trackClass}" aria-label="Enrollment steps">` + EJ.STEPS.map((s, i) => {
@@ -473,12 +473,14 @@ const EnrollmentSection = (() => {
     }).join('') + '</ol>';
   }
 
+  // Full icon names (not bare suffixes) so scripts/generate-icon-bundle.mjs can
+  // find and bundle them.
   function currentStepIcon() {
-    if (!current) return 'clock-circle-linear';
-    if (current.status === 'draft') return 'pen-new-square-linear';
-    if (current.status === 'submitted' || current.status === 'under_review') return 'clock-circle-linear';
-    if (current.status === 'approved') return current.encoded_at ? 'check-circle-bold' : 'verified-check-bold';
-    return 'clock-circle-linear';
+    if (!current) return 'solar:clock-circle-linear';
+    if (current.status === 'draft') return 'solar:pen-new-square-linear';
+    if (current.status === 'submitted' || current.status === 'under_review') return 'solar:clock-circle-linear';
+    if (current.status === 'approved') return current.encoded_at ? 'solar:check-circle-bold' : 'solar:verified-check-bold';
+    return 'solar:clock-circle-linear';
   }
 
   function renderAction() {

@@ -875,6 +875,11 @@ html[data-theme="light"] .auth-form-panel input:-webkit-autofill {
 .dd-menu::-webkit-scrollbar-track {
   background: transparent;
 }
+/* Menus that open upward grow from their bottom edge (dropdown.js adds .dd-up) */
+.dd.dd-up .dd-menu {
+  transform-origin: bottom center;
+  transform: translateY(6px) scale(0.98);
+}
 .dd.dd-open .dd-menu {
   opacity: 1;
   visibility: visible;
@@ -903,6 +908,7 @@ html[data-theme="light"] .auth-form-panel input:-webkit-autofill {
 .dd.dd-open .dd-menu li:nth-child(2) { transition-delay: 0.07s; }
 .dd.dd-open .dd-menu li:nth-child(3) { transition-delay: 0.11s; }
 .dd.dd-open .dd-menu li:nth-child(4) { transition-delay: 0.15s; }
+.dd.dd-open .dd-menu li:nth-child(n+5) { transition-delay: 0.19s; }
 
 .dd-menu li:hover {
   background: var(--accent-muted);
@@ -8402,14 +8408,14 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon {
   text-overflow: ellipsis !important;
 }
 
+/* Width, height, position and z-index are set by dropdown.js (fixed menu
+   sized to the trigger and its options); forcing width:100% here made the
+   fixed menu span the whole viewport and run off the right edge. */
 .enrollment-select-wrapper .dd-menu {
-  width: 100% !important;
-  min-width: 100% !important;
   background: #1C1C20 !important;
   border: 1px solid var(--border-default, rgba(255, 255, 255, 0.12)) !important;
   border-radius: var(--radius-md, 12px) !important;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
-  z-index: 100 !important;
   box-sizing: border-box !important;
 }
 

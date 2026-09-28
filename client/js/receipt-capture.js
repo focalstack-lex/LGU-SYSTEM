@@ -41,7 +41,7 @@ const ReceiptCapture = (() => {
           <video class="receipt-capture-video" autoplay playsinline muted></video>
           <img class="receipt-capture-preview hidden" alt="Captured receipt preview" />
           <div class="receipt-capture-error hidden">
-            <iconify-icon icon="solar:video-camera-off-linear" style="font-size:2rem"></iconify-icon>
+            <iconify-icon icon="solar:camera-minimalistic-linear" style="font-size:2rem"></iconify-icon>
             <p>Camera unavailable. You can still attach a photo or PDF file instead.</p>
           </div>
         </div>

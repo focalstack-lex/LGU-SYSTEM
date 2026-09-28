@@ -210,7 +210,7 @@ function buildReportsHTML(summary, monthly, events) {
                       </button>
                       <button class="tx-action-btn admin-only" style="font-size:.8rem;padding:.35rem .8rem;"
                         data-excel="${ev.id}" data-name="${ev.event_name}">
-                        <iconify-icon icon="solar:table-linear" style="font-size:.85rem; margin-right:.3rem"></iconify-icon>Excel
+                        <iconify-icon icon="solar:clipboard-list-linear" style="font-size:.85rem; margin-right:.3rem"></iconify-icon>Excel
                       </button>
                     </div>
                   </td>
@@ -244,7 +244,7 @@ function buildReportsHTML(summary, monthly, events) {
                   <iconify-icon icon="solar:document-text-linear"></iconify-icon> PDF
                 </button>
                 <button class="tx-action-btn admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;" data-excel="${ev.id}" data-name="${ev.event_name}">
-                  <iconify-icon icon="solar:table-linear"></iconify-icon> Excel
+                  <iconify-icon icon="solar:clipboard-list-linear"></iconify-icon> Excel
                 </button>
               </div>
             </div>

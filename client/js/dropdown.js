@@ -84,41 +84,94 @@ const Dropdowns = (() => {
       });
     }
 
+    // Tallest the menu may grow before it scrolls (about eight options), so
+    // short lists never clip their last option behind a scrollbar.
+    const MENU_MAX = 320;
+    const GAP = 6;     // trigger-to-menu gap
+    const EDGE = 8;    // minimum distance from any viewport edge
+
+    // Fixed mobile bars sit over the viewport bottom; the menu must stop above
+    // them. The bars auto-hide on scroll (slid off with a transform) and slide
+    // back, so reserve their resting position, not their current animated one.
+    function viewportBottom() {
+      let bottom = window.innerHeight;
+      document.querySelectorAll('#bottom-nav, #of-bottom-nav').forEach(nav => {
+        const cs = getComputedStyle(nav);
+        if (cs.display === 'none' || cs.position !== 'fixed' || !nav.offsetHeight) return;
+        const restingTop = window.innerHeight - (parseFloat(cs.bottom) || 0) - nav.offsetHeight;
+        if (restingTop > window.innerHeight / 2) bottom = Math.min(bottom, restingTop);
+      });
+      return bottom;
+    }
+
+    // position:fixed is relative to the viewport only when no ancestor has a
+    // transform / will-change: transform / filter. The animated views do, so a
+    // "fixed" menu is really positioned against the view box (shifted by the
+    // sidebar and by the view's own offset). Measure that box's origin with a
+    // zero-size fixed probe beside the menu and subtract it.
+    function fixedOrigin() {
+      const probe = document.createElement('span');
+      probe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;';
+      dd.appendChild(probe);
+      const r = probe.getBoundingClientRect();
+      probe.remove();
+      return { x: r.left, y: r.top };
+    }
+
     function positionMenu() {
       const rect = trigger.getBoundingClientRect();
-      const menuHeight = Math.min(menu.scrollHeight || 180, 180);
-      const spaceBelow = window.innerHeight - rect.bottom;
       const viewportWidth = window.innerWidth;
+      const origin = fixedOrigin();
 
-      const width = Math.min(rect.width, viewportWidth - 16);
-      let left = Math.max(8, rect.left);
-      if (left + width > viewportWidth - 8) {
-        left = Math.max(8, viewportWidth - width - 8);
-      }
-
+      // Width: at least the trigger, wide enough for the longest option,
+      // never wider than the viewport. Measured before placing.
       menu.style.position = 'fixed';
-      menu.style.left = `${left}px`;
-      menu.style.width = `${width}px`;
-      menu.style.minWidth = `${width}px`;
-      menu.style.maxWidth = `${viewportWidth - 16}px`;
       menu.style.right = 'auto';
+      menu.style.bottom = 'auto';
+      menu.style.minWidth = `${Math.min(rect.width, viewportWidth - EDGE * 2)}px`;
+      menu.style.maxWidth = `${viewportWidth - EDGE * 2}px`;
+      menu.style.width = 'max-content';
+      menu.style.maxHeight = 'none';
+      // ceil: a sub-pixel shortfall would wrap the longest option
+      const width = Math.min(Math.ceil(Math.max(menu.offsetWidth, rect.width)) + 1, viewportWidth - EDGE * 2);
+      // Border-box sizing: max-height includes the borders, scrollHeight does not
+      const contentHeight = menu.scrollHeight + (menu.offsetHeight - menu.clientHeight);
+
+      let left = Math.max(EDGE, rect.left);
+      if (left + width > viewportWidth - EDGE) left = Math.max(EDGE, viewportWidth - width - EDGE);
+      menu.style.width = `${width}px`;
       menu.style.zIndex = '999999';
 
-      if (spaceBelow < menuHeight + 10 && rect.top > menuHeight + 10) {
-        menu.style.top = 'auto';
-        menu.style.bottom = `${window.innerHeight - rect.top + 6}px`;
-      } else {
-        menu.style.bottom = 'auto';
-        menu.style.top = `${rect.bottom + 6}px`;
-      }
+      // Height: open toward the side that fits the whole list; otherwise the
+      // side with more room, capped so it never runs under a fixed bar.
+      const desired = Math.min(contentHeight, MENU_MAX);
+      const spaceBelow = viewportBottom() - rect.bottom - GAP - EDGE;
+      const spaceAbove = rect.top - GAP - EDGE;
+      const openUp = spaceBelow < desired && spaceAbove > spaceBelow;
+      const height = Math.max(Math.min(desired, openUp ? spaceAbove : spaceBelow), 80);
+      menu.style.maxHeight = `${height}px`;
+
+      // Anchor by top in both directions (bottom would resolve against the
+      // transformed ancestor's height, not the viewport).
+      const top = openUp ? rect.top - GAP - height : rect.bottom + GAP;
+      menu.style.left = `${left - origin.x}px`;
+      menu.style.top = `${top - origin.y}px`;
+      dd.classList.toggle('dd-up', openUp);
     }
 
     function open() {
       buildMenu(); // rebuild so dynamically-added options appear
+      // Mark before measuring: the selected option is bold (wider), and
+      // measuring first let it wrap to two lines and push the list into scroll.
+      markSelected();
       positionMenu();
       dd.classList.add('dd-open');
       trigger.setAttribute('aria-expanded', 'true');
-      markSelected();
+      // Long lists scroll: bring the current choice into view inside the menu
+      const sel = menu.querySelector('.dd-selected');
+      if (sel && menu.scrollHeight > menu.clientHeight) {
+        menu.scrollTop = Math.max(0, sel.offsetTop - (menu.clientHeight - sel.offsetHeight) / 2);
+      }
     }
 
     function close() {

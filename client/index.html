@@ -17,11 +17,12 @@
   <meta name="description" content="Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=7.7" />
+  <link rel="stylesheet" href="styles/main.css?v=7.8" />
   <link rel="stylesheet" href="styles/ai.css?v=6.7" />
   <script src="vendor/supabase.min.js"></script>
   <script src="vendor/chart.umd.min.js"></script>
   <script src="vendor/iconify-icon.min.js"></script>
+  <script src="vendor/icons-bundle.js?v=2"></script>
   <script src="js/init-theme.js"></script>
 </head>
 <body>
@@ -611,7 +612,7 @@
           <!-- Left: Graduation progress -->
           <aside class="units-progress-card" id="units-progress-card">
             <div class="units-progress-head">
-              <h3><iconify-icon icon="solar:academic-cap-linear" class="units-head-icon"></iconify-icon>Graduation Progress</h3>
+              <h3><iconify-icon icon="solar:square-academic-cap-2-linear" class="units-head-icon"></iconify-icon>Graduation Progress</h3>
               <div class="units-progress-pct" id="units-progress-pct">0%</div>
             </div>
             <div class="units-progress-track">
@@ -697,7 +698,7 @@
                   <select id="enrollment-sem-select" class="enrollment-filter-select" aria-label="Filter by Semester"></select>
                 </div>
                 <div class="enrollment-select-wrapper">
-                  <iconify-icon icon="solar:academic-cap-linear" class="filter-select-icon"></iconify-icon>
+                  <iconify-icon icon="solar:square-academic-cap-2-linear" class="filter-select-icon"></iconify-icon>
                   <select id="enrollment-year-select" class="enrollment-filter-select" aria-label="Filter by Year Level"></select>
                 </div>
               </div>
@@ -722,7 +723,7 @@
         <div class="admin-tabs">
           <button class="admin-tab-btn active" data-tab="create" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:pen-new-square-linear" style="font-size:16px" ></iconify-icon> Create Records</button>
           <button class="admin-tab-btn" data-tab="transfer" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:card-transfer-linear" style="font-size:16px" ></iconify-icon> Budget Transfer</button>
-          <button class="admin-tab-btn" data-tab="events" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:document-edit-linear" style="font-size:16px" ></iconify-icon> Manage Events</button>
+          <button class="admin-tab-btn" data-tab="events" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:pen-new-square-linear" style="font-size:16px" ></iconify-icon> Manage Events</button>
           <button class="admin-tab-btn" data-tab="users" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:users-group-rounded-linear" style="font-size:16px" ></iconify-icon> User Management</button>
           <button class="admin-tab-btn" data-tab="audit" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:history-linear" style="font-size:16px" ></iconify-icon> Audit Log</button>
         </div>
@@ -934,7 +935,7 @@
         <!-- Tab: Manage Events -->
         <div class="admin-tab-panel" id="admin-tab-events">
           <div class="dashboard-card" style="max-width:600px;">
-            <h3><iconify-icon icon="solar:document-edit-linear"></iconify-icon> Manage Events</h3>
+            <h3><iconify-icon icon="solar:pen-new-square-linear"></iconify-icon> Manage Events</h3>
             <p style="color:var(--col-text-muted);margin-bottom:1.25rem;font-size:.9rem;">
               Select an event to edit its details, or archive it to hide it from students. Archived events can be restored here.
             </p>
@@ -1669,7 +1670,7 @@
   <script src="js/units.js?v=5.4"></script>
   <script src="js/receipt-capture.js?v=5.3"></script>
   <script src="js/receipt-modal.js?v=5.4"></script>
-  <script src="js/dropdown.js?v=5.3"></script>
+  <script src="js/dropdown.js?v=5.4"></script>
   <script src="js/admin.js?v=5.4"></script>
   <script src="js/grizz-recommend.js?v=1.6"></script>
   <script src="js/ai-assistant.js?v=6.2"></script>

@@ -49,7 +49,7 @@ const Events = (() => {
       applyFilters(); // Apply current search/sort to newly loaded data
     } catch (err) {
       if (!allEvents.length) {
-        UI.setEmpty('events-grid', 'caution', 'Failed to load events.');
+        UI.setEmpty('events-grid', 'solar:danger-triangle-linear', 'Failed to load events.');
       }
     }
   }
@@ -106,11 +106,11 @@ const Events = (() => {
     const grid = document.getElementById('events-grid');
     if (!events.length) {
       if (isSearching) {
-        UI.setEmpty('events-grid', 'search', 'No events match your search.');
+        UI.setEmpty('events-grid', 'solar:magnifer-linear', 'No events match your search.');
       } else if (_statusFilter !== 'all') {
-        UI.setEmpty('events-grid', 'target', `No ${_statusFilter} events.`);
+        UI.setEmpty('events-grid', 'solar:target-linear', `No ${_statusFilter} events.`);
       } else {
-        UI.setEmpty('events-grid', 'target', 'No events posted yet.');
+        UI.setEmpty('events-grid', 'solar:target-linear', 'No events posted yet.');
       }
       return;
     }
@@ -128,7 +128,7 @@ const Events = (() => {
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
             ${UI.renderStatusBadge(ev.status)}
             <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-tertiary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
-              <iconify-icon icon="solar:vault-linear" style="font-size:12px;color:var(--brand-accent,#B23A0A)"></iconify-icon>
+              <iconify-icon icon="solar:safe-square-linear" style="font-size:12px;color:var(--brand-accent,#B23A0A)"></iconify-icon>
               ${UI.esc(ev.funding_source || 'General Fund')}
             </span>
           </div>
@@ -175,7 +175,7 @@ const Events = (() => {
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:0.4rem;">
             ${UI.renderStatusBadge(ev.status)}
             <span style="font-size:0.75rem;background:rgba(255,255,255,0.08);padding:3px 10px;border-radius:12px;color:var(--text-secondary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
-              <iconify-icon icon="solar:vault-linear" style="font-size:13px;color:var(--brand-accent,#B23A0A)"></iconify-icon>
+              <iconify-icon icon="solar:safe-square-linear" style="font-size:13px;color:var(--brand-accent,#B23A0A)"></iconify-icon>
               Source: ${UI.esc(ev.funding_source || 'General Fund')}
             </span>
           </div>
