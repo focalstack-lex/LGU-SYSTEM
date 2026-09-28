@@ -79,28 +79,28 @@ const Transactions = (() => {
     tbody.innerHTML = txs.map(tx => `
       <tr>
         <td>${UI.dateStr(tx.transaction_date)}</td>
-        <td style="color:var(--text-secondary);font-size:0.82rem">${tx.events?.event_name || '-'}</td>
+        <td style="color:var(--text-secondary);font-size:0.82rem">${UI.esc(tx.events?.event_name || '-')}</td>
         <td>${UI.renderStatusBadge(tx.type)}</td>
-        <td>${tx.description}</td>
+        <td>${UI.esc(tx.description)}</td>
         <td class="tx-amount ${tx.type}">
           ${tx.type === 'expense' ? '-' : (tx.type === 'transfer' ? '' : '+')}${UI.currency(tx.amount)}
         </td>
         <td>${tx.receipt_url
-          ? `<button type="button" class="receipt-link" data-receipt-url="${tx.receipt_url}" data-desc="${(tx.description || '').replace(/"/g, '&quot;')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${(tx.events?.event_name || '').replace(/"/g, '&quot;')}" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> View</button>`
+          ? `<button type="button" class="receipt-link" data-receipt-url="${UI.esc(tx.receipt_url)}" data-desc="${UI.esc(tx.description)}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${UI.esc(tx.events?.event_name)}" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> View</button>`
           : '<span style="color:var(--text-tertiary)">-</span>'}</td>
-        <td style="color:var(--text-secondary);font-size:0.82rem">${tx.profiles?.full_name || '-'}</td>
+        <td style="color:var(--text-secondary);font-size:0.82rem">${UI.esc(tx.profiles?.full_name || '-')}</td>
         ${_isAdmin ? `
         <td style="text-align:center;">
           <div style="display:inline-flex;gap:.4rem;">
             <button class="tx-action-btn tx-edit-btn"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
+              data-desc="${UI.esc(tx.description)}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
-              data-receipt="${tx.receipt_url || ''}"><iconify-icon icon="solar:pen-linear" style="font-size:15px"></iconify-icon></button>
+              data-receipt="${UI.esc(tx.receipt_url)}"><iconify-icon icon="solar:pen-linear" style="font-size:15px"></iconify-icon></button>
             <button class="tx-action-btn tx-del-btn"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><iconify-icon icon="solar:trash-bin-trash-linear" style="font-size:15px"></iconify-icon></button>
+              data-desc="${UI.esc(tx.description)}"><iconify-icon icon="solar:trash-bin-trash-linear" style="font-size:15px"></iconify-icon></button>
           </div>
         </td>` : ''}
       </tr>
@@ -116,28 +116,28 @@ const Transactions = (() => {
             <span style="font-size:0.75rem;color:var(--text-secondary);">${UI.dateStr(tx.transaction_date)}</span>
           </div>
           <div class="data-card-body">
-            <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.15rem;">${tx.description}</div>
+            <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.15rem;">${UI.esc(tx.description)}</div>
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;">
                <span class="tx-amount ${tx.type}" style="font-size:1.2rem;font-weight:800;">
                 ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
               </span>
-              ${tx.receipt_url ? `<button type="button" class="receipt-link" data-receipt-url="${tx.receipt_url}" data-desc="${(tx.description || '').replace(/"/g, '&quot;')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${(tx.events?.event_name || '').replace(/"/g, '&quot;')}" style="font-size:0.8rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> Receipt</button>` : ''}
+              ${tx.receipt_url ? `<button type="button" class="receipt-link" data-receipt-url="${UI.esc(tx.receipt_url)}" data-desc="${UI.esc(tx.description)}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${UI.esc(tx.events?.event_name)}" style="font-size:0.8rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> Receipt</button>` : ''}
             </div>
             <div style="font-size:0.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;">
-              <iconify-icon icon="solar:user-linear" style="font-size:12px"></iconify-icon> ${tx.profiles?.full_name || 'System'}
+              <iconify-icon icon="solar:user-linear" style="font-size:12px"></iconify-icon> ${UI.esc(tx.profiles?.full_name || 'System')}
             </div>
           </div>
           ${_isAdmin ? `
           <div class="data-card-actions" style="margin-top:0.75rem;padding-top:0.5rem;">
             <button class="tx-action-btn tx-edit-btn" style="padding:0.4rem 0.8rem;"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
+              data-desc="${UI.esc(tx.description)}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
-              data-receipt="${tx.receipt_url || ''}"><iconify-icon icon="solar:pen-linear"></iconify-icon></button>
+              data-receipt="${UI.esc(tx.receipt_url)}"><iconify-icon icon="solar:pen-linear"></iconify-icon></button>
             <button class="tx-action-btn tx-del-btn" style="padding:0.4rem 0.8rem;"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon></button>
+              data-desc="${UI.esc(tx.description)}"><iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon></button>
           </div>` : ''}
         </div>
       `).join('');
@@ -217,7 +217,7 @@ const Transactions = (() => {
       const currentVal = eventEl.value;
       eventEl.innerHTML = '<option value="all">All Events</option>' +
         '<option value="GENERAL">General Fund (No Event)</option>' +
-        (events || []).map(e => `<option value="${e.id}">${e.event_name}</option>`).join('');
+        (events || []).map(e => `<option value="${UI.esc(e.id)}">${UI.esc(e.event_name)}</option>`).join('');
       if (currentVal) eventEl.value = currentVal;
       eventEl._populated = true;
     } catch { /* ignore */ }
@@ -236,19 +236,19 @@ const Transactions = (() => {
         <h3 style="margin:0 0 1rem;font-size:1.1rem;">Edit Transaction</h3>
         <div class="form-group">
           <label>Description</label>
-          <input id="edit-desc" type="text" value="${desc}" maxlength="500" />
+          <input id="edit-desc" type="text" value="${UI.esc(desc)}" maxlength="500" />
         </div>
         <div class="form-group">
           <label>Amount (₱)</label>
-          <input id="edit-amount" type="number" step="0.01" min="0" value="${amount}" />
+          <input id="edit-amount" type="number" step="0.01" min="0" value="${UI.esc(amount)}" />
         </div>
         <div class="form-group">
           <label>Date</label>
-          <input id="edit-date" type="date" value="${date}" />
+          <input id="edit-date" type="date" value="${UI.esc(date)}" />
         </div>
         <div class="form-group">
           <label>Receipt URL (G-Drive Link)</label>
-          <input id="edit-receipt" type="url" value="${receipt || ''}" placeholder="Paste Google Drive/Receipt link here" />
+          <input id="edit-receipt" type="url" value="${UI.esc(receipt)}" placeholder="Paste Google Drive/Receipt link here" />
         </div>
         <div class="form-group">
           <label>Reason for Edit <span style="color:#ef4444">*</span></label>
@@ -310,7 +310,7 @@ const Transactions = (() => {
       <div class="modal-card">
         <h3 style="margin:0 0 .5rem;font-size:1.1rem;color:#ef4444;">Delete Transaction</h3>
         <p style="color:var(--text-secondary);margin-bottom:1rem;font-size:.9rem;">
-          You are about to delete: <strong>${desc}</strong>.<br>This action is permanent and recorded.
+          You are about to delete: <strong>${UI.esc(desc)}</strong>.<br>This action is permanent and recorded.
         </p>
         <div class="form-group">
           <label>Reason for Deletion <span style="color:#ef4444">*</span></label>

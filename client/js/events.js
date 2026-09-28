@@ -124,17 +124,17 @@ const Events = (() => {
         ? `<div class="event-over-note">Over budget by <strong>${UI.currency(spent - budget)}</strong></div>`
         : '';
       return `
-        <div class="event-card" data-id="${ev.id}">
+        <div class="event-card" data-id="${UI.esc(ev.id)}">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
             ${UI.renderStatusBadge(ev.status)}
             <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-tertiary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
               <iconify-icon icon="solar:vault-linear" style="font-size:12px;color:var(--brand-accent,#B23A0A)"></iconify-icon>
-              ${ev.funding_source || 'General Fund'}
+              ${UI.esc(ev.funding_source || 'General Fund')}
             </span>
           </div>
-          <h3>${ev.event_name}</h3>
+          <h3>${UI.esc(ev.event_name)}</h3>
           ${dateLine}
-          <p>${ev.description || 'No description provided.'}</p>
+          <p>${UI.esc(ev.description || 'No description provided.')}</p>
           <div class="event-budget-bar">
             <div class="event-budget-fill${over ? ' over' : ''}" style="width:${pct}%"></div>
           </div>
@@ -170,11 +170,11 @@ const Events = (() => {
             ${UI.renderStatusBadge(ev.status)}
             <span style="font-size:0.75rem;background:rgba(255,255,255,0.08);padding:3px 10px;border-radius:12px;color:var(--text-secondary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
               <iconify-icon icon="solar:vault-linear" style="font-size:13px;color:var(--brand-accent,#B23A0A)"></iconify-icon>
-              Source: ${ev.funding_source || 'General Fund'}
+              Source: ${UI.esc(ev.funding_source || 'General Fund')}
             </span>
           </div>
-          <h2 style="font-size:1.75rem;margin:0.5rem 0">${ev.event_name}</h2>
-          <p style="color:var(--text-secondary)">${ev.description || ''}</p>
+          <h2 style="font-size:1.75rem;margin:0.5rem 0">${UI.esc(ev.event_name)}</h2>
+          <p style="color:var(--text-secondary)">${UI.esc(ev.description)}</p>
           ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:calendar-date-linear" style="font-size:15px"></iconify-icon> ${UI.dateStr(ev.event_date)}</p>` : ''}
         </div>
 
@@ -215,14 +215,14 @@ const Events = (() => {
               ? ev.transactions.map(tx => `
                 <div class="tx-item">
                   ${UI.renderStatusBadge(tx.type)}
-                  <span class="tx-desc">${tx.description}</span>
+                  <span class="tx-desc">${UI.esc(tx.description)}</span>
                   <div>
                     <div class="tx-amount ${tx.type === 'expense' ? 'expense' : 'income'}">
                       ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
                     </div>
                     <div class="tx-meta">${UI.dateStr(tx.transaction_date)}</div>
                   </div>
-                  ${tx.receipt_url ? `<button type="button" class="receipt-link" data-receipt-url="${tx.receipt_url}" data-desc="${(tx.description || '').replace(/"/g, '&quot;')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${(ev.event_name || '').replace(/"/g, '&quot;')}" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> Receipt</button>` : ''}
+                  ${tx.receipt_url ? `<button type="button" class="receipt-link" data-receipt-url="${UI.esc(tx.receipt_url)}" data-desc="${UI.esc(tx.description)}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${UI.esc(ev.event_name)}" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> Receipt</button>` : ''}
                 </div>`).join('')
               : '<div class="empty-state"><span class="empty-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><p>No transactions recorded yet.</p></div>'
             }

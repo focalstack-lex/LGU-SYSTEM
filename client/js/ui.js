@@ -105,6 +105,17 @@ const UI = (() => {
     });
   }
 
+  // Escapes a value for safe interpolation into HTML text or a quoted attribute.
+  // Every database-sourced string rendered through innerHTML must pass through this.
+  function esc(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function capitalize(str) {
     return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
   }
@@ -314,5 +325,5 @@ const UI = (() => {
     document.body.classList.remove('modal-open');
   }
 
-  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators, lockScrollbar, unlockScrollbar };
+  return { showView, showScreen, setSplashView, toast, currency, dateStr, esc, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators, lockScrollbar, unlockScrollbar };
 })();
