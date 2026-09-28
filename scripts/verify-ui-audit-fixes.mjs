@@ -38,7 +38,7 @@ const receipt = await receiptPng();
   check('no fake password placeholder', form.passPlaceholder === '', JSON.stringify(form.passPlaceholder));
   check('login error has role=alert', form.errRole === 'alert');
   check('notice has no inline style', form.noticeInline === null);
-  check('primary button text is charcoal on coral', form.btnColor === 'rgb(18, 18, 20)' && form.btnBg === 'rgb(255, 85, 51)', `${form.btnColor} on ${form.btnBg}`);
+  check('primary button: charcoal on soft coral', form.btnColor === 'rgb(26, 26, 28)' && form.btnBg === 'rgb(242, 132, 92)', `${form.btnColor} on ${form.btnBg}`);
   // Enter from the EMAIL field now submits (implicit form submission)
   await page.fill('#login-email', '');
   await page.focus('#login-email');
@@ -93,7 +93,7 @@ async function portal(extraRoutes) {
     const cs = getComputedStyle(document.documentElement);
     return { tertiary: cs.getPropertyValue('--text-tertiary').trim(), on: cs.getPropertyValue('--accent-text-on').trim() };
   });
-  check('--text-tertiary raised to #8C8C98', tokens.tertiary.toUpperCase() === '#8C8C98', tokens.tertiary);
+  check('--text-tertiary is the soft palette #8E8D97', tokens.tertiary.toUpperCase() === '#8E8D97', tokens.tertiary);
 
   await page.evaluate(() => { UI.showView('transactions'); return Transactions.load(); });
   await page.waitForTimeout(600);
@@ -122,7 +122,7 @@ async function portal(extraRoutes) {
   check('delete modal is an aria-modal alertdialog', dlg.role === 'alertdialog' && dlg.modal === 'true');
   check('delete modal focuses the reason field', dlg.focused === 'delete-reason', dlg.focused);
   check('delete reason label is associated', dlg.labelFor);
-  check('danger button uses #DC2626 fill', dlg.btnBg === 'rgb(220, 38, 38)', dlg.btnBg);
+  check('danger button uses soft #BD4C45 fill', dlg.btnBg === 'rgb(189, 76, 69)', dlg.btnBg);
   check('delete modal has no inline handlers', dlg.inlineOnclick === 0);
   await page.screenshot({ path: `${OUT}/03-delete-modal.png` });
   // Tab trap: tabbing past the last control wraps inside the dialog
@@ -272,7 +272,7 @@ async function portal(extraRoutes) {
   }));
   check('feedback: Supabase loaded from /vendor (no CDN request)', fb.supabase && cdn.length === 0, `cdn requests: ${cdn.length}`);
   check('feedback: no "Supabase failed" error shown', !/Supabase failed/.test(fb.err), fb.err);
-  check('feedback: accent matches portal coral', fb.btnBg === 'rgb(255, 85, 51)' && fb.linkColor === 'rgb(255, 85, 51)', `${fb.btnBg} / ${fb.linkColor}`);
+  check('feedback: accent matches portal soft coral', fb.btnBg === 'rgb(242, 132, 92)' && fb.linkColor === 'rgb(242, 132, 92)', `${fb.btnBg} / ${fb.linkColor}`);
   await page.screenshot({ path: `${OUT}/06-feedback-mobile.png` });
   await ctx.close();
 }

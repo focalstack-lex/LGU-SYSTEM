@@ -27,13 +27,13 @@
 
 ## 1. Design Philosophy
 
-The system follows a **Flat Dark Charcoal & Vibrant Coral-Orange Pill** aesthetic. Inspired by modern high-contrast financial and administrative interfaces, the visual language combines flat dark matte surfaces, rounded card geometry, circular action controls, segmented pill toggles, and solid high-energy coral-orange action accents — strictly **without gradients or radial glow overlays**.
+The system follows a **Flat Dark Charcoal & Soft Coral Pill** aesthetic, tuned to be easy on the eyes for long sessions. The visual language combines flat dark matte surfaces, rounded card geometry, circular action controls, segmented pill toggles, and soft coral action accents, strictly **without gradients or radial glow overlays**.
 
 **Core principles:**
-- **Flat Solid Surfaces** — Hierarchy is carried by high-contrast matte surfaces (`#121214` base, `#1C1C20` cards, `#26262C` raised controls) and defined 1px structural borders. No gradients, glows, or radial background overlays.
-- **High-Energy Action Accent** — `--primary` and `--brand-accent` (`#FF5533`) provide instant visual clarity for CTAs, active pill tabs, active switches, and circular action icons.
+- **Flat Solid Surfaces**: Hierarchy is carried by matte surfaces (`#141416` base, `#1D1D21` cards, `#27272D` raised controls) and defined 1px structural borders. No gradients, glows, or radial background overlays.
+- **Soft Action Accent**: `--primary` and `--brand-accent` (`#F2845C`) mark CTAs, active pill tabs, active switches, and circular action icons. Intensity is lowered (85% saturation, not 100%) so the accent guides the eye without glare; text on coral fills is charcoal `#1A1A1C` (6.8:1).
 - **Modern Pill & Card Geometry** — Segmented control tracks use full rounded pills (`border-radius: 9999px`), while surface cards and modals use rounded 16px corners (`--radius-lg: 16px`).
-- **High Contrast Typography** — Headings and monetary metrics use crisp white (`#FFFFFF`) against muted secondary labels (`#9A9AA6`), passing WCAG AAA legibility standards.
+- **Comfortable Contrast Typography**: Headings and monetary metrics use warm off-white (`#ECEBE8`, 14:1) against secondary labels (`#A3A2AB`). Pure white at 18.7:1 caused halation on dark screens; every pair still passes WCAG AA, checked by `node scripts/verify-contrast.mjs` in both themes.
 - **Restrained Motion** — State changes use swift 0.25s linear/ease transitions without spring bounce.
 
 ---
@@ -44,26 +44,30 @@ The system follows a **Flat Dark Charcoal & Vibrant Coral-Orange Pill** aestheti
 
 | Token | Value | Usage |
 |---|---|---|
-| `--background` | `#121214` | Deep matte charcoal app shell & page background |
-| `--surface` | `#1C1C20` | Flat dark card surface, sidebar, modals |
-| `--surface-secondary` | `#26262C` | Input fields, raised control tracks, sub-cards |
-| `--surface-hover` | `#303038` | Interactive hover states |
+| `--background` | `#141416` | Deep matte charcoal app shell & page background |
+| `--surface` | `#1D1D21` | Flat dark card surface, sidebar, modals |
+| `--surface-secondary` | `#27272D` | Input fields, raised control tracks, sub-cards |
+| `--surface-hover` | `#313137` | Interactive hover states |
 | `--border` | `rgba(255,255,255,0.08)` | Crisp 1px structural dividers |
 | `--border-hover` | `rgba(255,255,255,0.16)` | Borders on hover |
-| `--primary` | `#FF5533` | Solid Vibrant Coral-Orange — action CTAs, active pills, links |
-| `--primary-hover` | `#FF6B4A` | Hover state of primary CTA |
-| `--primary-active` | `#E04826` | Pressed/active state of primary CTA |
-| `--brand-accent` | `#FF5533` | Vibrant Coral-Orange brand identity accent |
-| `--text-primary` | `#FFFFFF` | Crisp headings, primary metric amounts |
-| `--text-secondary` | `#9A9AA6` | Sub-labels, tab text, metadata |
-| `--text-tertiary` | `#6E6E7A` | Placeholders, disabled hints |
-| `--success` | `#22C55E` | Income, collection, positive balance |
-| `--warning` | `#F59E0B` | Over-budget alerts |
-| `--error` | `#EF4444` | Expenses, destructive actions |
+| `--primary` | `#F2845C` | Soft coral: action CTAs, active pills, links |
+| `--primary-hover` | `#F59470` | Hover state of primary CTA |
+| `--primary-active` | `#E0724A` | Pressed/active state of primary CTA |
+| `--brand-accent` | `#F2845C` | Soft coral brand identity accent |
+| `--text-primary` | `#ECEBE8` | Warm off-white headings, primary metric amounts |
+| `--text-secondary` | `#A3A2AB` | Sub-labels, tab text, metadata |
+| `--text-tertiary` | `#8E8D97` | Placeholders, hints (4.5:1 on every dark surface) |
+| `--success` | `#5FBF86` | Income, collection, positive balance |
+| `--warning` | `#E3A857` | Over-budget alerts |
+| `--error` | `#E5736B` | Expenses, destructive actions |
+| `--info` | `#8DB3DD` | Informational labels |
+| `--accent-text-on` | `#1A1A1C` | Text on coral fills |
+| `--danger-fill` | `#BD4C45` | Destructive button fill (white text, 4.9:1) |
+| `--primary-rgb` etc. | `242, 132, 92` | Channels for `rgba(var(--primary-rgb), a)` tints |
 
 ### Light Theme (`[data-theme="light"]`)
 
-Flat paper slate surfaces with solid coral-orange action accents:
+Flat paper slate surfaces with deeper soft coral accents (a lighter coral cannot carry text on white):
 
 | Token | Value |
 |---|---|
@@ -71,16 +75,16 @@ Flat paper slate surfaces with solid coral-orange action accents:
 | `--surface` | `#FFFFFF` |
 | `--surface-secondary` | `#EAECEF` |
 | `--border` | `#D5DBE2` |
-| `--primary / --brand-accent` | `#FF5533` |
-| `--text-primary / --text-secondary` | `#121417 / #4E5766` |
-| `--success / --warning / --error` | `#16A34A / #D97706 / #DC2626` |
+| `--primary / --brand-accent` | `#A84A28` (white text on fills) |
+| `--text-primary / --text-secondary / --text-tertiary` | `#1F2124 / #4E5766 / #5C6574` |
+| `--success / --warning / --error / --info` | `#26744C / #A8590F / #B83E36 / #2D6A9F` |
 
 ### Semantic Aliases
 
 | Alias | Resolves To | Context |
 |---|---|---|
 | `--accent` | `--primary` | Coral-orange in action elements |
-| `--accent-muted` | `rgba(255, 85, 51, 0.12)` | Subtle coral-orange tint backgrounds |
+| `--accent-muted` | `rgba(var(--primary-rgb), 0.12)` | Subtle coral tint backgrounds |
 | `--status-positive` | `--success` | Income / collections |
 | `--status-negative` | `--error` | Expenses |
 | `--status-warning` | `--warning` | Over-budget alerts |

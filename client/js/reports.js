@@ -274,10 +274,10 @@ function renderMonthlyChart(monthly) {
   });
 
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  const textColor = isLight ? '#64748B' : '#94A3B8';
+  const textColor = getThemeColor('--text-secondary', isLight ? '#4E5766' : '#A3A2AB');
   const gridColor = isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.04)';
-  const tooltipBg = isLight ? '#FFFFFF' : '#0F172A';
-  const tooltipText = isLight ? '#0F172A' : '#F8FAFC';
+  const tooltipBg = getThemeColor('--surface-secondary', isLight ? '#FFFFFF' : '#27272D');
+  const tooltipText = getThemeColor('--text-primary', isLight ? '#1F2124' : '#ECEBE8');
   const tooltipBorder = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
   _monthlyChart = new Chart(canvas, {
@@ -288,8 +288,8 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Income',
           data: monthly.map(m => m.income),
-          backgroundColor: isLight ? '#059669' : '#10B981',
-          hoverBackgroundColor: isLight ? '#047857' : '#059669',
+          backgroundColor: getThemeColor('--success', '#5FBF86'),
+          hoverBackgroundColor: getThemeColor('--success', '#5FBF86'),
           borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: 'bottom',
           maxBarThickness: isMobile ? 18 : 32,
@@ -299,8 +299,8 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Expenses',
           data: monthly.map(m => m.expense),
-          backgroundColor: isLight ? '#DC2626' : '#EF4444',
-          hoverBackgroundColor: isLight ? '#B91C1C' : '#F87171',
+          backgroundColor: getThemeColor('--error', '#E5736B'),
+          hoverBackgroundColor: getThemeColor('--error', '#E5736B'),
           borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: 'bottom',
           maxBarThickness: isMobile ? 18 : 32,
@@ -389,10 +389,10 @@ function renderBreakdownChart(breakdown) {
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
 
   const typeMap = [
-    { key: 'expense',    label: 'Expenses',   color: isLight ? '#DC2626' : '#EF4444' },
-    { key: 'allocation', label: 'Allocation', color: isLight ? '#4F46E5' : '#6366F1' },
-    { key: 'donation',   label: 'Donations',  color: isLight ? '#059669' : '#10B981' },
-    { key: 'collection', label: 'Collection', color: isLight ? '#0284C7' : '#0EA5E9' },
+    { key: 'expense',    label: 'Expenses',   color: getThemeColor('--error', '#E5736B') },
+    { key: 'allocation', label: 'Allocation', color: getThemeColor('--text-tertiary', '#8E8D97') },
+    { key: 'donation',   label: 'Donations',  color: getThemeColor('--success', '#5FBF86') },
+    { key: 'collection', label: 'Collection', color: getThemeColor('--primary', '#F2845C') },
   ];
 
   const active = typeMap.filter(t => (breakdown[t.key] || 0) > 0);
@@ -407,9 +407,9 @@ function renderBreakdownChart(breakdown) {
       })
     : ['No Data'];
 
-  const textColor = isLight ? '#64748B' : '#94A3B8';
-  const tooltipBg = isLight ? '#FFFFFF' : '#0F172A';
-  const tooltipText = isLight ? '#0F172A' : '#F8FAFC';
+  const textColor = getThemeColor('--text-secondary', isLight ? '#4E5766' : '#A3A2AB');
+  const tooltipBg = getThemeColor('--surface-secondary', isLight ? '#FFFFFF' : '#27272D');
+  const tooltipText = getThemeColor('--text-primary', isLight ? '#1F2124' : '#ECEBE8');
   const tooltipBorder = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
   _breakdownChart = new Chart(canvas, {

@@ -403,6 +403,9 @@ const Units = (() => {
     if (!sliderInit) slider.style.transition = 'none';
     slider.style.width = `${tabRect.width}px`;
     slider.style.transform = `translateX(${tabRect.left - contentLeft}px)`;
+    // Charcoal label only once the coral backplate is really under it; a
+    // hidden view measures 0px, which would leave charcoal text on charcoal.
+    wrapper.classList.toggle('slider-ready', tabRect.width > 0);
     if (!sliderInit) {
       void slider.offsetWidth; // commit position before enabling the transition
       slider.style.transition = '';

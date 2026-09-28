@@ -1,7 +1,7 @@
 <!-- code-map
-generated: 2026-09-28T04:56:37.570Z
-commit: db680cb
-fingerprint: 4a2876c3b8fc9d5a
+generated: 2026-09-28T05:50:22.207Z
+commit: bd54647
+fingerprint: 333eee36a904b7de
 -->
 # Code Map (Agent Navigation)
 
@@ -14,8 +14,8 @@ disagree, the code wins and the map is regenerated.
 
 ## Summary
 
-- Files indexed: 177
-- Total lines indexed: 51,258
+- Files indexed: 178
+- Total lines indexed: 51,433
 - Anchor index emitted for files over 300 lines: 37
 
 ### Areas
@@ -25,12 +25,12 @@ disagree, the code wins and the map is regenerated.
 | `.` | 4 | 2,309 |
 | `client` | 6 | 3,402 |
 | `client/feedback` | 2 | 227 |
-| `client/js` | 29 | 11,889 |
+| `client/js` | 29 | 11,892 |
 | `client/js/faculty` | 1 | 489 |
 | `client/js/officer` | 2 | 3,316 |
-| `client/styles` | 6 | 14,099 |
+| `client/styles` | 6 | 14,132 |
 | `electron` | 3 | 351 |
-| `scripts` | 61 | 6,430 |
+| `scripts` | 62 | 6,569 |
 | `server` | 1 | 227 |
 | `server/lib` | 8 | 713 |
 | `server/middleware` | 2 | 122 |
@@ -73,7 +73,7 @@ disagree, the code wins and the map is regenerated.
 |---|---:|---|
 | `ai-assistant.js` | 1450 | Grizz: COE Mascot AI Assistant |
 | `app.js` | 957 | Main Application Router |
-| `units.js` | 934 | Credit Unit Tracker View Module |
+| `units.js` | 937 | Credit Unit Tracker View Module |
 | `admin.js` | 901 | Admin View Module (Phase 4) |
 | `cv-builder.js` | 853 | College of Engineering CV Builder |
 | `api.js` | 669 | API Helper Module with SWR Pre-Caching |
@@ -118,7 +118,7 @@ disagree, the code wins and the map is regenerated.
 
 | File | Lines | Purpose |
 |---|---:|---|
-| `main.css` | 9212 | College of Engineering · Official Student Portal · Design System |
+| `main.css` | 9245 | College of Engineering · Official Student Portal · Design System |
 | `officer.css` | 2285 | EXECUTIVE PORTAL - Cohesive Portal Theme |
 | `ai.css` | 1622 | Grizz - COE Bear AI Assistant Styles |
 | `cv-builder.css` | 559 | College of Engineering CV Builder |
@@ -153,6 +153,7 @@ disagree, the code wins and the map is regenerated.
 | `verify-smoothness.mjs` | 156 | Verify Smoothness |
 | `deep-qa-security-suite.js` | 152 | Deep Qa Security Suite |
 | `test-staging-security-controls.mjs` | 142 | scripts/test-staging-security-controls.mjs |
+| `verify-contrast.mjs` | 139 | Verify Contrast |
 | `lint-sql-invariants.mjs` | 135 | scripts/lint-sql-invariants.mjs |
 | `smoke-test-component-outcomes.js` | 130 | Smoke Test Component Outcomes |
 | `smoke-test-component-outcomes-client.js` | 125 | Smoke Test Component Outcomes Client |
@@ -307,19 +308,19 @@ disagree, the code wins and the map is regenerated.
 Files over 300 lines. Each entry is a line number to jump to, so a target
 resolves to a window instead of a full read.
 
-### `client/styles/main.css` (9212 lines)
+### `client/styles/main.css` (9245 lines)
 
-- 1: `College of Engineering · Official Student Portal · Design System` | 543: `AUTHENTICATION SCREEN - Permanently Dark Charcoal & Coral-Orange` | 1244: `FORM ELEMENTS`
-- 1411: `BUTTONS` | 1760: `APP LAYOUT` | 2042: `DASHBOARD STATS & FINANCIAL SUMMARY HIERARCHY`
-- 2752: `DASHBOARD CARDS` | 3116: `EVENTS GRID` | 3232: `DATA TABLE`
-- 3421: `REPORTS` | 3467: `ADMIN PANELS` | 3487: `LOADING & EMPTY STATES`
-- 3509: `Iconify - icon-park-outline global normalization` | 3585: `TOAST NOTIFICATION` | 3618: `MOBILE CARDS (Hidden on Desktop)`
-- 3630: `RESPONSIVE - Tablet (≤1024px)` | 3638: `RESPONSIVE - Small Tablet / Large Phone (≤768px)` | 3898: `RESPONSIVE - Phone (≤480px)`
-- 4537: `Phase 4 - Admin Tabs & Modals` | 4677: `Skeleton Loading Screen` | 4988: `SKELETON RESPONSIVE OVERRIDES`
-- 5075: `CREDIT UNIT TRACKER` | 6170: `Mobile Profile Header Trigger` | 6212: `Profile & Account Settings Modal`
-- 6389: `Avatar Picker Section` | 7058: `LIGHT MODE DESIGN ENHANCEMENTS & ELEVATIONS (IN-APP)` | 7317: `RECEIPT CAPTURE MODAL + ATTACHMENT CHIP`
-- 7439: `IN-SYSTEM RECEIPT VIEWER LIGHTBOX MODAL` | 7910: `iOS Slide-Up Bottom Sheet Drawer ("More" Menu)` | 8250: `Load Verification (Phase B student portal)`
-- 8739: `Enrollment Verification — Journey UI (2026-09-10)` | 8969: `Faculty Portal (Phase B, /faculty)` | 9157: `Faculty review queue — year-level groups (2026-09-10)`
+- 1: `College of Engineering · Official Student Portal · Design System` | 562: `AUTHENTICATION SCREEN - Permanently Dark Charcoal & Coral-Orange` | 1273: `FORM ELEMENTS`
+- 1440: `BUTTONS` | 1789: `APP LAYOUT` | 2071: `DASHBOARD STATS & FINANCIAL SUMMARY HIERARCHY`
+- 2781: `DASHBOARD CARDS` | 3145: `EVENTS GRID` | 3261: `DATA TABLE`
+- 3450: `REPORTS` | 3496: `ADMIN PANELS` | 3516: `LOADING & EMPTY STATES`
+- 3538: `Iconify - icon-park-outline global normalization` | 3614: `TOAST NOTIFICATION` | 3647: `MOBILE CARDS (Hidden on Desktop)`
+- 3659: `RESPONSIVE - Tablet (≤1024px)` | 3667: `RESPONSIVE - Small Tablet / Large Phone (≤768px)` | 3927: `RESPONSIVE - Phone (≤480px)`
+- 4566: `Phase 4 - Admin Tabs & Modals` | 4706: `Skeleton Loading Screen` | 5017: `SKELETON RESPONSIVE OVERRIDES`
+- 5104: `CREDIT UNIT TRACKER` | 6203: `Mobile Profile Header Trigger` | 6245: `Profile & Account Settings Modal`
+- 6422: `Avatar Picker Section` | 7091: `LIGHT MODE DESIGN ENHANCEMENTS & ELEVATIONS (IN-APP)` | 7350: `RECEIPT CAPTURE MODAL + ATTACHMENT CHIP`
+- 7472: `IN-SYSTEM RECEIPT VIEWER LIGHTBOX MODAL` | 7943: `iOS Slide-Up Bottom Sheet Drawer ("More" Menu)` | 8283: `Load Verification (Phase B student portal)`
+- 8772: `Enrollment Verification — Journey UI (2026-09-10)` | 9002: `Faculty Portal (Phase B, /faculty)` | 9190: `Faculty review queue — year-level groups (2026-09-10)`
 
 ### `client/js/officer/officer-app.js` (3127 lines)
 
@@ -563,7 +564,7 @@ resolves to a window instead of a full read.
 - 636: `bindMobileMoreSheet()` | 643: `preventScrollOutsideSheet()` | 650: `openSheet()`
 - 664: `closeSheet()` | 790: `bootApp()` | 816: `isOffline()`
 
-### `client/js/units.js` (934 lines)
+### `client/js/units.js` (937 lines)
 
 - 5: `Units()` | 34: `currentSchoolYear()` | 40: `currentSemester()`
 - 49: `prospectusSchoolYear()` | 55: `esc()` | 63: `ddWrap()`
@@ -572,12 +573,12 @@ resolves to a window instead of a full read.
 - 225: `currentTermRecords()` | 236: `currentCardRow()` | 252: `currentSemesterButton()`
 - 268: `openCurrentModal()` | 283: `closeCurrentModal()` | 288: `recordFor()`
 - 293: `checklistControls()` | 307: `renderChecklist()` | 375: `applyYearFilter()`
-- 387: `updateTabSlider()` | 413: `updateBatchBar()` | 432: `batchMarkPassed()`
-- 459: `batchMarkEnrolled()` | 486: `formatPrereqRows()` | 499: `subjectRow()`
-- 508: `compBadge()` | 587: `ensureLabModalFields()` | 593: `modalHasLab()`
-- 597: `openModal()` | 646: `openModalOverlay()` | 654: `closeModalOverlay()`
-- 670: `closeModal()` | 674: `saveModal()` | 739: `markPassed()`
-- 750: `dropRecord()` | 768: `downloadStanding()`
+- 387: `updateTabSlider()` | 416: `updateBatchBar()` | 435: `batchMarkPassed()`
+- 462: `batchMarkEnrolled()` | 489: `formatPrereqRows()` | 502: `subjectRow()`
+- 511: `compBadge()` | 590: `ensureLabModalFields()` | 596: `modalHasLab()`
+- 600: `openModal()` | 649: `openModalOverlay()` | 657: `closeModalOverlay()`
+- 673: `closeModal()` | 677: `saveModal()` | 742: `markPassed()`
+- 753: `dropRecord()` | 771: `downloadStanding()`
 
 ### `client/js/admin.js` (901 lines)
 

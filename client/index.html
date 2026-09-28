@@ -17,8 +17,8 @@
   <meta name="description" content="Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=7.8" />
-  <link rel="stylesheet" href="styles/ai.css?v=6.7" />
+  <link rel="stylesheet" href="styles/main.css?v=7.9" />
+  <link rel="stylesheet" href="styles/ai.css?v=6.8" />
   <script src="vendor/supabase.min.js"></script>
   <script src="vendor/chart.umd.min.js"></script>
   <script src="vendor/iconify-icon.min.js"></script>
@@ -105,7 +105,7 @@
       </div>
 
       <!-- Unmatched Warning Banner -->
-      <div id="onboarding-unmatched-banner" class="hidden" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);padding:0.65rem 0.85rem;border-radius:8px;margin-bottom:0.75rem;font-size:0.78rem;color:var(--text-primary);line-height:1.4;">
+      <div id="onboarding-unmatched-banner" class="hidden" style="background:rgba(var(--error-rgb),0.08);border:1px solid rgba(var(--error-rgb),0.25);padding:0.65rem 0.85rem;border-radius:8px;margin-bottom:0.75rem;font-size:0.78rem;color:var(--text-primary);line-height:1.4;">
         <div style="display:flex;align-items:center;gap:0.4rem;color:var(--status-negative);font-weight:700;margin-bottom:0.25rem;">
           <iconify-icon icon="solar:shield-warning-bold" style="font-size:1.05rem;"></iconify-icon>
           <span>Account Not in S.Y. 2026-2027 Roster</span>
@@ -213,7 +213,7 @@
 
       <!-- Pending Verification Review State -->
       <div id="onboarding-pending-state" class="hidden" style="text-align:center;padding:1rem 0.5rem 0.5rem;">
-        <div style="width:52px;height:52px;border-radius:50%;background:rgba(245,158,11,0.12);color:#f59e0b;display:flex;align-items:center;justify-content:center;margin:0 auto 0.85rem;font-size:1.75rem;">
+        <div style="width:52px;height:52px;border-radius:50%;background:rgba(var(--warning-rgb),0.12);color:var(--warning);display:flex;align-items:center;justify-content:center;margin:0 auto 0.85rem;font-size:1.75rem;">
           <iconify-icon icon="solar:clock-circle-bold"></iconify-icon>
         </div>
         <h3 style="font-size:1.1rem;margin-bottom:0.35rem;">Verification Request Under Review</h3>
@@ -223,7 +223,7 @@
         <div style="background:var(--bg-surface-raised);border:1px solid var(--border-default);border-radius:8px;padding:0.75rem 1rem;font-size:0.8rem;text-align:left;margin-bottom:1.25rem;">
           <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span style="color:var(--text-secondary);">Student Name:</span> <strong id="onboarding-pending-name">-</strong></div>
           <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span style="color:var(--text-secondary);">Program &amp; Year:</span> <strong id="onboarding-pending-course">-</strong></div>
-          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Review Status:</span> <span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);font-size:0.72rem;">Pending Confirmation</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Review Status:</span> <span class="badge" style="background:rgba(var(--warning-rgb),0.15);color:var(--warning);border:1px solid rgba(var(--warning-rgb),0.3);font-size:0.72rem;">Pending Confirmation</span></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
           <button type="button" class="btn btn-primary btn-full" id="onboarding-refresh-btn">
@@ -908,7 +908,7 @@
                 <input type="number" id="transfer-amount" min="1" step="0.01" required placeholder="0.00" />
               </div>
               <div class="form-group">
-                <label for="transfer-reason">Reason <span style="color:#ef4444">*</span></label>
+                <label for="transfer-reason">Reason <span style="color:var(--error)">*</span></label>
                 <input type="text" id="transfer-reason" required placeholder="Why is this transfer being made?" />
               </div>
               <div class="form-error hidden" id="transfer-error"></div>
@@ -1073,7 +1073,7 @@
         <img src="assets/grizz.png" alt="Grizz" class="grizz-mascot-img" />
       </div>
       <div class="ursa-launcher-text">
-        <span class="ursa-launcher-title">Ask Grizz <iconify-icon icon="solar:stars-minimalistic-linear" style="color:#F97316;"></iconify-icon></span>
+        <span class="ursa-launcher-title">Ask Grizz <iconify-icon icon="solar:stars-minimalistic-linear" style="color:var(--primary);"></iconify-icon></span>
         <span class="ursa-launcher-sub">Your personal portal guide</span>
       </div>
     </button>
@@ -1197,7 +1197,7 @@
         <span class="mobile-sheet-section-label">Academic</span>
         <div class="mobile-sheet-group">
           <button type="button" class="mobile-sheet-row" id="bottom-nav-enrollment" data-view="enrollment" data-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(255,85,51,0.12);">
+            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(var(--primary-rgb),0.12);">
               <iconify-icon icon="solar:clipboard-check-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
@@ -1224,7 +1224,7 @@
         <span class="mobile-sheet-section-label">Finance</span>
         <div class="mobile-sheet-group">
           <button type="button" class="mobile-sheet-row" data-view="transactions" data-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(255,85,51,0.12);">
+            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(var(--primary-rgb),0.12);">
               <iconify-icon icon="solar:card-transfer-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
@@ -1234,7 +1234,7 @@
             <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
           </button>
           <button type="button" class="mobile-sheet-row" data-view="income" data-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:var(--status-positive); background:rgba(34,197,94,0.12);">
+            <div class="mobile-sheet-row-icon" style="color:var(--status-positive); background:rgba(var(--success-rgb),0.12);">
               <iconify-icon icon="solar:wallet-money-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
@@ -1251,7 +1251,7 @@
         <span class="mobile-sheet-section-label">Administration</span>
         <div class="mobile-sheet-group">
           <a href="/officer.html" class="mobile-sheet-row officer-only hidden" id="bottom-nav-executive-portal">
-            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(249,115,22,0.12);">
+            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(var(--primary-rgb),0.12);">
               <iconify-icon icon="solar:shield-user-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
@@ -1663,15 +1663,15 @@
   <script src="js/api.js?v=5.3"></script>
   <script src="js/ui.js?v=5.9"></script>
   <script src="js/dashboard.js?v=5.5"></script>
-  <script src="js/events.js?v=5.4"></script>
+  <script src="js/events.js?v=5.5"></script>
   <script src="js/transactions.js?v=5.4"></script>
-  <script src="js/reports.js?v=5.4"></script>
+  <script src="js/reports.js?v=5.5"></script>
   <script src="js/income.js?v=5.3"></script>
-  <script src="js/units.js?v=5.4"></script>
+  <script src="js/units.js?v=5.5"></script>
   <script src="js/receipt-capture.js?v=5.3"></script>
   <script src="js/receipt-modal.js?v=5.4"></script>
   <script src="js/dropdown.js?v=5.4"></script>
-  <script src="js/admin.js?v=5.4"></script>
+  <script src="js/admin.js?v=5.5"></script>
   <script src="js/grizz-recommend.js?v=1.6"></script>
   <script src="js/ai-assistant.js?v=6.2"></script>
   <script src="js/profile.js?v=5.4"></script>

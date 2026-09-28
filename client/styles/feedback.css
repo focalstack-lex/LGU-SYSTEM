@@ -7,15 +7,15 @@
 /* Values mirror the portal tokens in main.css (charcoal + coral system) so
    this standalone page reads as the same product. */
 :root {
-  --bg: #121214;      /* --background */
-  --ink: #FFFFFF;     /* --text-primary */
-  --ink-2: #9A9AA6;   /* --text-secondary */
-  --ink-3: #8C8C98;   /* --text-tertiary */
+  --bg: #141416;      /* --background */
+  --ink: #ECEBE8;     /* --text-primary */
+  --ink-2: #A3A2AB;   /* --text-secondary */
+  --ink-3: #8E8D97;   /* --text-tertiary */
   --line: rgba(255, 255, 255, 0.08); /* --border */
-  --field: #26262C;   /* --surface-secondary */
-  --accent: #FF5533;  /* --primary */
-  --accent-ink: #121214; /* --accent-text-on */
-  --danger: #EF4444;  /* --error */
+  --field: #27272D;   /* --surface-secondary */
+  --accent: #F2845C;  /* --primary */
+  --accent-ink: #1A1A1C; /* --accent-text-on */
+  --danger: #E5736B;  /* --error */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

@@ -11,24 +11,27 @@ This file defines mandatory instructions for AI coding assistants (Antigravity /
 
 ---
 
-## 2. UI & Design System Rules (Flat Charcoal & Coral-Orange)
+## 2. UI & Design System Rules (Flat Charcoal & Soft Coral)
 All UI modifications MUST strictly obey the project's design system tokens in [`client/styles/main.css`](file:///c:/Users/User/Documents/LGU%20System/client/styles/main.css) and reference doc [`UI_DESIGN.md`](file:///c:/Users/User/Documents/LGU%20System/UI_DESIGN.md):
 
 1. **Strictly NO Gradients:**
    - Do NOT add background mesh gradients, radial glows, or linear gradient overlays to buttons, cards, or page backgrounds. All surfaces must remain flat, solid, high-contrast matte colors.
 2. **Color Palette:**
-   - **Base App Shell:** Flat dark charcoal `#121214`.
-   - **Card & Surface Containers:** Flat matte dark slate `#1C1C20`.
-   - **Raised Fields & Sub-cards:** Raised dark surface `#26262C`.
-   - **Primary Action CTA & Accents:** Vibrant Solid Coral-Orange `#FF5533` (Hover `#FF6B4A`, Active `#E04826`).
+   - **Base App Shell:** Flat dark charcoal `#141416`.
+   - **Card & Surface Containers:** Flat matte dark slate `#1D1D21`.
+   - **Raised Fields & Sub-cards:** Raised dark surface `#27272D`.
+   - **Primary Action CTA & Accents:** Soft Coral `#F2845C` (Hover `#F59470`, Active `#E0724A`), with charcoal `#1A1A1C` text on coral fills (`--accent-text-on`).
+   - **Status:** Income/success `#5FBF86`, warning `#E3A857`, expense/error `#E5736B`, info `#8DB3DD`; destructive button fill `#BD4C45` with white text.
    - **Divider Borders:** Faint 1px structural dividers (`rgba(255, 255, 255, 0.08)`).
+   - **Soft palette rule:** The system is tuned to be easy on the eyes. Lower intensity, never contrast: no pure white text, no fully saturated hues. Every text pair must still pass WCAG AA (`node scripts/verify-contrast.mjs` for dark and `--theme=light`).
+   - **Tokens only:** Use `var(--primary)`, `var(--success)` and so on, and `rgba(var(--primary-rgb), 0.12)` for translucent tints. Never paste a palette hex into a rule, a template string or an inline style. Chart colors are read at draw time with `getThemeColor('--token')`, because a canvas cannot resolve `var()`.
 3. **Geometry & Pill Controls:**
    - **Segmented Tab Toggles & Action Filters:** Use full rounded pill tracks (`border-radius: 9999px`).
    - **Card & Modal Geometry:** Use 16px rounded corners (`--radius-lg: 16px`).
    - **Input Controls:** Use 12px rounded corners (`--radius-md: 12px`).
 4. **Typography & Contrast:**
-   - Headings, page titles, and monetary figures must be crisp `#FFFFFF`.
-   - Secondary labels `#9A9AA6`; hints/metadata `#6E6E7A`.
+   - Headings, page titles, and monetary figures use warm off-white `#ECEBE8` (`--text-primary`, 14:1 on cards).
+   - Secondary labels `#A3A2AB`; hints/metadata `#8E8D97`.
    - Financial amounts must retain tabular numbers (`font-variant-numeric: tabular-nums`).
 
 ---

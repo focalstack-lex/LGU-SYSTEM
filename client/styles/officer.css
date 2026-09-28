@@ -697,7 +697,7 @@ html, body {
 }
 
 .of-error {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(var(--error-rgb), 0.1);
   border: 1px solid var(--status-negative);
   color: var(--status-negative);
   padding: 0.65rem 0.9rem;
@@ -1581,7 +1581,7 @@ html, body {
     letter-spacing: 0.02em;
   }
   [data-theme="light"] .of-mobile-role {
-    color: #EA580C;
+    color: var(--primary-active);
     background: #FFF7ED;
     border-color: #FFEDD5;
   }
@@ -1619,7 +1619,7 @@ html, body {
   .sidebar-actions .of-logout-action:hover,
   .sidebar-actions .of-logout-action:active {
     color: var(--status-negative);
-    background: rgba(239, 68, 68, 0.12);
+    background: rgba(var(--error-rgb), 0.12);
   }
 
   .of-main {
@@ -1718,7 +1718,7 @@ html, body {
     height: 48px !important;
     padding: 4px 2px !important;
     border-radius: 14px !important;
-    color: #8E8E96 !important;
+    color: var(--text-secondary) !important;
     background: transparent !important;
     border: 1px solid transparent !important;
     display: flex !important;
@@ -1745,7 +1745,7 @@ html, body {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    color: #8E8E96 !important;
+    color: var(--text-secondary) !important;
     transition: color 0.18s ease, transform 0.18s ease !important;
   }
 
@@ -1760,7 +1760,7 @@ html, body {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     max-width: 100% !important;
-    color: #8E8E96 !important;
+    color: var(--text-secondary) !important;
     transition: color 0.18s ease !important;
   }
 
@@ -1780,7 +1780,7 @@ html, body {
     width: 8px !important;
     height: 8px !important;
     border-radius: 50% !important;
-    background: #FF5533 !important;
+    background: var(--primary) !important;
     border: 1.5px solid #1C1C20 !important;
   }
 
@@ -1803,7 +1803,7 @@ html, body {
 
   .of-bottom-nav > button.active iconify-icon,
   .of-bottom-nav > a.active iconify-icon {
-    color: #FF5533 !important;
+    color: var(--primary) !important;
     transform: scale(1.06) !important;
     filter: none !important;
   }
@@ -1811,7 +1811,7 @@ html, body {
   .of-bottom-nav > button.active span,
   .of-bottom-nav > a.active span {
     font-weight: 700 !important;
-    color: #FFFFFF !important;
+    color: #ECEBE8 !important;
   }
 
   [data-theme="light"] .of-bottom-nav > button.active span,
@@ -1821,10 +1821,10 @@ html, body {
 
   /* Main System Link Special Highlight */
   .of-bottom-nav > a.of-nav-link-main {
-    color: #8E8E96 !important;
+    color: var(--text-secondary) !important;
   }
   .of-bottom-nav > a.of-nav-link-main iconify-icon {
-    color: #FF5533 !important;
+    color: var(--primary) !important;
   }
   .of-bottom-nav > a.of-nav-link-main:active {
     background: #26262E !important;
@@ -2089,7 +2089,7 @@ html, body {
 
 .of-select:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
 }
 
 .of-select option {
@@ -2154,7 +2154,7 @@ html, body {
 
 .cur-input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
 }
 
 .btn-sm {
@@ -2246,9 +2246,9 @@ html, body {
 }
 
 .cur-flash--error {
-  background: rgba(239, 68, 68, 0.12);
-  color: var(--status-negative, #EF4444);
-  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(var(--error-rgb), 0.12);
+  color: var(--status-negative, var(--error));
+  border-color: rgba(var(--error-rgb), 0.3);
 }
 
 @media (max-width: 768px) {
