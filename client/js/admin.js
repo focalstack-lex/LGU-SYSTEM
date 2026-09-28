@@ -616,7 +616,7 @@ const Admin = (() => {
   // ── Users Tab ─────────────────────────────────────────────────────────────
   async function loadUsers() {
     const container = document.getElementById('admin-tab-users');
-    if (!container.innerHTML.includes('tx-search')) {
+    if (!container.innerHTML.includes('users-search')) {
       container.innerHTML = `
         <div style="margin-bottom:1rem;">
           <input type="text" id="users-search" placeholder="Search users by name, email, or course…" style="width:100%;max-width:400px;padding:0.5rem;border-radius:4px;border:1px solid var(--col-border);background:var(--col-surface);color:white;font-size:0.9rem;" />
@@ -624,6 +624,14 @@ const Admin = (() => {
         <div id="users-table-container"><div class="loading-state">Loading users…</div></div>
       `;
       document.getElementById('users-search').addEventListener('input', e => renderUsersTable(e.target.value.toLowerCase()));
+      // Delegated handler: row buttons carry data attributes instead of inline
+      // onclick, which the server CSP (script-src-attr 'none') blocks.
+      document.getElementById('users-table-container').addEventListener('click', e => {
+        const btn = e.target.closest('[data-user-action]');
+        if (!btn) return;
+        if (btn.dataset.userAction === 'verify') verifyUser(btn.dataset.userId, btn);
+        else if (btn.dataset.userAction === 'role') toggleRole(btn.dataset.userId, btn.dataset.userRole, btn);
+      });
     } else {
       document.getElementById('users-table-container').innerHTML = '<div class="loading-state">Loading users…</div>';
     }
@@ -632,7 +640,7 @@ const Admin = (() => {
       _allUsers = await Api.admin.users();
       renderUsersTable(document.getElementById('users-search').value.toLowerCase());
     } catch (err) {
-      document.getElementById('users-table-container').innerHTML = `<div class="empty-state"><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon> ${err.message}</div>`;
+      document.getElementById('users-table-container').innerHTML = `<div class="empty-state"><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon> ${UI.esc(err.message)}</div>`;
     }
   }
 
@@ -656,10 +664,10 @@ const Admin = (() => {
             <tbody>
               ${filtered.map(u => `
                 <tr>
-                  <td><strong>${u.full_name || '-'}</strong></td>
-                  <td style="font-size:.8rem;color:var(--text-secondary)">${u.email || '-'}</td>
-                  <td style="font-size:.8rem">${u.course || '-'}</td>
-                  <td style="font-size:.8rem">${u.year_level || '-'}</td>
+                  <td><strong>${UI.esc(u.full_name || '-')}</strong></td>
+                  <td style="font-size:.8rem;color:var(--text-secondary)">${UI.esc(u.email || '-')}</td>
+                  <td style="font-size:.8rem">${UI.esc(u.course || '-')}</td>
+                  <td style="font-size:.8rem">${UI.esc(u.year_level || '-')}</td>
                   <td>${UI.renderStatusBadge(u.role)}</td>
                   <td>
                     ${u.is_verified 
@@ -671,12 +679,12 @@ const Admin = (() => {
                     <div style="display:flex;gap:4px;justify-content:center;">
                       ${!u.is_verified ? `
                         <button class="tx-action-btn" style="font-size:.8rem;padding:.3rem .7rem;background:#16a34a;color:white;border:none;border-radius:6px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"
-                          onclick="Admin.verifyUser('${u.id}', this)">
+                          data-user-action="verify" data-user-id="${UI.esc(u.id)}">
                           <iconify-icon icon="solar:letter-bold"></iconify-icon> Approve Account
                         </button>
                       ` : ''}
                       <button class="tx-action-btn" style="font-size:.8rem;padding:.3rem .7rem;"
-                        onclick="Admin.toggleRole('${u.id}', '${u.role}', this)">
+                        data-user-action="role" data-user-id="${UI.esc(u.id)}" data-user-role="${UI.esc(u.role)}">
                         ${u.role === 'admin' ? 'Demote' : 'Promote to Admin'}
                       </button>
                     </div>

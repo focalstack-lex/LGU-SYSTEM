@@ -121,8 +121,8 @@ const UI = (() => {
   }
 
   function renderStatusBadge(type) {
-    const cleanType = type.toLowerCase();
-    return `<span class="status-badge"><span class="status-dot status-dot--${cleanType}"></span><span class="status-label">${capitalize(cleanType)}</span></span>`;
+    const cleanType = String(type || '').toLowerCase();
+    return `<span class="status-badge"><span class="status-dot status-dot--${esc(cleanType)}"></span><span class="status-label">${esc(capitalize(cleanType))}</span></span>`;
   }
 
   // ---- Admin-only elements ----
