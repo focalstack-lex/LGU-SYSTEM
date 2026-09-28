@@ -594,10 +594,10 @@ const OfficerApp = (() => {
     });
 
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    const textColor = isLight ? '#64748B' : '#94A3B8';
+    const textColor = getThemeColor('--text-secondary', isLight ? '#4E5766' : '#A3A2AB');
     const gridColor = isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.04)';
-    const tooltipBg = isLight ? '#FFFFFF' : '#0F172A';
-    const tooltipText = isLight ? '#0F172A' : '#F8FAFC';
+    const tooltipBg = getThemeColor('--surface-secondary', isLight ? '#FFFFFF' : '#27272D');
+    const tooltipText = getThemeColor('--text-primary', isLight ? '#1F2124' : '#ECEBE8');
     const tooltipBorder = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
     renderChartInstance(canvasId, {
@@ -608,8 +608,8 @@ const OfficerApp = (() => {
           {
             label: 'Income',
             data: monthly.map(m => m.income),
-            backgroundColor: '#F97316',
-            hoverBackgroundColor: '#FB923C',
+            backgroundColor: getThemeColor('--primary', '#F2845C'),
+            hoverBackgroundColor: getThemeColor('--primary-hover', '#F59470'),
             borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
             borderSkipped: 'bottom',
             maxBarThickness: 32,
@@ -619,8 +619,8 @@ const OfficerApp = (() => {
           {
             label: 'Expenses',
             data: monthly.map(m => m.expense),
-            backgroundColor: isLight ? '#94A3B8' : '#475569',
-            hoverBackgroundColor: isLight ? '#CBD5E1' : '#64748B',
+            backgroundColor: getThemeColor('--text-tertiary', '#8E8D97'),
+            hoverBackgroundColor: getThemeColor('--text-secondary', '#A3A2AB'),
             borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
             borderSkipped: 'bottom',
             maxBarThickness: 32,
@@ -701,18 +701,18 @@ const OfficerApp = (() => {
   function drawBreakdownChart(canvasId, breakdown) {
     if (!breakdown) return;
     const typeMap = [
-      { key: 'expense',    label: 'Expenses',   color: '#EF4444' },
-      { key: 'allocation', label: 'Allocation', color: '#64748B' },
-      { key: 'donation',   label: 'Donations',  color: '#10B981' },
-      { key: 'collection', label: 'Collection', color: '#F97316' },
+      { key: 'expense',    label: 'Expenses',   color: getThemeColor('--error', '#E5736B') },
+      { key: 'allocation', label: 'Allocation', color: getThemeColor('--text-tertiary', '#8E8D97') },
+      { key: 'donation',   label: 'Donations',  color: getThemeColor('--success', '#5FBF86') },
+      { key: 'collection', label: 'Collection', color: getThemeColor('--primary', '#F2845C') },
     ];
 
     const active = typeMap.filter(t => (breakdown[t.key] || 0) > 0);
     const hasData = active.length > 0;
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    const textColor = isLight ? '#64748B' : '#94A3B8';
-    const tooltipBg = isLight ? '#FFFFFF' : '#0F172A';
-    const tooltipText = isLight ? '#0F172A' : '#F8FAFC';
+    const textColor = getThemeColor('--text-secondary', isLight ? '#4E5766' : '#A3A2AB');
+    const tooltipBg = getThemeColor('--surface-secondary', isLight ? '#FFFFFF' : '#27272D');
+    const tooltipText = getThemeColor('--text-primary', isLight ? '#1F2124' : '#ECEBE8');
     const tooltipBorder = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
     renderChartInstance(canvasId, {
@@ -1362,8 +1362,8 @@ const OfficerApp = (() => {
         <div class="of-event-card" data-ev="${ev.id}">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
             ${UI.renderStatusBadge(ev.status)}
-            <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-tertiary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
-              <iconify-icon icon="solar:safe-square-linear" style="font-size:12px;color:var(--accent-primary,#f97316)"></iconify-icon>
+            <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-secondary);display:inline-flex;align-items:center;gap:4px;">
+              <iconify-icon icon="solar:safe-square-linear" style="font-size:12px;color:var(--primary)"></iconify-icon>
               ${ev.funding_source || 'General Fund'}
             </span>
           </div>
@@ -1770,17 +1770,17 @@ const OfficerApp = (() => {
   // Raw audit codes read like syntax - present them as plain sentences with
   // the same icon/color language the main system's admin panel uses.
   const AUDIT_ACTIONS = {
-    CREATE_TRANSACTION:       { icon: 'solar:add-circle-linear',       color: '#22C55E', label: 'Created a transaction' },
-    EDIT_TRANSACTION:         { icon: 'solar:pen-linear',              color: '#F97316', label: 'Edited a transaction' },
-    DELETE_TRANSACTION:       { icon: 'solar:trash-bin-trash-linear',  color: '#ef4444', label: 'Deleted a transaction' },
+    CREATE_TRANSACTION:       { icon: 'solar:add-circle-linear',       color: 'var(--success)', label: 'Created a transaction' },
+    EDIT_TRANSACTION:         { icon: 'solar:pen-linear',              color: 'var(--primary)', label: 'Edited a transaction' },
+    DELETE_TRANSACTION:       { icon: 'solar:trash-bin-trash-linear',  color: 'var(--error)', label: 'Deleted a transaction' },
     BULK_IMPORT_TRANSACTIONS: { icon: 'solar:upload-track-linear',     color: '#3b82f6', label: 'Bulk import' },
-    CREATE_EVENT:             { icon: 'solar:calendar-add-linear',     color: '#22C55E', label: 'Created an event' },
-    UPDATE_EVENT:             { icon: 'solar:calendar-date-linear',    color: '#F97316', label: 'Updated an event' },
+    CREATE_EVENT:             { icon: 'solar:calendar-add-linear',     color: 'var(--success)', label: 'Created an event' },
+    UPDATE_EVENT:             { icon: 'solar:calendar-date-linear',    color: 'var(--primary)', label: 'Updated an event' },
     ARCHIVE_EVENT:            { icon: 'solar:box-minimalistic-linear', color: '#8b5cf6', label: 'Archived an event' },
-    POST_ANNOUNCEMENT:        { icon: 'solar:bell-linear',             color: '#f59e0b', label: 'Posted an announcement' },
+    POST_ANNOUNCEMENT:        { icon: 'solar:bell-linear',             color: 'var(--warning)', label: 'Posted an announcement' },
     SET_USER_ROLE:            { icon: 'solar:shield-check-linear',     color: '#6366f1', label: 'Changed a user role' },
     BUDGET_TRANSFER:          { icon: 'solar:card-transfer-linear',    color: '#14b8a6', label: 'Transferred budget' },
-    OVER_BUDGET_ALERT:        { icon: 'solar:danger-triangle-linear',  color: '#F59E0B', label: 'Over-budget alert' },
+    OVER_BUDGET_ALERT:        { icon: 'solar:danger-triangle-linear',  color: 'var(--warning)', label: 'Over-budget alert' },
   };
 
   function humanizeAction(action) {
@@ -2497,11 +2497,11 @@ const OfficerApp = (() => {
       const displayName = formatStudentName(req.full_name);
       let statusBadge = '';
       if (req.status === 'pending') {
-        statusBadge = '<span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);font-size:0.72rem;">Pending Review</span>';
+        statusBadge = '<span class="badge" style="background:rgba(var(--warning-rgb),0.15);color:var(--warning);border:1px solid rgba(var(--warning-rgb),0.3);font-size:0.72rem;">Pending Review</span>';
       } else if (req.status === 'approved') {
         statusBadge = '<span class="badge" style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);font-size:0.72rem;">Approved</span>';
       } else {
-        statusBadge = '<span class="badge" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);font-size:0.72rem;">Rejected</span>';
+        statusBadge = '<span class="badge" style="background:rgba(var(--error-rgb),0.15);color:var(--error);border:1px solid rgba(var(--error-rgb),0.3);font-size:0.72rem;">Rejected</span>';
       }
 
       const dateStr = req.created_at ? new Date(req.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '-';

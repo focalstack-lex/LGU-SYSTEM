@@ -402,7 +402,10 @@ const UI = (() => {
       });
 
       overlay.querySelector('[data-action="cancel"]').addEventListener('click', dialog.close);
-      overlay.addEventListener('click', e => { if (e.target === overlay) dialog.close(); });
+      // The second click of a double-click on the trigger lands on this
+      // backdrop; ignore backdrop clicks until the dialog has settled.
+      const openedAt = Date.now();
+      overlay.addEventListener('click', e => { if (e.target === overlay && Date.now() - openedAt > 400) dialog.close(); });
       overlay.querySelector('[data-action="confirm"]').addEventListener('click', () => {
         if (!input) { dialog.release(); finish(true); return; }
         const value = input.value.trim();

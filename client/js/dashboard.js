@@ -7,9 +7,10 @@ const Dashboard = (() => {
   let realtimeChannel = null;
 
   async function load() {
-    await Promise.all([loadStats(), loadRecentTransactions(), loadAnnouncements()]);
+    await Promise.all([loadStats(), loadRecentTransactions(), loadAnnouncements(), loadStudentStatus()]);
     subscribeRealtime();
     bindPopovers();
+    bindViewAll();
 
     // Listen for local updates (e.g. from Income tab)
     document.addEventListener('transaction-updated', () => {
@@ -221,7 +222,7 @@ const Dashboard = (() => {
         <div class="stat-pop-row" style="border-top:1px dashed var(--border);margin-top:0.25rem;padding-top:0.25rem;font-weight:600;"><span>Net Cash Balance</span> <span>${UI.currency(netCashBalance)}</span></div>
         <div class="stat-pop-row" style="color:var(--status-neutral)"><span>Unspent Envelopes</span> <span>-${UI.currency(Math.max(0, (summary.breakdown.reserved_envelopes || 0) - (summary.totalExpense - summary.generalExpense)))}</span></div>
         <div class="stat-pop-row total"><span>Available General Fund</span> <span>${UI.currency(summary.remainingBalance)}</span></div>
-        <p style="font-size:0.65rem;color:var(--text-tertiary);margin-top:0.4rem;line-height:1.2;">Available General Fund = Net Cash Balance − unspent event envelopes.</p>
+        <p style="font-size:0.75rem;color:var(--text-tertiary);margin-top:0.4rem;line-height:1.3;">Available General Fund = Net Cash Balance minus unspent event envelopes.</p>
         <a class="stat-pop-action" data-nav="reports"><span>View Financial Reports & Trends</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
       `;
 
@@ -318,6 +319,85 @@ const Dashboard = (() => {
       console.error('Announcements load failed:', err);
       container.innerHTML = `<div class="loading-state" role="alert"><iconify-icon icon="solar:danger-triangle-linear" aria-hidden="true"></iconify-icon> Could not load announcements. Check your connection, then refresh.</div>`;
     }
+  }
+
+  let _viewAllBound = false;
+  function bindViewAll() {
+    const link = document.getElementById('announcements-view-all');
+    if (!link || _viewAllBound) return;
+    _viewAllBound = true;
+    link.addEventListener('click', e => { e.preventDefault(); if (window.navigateTo) window.navigateTo('announcements'); });
+  }
+
+  // ---- Student status strip (students only) ----
+  // Reads data the page already fetches elsewhere; officers and admins keep
+  // the plain fund dashboard.
+  async function loadStudentStatus() {
+    const el = document.getElementById('student-status');
+    if (!el) return;
+    let profile = null;
+    try { profile = await Auth.getProfile(); } catch { profile = null; }
+    if (!profile || profile.role !== 'student') { el.classList.add('hidden'); return; }
+
+    const EJ = window.EnrollmentJourney;
+    const [mine, units, events, notifs] = await Promise.all([
+      Api.enrollment.my().catch(() => ({ submissions: [] })),
+      Api.units.my().catch(() => []),
+      Api.events.list().catch(() => []),
+      Api.notifications.list().catch(() => null),
+    ]);
+
+    const now = new Date();
+    const sy = now.getMonth() >= 5 ? `${now.getFullYear()}-${now.getFullYear() + 1}` : `${now.getFullYear() - 1}-${now.getFullYear()}`;
+    const terms = mine.submissions || [];
+    const sub = terms.find(s => s.school_year === sy) || terms[0] || null;
+    const step = EJ ? EJ.stepOf(sub) : null;
+    const stepLabel = step && EJ ? EJ.STEPS[step.stepIndex].label : 'Not started';
+    const action = EJ ? EJ.actionFor(sub) : { kind: 'none' };
+    const enrollmentCta = !sub || sub.status === 'draft'
+      ? (action.kind === 'submit' ? 'Submit your load' : 'Build your load')
+      : 'View status';
+
+    const inProgress = (Array.isArray(units) ? units : []).filter(u => u.status === 'enrolled');
+    const unitsNow = inProgress.reduce((s, u) => s + (Number(u.subjects?.units) || 0), 0);
+
+    const today = now.toISOString().slice(0, 10);
+    const next = (events || []).filter(ev => ev.event_date && ev.event_date >= today && ev.status !== 'archived')
+      .sort((a, b) => a.event_date.localeCompare(b.event_date))[0];
+
+    const unread = notifs && typeof notifs.total_unread === 'number' ? notifs.total_unread : 0;
+
+    el.innerHTML = `
+      <a href="#" class="status-tile" data-view="enrollment">
+        <span class="status-tile-label">Enrollment</span>
+        <span class="status-tile-value">${UI.esc(stepLabel)}</span>
+        <span class="status-tile-cta">${UI.esc(enrollmentCta)}</span>
+      </a>
+      <a href="#" class="status-tile" data-view="units">
+        <span class="status-tile-label">This term</span>
+        <span class="status-tile-value">${inProgress.length} subject${inProgress.length === 1 ? '' : 's'} · ${unitsNow} units</span>
+        <span class="status-tile-cta">Academic Progress</span>
+      </a>
+      <a href="#" class="status-tile" data-view="events">
+        <span class="status-tile-label">Next event</span>
+        <span class="status-tile-value">${next ? UI.esc(next.event_name) : 'Nothing scheduled'}</span>
+        <span class="status-tile-cta">${next ? UI.esc(UI.dateStr(next.event_date)) : 'See all events'}</span>
+      </a>
+      <a href="#" class="status-tile" data-view="notifications">
+        <span class="status-tile-label">Notifications</span>
+        <span class="status-tile-value">${unread ? `${unread} unread` : 'All caught up'}</span>
+        <span class="status-tile-cta">Open inbox</span>
+      </a>
+      <a href="/feedback/" class="status-tile status-tile--quiet">
+        <span class="status-tile-label">Have a concern?</span>
+        <span class="status-tile-value">Send feedback</span>
+        <span class="status-tile-cta">Eight questions, two minutes</span>
+      </a>`;
+    el.querySelectorAll('[data-view]').forEach(a => a.addEventListener('click', e => {
+      e.preventDefault();
+      if (window.navigateTo) window.navigateTo(a.dataset.view);
+    }));
+    el.classList.remove('hidden');
   }
 
   async function subscribeRealtime() {

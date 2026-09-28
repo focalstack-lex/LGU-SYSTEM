@@ -1,0 +1,23 @@
+{
+ "headings": [
+  "Financial Reports",
+  "₱191,300.00",
+  "₱84,315.00",
+  "₱94,685.00",
+  "44%",
+  "Monthly Income vs Expenses",
+  "Breakdown by Type",
+  "Export Per-Event Reports"
+ ],
+ "buttons": [
+  "All Time"
+ ],
+ "loaders": 0,
+ "empties": [],
+ "staffLeak": [],
+ "overflow": false,
+ "dashes": 1,
+ "tiny": 11,
+ "smallTargets": [],
+ "text": "Financial Reports\nMonthly summaries and breakdowns\nAll Time\nTOTAL INCOME\n₱191,300.00\nTOTAL EXPENSES\n₱84,315.00\nAVAILABLE GENERAL FUND\n₱94,685.00\nNet Cash: ₱106,985.00\nBUDGET UTILIZED\n44%\nMonthly Income vs Expenses\nBreakdown by Type\nExport Per-Event Reports\nAdmin only\nEngineering Week 2026\nOngoing\nALLOCATED\n₱85,000.00\nREMAINING\n₱13,600.00\nIntramurals 2026\nCompleted\nALLOCATED\n₱60,000.00\nREMAINING\n₱1,725.00\nTienda Eng'g Fund Raising\nCompleted\nALLOCATED\n₱40,000.00\nREMAINING\n₱3,850.00\nResearch Colloquium\nUpcoming\nALLOCATED\n₱30,000.00\nREMAINING\n₱30,000.00\nCommunity Outreach — Barrio Tipan\nUpcoming\nALLOCATED\n₱25,000.00\nREMAINING\n₱25,000.00"
+}

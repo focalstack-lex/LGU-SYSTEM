@@ -550,7 +550,7 @@ const Admin = (() => {
 
       if (fromId === 'GENERAL') {
         const newBal = _genFundBalance - amount;
-        fromBalEl.innerHTML = `${UI.currency(_genFundBalance)} <iconify-icon icon="solar:arrow-right-linear" style="font-size:12px"></iconify-icon> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
+        fromBalEl.innerHTML = `${UI.currency(_genFundBalance)} <iconify-icon icon="solar:arrow-right-linear" style="font-size:12px"></iconify-icon> <span style="color:${newBal < 0 ? 'var(--error)' : 'inherit'}">${UI.currency(newBal)}</span>`;
         if (newBal < 0) {
           errEl.textContent = "Insufficient funds in General Fund!";
           errEl.classList.remove('hidden');
@@ -561,7 +561,7 @@ const Admin = (() => {
         }
       } else if (fromId && fromEv) {
         const newBal = fromEv.remaining_budget - amount;
-        fromBalEl.innerHTML = `${UI.currency(fromEv.remaining_budget)} <iconify-icon icon="solar:arrow-right-linear" style="font-size:12px"></iconify-icon> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
+        fromBalEl.innerHTML = `${UI.currency(fromEv.remaining_budget)} <iconify-icon icon="solar:arrow-right-linear" style="font-size:12px"></iconify-icon> <span style="color:${newBal < 0 ? 'var(--error)' : 'inherit'}">${UI.currency(newBal)}</span>`;
         if (newBal < 0) {
           errEl.textContent = "Source event has insufficient funds!";
           errEl.classList.remove('hidden');
@@ -576,7 +576,7 @@ const Admin = (() => {
 
       if (toEv) {
         const newBal = toEv.remaining_budget + amount;
-        toBalEl.innerHTML = `${UI.currency(toEv.remaining_budget)} <iconify-icon icon="solar:arrow-right-linear" style="font-size:12px"></iconify-icon> <span style="color:#22C55E">${UI.currency(newBal)}</span>`;
+        toBalEl.innerHTML = `${UI.currency(toEv.remaining_budget)} <iconify-icon icon="solar:arrow-right-linear" style="font-size:12px"></iconify-icon> <span style="color:var(--success)">${UI.currency(newBal)}</span>`;
       } else {
         toBalEl.textContent = '-';
       }
@@ -671,14 +671,14 @@ const Admin = (() => {
                   <td>${UI.renderStatusBadge(u.role)}</td>
                   <td>
                     ${u.is_verified 
-                      ? '<span style="font-size:0.75rem;padding:3px 10px;border-radius:12px;background:rgba(34,197,94,0.15);color:#22c55e;font-weight:700;display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="solar:check-circle-bold"></iconify-icon> Verified</span>'
-                      : '<span style="font-size:0.75rem;padding:3px 10px;border-radius:12px;background:rgba(245,158,11,0.15);color:#f59e0b;font-weight:700;display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="solar:clock-circle-bold"></iconify-icon> Pending</span>'
+                      ? '<span style="font-size:0.75rem;padding:3px 10px;border-radius:12px;background:rgba(var(--success-rgb),0.15);color:var(--success);font-weight:700;display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="solar:check-circle-bold"></iconify-icon> Verified</span>'
+                      : '<span style="font-size:0.75rem;padding:3px 10px;border-radius:12px;background:rgba(var(--warning-rgb),0.15);color:var(--warning);font-weight:700;display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="solar:clock-circle-bold"></iconify-icon> Pending</span>'
                     }
                   </td>
                   <td style="text-align:center;">
                     <div style="display:flex;gap:4px;justify-content:center;">
                       ${!u.is_verified ? `
-                        <button class="tx-action-btn" style="font-size:.8rem;padding:.3rem .7rem;background:#16a34a;color:white;border:none;border-radius:6px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"
+                        <button class="tx-action-btn" style="font-size:.8rem;padding:.3rem .7rem;background:var(--success);color:var(--accent-text-on);border:none;border-radius:6px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"
                           data-user-action="verify" data-user-id="${UI.esc(u.id)}">
                           <iconify-icon icon="solar:letter-bold"></iconify-icon> Approve Account
                         </button>
@@ -784,17 +784,17 @@ const Admin = (() => {
 
     const actionLabel = a => {
       const icons = {
-        CREATE_TRANSACTION:       { icon: 'solar:add-circle-linear', color: '#22C55E', label: 'Created Transaction' },
-        EDIT_TRANSACTION:         { icon: 'solar:pen-linear', color: '#F97316', label: 'Edited Transaction' },
-        DELETE_TRANSACTION:       { icon: 'solar:trash-bin-trash-linear', color: '#ef4444', label: 'Deleted Transaction' },
+        CREATE_TRANSACTION:       { icon: 'solar:add-circle-linear', color: 'var(--success)', label: 'Created Transaction' },
+        EDIT_TRANSACTION:         { icon: 'solar:pen-linear', color: 'var(--primary)', label: 'Edited Transaction' },
+        DELETE_TRANSACTION:       { icon: 'solar:trash-bin-trash-linear', color: 'var(--error)', label: 'Deleted Transaction' },
         BULK_IMPORT_TRANSACTIONS: { icon: 'solar:upload-track-linear', color: '#3b82f6', label: 'Bulk Import' },
-        CREATE_EVENT:             { icon: 'solar:calendar-add-linear', color: '#22C55E', label: 'Created Event' },
-        UPDATE_EVENT:             { icon: 'solar:calendar-date-linear', color: '#F97316', label: 'Updated Event' },
+        CREATE_EVENT:             { icon: 'solar:calendar-add-linear', color: 'var(--success)', label: 'Created Event' },
+        UPDATE_EVENT:             { icon: 'solar:calendar-date-linear', color: 'var(--primary)', label: 'Updated Event' },
         ARCHIVE_EVENT:            { icon: 'solar:box-minimalistic-linear', color: '#8b5cf6', label: 'Archived Event' },
-        POST_ANNOUNCEMENT:        { icon: 'solar:bell-linear', color: '#f59e0b', label: 'Posted Announcement' },
+        POST_ANNOUNCEMENT:        { icon: 'solar:bell-linear', color: 'var(--warning)', label: 'Posted Announcement' },
         SET_USER_ROLE:            { icon: 'solar:shield-check-linear', color: '#6366f1', label: 'Changed User Role' },
         BUDGET_TRANSFER:          { icon: 'solar:card-transfer-linear', color: '#14b8a6', label: 'Budget Transfer' },
-        OVER_BUDGET_ALERT:        { icon: 'solar:danger-triangle-linear', color: '#F59E0B', label: 'Over Budget Alert' },
+        OVER_BUDGET_ALERT:        { icon: 'solar:danger-triangle-linear', color: 'var(--warning)', label: 'Over Budget Alert' },
       };
       const item = icons[a] || { icon: 'solar:info-circle-linear', color: 'var(--text-secondary)', label: a };
       return `

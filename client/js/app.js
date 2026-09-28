@@ -602,7 +602,7 @@
     }
 
     // Sync active class on both sidebar and bottom nav
-    const moreViews = ['income', 'transactions', 'enrollment', 'admin'];
+    const moreViews = ['income', 'transactions', 'enrollment', 'admin', 'announcements', 'notifications'];
     const isMoreActive = moreViews.includes(view);
     const moreBtn = document.getElementById('bottom-nav-more-btn');
     if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
@@ -617,6 +617,8 @@
     UI.moveNavIndicator(document.getElementById('bottom-nav'));
 
     if (view === 'dashboard')    Dashboard.load();
+    if (view === 'announcements') Updates.loadAnnouncements();
+    if (view === 'notifications') Updates.loadNotifications();
     if (view === 'events')       Events.load();
     if (view === 'transactions') Transactions.load();
     if (view === 'reports')      Reports.load();

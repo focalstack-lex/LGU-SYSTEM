@@ -585,7 +585,7 @@ const GrizzAI = (() => {
     const afternoonGreetings = [
       `Good afternoon, ${displayName}`,
       `Hope your afternoon is going well, ${displayName}.`,
-      `Good afternoon, engineer ${displayName}! The system is fully operational.`,
+      `Good afternoon, engineer ${displayName}.`,
       `Afternoon, ${displayName}! Let's optimize your study load.`,
       `Good afternoon, ${displayName}. Staying hydrated? Don't forget to take short breaks.`,
       `Hello, ${displayName}. Ready for some afternoon curriculum planning?`,
@@ -706,12 +706,7 @@ const GrizzAI = (() => {
         <div class="ursa-msg-content">
           <div class="ursa-bubble">
             <h4>${esc(greeting)}</h4>
-            <p>I am <strong>Grizz</strong>, your official College of Engineering advisor for <strong>${esc(progName)}</strong>. Select any inquiry below to explore your subjects or council funds.</p>
-            <p style="color:var(--text-secondary);font-size:0.75rem;margin-bottom:0.5rem;">Zero typing required - simply click what you need.</p>
-            <div class="ursa-motivational-box" style="border-top:1px dashed var(--border);margin-top:0.75rem;padding-top:0.65rem;font-size:0.78rem;color:var(--primary);font-style:italic;line-height:1.4;display:flex;align-items:flex-start;gap:0.35rem;">
-              <iconify-icon icon="solar:lightbulb-bolt-linear" style="font-size:0.95rem;flex-shrink:0;margin-top:1px;"></iconify-icon>
-              <span>Grizz says: "${esc(motivationalQuote)}"</span>
-            </div>
+            <p>I am <strong>Grizz</strong>, the College of Engineering guide for <strong>${esc(progName)}</strong>. Pick a question below to check your subjects, your standing, or the council funds.</p>
           </div>
         </div>
       </div>

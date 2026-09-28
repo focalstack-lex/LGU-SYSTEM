@@ -17,13 +17,14 @@
   <link rel="icon" type="image/png" href="assets/coe-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=7.8" />
-  <link rel="stylesheet" href="styles/officer.css?v=6.6" />
+  <link rel="stylesheet" href="styles/main.css?v=8.0" />
+  <link rel="stylesheet" href="styles/officer.css?v=6.7" />
   <script src="vendor/iconify-icon.min.js"></script>
   <script src="vendor/icons-bundle.js?v=2"></script>
   <script src="js/init-theme.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
   <!-- Access gate: filled by officer-app.js; students/unauthenticated never see data -->
   <div id="of-gate" class="of-gate hidden">
@@ -119,7 +120,7 @@
     </aside>
 
     <!-- Main content -->
-    <main class="of-main">
+    <main class="of-main" id="main-content" tabindex="-1">
 
       <!-- 1. Fund Overview -->
       <section class="of-view active" id="of-view-overview">
@@ -359,7 +360,7 @@
           <div class="of-stat">
             <div class="of-stat-label">
               <span>Total Registered</span>
-              <iconify-icon icon="solar:users-group-two-rounded-linear" style="color:var(--accent-primary, #f97316); font-size:1.1rem;"></iconify-icon>
+              <iconify-icon icon="solar:users-group-two-rounded-linear" style="color:var(--primary); font-size:1.1rem;"></iconify-icon>
             </div>
             <div class="of-stat-value" id="of-stat-val-users-total">0</div>
             <div class="of-stat-sub" id="of-stat-sub-users-total">0 of 0 registered</div>
@@ -375,7 +376,7 @@
           <div class="of-stat">
             <div class="of-stat-label">
               <span>Officers &amp; Leaders</span>
-              <span class="badge" style="background:rgba(249,115,22,0.12);color:var(--accent-primary, #f97316);border:1px solid rgba(249,115,22,0.25);font-size:0.62rem;padding:1px 5px;border-radius:4px;white-space:nowrap;">Leaders</span>
+              <span class="badge" style="background:rgba(var(--primary-rgb),0.12);color:var(--primary);border:1px solid rgba(var(--primary-rgb),0.25);font-size:0.62rem;padding:1px 5px;border-radius:4px;white-space:nowrap;">Leaders</span>
             </div>
             <div class="of-stat-value" id="of-stat-val-users-officers">0</div>
             <div class="of-stat-sub" id="of-stat-sub-users-officers">Admin, Governor, Officer, Cashier</div>
@@ -479,7 +480,7 @@
           </button>
           <button type="button" class="of-filter-btn" data-roster-view="requests" id="of-tab-roster-requests">
             <iconify-icon icon="solar:user-hand-up-linear"></iconify-icon> Verification Requests
-            <span id="of-roster-pending-badge" class="badge" style="margin-left:0.35rem; background:rgba(245,158,11,0.2); color:#f59e0b; padding:1px 6px; border-radius:10px; font-size:0.7rem; display:none;">0</span>
+            <span id="of-roster-pending-badge" class="badge" style="margin-left:0.35rem; background:rgba(var(--warning-rgb),0.2); color:var(--warning); padding:1px 6px; border-radius:10px; font-size:0.7rem; display:none;">0</span>
           </button>
         </div>
 
@@ -683,7 +684,7 @@
         <span class="mobile-sheet-section-label">Directory & Roster</span>
         <div class="mobile-sheet-group">
           <button type="button" class="mobile-sheet-row" data-of="roster" data-of-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(249,115,22,0.12);">
+            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(var(--primary-rgb),0.12);">
               <iconify-icon icon="solar:user-plus-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
@@ -722,7 +723,7 @@
         <span class="mobile-sheet-section-label">Communication</span>
         <div class="mobile-sheet-group">
           <button type="button" class="mobile-sheet-row" data-of="announcements" data-of-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:#F59E0B; background:rgba(245,158,11,0.12);">
+            <div class="mobile-sheet-row-icon" style="color:var(--warning); background:rgba(var(--warning-rgb),0.12);">
               <iconify-icon icon="solar:bell-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
@@ -1159,15 +1160,15 @@
   <script src="js/swr-cache.js"></script>
   <script src="js/roster.js?v=5.3"></script>
   <script src="js/auth.js?v=5.5"></script>
-  <script src="js/api.js?v=5.3"></script>
-  <script src="js/ui.js?v=5.9"></script>
+  <script src="js/api.js?v=5.4"></script>
+  <script src="js/ui.js?v=5.10"></script>
   <script src="js/receipt-capture.js?v=5.3"></script>
   <script src="js/receipt-modal.js?v=5.4"></script>
   <script src="js/dropdown.js?v=5.4"></script>
-  <script src="js/profile.js?v=5.4"></script>
-  <script src="js/notifications.js?v=5.3"></script>
+  <script src="js/profile.js?v=5.5"></script>
+  <script src="js/notifications.js?v=5.4"></script>
   <script src="js/officer/curriculum.js?v=1.1"></script>
-  <script src="js/officer/officer-app.js?v=6.5"></script>
+  <script src="js/officer/officer-app.js?v=6.6"></script>
   <script src="js/sw-register.js"></script>
 </body>
 </html>

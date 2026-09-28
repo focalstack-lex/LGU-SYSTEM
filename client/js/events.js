@@ -127,8 +127,8 @@ const Events = (() => {
         <div class="event-card" data-id="${UI.esc(ev.id)}" role="button" tabindex="0" aria-label="View details for ${UI.esc(ev.event_name)}">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
             ${UI.renderStatusBadge(ev.status)}
-            <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-tertiary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
-              <iconify-icon icon="solar:safe-square-linear" style="font-size:12px;color:var(--brand-accent,#B23A0A)"></iconify-icon>
+            <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-secondary);display:inline-flex;align-items:center;gap:4px;">
+              <iconify-icon icon="solar:safe-square-linear" style="font-size:12px;color:var(--brand-accent)"></iconify-icon>
               ${UI.esc(ev.funding_source || 'General Fund')}
             </span>
           </div>
@@ -175,7 +175,7 @@ const Events = (() => {
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:0.4rem;">
             ${UI.renderStatusBadge(ev.status)}
             <span style="font-size:0.75rem;background:rgba(255,255,255,0.08);padding:3px 10px;border-radius:12px;color:var(--text-secondary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
-              <iconify-icon icon="solar:safe-square-linear" style="font-size:13px;color:var(--brand-accent,#B23A0A)"></iconify-icon>
+              <iconify-icon icon="solar:safe-square-linear" style="font-size:13px;color:var(--brand-accent)"></iconify-icon>
               Source: ${UI.esc(ev.funding_source || 'General Fund')}
             </span>
           </div>
@@ -203,7 +203,7 @@ const Events = (() => {
             <div class="stat-icon"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></div>
             <div class="stat-body">
               <p class="stat-label">Budget Utilization</p>
-              <h3 class="stat-value">${UI.currency(Math.max(0, budget - Number(ev.computed_remaining)))}</h3>
+              <h3 class="stat-value">${budget > 0 ? Math.round((spent / budget) * 100) : 0}%</h3>
               <p class="stat-sublabel" style="font-size:0.75rem;color:var(--text-secondary)">Remaining: ${UI.currency(ev.computed_remaining)}</p>
             </div>
           </div>

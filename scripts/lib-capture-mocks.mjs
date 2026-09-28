@@ -192,8 +192,21 @@ export async function routeMocks(page, receipt, { verbose = false } = {}) {
   // Block the service worker so it can't serve cached shells
   await page.route(/\/sw\.js(\?.*)?$/, r => r.fulfill({ status: 404, body: '' }));
 
-  // Abort Realtime websocket requests so mock tests never hit the live Supabase realtime cluster
-  await page.route(/supabase\.co\/realtime\/v1\/websocket/, r => r.abort());
+  // Nothing from a mocked run may reach the live project. Routes match in
+  // reverse registration order, so these two catch-alls go first (lowest
+  // priority) and the specific mocks below win whenever they match.
+  //  - Any other Supabase HTTP call gets an empty 200 instead of a 401 that
+  //    would count against the project's API stats.
+  //  - Any unmocked local /api call gets a 404 here, so the Express server
+  //    never validates the mock token against Supabase Auth.
+  await page.route(/supabase\.co\//, r => { hit('supabase catch-all: ' + r.request().url().replace(/^https:\/\/[^/]+/, '').slice(0, 60)); reply(r, json([])); });
+  await page.route(/\/api\//, r => { hit('api catch-all (404): ' + r.request().url().replace(/^https?:\/\/[^/]+/, '').slice(0, 60)); reply(r, json({ error: 'not mocked' }, 404)); });
+
+  // Realtime connects over a WebSocket, which page.route cannot intercept.
+  // routeWebSocket without connectToServer keeps the socket local: the mock
+  // JWT never reaches the Realtime cluster (it produced JwtSignatureError
+  // entries there every few seconds).
+  await page.routeWebSocket(/supabase\.co\/realtime\//, ws => { hit('realtime websocket (kept local)'); });
 
   // Supabase auth
   await page.route(/supabase\.co\/auth\/v1\/token/, r => { hit('auth/token'); reply(r, json(session())); });
@@ -219,6 +232,9 @@ export async function routeMocks(page, receipt, { verbose = false } = {}) {
   await page.route(/\/api\/events\/[^/]+$/, r => { hit('api/events/detail'); reply(r, json(EVENTS[0])); });
   await page.route(/\/api\/events(\?.*)?$/, r => { hit('api/events'); reply(r, json(EVENTS)); });
   await page.route(/\/api\/announcements/, r => { hit('api/announcements'); reply(r, json(ANNOUNCEMENTS)); });
+  await page.route(/\/api\/notifications\/read/, r => { hit('api/notifications/read'); reply(r, json({ ok: true })); });
+  await page.route(/\/api\/notifications/, r => { hit('api/notifications'); reply(r, json({ total_unread: 0, unread_by_category: { events: 0, transactions: 0, reports: 0, announcements: 0, units: 0, system: 0 }, notifications: [] })); });
+  await page.route(/\/api\/enrollment\/pilot-status/, r => { hit('api/enrollment/pilot-status'); reply(r, json({ pilot: true })); });
   await page.route(/\/api\/units\/my/, r => { hit('api/units/my'); reply(r, json({ subjects: [] })); });
   await page.route(/\/api\/units\/checklists/, r => { hit('api/units/checklists'); reply(r, json({ subjects: [], requirements: [] })); });
   await page.route(/\/api\/admin\/users/, r => { hit('api/admin/users'); reply(r, json(ADMIN_USERS)); });

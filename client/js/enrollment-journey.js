@@ -37,6 +37,94 @@
     });
   }
 
+  // Newest record per subject decides its state (the API returns newest
+  // first). A subject whose newest record is 'failed' is a retake candidate.
+  function failedCodes(records) {
+    var seen = new Set();
+    var failed = new Set();
+    (records || []).forEach(function (u) {
+      var code = normCode(u && u.subjects && u.subjects.code);
+      if (!code || seen.has(code)) return;
+      seen.add(code);
+      if (u.status === 'failed') failed.add(code);
+    });
+    return failed;
+  }
+
+  function passedAndEnrolled(records) {
+    var seen = new Set();
+    var passed = new Set();
+    var enrolled = new Set();
+    (records || []).forEach(function (u) {
+      var code = normCode(u && u.subjects && u.subjects.code);
+      if (!code || seen.has(code)) return;
+      seen.add(code);
+      if (u.status === 'passed') passed.add(code);
+      else if (u.status === 'enrolled') enrolled.add(code);
+    });
+    return { passed: passed, enrolled: enrolled };
+  }
+
+  // Subjects a student may add to a load. Passed and currently enrolled
+  // subjects are out. A failed subject is offered from any year (retake).
+  // Everything else stays inside the one-year window below the student's
+  // level; yearLevel 0 means no window. Each result carries `retake`.
+  function eligibleSubjects(subjects, records, yearLevel) {
+    var state = passedAndEnrolled(records);
+    var failed = failedCodes(records);
+    var year = Number(yearLevel) || 0;
+    return (subjects || []).filter(function (s) {
+      var code = normCode(s && s.code);
+      if (!code || state.passed.has(code) || state.enrolled.has(code)) return false;
+      if (failed.has(code)) return true;
+      return !year || Number(s.year_level) >= year - 1;
+    }).map(function (s) {
+      var copy = {};
+      for (var k in s) copy[k] = s[k];
+      copy.retake = failed.has(normCode(s.code));
+      return copy;
+    });
+  }
+
+  // A load belongs to one semester; adding the other semester's subject is
+  // refused with a sentence the student can act on. Null means no problem.
+  function semesterMismatch(subject, term) {
+    if (!subject || !term || !term.semester || !subject.semester) return null;
+    if (Number(subject.semester) === Number(term.semester)) return null;
+    return subject.code + ' is a Semester ' + subject.semester + ' subject; this load is for Semester ' + term.semester + '.';
+  }
+
+  // Prerequisite codes the student has not passed. Structured rows win; the
+  // legacy free-text `prerequisites` field is the fallback. Corequisites are
+  // not blockers here (they are taken together).
+  function unmetPrerequisites(subject, rows, passedCodes) {
+    var passed = passedCodes || new Set();
+    var codes = [];
+    var structured = (rows || []).filter(function (r) { return r && r.subject_id === subject.id && r.kind === 'prerequisite'; });
+    if (structured.length) {
+      structured.forEach(function (r) {
+        var dep = r.depends_on_subject_id;
+        var code = normCode(dep && typeof dep === 'object' ? dep.code : (r.depends_on_code || ''));
+        if (code) codes.push(code);
+      });
+    } else if (subject.prerequisites) {
+      String(subject.prerequisites).split(/[,;/]|\band\b/i).forEach(function (part) {
+        var code = normCode(part.replace(/^(?:pre[- ]?req(?:uisite)?s?|requires?|depends?)\s*:?\s*/i, ''));
+        if (/^[A-Z]{2,5}\s?\d{2,4}[A-Z]?$/.test(code)) codes.push(code);
+      });
+    }
+    return codes.filter(function (c, i) { return codes.indexOf(c) === i && !passed.has(c); });
+  }
+
+  // Units in the active load against the program cap (null cap = no limit).
+  function loadUnits(sub, cap) {
+    var total = activeItems(sub).reduce(function (sum, i) {
+      return sum + (Number(i.subjects && i.subjects.units) || 0);
+    }, 0);
+    var limit = cap == null ? null : Number(cap);
+    return { total: total, cap: limit, over: limit != null && total > limit };
+  }
+
   // Server status -> { stepIndex, state, stepKey }.
   // state: 'current' | 'done' | 'upcoming' | 'defensive'
   function stepOf(sub) {
@@ -81,5 +169,6 @@
     return 'neutral';
   }
 
-  return { STEPS: STEPS, stepOf: stepOf, canEdit: canEdit, actionFor: actionFor, toneFor: toneFor, activeItems: activeItems, filterAvailable: filterAvailable };
+  return { STEPS: STEPS, stepOf: stepOf, canEdit: canEdit, actionFor: actionFor, toneFor: toneFor, activeItems: activeItems, filterAvailable: filterAvailable,
+    failedCodes: failedCodes, eligibleSubjects: eligibleSubjects, semesterMismatch: semesterMismatch, unmetPrerequisites: unmetPrerequisites, loadUnits: loadUnits };
 });

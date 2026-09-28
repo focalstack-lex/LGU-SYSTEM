@@ -20,10 +20,23 @@ const Notifications = (() => {
   let pollingInterval = null;
   let realtimeChannel = null;
 
+  // The student portal exposes `Api` (api.js); the executive portal's legacy
+  // helper is `API`. Use whichever this page loaded.
+  function client() {
+    if (typeof Api !== 'undefined' && Api.notifications) {
+      return { get: () => Api.notifications.list(), read: (category) => Api.notifications.markRead(category) };
+    }
+    if (typeof API !== 'undefined' && API.get) {
+      return { get: () => API.get('/api/notifications'), read: (category) => API.post('/api/notifications/read', { category }) };
+    }
+    return null;
+  }
+
   async function fetchNotifications() {
     try {
-      if (typeof API === 'undefined' || !API.get) return;
-      const data = await API.get('/api/notifications');
+      const api = client();
+      if (!api) return;
+      const data = await api.get();
       if (data && typeof data.total_unread === 'number') {
         state = data;
         updateUI();
@@ -47,9 +60,17 @@ const Notifications = (() => {
       events: ['nav-events'],
       transactions: ['nav-transactions'],
       reports: ['nav-reports'],
-      announcements: ['bottom-nav-more-btn'],
+      announcements: ['nav-announcements', 'bottom-nav-more-btn'],
       units: ['nav-units']
     };
+
+    // The Notifications entry carries the total, in the sidebar and the More sheet.
+    ['nav-notifications', 'bottom-nav-notifications'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle('has-unread', state.total_unread > 0);
+      el.setAttribute('data-unread', state.total_unread);
+    });
 
     // Update desktop & mobile bottom nav elements
     Object.keys(studentCategoryMap).forEach(cat => {
@@ -134,9 +155,8 @@ const Notifications = (() => {
     }
 
     try {
-      if (typeof API !== 'undefined' && API.post) {
-        await API.post('/api/notifications/read', { category });
-      }
+      const api = client();
+      if (api) await api.read(category);
     } catch (err) {
       console.debug('[Notifications] Mark read failed:', err.message);
     }

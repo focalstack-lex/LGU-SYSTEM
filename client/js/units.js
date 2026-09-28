@@ -200,11 +200,13 @@ const Units = (() => {
       ? Math.min(100 - pct, Math.round((inProgressUnits / total) * 100))
       : 0;
 
-    document.getElementById('units-progress-pct').textContent = `${pct}%`;
+    // No requirement row for this program: say so instead of printing 0%.
+    document.getElementById('units-progress-pct').textContent = total > 0 ? `${pct}%` : 'n/a';
     document.getElementById('units-progress-fill').style.width = `${pct}%`;
     document.getElementById('units-progress-progress').style.width = `${Math.min(100, pct + inPct)}%`;
-    document.getElementById('units-progress-caption').textContent =
-      `${completed} / ${total || '-'} units${inProgressUnits > 0 ? ` · ${inProgressUnits} in progress` : ''}`;
+    document.getElementById('units-progress-caption').textContent = total > 0
+      ? `${completed} / ${total} units${inProgressUnits > 0 ? ` · ${inProgressUnits} in progress` : ''}`
+      : `${completed} units completed. Required units are not set for ${program} yet.`;
     document.getElementById('units-completed').textContent = completed;
     document.getElementById('units-total').textContent = total || '-';
 
@@ -403,6 +405,9 @@ const Units = (() => {
     if (!sliderInit) slider.style.transition = 'none';
     slider.style.width = `${tabRect.width}px`;
     slider.style.transform = `translateX(${tabRect.left - contentLeft}px)`;
+    // Charcoal label only once the coral backplate is really under it; a
+    // hidden view measures 0px, which would leave charcoal text on charcoal.
+    wrapper.classList.toggle('slider-ready', tabRect.width > 0);
     if (!sliderInit) {
       void slider.offsetWidth; // commit position before enabling the transition
       slider.style.transition = '';
