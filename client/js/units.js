@@ -506,7 +506,7 @@ const Units = (() => {
       // component, tinted with that component's status. Kept inside a single
       // wrapper so the .unit-row grid still sees one badge element.
       const compBadge = (label, st, grade) => `
-        <span class="unit-badge unit-badge--${esc(st || 'none')}" style="width:auto;max-width:none;" title="${esc(label)}: ${esc(STATUS_LABELS[st] || '—')}${grade != null ? ' · grade ' + esc(grade) : ''}">${esc(label)}: ${esc(STATUS_LABELS[st] || '—')}${grade != null ? ' · ' + esc(grade) : ''}</span>`;
+        <span class="unit-badge unit-badge--${esc(st || 'none')}" style="width:auto;max-width:none;" title="${esc(label)}: ${esc(STATUS_LABELS[st] || '-')}${grade != null ? ' · grade ' + esc(grade) : ''}">${esc(label)}: ${esc(STATUS_LABELS[st] || '-')}${grade != null ? ' · ' + esc(grade) : ''}</span>`;
       badge = `
         <span style="display:inline-flex;align-items:center;gap:0.4rem;">
           ${compBadge('Lec', rec.lec_status, rec.lec_grade)}
@@ -580,7 +580,7 @@ const Units = (() => {
           </select>
         </div>
         <div class="form-group hidden" id="units-lab-grade-group">
-          <label>Laboratory Grade (1.0 – 5.0)</label>
+          <label>Laboratory Grade (1.0 - 5.0)</label>
           <input type="number" id="units-lab-grade" min="1" max="5" step="0.25" placeholder="e.g. 1.5" />
         </div>`;
 
@@ -614,7 +614,7 @@ const Units = (() => {
     const statusLabel = document.getElementById('units-status')?.closest('.form-group')?.querySelector('label');
     const gradeLabel  = document.getElementById('units-grade')?.closest('.form-group')?.querySelector('label');
     if (statusLabel) statusLabel.textContent = hasLab ? 'Lecture Status' : 'Status';
-    if (gradeLabel)  gradeLabel.textContent  = hasLab ? 'Lecture Grade (1.0 – 5.0)' : 'Grade (1.0 – 5.0)';
+    if (gradeLabel)  gradeLabel.textContent  = hasLab ? 'Lecture Grade (1.0 - 5.0)' : 'Grade (1.0 - 5.0)';
     if (hasLab) {
       setDDValue(document.getElementById('units-lab-status'), record?.lab_status || 'enrolled');
       document.getElementById('units-lab-grade').value = record?.lab_grade != null ? record.lab_grade : '';
@@ -748,7 +748,13 @@ const Units = (() => {
   }
 
   async function dropRecord(id) {
-    if (!confirm('Remove this subject record? This cannot be undone.')) return;
+    const ok = await UI.confirmDialog({
+      title: 'Remove subject record?',
+      message: 'This removes the subject from your record and cannot be undone.',
+      confirmLabel: 'Remove record',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await Api.units.drop(id);
       UI.toast('Subject record removed.', 'success');

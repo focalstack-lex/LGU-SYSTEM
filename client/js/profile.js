@@ -243,6 +243,8 @@ const ProfileModal = (() => {
     }
   }
 
+  let _trap = null; // focus trap for the open modal (UI.trapDialog)
+
   async function open(defaultTab = 'general') {
     const modal = document.getElementById('profile-modal');
     const overlay = document.getElementById('profile-modal-overlay');
@@ -267,6 +269,12 @@ const ProfileModal = (() => {
     // 3. Clear feedbacks
     setFeedback('profile-general-feedback', '');
     setFeedback('profile-security-feedback', '');
+
+    // Move focus into the dialog, keep Tab inside it, and return focus to the
+    // trigger on close.
+    if (!_trap && typeof UI !== 'undefined' && UI.trapDialog) {
+      _trap = UI.trapDialog(modal, { initialFocus: '.profile-tab-btn.active', onClose: close });
+    }
 
     // 4. Pre-fill from current UI state immediately
     const curName = document.getElementById('user-name')?.textContent || document.getElementById('of-user-name')?.textContent || '';
@@ -305,6 +313,9 @@ const ProfileModal = (() => {
   }
 
   function close() {
+    const trap = _trap;
+    _trap = null;
+    if (trap) trap.release();
     const modal = document.getElementById('profile-modal');
     const overlay = document.getElementById('profile-modal-overlay');
     if (modal) modal.classList.add('hidden');
@@ -507,13 +518,21 @@ const ProfileModal = (() => {
     const newPassword = newPassEl ? newPassEl.value : '';
     const confirmPassword = confPassEl ? confPassEl.value : '';
 
+    // Mark the failing field so the error is tied to it, not only to the box.
+    const invalid = (el, message) => {
+      setFeedback('profile-security-feedback', message, 'error');
+      if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); }
+    };
+    newPassEl?.removeAttribute('aria-invalid');
+    confPassEl?.removeAttribute('aria-invalid');
+
     if (!newPassword || newPassword.length < 8) {
-      setFeedback('profile-security-feedback', 'Password must be at least 8 characters long.', 'error');
+      invalid(newPassEl, 'Password must be at least 8 characters long.');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setFeedback('profile-security-feedback', 'Passwords do not match.', 'error');
+      invalid(confPassEl, 'Passwords do not match.');
       return;
     }
 

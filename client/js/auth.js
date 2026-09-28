@@ -65,7 +65,7 @@ const Auth = (() => {
       // 401/403 = GoTrue definitively rejected the token. Anything else
       // (offline, timeout, 5xx) must NOT log the user out.
       if (error.status === 401 || error.status === 403) {
-        console.warn('[Auth] Stored session token was rejected by the server — clearing it. Please sign in again.');
+        console.warn('[Auth] Stored session token was rejected by the server; clearing it. Please sign in again.');
         try { await window.supabaseClient.auth.signOut({ scope: 'local' }); } catch {}
         // Belt and braces: guarantee the rejected token is gone even when the
         // signOut network call itself fails with the same 401.

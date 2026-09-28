@@ -352,7 +352,7 @@ const Admin = (() => {
       }
 
       btn.disabled = true;
-      btn.textContent = 'Submitting…';
+      btn.textContent = 'Recording…';
 
       try {
         // With an attached receipt the request must be multipart so the file
@@ -401,7 +401,7 @@ const Admin = (() => {
         errEl.classList.remove('hidden');
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Submit Transaction';
+        btn.textContent = 'Record Transaction';
       }
     });
   }
@@ -874,7 +874,7 @@ const Admin = (() => {
           </table>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;flex-wrap:wrap;gap:0.5rem;">
-          <span style="font-size:0.8rem;color:var(--text-secondary)">Showing ${start}–${end} of ${filtered.length} entries</span>
+          <span style="font-size:0.8rem;color:var(--text-secondary)">Showing ${start}-${end} of ${filtered.length} entries</span>
           <div style="display:flex;gap:0.35rem;align-items:center;">
             <button type="button" class="btn btn-ghost" id="admin-audit-prev" style="padding:0.25rem 0.6rem;font-size:0.8rem;" ${_auditPage <= 1 ? 'disabled' : ''}>Prev</button>
             ${pagesHTML}

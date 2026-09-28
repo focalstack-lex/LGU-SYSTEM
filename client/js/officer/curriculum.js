@@ -85,7 +85,7 @@ const CurriculumManager = (() => {
   }
 
   function prereqSummary(rowsFor) {
-    if (!rowsFor.length) return '—';
+    if (!rowsFor.length) return '-';
     return rowsFor.map(r =>
       r.kind === 'year_standing' || r.kind === 'special'
         ? KIND_LABELS[r.kind]
@@ -114,7 +114,7 @@ const CurriculumManager = (() => {
     const { prerequisites } = await Api.curriculum.prerequisites(subjectId);
     panel.innerHTML = `
       <div class="cur-editor">
-        <h3>Prerequisites — ${esc(editorSubject.code)}</h3>
+        <h3>Prerequisites: ${esc(editorSubject.code)}</h3>
         <ul class="cur-prereq-list">
           ${prerequisites.map(r => `
             <li>
@@ -130,9 +130,9 @@ const CurriculumManager = (() => {
             <option value="special">Special</option>
           </select>
           <select id="cur-new-subject">
-            <option value="">— subject —</option>
+            <option value="">Select subject</option>
             ${subjects.filter(s => s.id !== subjectId).map(s =>
-              `<option value="${s.id}">${esc(s.code)} — ${esc(s.title)}</option>`).join('')}
+              `<option value="${s.id}">${esc(s.code)}: ${esc(s.title)}</option>`).join('')}
           </select>
           <input type="text" id="cur-new-detail" placeholder="Detail (year standing / special)" />
           <button type="submit" class="btn btn-primary btn-sm">Add</button>

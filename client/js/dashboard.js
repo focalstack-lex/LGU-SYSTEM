@@ -258,7 +258,8 @@ const Dashboard = (() => {
         </div>
       `).join('');
     } catch (err) {
-      container.innerHTML = `<div class="loading-state"><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon> Failed to load transactions.</div>`;
+      console.error('Recent transactions load failed:', err);
+      container.innerHTML = `<div class="loading-state" role="alert"><iconify-icon icon="solar:danger-triangle-linear" aria-hidden="true"></iconify-icon> Could not load recent transactions. Check your connection, then refresh.</div>`;
     }
   }
 
@@ -314,7 +315,8 @@ const Dashboard = (() => {
         });
       });
     } catch (err) {
-      container.innerHTML = `<div class="loading-state"><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon> Failed to load announcements.</div>`;
+      console.error('Announcements load failed:', err);
+      container.innerHTML = `<div class="loading-state" role="alert"><iconify-icon icon="solar:danger-triangle-linear" aria-hidden="true"></iconify-icon> Could not load announcements. Check your connection, then refresh.</div>`;
     }
   }
 

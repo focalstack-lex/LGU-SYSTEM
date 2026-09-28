@@ -15,17 +15,38 @@
   }
 
   // ---- Login ----
+  // #login-form is a real <form> (autofill, Enter from either field); the
+  // click handler below does the work, so the native submit is cancelled.
+  document.getElementById('login-form')?.addEventListener('submit', e => e.preventDefault());
+
+  // Supabase auth messages are developer-facing; map the known ones to plain
+  // sentences and fall back to a generic one instead of echoing raw text.
+  function friendlyLoginError(err) {
+    const msg = String(err?.message || '').toLowerCase();
+    if (msg.includes('email not confirmed')) return 'Your email is not confirmed yet. Check your inbox for the confirmation link.';
+    if (msg.includes('rate limit') || msg.includes('too many')) return 'Too many sign-in attempts. Wait a minute and try again.';
+    if (msg.includes('failed to fetch') || msg.includes('network')) return 'Could not reach the server. Check your connection and try again.';
+    return 'Email or password is incorrect.';
+  }
+
   document.getElementById('login-btn').addEventListener('click', async () => {
     const errEl = document.getElementById('login-error');
     const btn   = document.getElementById('login-btn');
     const email = document.getElementById('login-email').value.trim();
     const pass  = document.getElementById('login-password').value;
 
+    const emailEl = document.getElementById('login-email');
+    const passEl  = document.getElementById('login-password');
     errEl.classList.add('hidden');
+    emailEl.removeAttribute('aria-invalid');
+    passEl.removeAttribute('aria-invalid');
 
     if (!email || !pass) {
       errEl.textContent = 'Please enter your email and password.';
       errEl.classList.remove('hidden');
+      const missing = !email ? emailEl : passEl;
+      missing.setAttribute('aria-invalid', 'true');
+      missing.focus();
       return;
     }
 
@@ -41,9 +62,10 @@
       if (err.message.includes('missing email or phone') || err.message.includes('phone')) {
         errEl.textContent = 'Please enter your email and password.';
       } else if (isSchoolEmail && (err.message.includes('Invalid login credentials') || err.message.includes('Invalid credentials') || err.message.includes('invalid_grant'))) {
-        errEl.innerHTML = '<strong>Notice:</strong> You will not use your official GSuite/Google account password in this area. Please click <strong>Continue with CJC Google Account</strong> above to sign in securely with your school account.';
+        errEl.innerHTML = 'School accounts sign in with Google. Use <strong>Continue with CJC Google Account</strong> above.';
       } else {
-        errEl.textContent = err.message || 'Invalid email or password.';
+        console.error('Login failed:', err);
+        errEl.textContent = friendlyLoginError(err);
       }
       errEl.classList.remove('hidden');
     } finally {
@@ -54,7 +76,10 @@
 
   // Allow Enter key on login form
   document.getElementById('login-password').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('login-btn').click();
+    if (e.key === 'Enter') {
+      e.preventDefault(); // stop implicit form submission from clicking a second time
+      document.getElementById('login-btn').click();
+    }
   });
 
   // ---- Google OAuth Sign-in Handler ----
@@ -198,7 +223,7 @@
         pendingSec.classList.remove('hidden');
         const nameEl = document.getElementById('onboarding-pending-name');
         const courseEl = document.getElementById('onboarding-pending-course');
-        if (nameEl) nameEl.textContent = existingReq.full_name || user?.user_metadata?.full_name || '—';
+        if (nameEl) nameEl.textContent = existingReq.full_name || user?.user_metadata?.full_name || '-';
         if (courseEl) courseEl.textContent = `${existingReq.course} - Year ${existingReq.year_level}`;
       }
       onboardingModal.classList.remove('hidden');

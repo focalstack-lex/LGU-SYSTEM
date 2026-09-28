@@ -594,7 +594,7 @@ const GrizzAI = (() => {
       `Maayong hapon! Ready na ba mo mag-engineer, or nag-loading pa ang brain?`,
       `Hapon na, ${displayName}. Ang adlaw init, ang workload mas init.`,
       `Good afternoon! May your coffee be strong and your calculations stronger.`,
-      `Maayong hapon! Unsay atong i-solve karon — equation or existential crisis?`,
+      `Maayong hapon! Unsay atong i-solve karon: equation or existential crisis?`,
       `Hapon na! Time to convert caffeine into engineering solutions.`,
       `Maayong hapon, ${displayName}! Ayaw kabalaka, dili pa late… basin.`,
       `Good afternoon! Ang brain nimo naka-afternoon mode na, pero ang requirements naka-hard mode.`,
@@ -1105,8 +1105,8 @@ const GrizzAI = (() => {
     if (partialPasses.size > 0) {
       const componentNotes = [...partialPasses.entries()].map(([code, component]) =>
         component === 'lecture'
-          ? `You passed <strong>${esc(code)}</strong> lecture — retake the lab only.`
-          : `You passed <strong>${esc(code)}</strong> lab — retake the lecture only.`
+          ? `You passed <strong>${esc(code)}</strong> lecture, so retake the lab only.`
+          : `You passed <strong>${esc(code)}</strong> lab, so retake the lecture only.`
       );
       backlogNote += `
         <div class="ursa-alert-box">

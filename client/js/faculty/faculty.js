@@ -38,9 +38,19 @@ const FacultyPortal = (() => {
     setTimeout(() => el.remove(), 4200);
   }
 
+  // Fallback sentences when the server gives no message, keyed by guard label.
+  const GUARD_FAILURES = {
+    approve: 'Could not verify this load. Try again.',
+    addItem: 'Could not add the subject. Try again.',
+    removeItem: 'Could not remove the subject. Try again.',
+  };
+
   async function guard(label, fn) {
     try { return await fn(); }
-    catch (err) { console.error(`[faculty] ${label}:`, err); toast(err.message || 'Something went wrong.', 'error'); }
+    catch (err) {
+      console.error(`[faculty] ${label}:`, err);
+      toast(err.message || GUARD_FAILURES[label] || 'The request failed. Try again.', 'error');
+    }
   }
 
   const isHead = () => profile?.role === 'program_head' || profile?.role === 'admin';
@@ -198,7 +208,7 @@ const FacultyPortal = (() => {
           <span class="fq-meta">${esc(s.student?.course || '')} · ${subjLabel} · ${esc(STATUS_LABELS[s.status] || s.status)}</span>
           ${timeLabel}
         </span>
-        <span class="faculty-row-actions"><button type="button" class="btn btn-primary btn-sm">Review</button></span>
+        <span class="faculty-row-actions"><button type="button" class="btn btn-primary btn-sm" aria-label="Review load for ${esc(s.student?.full_name || 'Student')}">Review</button></span>
       </div>`;
   }
 
@@ -261,10 +271,16 @@ const FacultyPortal = (() => {
       </div>`).join('') || '<p class="muted">No subjects in this load.</p>';
     itemsEl.querySelectorAll('[data-remove]').forEach(btn =>
       btn.addEventListener('click', async () => {
-        const note = prompt('Reason for removing this subject (required):');
-        if (!note || !note.trim()) return;
+        const note = await UI.confirmDialog({
+          title: 'Remove subject from this load?',
+          message: 'The student sees your reason next to the removed subject.',
+          confirmLabel: 'Remove subject',
+          danger: true,
+          reason: { label: 'Reason for removing', required: true },
+        });
+        if (!note) return;
         await guard('removeItem', async () => {
-          await Api.faculty.removeItem(s.id, btn.dataset.remove, note.trim());
+          await Api.faculty.removeItem(s.id, btn.dataset.remove, note);
           await openEvaluation(s.id);
         });
       }));
@@ -279,12 +295,22 @@ const FacultyPortal = (() => {
     // Verify is the head's only decision: add/remove adjust the load, verify
     // finalizes it (spec D8 — no reject, no return-for-changes).
     document.getElementById('faculty-approve-btn').onclick = async () => {
+      const btn = document.getElementById('faculty-approve-btn');
+      if (btn.disabled) return;
       if (!confirm('Verify and finalize this load? The subjects are enrolled for the student now. Continue?')) return;
-      await guard('approve', async () => {
-        const r = await Api.faculty.approve(s.id);
-        if (r.alreadyApproved) { alert('This load is already verified.'); return; }
-        backToQueue();
-      });
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+      try {
+        await guard('approve', async () => {
+          const r = await Api.faculty.approve(s.id);
+          if (r.alreadyApproved) { toast('This load is already verified.', 'info'); return; }
+          toast('Load verified and finalized.', 'success');
+          backToQueue();
+        });
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Verify &amp; Finalize';
+      }
     };
   }
 
@@ -432,10 +458,22 @@ const FacultyPortal = (() => {
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('faculty-eval-back')?.addEventListener('click', backToQueue);
     document.getElementById('faculty-add-btn')?.addEventListener('click', async () => {
-      const subjectId = document.getElementById('faculty-add-subject').value;
-      const note = document.getElementById('faculty-add-note').value.trim();
-      if (!subjectId) return alert('Choose a subject.');
-      if (!note) return alert('A reason is required when adding a subject.');
+      const subjectEl = document.getElementById('faculty-add-subject');
+      const noteEl = document.getElementById('faculty-add-note');
+      const errEl = document.getElementById('faculty-add-error');
+      const subjectId = subjectEl.value;
+      const note = noteEl.value.trim();
+      const fail = (el, message) => {
+        errEl.textContent = message;
+        errEl.classList.remove('hidden');
+        el.setAttribute('aria-invalid', 'true');
+        el.focus();
+      };
+      errEl.classList.add('hidden');
+      subjectEl.removeAttribute('aria-invalid');
+      noteEl.removeAttribute('aria-invalid');
+      if (!subjectId) return fail(subjectEl, 'Choose a subject to add.');
+      if (!note) return fail(noteEl, 'Enter a reason for adding this subject.');
       await guard('addItem', async () => {
         await Api.faculty.addItem(currentSubmission.id, subjectId, note);
         document.getElementById('faculty-add-note').value = '';

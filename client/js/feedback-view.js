@@ -18,7 +18,8 @@
   let client = null;
 
   if (typeof supabase === 'undefined' || !window.SUPABASE_URL) {
-    showLogin('Supabase failed to load. Check your connection and refresh.');
+    showLogin('Could not connect to the portal. Check your internet connection, then refresh this page.');
+    document.querySelectorAll('form button').forEach(b => { b.disabled = true; });
     return;
   }
   client = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON, {

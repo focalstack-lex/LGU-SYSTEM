@@ -17,8 +17,8 @@
   <meta name="description" content="Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=7.6" />
-  <link rel="stylesheet" href="styles/ai.css?v=6.6" />
+  <link rel="stylesheet" href="styles/main.css?v=7.7" />
+  <link rel="stylesheet" href="styles/ai.css?v=6.7" />
   <script src="vendor/supabase.min.js"></script>
   <script src="vendor/chart.umd.min.js"></script>
   <script src="vendor/iconify-icon.min.js"></script>
@@ -49,7 +49,7 @@
     <div class="auth-form-panel">
       <div class="auth-form-container">
         <!-- Login Form -->
-        <div id="login-form" class="auth-form active">
+        <form id="login-form" class="auth-form active" novalidate>
           <div class="auth-form-header">
             <h2>Sign in</h2>
             <p>Use your CJC Google account or email & password.</p>
@@ -72,24 +72,24 @@
           <div class="form-group">
             <label for="login-email">Email Address</label>
             <div class="input-icon-wrap">
-              <input type="email" id="login-email" placeholder="you@g.cjc.edu.ph" />
+              <input type="email" id="login-email" name="email" autocomplete="email" inputmode="email" aria-describedby="login-error" placeholder="you@g.cjc.edu.ph" />
             </div>
           </div>
           <div class="form-group">
             <label for="login-password">Password</label>
             <div class="input-icon-wrap">
-              <input type="password" id="login-password" placeholder="••••••••" />
+              <input type="password" id="login-password" name="password" autocomplete="current-password" aria-describedby="login-password-notice login-error" />
             </div>
-            <p class="auth-field-hint auth-password-notice" style="margin-top:0.45rem;line-height:1.4;display:flex;align-items:flex-start;gap:0.35rem;">
-              <iconify-icon icon="solar:info-circle-linear" style="color:var(--primary);font-size:1rem;flex-shrink:0;margin-top:1px;"></iconify-icon>
-              <span><strong>Notice:</strong> Do not enter your official GSuite/Google password here. For school accounts, click <strong>Continue with CJC Google Account</strong> above.</span>
+            <p class="auth-field-hint auth-password-notice" id="login-password-notice">
+              <iconify-icon icon="solar:info-circle-linear" aria-hidden="true"></iconify-icon>
+              <span>School account? Use <strong>Continue with CJC Google Account</strong> above. Your CJC Google password does not work here.</span>
             </p>
           </div>
-          <div class="auth-error hidden" id="login-error"></div>
-          <button class="btn btn-primary btn-full" id="login-btn" type="button">
+          <div class="auth-error hidden" id="login-error" role="alert"></div>
+          <button class="btn btn-primary btn-full" id="login-btn" type="submit">
             <span>Sign In</span>
           </button>
-        </div>
+        </form>
       </div>
     </div>
   </div>
@@ -107,9 +107,9 @@
       <div id="onboarding-unmatched-banner" class="hidden" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);padding:0.65rem 0.85rem;border-radius:8px;margin-bottom:0.75rem;font-size:0.78rem;color:var(--text-primary);line-height:1.4;">
         <div style="display:flex;align-items:center;gap:0.4rem;color:var(--status-negative);font-weight:700;margin-bottom:0.25rem;">
           <iconify-icon icon="solar:shield-warning-bold" style="font-size:1.05rem;"></iconify-icon>
-          <span>Account Not in S.Y. 2026–2027 Roster</span>
+          <span>Account Not in S.Y. 2026-2027 Roster</span>
         </div>
-        <p style="margin:0;color:var(--text-secondary);">We couldn't find your account in the officially enrolled students database of <strong>S.Y. 2026–2027</strong>. Please submit an enrollment verification request below and wait for confirmation from Executive Officers / Admins.</p>
+        <p style="margin:0;color:var(--text-secondary);">We couldn't find your account in the officially enrolled students database of <strong>S.Y. 2026-2027</strong>. Please submit an enrollment verification request below and wait for confirmation from Executive Officers / Admins.</p>
       </div>
 
       <!-- Main Onboarding / Request Form -->
@@ -196,7 +196,7 @@
           <p class="auth-field-hint" style="margin-top:-0.35rem;margin-bottom:1rem;">Optional: Set a password for standalone email login without Google popup.</p>
         </div>
 
-        <div id="onboarding-error" class="auth-error hidden"></div>
+        <div id="onboarding-error" class="auth-error hidden" role="alert"></div>
 
         <div class="modal-footer" style="margin-top:1.25rem;display:flex;flex-direction:column;gap:0.5rem;">
           <button type="button" class="btn btn-primary btn-full" id="onboarding-submit-btn">
@@ -220,8 +220,8 @@
           Your enrollment verification request has been submitted and is currently awaiting confirmation from the Executive Officers.
         </p>
         <div style="background:var(--bg-surface-raised);border:1px solid var(--border-default);border-radius:8px;padding:0.75rem 1rem;font-size:0.8rem;text-align:left;margin-bottom:1.25rem;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span style="color:var(--text-secondary);">Student Name:</span> <strong id="onboarding-pending-name">—</strong></div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span style="color:var(--text-secondary);">Program &amp; Year:</span> <strong id="onboarding-pending-course">—</strong></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span style="color:var(--text-secondary);">Student Name:</span> <strong id="onboarding-pending-name">-</strong></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span style="color:var(--text-secondary);">Program &amp; Year:</span> <strong id="onboarding-pending-course">-</strong></div>
           <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Review Status:</span> <span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);font-size:0.72rem;">Pending Confirmation</span></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -325,7 +325,7 @@
     <main class="main-content">
       <div id="offline-banner" class="offline-banner hidden">
         <iconify-icon icon="solar:cloud-cross-linear" class="offline-banner-icon"></iconify-icon>
-        <span>Offline — reconnect to refresh financial data</span>
+        <span>Offline: reconnect to refresh financial data</span>
       </div>
 
       <!-- DASHBOARD -->
@@ -532,7 +532,7 @@
             <h3><iconify-icon icon="solar:add-circle-linear" style="color:var(--col-success); margin-right:0.4rem" ></iconify-icon> Add General Income</h3>
             <form id="add-income-form" class="admin-form" style="margin-top:1rem;">
               <div class="form-group">
-                <label>Income Type</label>
+                <label for="inc-type">Income Type</label>
                 <select id="inc-type" required>
                   <option value="donation">Donation (External Sponsorship)</option>
                   <option value="collection">Collection (General Fee/Ticket)</option>
@@ -540,24 +540,24 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>Source / Description</label>
+                <label for="inc-desc">Source / Description</label>
                 <input type="text" id="inc-desc" required placeholder="Where did this come from?" />
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label>Amount (₱)</label>
+                  <label for="inc-amount">Amount (₱)</label>
                   <input type="number" id="inc-amount" min="1" step="0.01" required placeholder="0.00" />
                 </div>
                 <div class="form-group">
-                  <label>Date Received</label>
+                  <label for="inc-date">Date Received</label>
                   <input type="date" id="inc-date" required />
                 </div>
               </div>
               <div class="form-group">
-                <label>Proof of Receipt (Optional Link)</label>
+                <label for="inc-receipt">Proof of Receipt (Optional Link)</label>
                 <input type="url" id="inc-receipt" placeholder="https://" />
               </div>
-              <div class="auth-error hidden" id="inc-error"></div>
+              <div class="auth-error hidden" id="inc-error" role="alert"></div>
               <button class="btn btn-primary" type="submit" id="inc-submit" style="width:100%;margin-top:1rem;background:var(--col-success);border-color:var(--col-success);">
                 Add to Total Income
               </button>
@@ -683,13 +683,13 @@
               <p class="enrollment-note" id="enrollment-term-line"></p>
               <div id="enrollment-items"></div>
               <div class="ev-locked-note hidden" id="enrollment-locked-note"></div>
-              <div class="auth-error hidden" id="enrollment-error"></div>
+              <div class="auth-error hidden" id="enrollment-error" role="alert"></div>
             </div>
 
             <div class="enrollment-card" id="enrollment-eligible-card">
               <div class="enrollment-eligible-header">
                 <h3><iconify-icon icon="solar:book-bookmark-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Eligible Courses for this Semester</h3>
-                <p class="enrollment-note" style="margin:0.25rem 0 0.85rem;">Pick the subjects you need — Grizz's recommendations are a great starting point.</p>
+                <p class="enrollment-note" style="margin:0.25rem 0 0.85rem;">Pick the subjects you need. Grizz's recommendations are a great starting point.</p>
               </div>
               <div class="enrollment-filter-toolbar">
                 <div class="enrollment-select-wrapper">
@@ -737,11 +737,11 @@
               <form id="add-event-form" class="admin-form">
                 <div class="form-row">
                   <div class="form-group">
-                    <label>Event Name</label>
+                    <label for="ev-name">Event Name</label>
                     <input type="text" id="ev-name" required placeholder="e.g. Engineering Week 2026" />
                   </div>
                   <div class="form-group">
-                    <label>Status</label>
+                    <label for="ev-status">Status</label>
                     <select id="ev-status">
                       <option value="upcoming">Upcoming</option>
                       <option value="ongoing">Ongoing</option>
@@ -752,25 +752,25 @@
                 </div>
                 <div class="form-row">
                   <div class="form-group">
-                    <label>Funding Source</label>
+                    <label for="ev-funding-source">Funding Source</label>
                     <select id="ev-funding-source" style="opacity:0.9;">
                       <option value="GENERAL">General Fund (Council Treasury)</option>
                     </select>
                   </div>
                   <div class="form-group">
-                    <label>Allocated Budget (₱)</label>
+                    <label for="ev-budget">Allocated Budget (₱)</label>
                     <input type="number" id="ev-budget" min="0" step="0.01" required placeholder="0.00" />
                     <small id="ev-budget-hint" style="color:var(--text-tertiary, #94a3b8);font-size:0.78rem;margin-top:4px;display:block;">
                       Available General Fund: <strong id="ev-avail-bal">₱0.00</strong>
                     </small>
                   </div>
                   <div class="form-group">
-                    <label>Event Date</label>
+                    <label for="ev-date">Event Date</label>
                     <input type="date" id="ev-date" />
                   </div>
                 </div>
                 <div class="form-group">
-                  <label>Description</label>
+                  <label for="ev-description">Description</label>
                   <textarea id="ev-description" rows="2" placeholder="Brief description of the event…"></textarea>
                 </div>
                 <div class="form-error hidden" id="ev-error"></div>
@@ -784,13 +784,13 @@
               <form id="add-tx-form" class="admin-form">
                 <div class="form-row">
                   <div class="form-group">
-                    <label>Event</label>
+                    <label for="tx-event-id">Event</label>
                     <select id="tx-event-id" name="event_id" required class="event-select-dropdown">
                       <option value="">Select Event</option>
                     </select>
                   </div>
                   <div class="form-group">
-                    <label>Type</label>
+                    <label for="tx-type">Type</label>
                     <select id="tx-type" name="type" required>
                       <option value="expense">Expense</option>
                       <option value="donation">Donation</option>
@@ -801,20 +801,20 @@
                 </div>
                 <div class="form-row">
                   <div class="form-group">
-                    <label>Amount (₱) <span id="tx-balance-indicator" style="font-size: 0.75rem; color: var(--col-text-muted); margin-left: 0.5rem; display: none;"></span></label>
+                    <label for="tx-amount">Amount (₱) <span id="tx-balance-indicator" style="font-size: 0.75rem; color: var(--col-text-muted); margin-left: 0.5rem; display: none;"></span></label>
                     <input type="number" id="tx-amount" name="amount" min="1" step="0.01" required placeholder="0.00" />
                   </div>
                   <div class="form-group">
-                    <label>Date</label>
+                    <label for="tx-date">Date</label>
                     <input type="date" id="tx-date" name="transaction_date" required />
                   </div>
                 </div>
                 <div class="form-group">
-                  <label>Description</label>
+                  <label for="tx-desc">Description</label>
                   <input type="text" id="tx-desc" name="description" required placeholder="e.g. Sound system rental" />
                 </div>
                 <div class="form-group">
-                  <label>Donor Name <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+                  <label for="tx-donor">Donor Name <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
                   <input type="text" id="tx-donor" name="donor_name" placeholder="Donor or sponsor name" />
                 </div>
                 <div class="form-group">
@@ -839,7 +839,7 @@
                    <p style="font-size:.7rem;color:var(--col-text-muted);margin: .25rem 0 0 .5rem;">If unchecked, this will deduct directly from the general Dashboard balance.</p>
                 </div>
                 <div class="form-error hidden" id="tx-error"></div>
-                <button class="btn btn-primary" type="submit" id="submit-tx-btn">Submit Transaction</button>
+                <button class="btn btn-primary" type="submit" id="submit-tx-btn">Record Transaction</button>
               </form>
             </div>
 
@@ -848,11 +848,11 @@
               <h3><iconify-icon icon="solar:bell-linear"></iconify-icon> Post Announcement</h3>
               <form id="add-announce-form" class="admin-form">
                 <div class="form-group">
-                  <label>Title</label>
+                  <label for="announce-title">Title</label>
                   <input type="text" id="announce-title" required placeholder="Announcement title" />
                 </div>
                 <div class="form-group">
-                  <label>Message</label>
+                  <label for="announce-body">Message</label>
                   <textarea id="announce-body" required rows="4" placeholder="Write the announcement here…"></textarea>
                 </div>
                 <div class="form-error hidden" id="announce-error"></div>
@@ -866,13 +866,13 @@
               <p style="color:var(--col-text-muted);font-size:0.85rem;margin-bottom:1rem;line-height:1.4;">Insert multiple transactions at once. Ensure your file matches the template.</p>
               <form id="bulk-import-form" class="admin-form">
                 <div class="form-group">
-                  <label>Target Event</label>
+                  <label for="bulk-event-id">Target Event</label>
                   <select id="bulk-event-id" required class="event-select-dropdown">
                     <option value="">Select Event</option>
                   </select>
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
-                  <label>Upload .CSV</label>
+                  <label for="bulk-csv-file">Upload .CSV</label>
                   <input type="file" id="bulk-csv-file" accept=".csv" required style="padding:0.75rem; border:1px dashed var(--col-border); background:var(--col-surface); border-radius:var(--radius-sm); width:100%; color:var(--col-text); font-size:0.87rem; cursor:pointer;" />
                 </div>
                 <div class="form-error hidden" id="bulk-error" style="margin-top:0.75rem;"></div>
@@ -895,19 +895,19 @@
             </p>
             <form id="transfer-form" class="admin-form">
               <div class="form-group">
-                <label>Transfer From</label>
+                <label for="transfer-from">Transfer From</label>
                 <select id="transfer-from" required class="event-select-dropdown"><option value="">Select Source Event</option></select>
               </div>
               <div class="form-group">
-                <label>Transfer To</label>
+                <label for="transfer-to">Transfer To</label>
                 <select id="transfer-to" required class="event-select-dropdown"><option value="">Select Target Event</option></select>
               </div>
               <div class="form-group">
-                <label>Amount (₱)</label>
+                <label for="transfer-amount">Amount (₱)</label>
                 <input type="number" id="transfer-amount" min="1" step="0.01" required placeholder="0.00" />
               </div>
               <div class="form-group">
-                <label>Reason <span style="color:#ef4444">*</span></label>
+                <label for="transfer-reason">Reason <span style="color:#ef4444">*</span></label>
                 <input type="text" id="transfer-reason" required placeholder="Why is this transfer being made?" />
               </div>
               <div class="form-error hidden" id="transfer-error"></div>
@@ -940,18 +940,18 @@
             </p>
             <form id="edit-event-form" class="admin-form">
               <div class="form-group">
-                <label>Select Event</label>
+                <label for="me-select">Select Event</label>
                 <select id="me-select" required>
                   <option value="">Select Event</option>
                 </select>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label>Event Name</label>
+                  <label for="me-name">Event Name</label>
                   <input type="text" id="me-name" required placeholder="Event name" />
                 </div>
                 <div class="form-group">
-                  <label>Status</label>
+                  <label for="me-status">Status</label>
                   <select id="me-status">
                     <option value="upcoming">Upcoming</option>
                     <option value="ongoing">Ongoing</option>
@@ -962,16 +962,16 @@
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label>Allocated Budget (₱)</label>
+                  <label for="me-budget">Allocated Budget (₱)</label>
                   <input type="number" id="me-budget" min="0" step="0.01" required placeholder="0.00" />
                 </div>
                 <div class="form-group">
-                  <label>Event Date</label>
+                  <label for="me-date">Event Date</label>
                   <input type="date" id="me-date" />
                 </div>
               </div>
               <div class="form-group">
-                <label>Description</label>
+                <label for="me-description">Description</label>
                 <textarea id="me-description" rows="2" placeholder="Brief description of the event…"></textarea>
               </div>
               <div class="form-error hidden" id="me-error"></div>
@@ -1005,11 +1005,11 @@
         <p id="units-modal-subject" class="view-sub" style="margin-bottom:1rem;"></p>
         <div class="form-row">
           <div class="form-group">
-            <label>School Year</label>
+            <label for="units-sy">School Year</label>
             <input type="text" id="units-sy" placeholder="2026-2027" />
           </div>
           <div class="form-group">
-            <label>Semester</label>
+            <label for="units-sem">Semester</label>
             <select id="units-sem">
               <option value="1">1st Semester</option>
               <option value="2">2nd Semester</option>
@@ -1018,7 +1018,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label>Status</label>
+          <label for="units-status">Status</label>
           <select id="units-status">
             <option value="enrolled">Enrolled</option>
             <option value="passed">Passed</option>
@@ -1028,20 +1028,20 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Grade (1.0 – 5.0)</label>
+          <label for="units-grade">Grade (1.0 - 5.0)</label>
           <input type="number" id="units-grade" min="1" max="5" step="0.25" placeholder="e.g. 1.5" />
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Schedule <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
-            <input type="text" id="units-schedule" maxlength="120" placeholder="e.g. MWF 9:00–10:00 AM" />
+            <label for="units-schedule">Schedule <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+            <input type="text" id="units-schedule" maxlength="120" placeholder="e.g. MWF 9:00-10:00 AM" />
           </div>
           <div class="form-group">
-            <label>Instructor <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+            <label for="units-instructor">Instructor <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
             <input type="text" id="units-instructor" maxlength="120" placeholder="e.g. Engr. Juan Dela Cruz" />
           </div>
         </div>
-        <div class="auth-error hidden" id="units-modal-error"></div>
+        <div class="auth-error hidden" id="units-modal-error" role="alert"></div>
         <div style="display:flex; gap:0.6rem; justify-content:flex-end;">
           <button class="btn btn-ghost" id="units-modal-cancel" type="button">Cancel</button>
           <button class="btn btn-primary" id="units-modal-save" type="button">Save</button>
@@ -1611,7 +1611,7 @@
             </div>
           </div>
 
-          <div class="profile-feedback hidden" id="profile-general-feedback"></div>
+          <div class="profile-feedback hidden" id="profile-general-feedback" role="status" aria-live="polite"></div>
 
           <div class="profile-modal-footer">
             <button type="button" class="btn btn-secondary" id="profile-cancel-btn">Cancel</button>
@@ -1635,15 +1635,15 @@
 
           <div class="form-group">
             <label for="profile-new-password">New Password</label>
-            <input type="password" id="profile-new-password" class="input-field" placeholder="Minimum 8 characters" minlength="8" />
+            <input type="password" id="profile-new-password" class="input-field" autocomplete="new-password" aria-describedby="profile-security-feedback" placeholder="Minimum 8 characters" minlength="8" />
           </div>
 
           <div class="form-group">
             <label for="profile-confirm-password">Confirm New Password</label>
-            <input type="password" id="profile-confirm-password" class="input-field" placeholder="Re-type new password" />
+            <input type="password" id="profile-confirm-password" class="input-field" autocomplete="new-password" aria-describedby="profile-security-feedback" placeholder="Re-type new password" />
           </div>
 
-          <div class="profile-feedback hidden" id="profile-security-feedback"></div>
+          <div class="profile-feedback hidden" id="profile-security-feedback" role="status" aria-live="polite"></div>
 
           <div class="profile-modal-footer">
             <button type="submit" class="btn btn-primary" id="profile-save-security-btn">
@@ -1658,26 +1658,26 @@
   <script src="js/config.js?v=5.5"></script>
   <script src="js/swr-cache.js"></script>
   <script src="js/roster.js?v=5.4"></script>
-  <script src="js/auth.js?v=5.4"></script>
+  <script src="js/auth.js?v=5.5"></script>
   <script src="js/api.js?v=5.3"></script>
-  <script src="js/ui.js?v=5.8"></script>
-  <script src="js/dashboard.js?v=5.4"></script>
-  <script src="js/events.js?v=5.3"></script>
-  <script src="js/transactions.js?v=5.3"></script>
-  <script src="js/reports.js?v=5.3"></script>
+  <script src="js/ui.js?v=5.9"></script>
+  <script src="js/dashboard.js?v=5.5"></script>
+  <script src="js/events.js?v=5.4"></script>
+  <script src="js/transactions.js?v=5.4"></script>
+  <script src="js/reports.js?v=5.4"></script>
   <script src="js/income.js?v=5.3"></script>
-  <script src="js/units.js?v=5.3"></script>
+  <script src="js/units.js?v=5.4"></script>
   <script src="js/receipt-capture.js?v=5.3"></script>
   <script src="js/receipt-modal.js?v=5.4"></script>
   <script src="js/dropdown.js?v=5.3"></script>
-  <script src="js/admin.js?v=5.3"></script>
+  <script src="js/admin.js?v=5.4"></script>
   <script src="js/grizz-recommend.js?v=1.6"></script>
-  <script src="js/ai-assistant.js?v=6.1"></script>
-  <script src="js/profile.js?v=5.3"></script>
+  <script src="js/ai-assistant.js?v=6.2"></script>
+  <script src="js/profile.js?v=5.4"></script>
   <script src="js/notifications.js?v=5.3"></script>
   <script src="js/enrollment-journey.js?v=1.1"></script>
-  <script src="js/enrollment.js?v=1.6"></script>
-  <script src="js/app.js?v=6.5"></script>
+  <script src="js/enrollment.js?v=1.7"></script>
+  <script src="js/app.js?v=6.6"></script>
   <script src="js/sw-register.js"></script>
 </body>
 </html>

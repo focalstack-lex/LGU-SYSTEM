@@ -4,16 +4,18 @@
    No gradients, no glass, no shadows, no glow.
    ============================================= */
 
+/* Values mirror the portal tokens in main.css (charcoal + coral system) so
+   this standalone page reads as the same product. */
 :root {
-  --bg: #141414;
-  --ink: #e8e8e6;
-  --ink-2: #a3a3a0;
-  --ink-3: #6f6f6c;
-  --line: #2a2a28;
-  --field: #1c1c1b;
-  --accent: #f97316;
-  --accent-ink: #171717;
-  --danger: #ef4444;
+  --bg: #121214;      /* --background */
+  --ink: #FFFFFF;     /* --text-primary */
+  --ink-2: #9A9AA6;   /* --text-secondary */
+  --ink-3: #8C8C98;   /* --text-tertiary */
+  --line: rgba(255, 255, 255, 0.08); /* --border */
+  --field: #26262C;   /* --surface-secondary */
+  --accent: #FF5533;  /* --primary */
+  --accent-ink: #121214; /* --accent-text-on */
+  --danger: #EF4444;  /* --error */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -174,6 +176,14 @@ input {
 textarea { resize: vertical; margin-top: 1rem; margin-left: 2.4rem; width: calc(100% - 2.4rem); }
 
 textarea::placeholder { color: var(--ink-3); }
+
+.fb-copyright {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: var(--ink-3);
+  text-align: center;
+}
+.fb-copyright a { color: var(--accent); }
 
 /* ---------- Submit ---------- */
 

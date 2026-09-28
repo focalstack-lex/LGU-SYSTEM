@@ -546,6 +546,9 @@ html, body {
   font-size: 0.82rem;
   outline: none;
 }
+.of-sort-select:focus-visible {
+  border-color: var(--border-focus);
+}
 
 /* ---------- Forms ---------- */
 .of-form {
@@ -779,12 +782,12 @@ html, body {
 }
 
 .of-btn-danger {
-  background: var(--status-negative);
+  background: var(--danger-fill);
   color: #FFFFFF;
 }
 
 .of-btn-danger:hover:not(:disabled) {
-  filter: brightness(1.1);
+  background: var(--danger-fill-hover);
 }
 
 /* ---------- Scrollables & Tables ---------- */
@@ -986,7 +989,7 @@ html, body {
 
 .of-page-btn.active {
   background: var(--primary);
-  color: #FFFFFF;
+  color: var(--accent-text-on);
   border-color: var(--primary);
   font-weight: 700;
 }

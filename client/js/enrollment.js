@@ -321,7 +321,7 @@ const EnrollmentSection = (() => {
         ${i.origin === 'grizz' ? `<span class="unit-badge unit-badge--none" style="width:auto;max-width:none;" title="${esc(i.grizz_reason || 'Recommended by Grizz')}">Grizz</span>` : ''}
         ${i.item_state === 'added_by_head' ? '<span class="unit-badge unit-badge--enrolled" style="width:auto;max-width:none;">Added by Program Head</span>' : ''}
         ${canEdit
-          ? `<button type="button" class="btn btn-ghost" data-remove-item="${i.id}" aria-label="Remove ${esc(i.subjects?.code)}">✕</button>`
+          ? `<button type="button" class="btn btn-ghost" data-remove-item="${i.id}" aria-label="Remove ${esc(i.subjects?.code)}"><iconify-icon icon="solar:close-circle-linear" aria-hidden="true"></iconify-icon></button>`
           : ''}
       </div>`).join('')
       || (canEdit
@@ -507,37 +507,59 @@ const EnrollmentSection = (() => {
     } catch (err) { return { ok: false, error: err.message }; }
   }
 
+  const _removing = new Set(); // item ids with a remove request in flight
+
   async function removeItem(itemId) {
-    if (!current || !EJ.canEdit(current)) return;
+    if (!current || !EJ.canEdit(current) || _removing.has(itemId)) return;
+    _removing.add(itemId);
+    clearError();
     try {
       await Api.enrollment.removeItem(current.id, itemId);
       current.enrollment_submission_items = (current.enrollment_submission_items || []).filter(i => i.id !== itemId);
       fillPicker();
       renderAll();
     } catch (err) { show(err.message); }
+    finally { _removing.delete(itemId); }
   }
 
+  let _submitting = false;
+
   async function submit() {
-    if (!current || !EJ.canEdit(current)) return;
+    if (!current || !EJ.canEdit(current) || _submitting) return;
+    clearError();
     const items = EJ.activeItems(current);
     if (!items.length) { show('Add at least one subject before submitting.'); return; }
     const total = items.reduce((sum, i) => sum + Number(i.subjects?.units || 0), 0);
     const ok = window.confirm(`Submit ${items.length} subject${items.length === 1 ? '' : 's'} (${total} units) to the ${program} Program Head?`);
     if (!ok) return;
+    // Lock before the await so a double click cannot send two submissions.
+    _submitting = true;
+    const btn = document.getElementById('enrollment-submit-btn');
+    const btnHTML = btn ? btn.innerHTML : null;
+    if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
     try {
       const { submission } = await Api.enrollment.submit(current.id);
       current = submission;
       renderAll();
       UI.toast('Load submitted for verification.', 'success');
-    } catch (err) { show(err.message); }
+    } catch (err) {
+      show(err.message);
+      if (btn && btn.isConnected) { btn.disabled = false; btn.innerHTML = btnHTML; }
+    } finally {
+      _submitting = false;
+    }
   }
 
+  // Errors stay visible until the next action, so they are not missed.
   function show(msg) {
     const el = document.getElementById('enrollment-error');
     if (!el) return;
     el.textContent = msg;
     el.classList.remove('hidden');
-    setTimeout(() => el.classList.add('hidden'), 5000);
+  }
+
+  function clearError() {
+    document.getElementById('enrollment-error')?.classList.add('hidden');
   }
 
   // Action delegation (the action button is rendered dynamically).

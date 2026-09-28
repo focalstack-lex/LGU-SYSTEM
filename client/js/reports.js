@@ -101,18 +101,22 @@ async function initReports() {
     });
 
   } catch (err) {
-    const isSessionErr = err.message.includes('session');
+    console.error('Reports load failed:', err);
+    const isSessionErr = String(err?.message || '').includes('session');
     container.innerHTML = `
       <div class="empty-state">
         <iconify-icon icon="solar:danger-triangle-linear" style="font-size:48px; color:var(--col-danger); margin-bottom:1rem"></iconify-icon>
         <p style="font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;">${isSessionErr ? 'Session Expired' : 'Failed to Load Reports'}</p>
         <p style="color:var(--col-text-muted);margin-bottom:1.5rem;max-width:300px;margin-left:auto;margin-right:auto;">
-          ${err.message}
+          ${UI.esc(err?.message || 'Check your connection and try again.')}
         </p>
         ${isSessionErr 
-          ? `<button class="btn btn-primary" onclick="Auth.logout()">Sign In Again</button>` 
-          : `<button class="btn btn-ghost" onclick="Reports.load()">Retry</button>`}
+          ? `<button type="button" class="btn btn-primary" data-reports-action="signin">Sign In Again</button>` 
+          : `<button type="button" class="btn btn-ghost" data-reports-action="retry">Retry</button>`}
       </div>`;
+    // Listeners instead of inline onclick (blocked by the server CSP, script-src-attr 'none')
+    container.querySelector('[data-reports-action="signin"]')?.addEventListener('click', () => Auth.logout());
+    container.querySelector('[data-reports-action="retry"]')?.addEventListener('click', () => initReports());
 }
 }
 
@@ -483,7 +487,7 @@ document.addEventListener('transaction-updated', () => {
 
 async function downloadReport(type, eventId, eventName) {
   const token = window._authToken;
-  if (!token) { alert('Please log in again.'); return; }
+  if (!token) { UI.toast('Your session has ended. Please sign in again.', 'error'); return; }
 
   const btn = document.querySelector(`[data-${type}="${eventId}"]`);
   const originalHTML = btn ? btn.innerHTML : null;
@@ -508,7 +512,8 @@ async function downloadReport(type, eventId, eventName) {
     a.click();
     URL.revokeObjectURL(url);
   } catch (err) {
-    alert(`Download failed: ${err.message}`);
+    console.error('Report download failed:', err);
+    UI.toast(`Download failed: ${err.message}`, 'error');
   } finally {
     if (btn && originalHTML) { btn.disabled = false; btn.innerHTML = originalHTML; }
 }

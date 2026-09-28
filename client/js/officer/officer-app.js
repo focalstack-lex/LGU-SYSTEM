@@ -1052,11 +1052,19 @@ const OfficerApp = (() => {
       e.preventDefault();
       const errEl = $('of-tx-error');
       errEl.classList.add('hidden');
-      if (!eventSel.value) {
-        errEl.textContent = 'Please select an event.';
+      ['of-tx-event', 'of-tx-amount', 'of-tx-date', 'of-tx-desc'].forEach(id => $(id)?.removeAttribute('aria-invalid'));
+      // Field-specific messages (the form is novalidate, so native bubbles
+      // that vanish on their own never replace these).
+      const invalid = (id, message) => {
+        errEl.textContent = message;
         errEl.classList.remove('hidden');
-        return;
-      }
+        const field = $(id);
+        if (field) { field.setAttribute('aria-invalid', 'true'); field.focus(); }
+      };
+      if (!eventSel.value) return invalid('of-tx-event', 'Please select an event.');
+      if (!(Number($('of-tx-amount').value) >= 1)) return invalid('of-tx-amount', 'Enter an amount of at least ₱1.00.');
+      if (!$('of-tx-date').value) return invalid('of-tx-date', 'Choose the transaction date.');
+      if (!$('of-tx-desc').value.trim()) return invalid('of-tx-desc', 'Describe what this transaction is for.');
       const btn = $('of-tx-submit');
       btn.disabled = true;
       btn.textContent = 'Recording…';
@@ -1252,7 +1260,7 @@ const OfficerApp = (() => {
       const fmt = (id) => {
         if (id === 'GENERAL') return `₱${fmtNum(0)} + general fund`;
         const ev = _events.find(e => e.id === id);
-        return ev ? `₱${fmtNum(ev.computed_remaining)}` : '—';
+        return ev ? `₱${fmtNum(ev.computed_remaining)}` : '-';
       };
       box.innerHTML = `
         <div><div style="font-size:0.68rem;text-transform:uppercase;color:var(--text-tertiary)">From</div><strong>${fromSel.value === 'GENERAL' ? 'General Fund' : esc(_events.find(e => e.id === fromSel.value)?.event_name || '')}</strong> · ${fmt(fromSel.value)}</div>
@@ -1723,7 +1731,7 @@ const OfficerApp = (() => {
     }
 
     pag.innerHTML = `
-      <span class="of-pagination-info">Showing ${start}–${end} of ${totalItems} entries</span>
+      <span class="of-pagination-info">Showing ${start}-${end} of ${totalItems} entries</span>
       <div class="of-pagination-controls">
         <button type="button" class="of-page-btn" id="of-audit-prev" ${_auditCurrentPage <= 1 ? 'disabled' : ''}>
           <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon> Prev
@@ -1793,15 +1801,15 @@ const OfficerApp = (() => {
     const d = log.details || {};
     switch (log.action) {
       case 'BUDGET_TRANSFER':
-        return `₱${fmtNum(d.amount)} from "${d.from_event_name || 'an event'}" to "${d.to_event_name || 'an event'}"${d.reason ? ` — reason: ${d.reason}` : ''}`;
+        return `₱${fmtNum(d.amount)} from "${d.from_event_name || 'an event'}" to "${d.to_event_name || 'an event'}"${d.reason ? `. Reason: ${d.reason}` : ''}`;
       case 'SET_USER_ROLE':
-        return `Set ${d.user_name || 'a user'}'s role to ${d.new_role || '—'}`;
+        return `Set ${d.user_name || 'a user'}'s role to ${d.new_role || '-'}`;
       case 'CREATE_TRANSACTION':
-        return `${d.type ? UI.capitalize(String(d.type)) + ' of ' : ''}₱${fmtNum(d.amount)}${d.description ? ` — "${d.description}"` : ''}`;
+        return `${d.type ? UI.capitalize(String(d.type)) + ' of ' : ''}₱${fmtNum(d.amount)}${d.description ? `: "${d.description}"` : ''}`;
       case 'EDIT_TRANSACTION':
-        return `Reason: ${d.reason || '—'}`;
+        return `Reason: ${d.reason || '-'}`;
       case 'DELETE_TRANSACTION':
-        return `Deleted "${d.description || 'a transaction'}"${d.reason ? ` — reason: ${d.reason}` : ''}`;
+        return `Deleted "${d.description || 'a transaction'}"${d.reason ? `. Reason: ${d.reason}` : ''}`;
       case 'BULK_IMPORT_TRANSACTIONS':
         return `Imported ${d.count || 0} transactions`;
       case 'CREATE_EVENT':
@@ -1810,7 +1818,7 @@ const OfficerApp = (() => {
         const changed = Array.isArray(d.changes)
           ? d.changes.filter(c => c !== 'updated_at').map(c => String(c).replace(/_/g, ' ')).join(', ')
           : (d.changes ? String(d.changes) : '');
-        return `Updated "${d.event_name || 'an event'}"${changed ? ` — modified ${changed}` : ''}`;
+        return `Updated "${d.event_name || 'an event'}"${changed ? `: modified ${changed}` : ''}`;
       }
       case 'ARCHIVE_EVENT':
         return `Archived "${d.event_name || 'an event'}"`;
@@ -1945,9 +1953,9 @@ const OfficerApp = (() => {
       const displayName = u.full_name ? formatStudentName(u.full_name) : (u.email?.split('@')[0] || 'User');
       const progBadge = u.course
         ? `<span class="badge" style="background:var(--bg-surface-raised);color:var(--text-primary);border:1px solid var(--border-default);font-size:0.74rem;font-weight:600;padding:2px 6px;border-radius:4px;">${esc(u.course)}</span>`
-        : '<span style="color:var(--text-tertiary);font-size:0.75rem;">—</span>';
+        : '<span style="color:var(--text-tertiary);font-size:0.75rem;">-</span>';
       const yrText = u.year_level ? `<span style="font-size:0.78rem;color:var(--text-secondary);margin-left:0.25rem;">Yr ${esc(u.year_level)}</span>` : '';
-      const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+      const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '-';
 
       return `
       <tr>
@@ -2496,7 +2504,7 @@ const OfficerApp = (() => {
         statusBadge = '<span class="badge" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);font-size:0.72rem;">Rejected</span>';
       }
 
-      const dateStr = req.created_at ? new Date(req.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+      const dateStr = req.created_at ? new Date(req.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '-';
       const notesHtml = req.notes ? `<div style="font-size:0.75rem;color:var(--text-tertiary);margin-top:2px;">Note: ${esc(req.notes)}</div>` : '';
 
       let actionsHtml = '';
@@ -2516,7 +2524,7 @@ const OfficerApp = (() => {
           </button>
         `;
       } else {
-        checkColHtml = `<span style="color:var(--text-tertiary);font-size:0.75rem;">—</span>`;
+        checkColHtml = `<span style="color:var(--text-tertiary);font-size:0.75rem;">-</span>`;
         actionsHtml = `<span style="font-size:0.78rem;color:var(--text-tertiary);">${req.reviewed_at ? 'Reviewed' : 'Completed'}</span>`;
       }
 
@@ -2529,7 +2537,7 @@ const OfficerApp = (() => {
             <div style="font-weight:600;color:var(--text-primary);font-size:0.86rem;">${esc(displayName)}</div>
             ${notesHtml}
           </td>
-          <td><span style="font-size:0.82rem;color:var(--text-secondary);">${esc(req.email || '—')}</span></td>
+          <td><span style="font-size:0.82rem;color:var(--text-secondary);">${esc(req.email || '-')}</span></td>
           <td>
             <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-primary);border:1px solid var(--border-default);font-size:0.74rem;font-weight:600;padding:2px 6px;border-radius:4px;">${esc(req.course)}</span>
             <span style="font-size:0.8rem;color:var(--text-secondary);margin-left:0.25rem;">Year ${esc(req.year_level)}</span>
@@ -2608,8 +2616,14 @@ const OfficerApp = (() => {
       btn.addEventListener('click', async () => {
         const id = btn.dataset.id;
         const name = btn.dataset.name;
-        const reason = prompt(`Optional reason for rejecting "${name}":`);
-        if (reason === null) return; // User cancelled
+        const reason = await UI.confirmDialog({
+          title: 'Reject verification request?',
+          message: `"${name}" will not be added to the official enrolled roster.`,
+          confirmLabel: 'Reject request',
+          danger: true,
+          reason: { label: 'Reason (optional)', placeholder: 'Shown to the student' },
+        });
+        if (reason === false) return; // User cancelled
 
         btn.disabled = true;
         btn.textContent = 'Rejecting…';
@@ -2691,7 +2705,7 @@ const OfficerApp = (() => {
             <button type="button" class="of-btn of-btn-ghost edit-roster-btn" data-id="${student.id}" style="padding:0.25rem 0.55rem; font-size:0.8rem; margin-right:0.25rem;" title="Edit Student">
               <iconify-icon icon="solar:pen-2-linear"></iconify-icon> Edit
             </button>
-            <button type="button" class="of-btn of-btn-ghost delete-roster-btn" data-id="${student.id}" data-name="${esc(student.full_name)}" style="color:var(--text-tertiary); padding:0.25rem 0.45rem; font-size:0.85rem;" title="Delete Student">
+            <button type="button" class="of-btn of-btn-ghost delete-roster-btn" data-id="${student.id}" data-name="${esc(student.full_name)}" style="color:var(--text-secondary); padding:0.25rem 0.45rem; font-size:0.85rem;" title="Remove from roster" aria-label="Remove ${esc(student.full_name)} from roster">
               <iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon>
             </button>
           </td>
@@ -2719,7 +2733,13 @@ const OfficerApp = (() => {
       btn.addEventListener('click', async () => {
         const id = btn.dataset.id;
         const name = btn.dataset.name;
-        if (!confirm(`Are you sure you want to remove "${name}" from the official enrolled roster?`)) return;
+        const ok = await UI.confirmDialog({
+          title: 'Remove from roster?',
+          message: `"${name}" will be removed from the official enrolled roster.`,
+          confirmLabel: 'Remove student',
+          danger: true,
+        });
+        if (!ok) return;
 
         try {
           await Api.roster.delete(id);
@@ -2727,7 +2747,7 @@ const OfficerApp = (() => {
           if (window.Roster && window.Roster.getRoster) window.Roster.getRoster().catch(() => {});
           await loadRoster(true);
         } catch (err) {
-          toast(`Failed to delete student: ${err.message}`, 'error');
+          toast(`Failed to remove student: ${err.message}`, 'error');
         }
       });
     });
@@ -2749,7 +2769,7 @@ const OfficerApp = (() => {
 
       paginationEl.innerHTML = `
         <div style="font-size:0.8rem; color:var(--text-secondary);">
-          Showing <strong style="color:var(--text-primary);">${startIndex + 1}–${endIndex}</strong> of <strong style="color:var(--text-primary);">${filtered.length}</strong> students
+          Showing <strong style="color:var(--text-primary);">${startIndex + 1}-${endIndex}</strong> of <strong style="color:var(--text-primary);">${filtered.length}</strong> students
         </div>
         <div style="display:flex; gap:0.35rem; align-items:center;">
           <button type="button" class="of-btn of-btn-ghost" id="of-roster-prev-btn" style="padding:0.25rem 0.6rem; font-size:0.8rem;" ${_rosterPage <= 1 ? 'disabled' : ''}>

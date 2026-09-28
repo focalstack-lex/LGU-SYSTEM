@@ -124,7 +124,7 @@ const Events = (() => {
         ? `<div class="event-over-note">Over budget by <strong>${UI.currency(spent - budget)}</strong></div>`
         : '';
       return `
-        <div class="event-card" data-id="${UI.esc(ev.id)}">
+        <div class="event-card" data-id="${UI.esc(ev.id)}" role="button" tabindex="0" aria-label="View details for ${UI.esc(ev.event_name)}">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
             ${UI.renderStatusBadge(ev.status)}
             <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-tertiary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
@@ -149,6 +149,12 @@ const Events = (() => {
     // Attach click handlers for event detail
     grid.querySelectorAll('.event-card').forEach(card => {
       card.addEventListener('click', () => loadEventDetail(card.dataset.id));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          loadEventDetail(card.dataset.id);
+        }
+      });
     });
 }
 
@@ -229,7 +235,13 @@ const Events = (() => {
           </div>
         </div>`;
 } catch (err) {
-      container.innerHTML = `<div class="loading-state">Failed to load event details.</div>`;
+      console.error('Event detail load failed:', err);
+      container.innerHTML = `<div class="empty-state" role="alert">
+          <span class="empty-icon"><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon></span>
+          <p>Could not load this event. ${UI.esc(err?.message || 'Check your connection and try again.')}</p>
+          <button type="button" class="btn btn-ghost" id="event-detail-retry">Retry</button>
+        </div>`;
+      document.getElementById('event-detail-retry')?.addEventListener('click', () => loadEventDetail(id));
     }
   }
 

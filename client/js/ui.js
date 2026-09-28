@@ -303,6 +303,124 @@ const UI = (() => {
     window.addEventListener('pageshow', e => { if (e.persisted) kickViewportRelayout(); });
   }
 
+  // ---- Accessible dialog behaviour ----
+  // Moves focus into `container`, keeps Tab inside it, closes on Escape and
+  // returns focus to whatever was focused before. Returns { close, release }:
+  // close() runs onClose (default: remove the container), release() only
+  // detaches the keyboard handling and restores focus (use after a success
+  // path that removes the dialog itself).
+  function trapDialog(container, { initialFocus = null, onClose = null } = {}) {
+    const previous = document.activeElement;
+    const focusable = () => [...container.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )].filter(el => el.offsetParent !== null);
+
+    function onKey(e) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+      } else if (e.key === 'Tab') {
+        const items = focusable();
+        if (!items.length) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+
+    let released = false;
+    function release() {
+      if (released) return;
+      released = true;
+      container.removeEventListener('keydown', onKey);
+      if (previous && previous.isConnected && typeof previous.focus === 'function') previous.focus();
+    }
+    function close() {
+      release();
+      if (onClose) onClose(); else container.remove();
+    }
+
+    container.addEventListener('keydown', onKey);
+    const target = (typeof initialFocus === 'string' ? container.querySelector(initialFocus) : initialFocus) || focusable()[0];
+    if (target) target.focus();
+    return { close, release };
+  }
+
+  // Accessible replacement for window.confirm / window.prompt.
+  // Resolves to true (confirm), the trimmed reason (when `reason` is set) or
+  // false (cancel / Escape). Text options are rendered with textContent.
+  function confirmDialog({
+    title = 'Are you sure?',
+    message = '',
+    confirmLabel = 'Confirm',
+    cancelLabel = 'Cancel',
+    danger = false,
+    reason = null, // { label, placeholder, required, minLength }
+  } = {}) {
+    return new Promise(resolve => {
+      const uid = `ui-confirm-${Date.now()}`;
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = `
+        <div class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="${uid}-title" aria-describedby="${uid}-text">
+          <h3 class="modal-title${danger ? ' is-danger' : ''}" id="${uid}-title"></h3>
+          <p class="modal-text" id="${uid}-text"></p>
+          ${reason ? `
+          <div class="form-group">
+            <label for="${uid}-reason"></label>
+            <input id="${uid}-reason" type="text" aria-describedby="${uid}-error" />
+          </div>` : ''}
+          <div class="auth-error hidden" id="${uid}-error" role="alert"></div>
+          <div class="modal-actions">
+            <button type="button" class="btn ${danger ? 'btn-danger' : 'btn-primary'}" data-action="confirm"></button>
+            <button type="button" class="btn btn-ghost" data-action="cancel"></button>
+          </div>
+        </div>`;
+      overlay.querySelector(`#${uid}-title`).textContent = title;
+      overlay.querySelector(`#${uid}-text`).textContent = message;
+      overlay.querySelector('[data-action="confirm"]').textContent = confirmLabel;
+      overlay.querySelector('[data-action="cancel"]').textContent = cancelLabel;
+      const input = reason ? overlay.querySelector(`#${uid}-reason`) : null;
+      if (input) {
+        overlay.querySelector(`label[for="${uid}-reason"]`).textContent = reason.label || 'Reason';
+        input.placeholder = reason.placeholder || '';
+        if (reason.required) input.required = true;
+      }
+      document.body.appendChild(overlay);
+
+      let settled = false;
+      const finish = value => {
+        if (settled) return;
+        settled = true;
+        overlay.remove();
+        resolve(value);
+      };
+      const dialog = trapDialog(overlay, {
+        initialFocus: input || overlay.querySelector('[data-action="cancel"]'),
+        onClose: () => finish(false),
+      });
+
+      overlay.querySelector('[data-action="cancel"]').addEventListener('click', dialog.close);
+      overlay.addEventListener('click', e => { if (e.target === overlay) dialog.close(); });
+      overlay.querySelector('[data-action="confirm"]').addEventListener('click', () => {
+        if (!input) { dialog.release(); finish(true); return; }
+        const value = input.value.trim();
+        const min = reason.minLength || (reason.required ? 1 : 0);
+        if (value.length < min) {
+          const errEl = overlay.querySelector(`#${uid}-error`);
+          errEl.textContent = min > 1 ? `Please enter a reason (at least ${min} characters).` : 'Please enter a reason.';
+          errEl.classList.remove('hidden');
+          input.setAttribute('aria-invalid', 'true');
+          input.focus();
+          return;
+        }
+        dialog.release();
+        finish(value);
+      });
+    });
+  }
+
   // ---- Scrollbar Lock Management (prevents layout jump when modals open) ----
   function lockScrollbar() {
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -325,5 +443,5 @@ const UI = (() => {
     document.body.classList.remove('modal-open');
   }
 
-  return { showView, showScreen, setSplashView, toast, currency, dateStr, esc, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators, lockScrollbar, unlockScrollbar };
+  return { showView, showScreen, setSplashView, toast, currency, dateStr, esc, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators, lockScrollbar, unlockScrollbar, trapDialog, confirmDialog };
 })();

@@ -17,8 +17,8 @@
   <link rel="icon" type="image/png" href="assets/coe-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=7.6" />
-  <link rel="stylesheet" href="styles/officer.css?v=6.5" />
+  <link rel="stylesheet" href="styles/main.css?v=7.7" />
+  <link rel="stylesheet" href="styles/officer.css?v=6.6" />
   <script src="vendor/iconify-icon.min.js"></script>
   <script src="vendor/icons-bundle.js"></script>
   <script src="js/init-theme.js"></script>
@@ -170,11 +170,11 @@
         </div>
         <div class="of-record-layout">
           <div class="of-card">
-            <h3>New Entry</h3>
-            <form id="of-tx-form" class="of-form">
+            <h3>New Transaction</h3>
+            <form id="of-tx-form" class="of-form" novalidate>
               <div class="of-form-row">
-                <div class="of-field"><label>Event</label><select id="of-tx-event"></select></div>
-                <div class="of-field"><label>Type</label>
+                <div class="of-field"><label for="of-tx-event">Event</label><select id="of-tx-event" aria-describedby="of-tx-error"></select></div>
+                <div class="of-field"><label for="of-tx-type">Type</label>
                   <select id="of-tx-type" required>
                     <option value="expense">Expense</option>
                     <option value="donation">Donation</option>
@@ -184,11 +184,11 @@
                 </div>
               </div>
               <div class="of-form-row">
-                <div class="of-field"><label>Amount (₱)</label><input type="number" id="of-tx-amount" min="1" step="0.01" required placeholder="0.00" /></div>
-                <div class="of-field"><label>Date</label><input type="date" id="of-tx-date" required /></div>
+                <div class="of-field"><label for="of-tx-amount">Amount (₱)</label><input type="number" id="of-tx-amount" aria-describedby="of-tx-error" min="1" step="0.01" required placeholder="0.00" /></div>
+                <div class="of-field"><label for="of-tx-date">Date</label><input type="date" id="of-tx-date" aria-describedby="of-tx-error" required /></div>
               </div>
-              <div class="of-field"><label>Description</label><input type="text" id="of-tx-desc" required placeholder="e.g. Sound system rental" /></div>
-              <div class="of-field"><label>Donor Name <small>(optional)</small></label><input type="text" id="of-tx-donor" placeholder="Donor or sponsor name" /></div>
+              <div class="of-field"><label for="of-tx-desc">Description</label><input type="text" id="of-tx-desc" aria-describedby="of-tx-error" required placeholder="e.g. Sound system rental" /></div>
+              <div class="of-field"><label for="of-tx-donor">Donor Name <small>(optional)</small></label><input type="text" id="of-tx-donor" placeholder="Donor or sponsor name" /></div>
               <div class="of-field" id="of-tx-alloc-field">
                 <label class="of-check"><input type="checkbox" id="of-tx-alloc" checked /> Deduct from event's allocated budget</label>
               </div>
@@ -199,11 +199,11 @@
                   <span class="receipt-chip hidden" id="of-tx-receipt-chip">
                     <iconify-icon icon="solar:paperclip-linear"></iconify-icon>
                     <span id="of-tx-receipt-chip-text"></span>
-                    <button type="button" class="receipt-chip-remove" id="of-tx-receipt-remove">&times;</button>
+                    <button type="button" class="receipt-chip-remove" id="of-tx-receipt-remove" aria-label="Remove attached receipt">&times;</button>
                   </span>
                 </div>
               </div>
-              <div class="of-error hidden" id="of-tx-error"></div>
+              <div class="of-error hidden" id="of-tx-error" role="alert"></div>
               <button class="of-btn of-btn-primary" type="submit" id="of-tx-submit">Record Transaction</button>
             </form>
           </div>
@@ -227,8 +227,8 @@
             <h3><iconify-icon icon="solar:calendar-add-linear"></iconify-icon> Create Event</h3>
             <form id="of-event-form" class="of-form">
               <div class="of-form-row">
-                <div class="of-field"><label>Event Name</label><input type="text" id="of-ev-name" required placeholder="e.g. Engineering Week 2026" /></div>
-                <div class="of-field"><label>Status</label>
+                <div class="of-field"><label for="of-ev-name">Event Name</label><input type="text" id="of-ev-name" required placeholder="e.g. Engineering Week 2026" /></div>
+                <div class="of-field"><label for="of-ev-status">Status</label>
                   <select id="of-ev-status">
                     <option value="upcoming">Upcoming</option>
                     <option value="ongoing">Ongoing</option>
@@ -239,22 +239,22 @@
               </div>
               <div class="of-form-row">
                 <div class="of-field">
-                  <label>Funding Source</label>
+                  <label for="of-ev-funding-source">Funding Source</label>
                   <select id="of-ev-funding-source" style="opacity:0.9;">
                     <option value="GENERAL">General Fund (Council Treasury)</option>
                   </select>
                 </div>
                 <div class="of-field">
-                  <label>Allocated Budget (₱)</label>
+                  <label for="of-ev-budget">Allocated Budget (₱)</label>
                   <input type="number" id="of-ev-budget" min="0" step="0.01" required placeholder="0.00" />
                   <small id="of-ev-budget-hint" style="color:var(--text-secondary, #94a3b8);font-size:0.78rem;margin-top:4px;display:block;">
                     Available General Fund: <strong id="of-ev-avail-bal">₱0.00</strong>
                   </small>
                 </div>
-                <div class="of-field"><label>Event Date</label><input type="date" id="of-ev-date" /></div>
+                <div class="of-field"><label for="of-ev-date">Event Date</label><input type="date" id="of-ev-date" /></div>
               </div>
-              <div class="of-field"><label>Description</label><textarea id="of-ev-desc" rows="2" placeholder="Brief description"></textarea></div>
-              <div class="of-error hidden" id="of-ev-error"></div>
+              <div class="of-field"><label for="of-ev-desc">Description</label><textarea id="of-ev-desc" rows="2" placeholder="Brief description"></textarea></div>
+              <div class="of-error hidden" id="of-ev-error" role="alert"></div>
               <button class="of-btn of-btn-primary" type="submit" id="of-ev-submit">Create Event</button>
             </form>
           </div>
@@ -262,15 +262,15 @@
             <h3><iconify-icon icon="solar:card-transfer-linear"></iconify-icon> Budget Transfer</h3>
             <form id="of-transfer-form" class="of-form">
               <div class="of-form-row">
-                <div class="of-field"><label>From</label><select id="of-transfer-from" class="of-event-select"></select></div>
-                <div class="of-field"><label>To</label><select id="of-transfer-to" class="of-event-select"></select></div>
+                <div class="of-field"><label for="of-transfer-from">From</label><select id="of-transfer-from" class="of-event-select"></select></div>
+                <div class="of-field"><label for="of-transfer-to">To</label><select id="of-transfer-to" class="of-event-select"></select></div>
               </div>
               <div class="of-form-row">
-                <div class="of-field"><label>Amount (₱)</label><input type="number" id="of-transfer-amount" min="1" step="0.01" required placeholder="0.00" /></div>
-                <div class="of-field"><label>Reason *</label><input type="text" id="of-transfer-reason" required placeholder="Why is this transfer being made?" /></div>
+                <div class="of-field"><label for="of-transfer-amount">Amount (₱)</label><input type="number" id="of-transfer-amount" min="1" step="0.01" required placeholder="0.00" /></div>
+                <div class="of-field"><label for="of-transfer-reason">Reason *</label><input type="text" id="of-transfer-reason" required placeholder="Why is this transfer being made?" /></div>
               </div>
               <div id="of-transfer-preview" class="of-transfer-preview hidden"></div>
-              <div class="of-error hidden" id="of-transfer-error"></div>
+              <div class="of-error hidden" id="of-transfer-error" role="alert"></div>
               <button class="of-btn of-btn-primary" type="submit" id="of-transfer-submit">Confirm Transfer</button>
             </form>
           </div>
@@ -439,9 +439,9 @@
           <div class="of-card" id="of-exec-announce-card">
             <h3><iconify-icon icon="solar:bell-linear"></iconify-icon> New Announcement</h3>
             <form id="of-announce-form" class="of-form">
-              <div class="of-field"><label>Title</label><input type="text" id="of-announce-title" required placeholder="Announcement title" /></div>
-              <div class="of-field"><label>Message</label><textarea id="of-announce-body" required rows="4" placeholder="Write the announcement here…"></textarea></div>
-              <div class="of-error hidden" id="of-announce-error"></div>
+              <div class="of-field"><label for="of-announce-title">Title</label><input type="text" id="of-announce-title" required placeholder="Announcement title" /></div>
+              <div class="of-field"><label for="of-announce-body">Message</label><textarea id="of-announce-body" required rows="4" placeholder="Write the announcement here…"></textarea></div>
+              <div class="of-error hidden" id="of-announce-error" role="alert"></div>
               <button class="of-btn of-btn-primary" type="submit" id="of-announce-submit">Post Announcement</button>
             </form>
           </div>
@@ -568,7 +568,7 @@
                 <h3 style="margin:0; font-size:1.05rem; display:flex; align-items:center; gap:0.45rem;">
                   <iconify-icon icon="solar:user-hand-up-bold" style="color:var(--accent);"></iconify-icon> Student Enrollment Verification Requests
                 </h3>
-                <p style="font-size:0.8rem; color:var(--text-secondary); margin:0.25rem 0 0;">Students who signed in with Google but were not yet listed in the S.Y. 2026–2027 masterlist</p>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin:0.25rem 0 0;">Students who signed in with Google but were not yet listed in the S.Y. 2026-2027 masterlist</p>
               </div>
               <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
                 <!-- Bulk Action Controls -->
@@ -771,26 +771,26 @@
         <h3 id="of-roster-modal-title" style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
           <iconify-icon icon="solar:user-plus-bold" style="color:var(--accent);"></iconify-icon> Add Enrolled Student
         </h3>
-        <button type="button" class="btn-icon" id="of-roster-modal-close" title="Close Modal">
+        <button type="button" class="btn-icon" id="of-roster-modal-close" title="Close" aria-label="Close add student dialog">
           <iconify-icon icon="solar:close-circle-linear" style="font-size:1.3rem;"></iconify-icon>
         </button>
       </div>
       <form id="of-roster-modal-form" class="of-form">
         <input type="hidden" id="of-roster-edit-id" value="" />
         <div class="of-field">
-          <label>Full Name (LASTNAME, FIRSTNAME MIDDLE)</label>
+          <label for="of-modal-roster-name">Full Name (LASTNAME, FIRSTNAME MIDDLE)</label>
           <input type="text" id="of-modal-roster-name" required placeholder="e.g. MATONDO, LEX EDRICK" class="input-field" />
         </div>
         <div class="form-row">
           <div class="of-field">
-            <label>Sex / Gender</label>
+            <label for="of-modal-roster-sex">Sex / Gender</label>
             <select id="of-modal-roster-sex" class="input-field">
               <option value="M">Male (M)</option>
               <option value="F">Female (F)</option>
             </select>
           </div>
           <div class="of-field">
-            <label>Engineering Program</label>
+            <label for="of-modal-roster-course">Engineering Program</label>
             <select id="of-modal-roster-course" required class="input-field">
               <option value="BSCE">BS Civil Engineering (BSCE)</option>
               <option value="BSCoE">BS Computer Engineering (BSCoE)</option>
@@ -799,7 +799,7 @@
           </div>
         </div>
         <div class="of-field">
-          <label>Year Level</label>
+          <label for="of-modal-roster-year">Year Level</label>
           <select id="of-modal-roster-year" required class="input-field">
             <option value="1">1st Year</option>
             <option value="2">2nd Year</option>
@@ -808,7 +808,7 @@
             <option value="5">5th Year</option>
           </select>
         </div>
-        <div class="of-error hidden" id="of-modal-roster-error"></div>
+        <div class="of-error hidden" id="of-modal-roster-error" role="alert"></div>
         <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1.25rem;">
           <button type="button" class="of-btn of-btn-ghost" id="of-roster-modal-cancel">Cancel</button>
           <button type="submit" class="of-btn of-btn-primary" id="of-roster-modal-submit">Save Student</button>
@@ -824,7 +824,7 @@
         <h3 style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
           <iconify-icon icon="solar:file-upload-bold" style="color:var(--accent);"></iconify-icon> Bulk Import Semester Roster
         </h3>
-        <button type="button" class="btn-icon" id="of-import-modal-close" title="Close Modal">
+        <button type="button" class="btn-icon" id="of-import-modal-close" title="Close" aria-label="Close roster import dialog">
           <iconify-icon icon="solar:close-circle-linear" style="font-size:1.3rem;"></iconify-icon>
         </button>
       </div>
@@ -849,7 +849,7 @@
         </div>
       </div>
 
-      <div class="of-error hidden" id="of-import-error" style="margin-top:0.75rem;"></div>
+      <div class="of-error hidden" id="of-import-error" role="alert" style="margin-top:0.75rem;"></div>
 
       <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1.25rem;">
         <button type="button" class="of-btn of-btn-ghost" id="of-import-cancel-btn">Cancel</button>
@@ -865,7 +865,7 @@
     </div>
   </div>
 
-  <div id="of-toast-holder"></div>
+  <div id="of-toast-holder" role="status" aria-live="polite"></div>
 
   <!-- Skeleton Loading Screen (matches student portal & officer hierarchy) -->
   <div id="splash-screen" class="splash-screen hidden" aria-hidden="true">
@@ -1109,7 +1109,7 @@
             </div>
           </div>
 
-          <div class="profile-feedback hidden" id="profile-general-feedback"></div>
+          <div class="profile-feedback hidden" id="profile-general-feedback" role="status" aria-live="polite"></div>
 
           <div class="profile-modal-footer">
             <button type="button" class="btn btn-secondary" id="profile-cancel-btn">Cancel</button>
@@ -1133,15 +1133,15 @@
 
           <div class="form-group">
             <label for="profile-new-password">New Password</label>
-            <input type="password" id="profile-new-password" class="input-field" placeholder="Minimum 8 characters" minlength="8" />
+            <input type="password" id="profile-new-password" class="input-field" autocomplete="new-password" aria-describedby="profile-security-feedback" placeholder="Minimum 8 characters" minlength="8" />
           </div>
 
           <div class="form-group">
             <label for="profile-confirm-password">Confirm New Password</label>
-            <input type="password" id="profile-confirm-password" class="input-field" placeholder="Re-type your password" minlength="8" />
+            <input type="password" id="profile-confirm-password" class="input-field" autocomplete="new-password" aria-describedby="profile-security-feedback" placeholder="Re-type your password" minlength="8" />
           </div>
 
-          <div class="profile-feedback hidden" id="profile-security-feedback"></div>
+          <div class="profile-feedback hidden" id="profile-security-feedback" role="status" aria-live="polite"></div>
 
           <div class="profile-modal-footer">
             <button type="submit" class="btn btn-primary" id="profile-save-security-btn">
@@ -1158,16 +1158,16 @@
   <script src="js/config.js?v=5.5"></script>
   <script src="js/swr-cache.js"></script>
   <script src="js/roster.js?v=5.3"></script>
-  <script src="js/auth.js?v=5.4"></script>
+  <script src="js/auth.js?v=5.5"></script>
   <script src="js/api.js?v=5.3"></script>
-  <script src="js/ui.js?v=5.8"></script>
+  <script src="js/ui.js?v=5.9"></script>
   <script src="js/receipt-capture.js?v=5.3"></script>
   <script src="js/receipt-modal.js?v=5.4"></script>
   <script src="js/dropdown.js?v=5.3"></script>
-  <script src="js/profile.js?v=5.3"></script>
+  <script src="js/profile.js?v=5.4"></script>
   <script src="js/notifications.js?v=5.3"></script>
-  <script src="js/officer/curriculum.js?v=1.0"></script>
-  <script src="js/officer/officer-app.js?v=6.4"></script>
+  <script src="js/officer/curriculum.js?v=1.1"></script>
+  <script src="js/officer/officer-app.js?v=6.5"></script>
   <script src="js/sw-register.js"></script>
 </body>
 </html>

@@ -50,9 +50,27 @@ const Transactions = (() => {
       renderTable(allTxs);
       updatePagination();
     } catch (err) {
-      document.getElementById('tx-table-body').innerHTML =
-        `<tr><td colspan="8" class="loading-state">Failed to load transactions.</td></tr>`;
+      console.error('Transactions load failed:', err);
+      renderLoadError(err);
     }
+  }
+
+  // Shown in both the desktop table and the mobile card list, so mobile users
+  // never stay stuck on the skeleton when the request fails.
+  function renderLoadError(err) {
+    const reason = err?.message ? UI.esc(err.message) : 'Check your connection and try again.';
+    const block = `<div class="empty-state" role="alert">
+        <span class="empty-icon"><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon></span>
+        <p>Could not load transactions. ${reason}</p>
+        <button type="button" class="btn btn-ghost tx-retry-btn">Retry</button>
+      </div>`;
+    const tbody = document.getElementById('tx-table-body');
+    if (tbody) tbody.innerHTML = `<tr><td colspan="${_isAdmin ? 8 : 7}">${block}</td></tr>`;
+    const cards = document.getElementById('tx-mobile-cards');
+    if (cards) cards.innerHTML = block;
+    document.querySelectorAll('.tx-retry-btn').forEach(btn =>
+      btn.addEventListener('click', () => fetchPage(_currentPage))
+    );
   }
 
   function updatePagination() {
@@ -92,13 +110,13 @@ const Transactions = (() => {
         ${_isAdmin ? `
         <td style="text-align:center;">
           <div style="display:inline-flex;gap:.4rem;">
-            <button class="tx-action-btn tx-edit-btn"
+            <button type="button" class="tx-action-btn tx-edit-btn" aria-label="Edit transaction: ${UI.esc(tx.description)}"
               data-txid="${tx.id}"
               data-desc="${UI.esc(tx.description)}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
               data-receipt="${UI.esc(tx.receipt_url)}"><iconify-icon icon="solar:pen-linear" style="font-size:15px"></iconify-icon></button>
-            <button class="tx-action-btn tx-del-btn"
+            <button type="button" class="tx-action-btn tx-del-btn" aria-label="Delete transaction: ${UI.esc(tx.description)}"
               data-txid="${tx.id}"
               data-desc="${UI.esc(tx.description)}"><iconify-icon icon="solar:trash-bin-trash-linear" style="font-size:15px"></iconify-icon></button>
           </div>
@@ -129,13 +147,13 @@ const Transactions = (() => {
           </div>
           ${_isAdmin ? `
           <div class="data-card-actions" style="margin-top:0.75rem;padding-top:0.5rem;">
-            <button class="tx-action-btn tx-edit-btn" style="padding:0.4rem 0.8rem;"
+            <button type="button" class="tx-action-btn tx-edit-btn" style="padding:0.4rem 0.8rem;" aria-label="Edit transaction: ${UI.esc(tx.description)}"
               data-txid="${tx.id}"
               data-desc="${UI.esc(tx.description)}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
               data-receipt="${UI.esc(tx.receipt_url)}"><iconify-icon icon="solar:pen-linear"></iconify-icon></button>
-            <button class="tx-action-btn tx-del-btn" style="padding:0.4rem 0.8rem;"
+            <button type="button" class="tx-action-btn tx-del-btn" style="padding:0.4rem 0.8rem;" aria-label="Delete transaction: ${UI.esc(tx.description)}"
               data-txid="${tx.id}"
               data-desc="${UI.esc(tx.description)}"><iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon></button>
           </div>` : ''}
@@ -232,46 +250,52 @@ const Transactions = (() => {
     modal.id = 'tx-edit-modal';
     modal.className = 'modal-overlay';
     modal.innerHTML = `
-      <div class="modal-card">
-        <h3 style="margin:0 0 1rem;font-size:1.1rem;">Edit Transaction</h3>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="tx-edit-title">
+        <h3 id="tx-edit-title" style="margin:0 0 1rem;font-size:1.1rem;">Edit Transaction</h3>
         <div class="form-group">
-          <label>Description</label>
+          <label for="edit-desc">Description</label>
           <input id="edit-desc" type="text" value="${UI.esc(desc)}" maxlength="500" />
         </div>
         <div class="form-group">
-          <label>Amount (₱)</label>
+          <label for="edit-amount">Amount (₱)</label>
           <input id="edit-amount" type="number" step="0.01" min="0" value="${UI.esc(amount)}" />
         </div>
         <div class="form-group">
-          <label>Date</label>
+          <label for="edit-date">Date</label>
           <input id="edit-date" type="date" value="${UI.esc(date)}" />
         </div>
         <div class="form-group">
-          <label>Receipt URL (G-Drive Link)</label>
+          <label for="edit-receipt">Receipt URL (G-Drive Link)</label>
           <input id="edit-receipt" type="url" value="${UI.esc(receipt)}" placeholder="Paste Google Drive/Receipt link here" />
         </div>
         <div class="form-group">
-          <label>Reason for Edit <span style="color:#ef4444">*</span></label>
-          <input id="edit-reason" type="text" placeholder="Required - why are you editing this?" />
+          <label for="edit-reason">Reason for Edit <span style="color:var(--error)" aria-hidden="true">*</span></label>
+          <input id="edit-reason" type="text" required aria-describedby="edit-error" placeholder="Required - why are you editing this?" />
         </div>
-        <div class="auth-error hidden" id="edit-error"></div>
+        <div class="auth-error hidden" id="edit-error" role="alert"></div>
         <div style="display:flex;gap:.75rem;margin-top:1rem;">
-          <button class="btn btn-primary" style="flex:1;" id="edit-submit-btn">Save Changes</button>
-          <button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('tx-edit-modal').remove()">Cancel</button>
+          <button type="button" class="btn btn-primary" style="flex:1;" id="edit-submit-btn">Save Changes</button>
+          <button type="button" class="btn btn-ghost" style="flex:1;" id="edit-cancel-btn">Cancel</button>
         </div>
       </div>`;
 
     document.body.appendChild(modal);
+    const dialog = UI.trapDialog(modal, { initialFocus: '#edit-desc' });
+    document.getElementById('edit-cancel-btn').addEventListener('click', dialog.close);
 
     document.getElementById('edit-submit-btn').addEventListener('click', async () => {
       const btn    = document.getElementById('edit-submit-btn');
       const errEl  = document.getElementById('edit-error');
-      const reason = document.getElementById('edit-reason').value.trim();
+      const reasonEl = document.getElementById('edit-reason');
+      const reason = reasonEl.value.trim();
       errEl.classList.add('hidden');
+      reasonEl.removeAttribute('aria-invalid');
 
       if (!reason || reason.length < 5) {
         errEl.textContent = 'Please provide a reason (min 5 characters).';
         errEl.classList.remove('hidden');
+        reasonEl.setAttribute('aria-invalid', 'true');
+        reasonEl.focus();
         return;
       }
 
@@ -285,7 +309,7 @@ const Transactions = (() => {
           receipt_url:      document.getElementById('edit-receipt').value,
           reason,
         });
-        modal.remove();
+        dialog.close();
         UI.toast('Transaction updated successfully.', 'success');
         document.dispatchEvent(new CustomEvent('transaction-updated'));
         load();
@@ -307,33 +331,39 @@ const Transactions = (() => {
     modal.id = 'tx-delete-modal';
     modal.className = 'modal-overlay';
     modal.innerHTML = `
-      <div class="modal-card">
-        <h3 style="margin:0 0 .5rem;font-size:1.1rem;color:#ef4444;">Delete Transaction</h3>
-        <p style="color:var(--text-secondary);margin-bottom:1rem;font-size:.9rem;">
+      <div class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="tx-delete-title" aria-describedby="tx-delete-desc">
+        <h3 id="tx-delete-title" style="margin:0 0 .5rem;font-size:1.1rem;color:var(--error);">Delete Transaction</h3>
+        <p id="tx-delete-desc" style="color:var(--text-secondary);margin-bottom:1rem;font-size:.9rem;">
           You are about to delete: <strong>${UI.esc(desc)}</strong>.<br>This action is permanent and recorded.
         </p>
         <div class="form-group">
-          <label>Reason for Deletion <span style="color:#ef4444">*</span></label>
-          <input id="delete-reason" type="text" placeholder="Required - why are you deleting this?" />
+          <label for="delete-reason">Reason for Deletion <span style="color:var(--error)" aria-hidden="true">*</span></label>
+          <input id="delete-reason" type="text" required aria-describedby="delete-error" placeholder="Required - why are you deleting this?" />
         </div>
-        <div class="auth-error hidden" id="delete-error"></div>
+        <div class="auth-error hidden" id="delete-error" role="alert"></div>
         <div style="display:flex;gap:.75rem;margin-top:1rem;">
-          <button class="btn btn-primary" style="flex:1;background:#ef4444;" id="delete-submit-btn">Confirm Delete</button>
-          <button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('tx-delete-modal').remove()">Cancel</button>
+          <button type="button" class="btn btn-danger" style="flex:1;" id="delete-submit-btn">Confirm Delete</button>
+          <button type="button" class="btn btn-ghost" style="flex:1;" id="delete-cancel-btn">Cancel</button>
         </div>
       </div>`;
 
     document.body.appendChild(modal);
+    const dialog = UI.trapDialog(modal, { initialFocus: '#delete-reason' });
+    document.getElementById('delete-cancel-btn').addEventListener('click', dialog.close);
 
     document.getElementById('delete-submit-btn').addEventListener('click', async () => {
       const btn    = document.getElementById('delete-submit-btn');
       const errEl  = document.getElementById('delete-error');
-      const reason = document.getElementById('delete-reason').value.trim();
+      const reasonEl = document.getElementById('delete-reason');
+      const reason = reasonEl.value.trim();
       errEl.classList.add('hidden');
+      reasonEl.removeAttribute('aria-invalid');
 
       if (!reason || reason.length < 5) {
         errEl.textContent = 'Please provide a reason (min 5 characters).';
         errEl.classList.remove('hidden');
+        reasonEl.setAttribute('aria-invalid', 'true');
+        reasonEl.focus();
         return;
       }
 
@@ -341,7 +371,7 @@ const Transactions = (() => {
       btn.textContent = 'Deleting…';
       try {
         await Api.transactions.remove(id, { reason });
-        modal.remove();
+        dialog.close();
         UI.toast('Transaction deleted.', 'success');
         document.dispatchEvent(new CustomEvent('transaction-updated'));
         load();

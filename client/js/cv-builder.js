@@ -57,8 +57,8 @@ const CvBuilder = (() => {
     saved:   'All changes saved',
     saving:  'Saving…',
     unsaved: 'Unsaved changes',
-    offline: 'Offline — kept in this browser',
-    error:   'Not saved — tap to retry'
+    offline: 'Offline: kept in this browser',
+    error:   'Not saved. Tap to retry'
   };
 
   // ---------------- State ----------------
@@ -294,8 +294,8 @@ const CvBuilder = (() => {
     const msg = String(err?.message || '');
     persistLocal();
     if (/session|log in/i.test(msg)) {
-      setStatus('error', 'Session expired — sign in again');
-      showToast('Your session expired. Your edits are kept — sign in and reopen the CV builder.', 'error');
+      setStatus('error', 'Session expired. Sign in again');
+      showToast('Your session expired. Your edits are kept. Sign in and reopen the CV builder.', 'error');
       setTimeout(toLogin, 3000);
       return;
     }
@@ -476,7 +476,7 @@ const CvBuilder = (() => {
           </div>
           <div class="cv-form-group">
             <label>Date</label>
-            <input type="text" class="cv-input" data-entry-key="date" maxlength="40" value="${esc(e.date)}" placeholder="e.g. Jun – Aug 2025" />
+            <input type="text" class="cv-input" data-entry-key="date" maxlength="40" value="${esc(e.date)}" placeholder="e.g. Jun - Aug 2025" />
           </div>
         </div>
         <div class="cv-form-group">
@@ -677,7 +677,7 @@ const CvBuilder = (() => {
     const pages = Math.max(1, Math.ceil((paper.offsetHeight - PAPER_CHROME_H) / PAPER_PRINTABLE_H));
     out.classList.toggle('warn', pages > 1);
     out.textContent = pages > 1
-      ? `Runs to ${pages} pages — trim to fit one page`
+      ? `Runs to ${pages} pages. Trim to fit one page`
       : 'Fits on one page';
   }
 
