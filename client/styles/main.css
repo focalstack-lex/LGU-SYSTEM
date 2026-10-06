@@ -1914,9 +1914,13 @@ html[data-theme="light"] .auth-divider span {
   font-size: 1.1rem;
 }
 
+/* Two rows: the account pill gets the full rail width for the name, and
+   the action icons sit beneath it on the avatar's left edge. One row could
+   not hold an avatar, a name, a role and four icons in 252px. */
 .sidebar-footer {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 0.5rem;
   padding-top: 1.25rem;
   border-top: 1px solid var(--border-default);
@@ -1974,7 +1978,6 @@ html[data-theme="light"] .auth-divider span {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 120px;
 }
 .user-role {
   font-family: var(--font-ui);
@@ -1988,6 +1991,7 @@ html[data-theme="light"] .auth-divider span {
   align-items: center;
   gap: 0.15rem;
   flex-shrink: 0;
+  padding-left: 0.45rem; /* same inset as the avatar inside .user-pill */
 }
 
 .sidebar-footer .btn-icon {

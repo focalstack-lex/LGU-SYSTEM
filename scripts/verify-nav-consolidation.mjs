@@ -52,6 +52,16 @@ async function student(browser, viewport, label) {
     const nav = await page.evaluate(() => [...document.querySelectorAll('.sidebar-nav .nav-item')].filter(n => n.offsetParent).map(n => n.textContent.trim()));
     check('student sidebar is Dashboard, Money, Events, Updates, Academics', nav.join('|') === 'Dashboard|Money|Events|Updates|Academics', nav.join('|'));
     check('student sidebar has no staff entries for a student', !nav.includes('Admin') && !nav.includes('Executive Portal'));
+    const footer = await page.evaluate(() => {
+      const name = document.getElementById('user-name'), info = name.closest('.user-info'), actions = document.querySelector('.sidebar-footer .sidebar-actions'), avatar = document.querySelector('.sidebar-footer .user-avatar');
+      const original = name.textContent;
+      name.textContent = 'Lex Edrick Asherjesse C. Matondo'; // a real-length name
+      const room = name.clientWidth;
+      name.textContent = original;
+      const i = info.getBoundingClientRect(), a = actions.getBoundingClientRect(), av = avatar.getBoundingClientRect();
+      return { nameRoom: Math.round(room), overlap: a.left < i.right && a.top < i.bottom, actionsLeft: Math.round(a.left + parseFloat(getComputedStyle(actions).paddingLeft)), avatarLeft: Math.round(av.left), icons: actions.querySelectorAll('.btn-icon').length };
+    });
+    check('sidebar footer: a long name gets at least 150px, icons sit below on the avatar edge, nothing overlaps', footer.nameRoom >= 150 && !footer.overlap && Math.abs(footer.actionsLeft - footer.avatarLeft) <= 1 && footer.icons === 4, JSON.stringify(footer));
     check('dashboard has no tab bar', (await page.evaluate(() => document.querySelectorAll('#view-dashboard .view-tabs').length)) === 0);
     const home = await page.evaluate(() => {
       const cards = [...document.querySelectorAll('#view-dashboard .dashboard-card h3')].map(h => h.textContent.trim());
@@ -193,6 +203,16 @@ async function officer(browser, viewport, label) {
   if (label === 'desktop') {
     const nav = await page.evaluate(() => [...document.querySelectorAll('.of-nav .nav-item')].filter(n => n.offsetParent).map(n => n.textContent.trim()));
     check('officer sidebar is Overview, Finance, Events, People, Announcements, Curriculum, Main Dashboard', nav.join('|') === 'Fund Overview|Finance|Events & Budgets|People|Announcements|Curriculum|Main Dashboard', nav.join('|'));
+    const ofFooter = await page.evaluate(() => {
+      const name = document.getElementById('of-user-name'), info = name.closest('.user-info'), actions = document.querySelector('.sidebar-footer .sidebar-actions');
+      const original = name.textContent;
+      name.textContent = 'Lex Edrick Asherjesse C. Matondo';
+      const room = name.clientWidth;
+      name.textContent = original;
+      const i = info.getBoundingClientRect(), a = actions.getBoundingClientRect();
+      return { nameRoom: Math.round(room), overlap: a.left < i.right && a.top < i.bottom };
+    });
+    check('officer sidebar footer: a long name gets at least 150px and icons do not overlap it', ofFooter.nameRoom >= 150 && !ofFooter.overlap, JSON.stringify(ofFooter));
     const financeBadged = await page.waitForFunction(() => document.querySelector('.of-nav .nav-item[data-of-group="finance"]').classList.contains('has-unread'), null, { timeout: 8000 }).then(() => true).catch(() => false);
     check('Finance entry carries the transactions badge on load', financeBadged);
     await click('.of-nav .nav-item[data-of-group="finance"]');
