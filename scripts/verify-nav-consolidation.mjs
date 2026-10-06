@@ -60,15 +60,17 @@ async function student(browser, viewport, label) {
         donations: !!document.getElementById('stat-donations'),
         nextEvent: document.getElementById('stat-next-event')?.textContent.trim(),
         nextDate: document.getElementById('stat-next-event-date')?.textContent.trim(),
-        sublabels: [...document.querySelectorAll('.stat-balance .stat-sublabel, .stat-income .stat-sublabel, .stat-expense .stat-sublabel')].length,
+        sublabels: [...document.querySelectorAll('.stat-balance .stat-sublabel')].length,
+        monthLines: [document.getElementById('stat-income-month')?.textContent.trim(), document.getElementById('stat-expense-month')?.textContent.trim()],
         txRows: document.querySelectorAll('#recent-tx-list .tx-item').length,
         announcements: document.querySelectorAll('#announcement-list .announce-item').length,
         ledgerLink: !!document.querySelector('#recent-tx-view-all[data-nav="transactions"]'),
       };
     });
-    check('home: Next Event card replaces Total Donations and shows the mocked upcoming event', !home.donations && home.nextEvent === 'Hackathon 2026' && /Dec/.test(home.nextDate), JSON.stringify([home.nextEvent, home.nextDate]));
+    check('home: Next Event card replaces Total Donations and shows the mocked upcoming event with a countdown', !home.donations && home.nextEvent === 'Hackathon 2026' && /^Dec 5, 2026 · in \d+ days$/.test(home.nextDate), JSON.stringify([home.nextEvent, home.nextDate]));
     check('home: Announcements come before Recent Transactions', home.cards.join('|') === 'Announcements|Recent Transactions', home.cards.join('|'));
-    check('home: two announcements, three transactions, ledger link, no explanatory sublabels', home.announcements === 2 && home.txRows === 3 && home.ledgerLink && home.sublabels === 0, JSON.stringify(home));
+    check('home: two announcements, three transactions, ledger link, no hero sublabel', home.announcements === 2 && home.txRows === 3 && home.ledgerLink && home.sublabels === 0, JSON.stringify(home));
+    check('home: income and expense cards carry this month\'s figures', home.monthLines.every(t => /^₱[\d,]+\.\d{2} this month$/.test(t || '')), JSON.stringify(home.monthLines));
     await shot(page, `${label}-student-dashboard`);
     await click('#view-dashboard .stat-event');
     check('home: Next Event card opens Events', (await activeView()) === 'view-events', await activeView());
@@ -140,6 +142,8 @@ async function student(browser, viewport, label) {
     const labels = await page.evaluate(() => [...document.querySelectorAll('#bottom-nav .bottom-nav-item span:not(.nav-icon)')].map(s => ({ t: s.textContent.trim(), clipped: s.scrollWidth > s.clientWidth })));
     check('phone: no bottom nav label is truncated', labels.every(l => !l.clipped), JSON.stringify(labels.filter(l => l.clipped)));
     check('phone: no status strip; the fund hero is the first block under the heading', await page.evaluate(() => !document.getElementById('student-status') && document.querySelector('#view-dashboard .view-header').nextElementSibling.classList.contains('stats-summary-wrapper')));
+    const eventCard = await page.evaluate(() => { const c = document.querySelector('.stats-secondary-grid .stat-event').getBoundingClientRect(); const g = document.querySelector('.stats-secondary-grid').getBoundingClientRect(); return { card: Math.round(c.width), grid: Math.round(g.width) }; });
+    check('phone: Next Event spans the full row', eventCard.card >= eventCard.grid - 2, JSON.stringify(eventCard));
     await shot(page, `${label}-student-dashboard`);
     await click('#bottom-nav .bottom-nav-item[data-group="money"]');
     check('phone: Money opens the ledger', (await activeView()) === 'view-transactions', await activeView());

@@ -2386,22 +2386,9 @@ html body .stats-secondary-grid .stat-income:hover .stat-icon {
     gap: 0.55rem;
   }
 
-  /* Total Donations card spans full width across both columns */
-  .stats-secondary-grid .stat-donations {
+  /* Next Event card spans full width across both columns */
+  .stats-secondary-grid .stat-event {
     grid-column: 1 / -1;
-  }
-
-  .stats-secondary-grid .stat-donations .stat-body {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.75rem;
-  }
-
-  .stats-secondary-grid .stat-donations .stat-value {
-    margin-left: auto;
   }
 
   .stats-secondary-grid .stat-card,

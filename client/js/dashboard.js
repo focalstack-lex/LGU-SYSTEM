@@ -196,6 +196,7 @@ const Dashboard = (() => {
       document.getElementById('stat-income').textContent    = UI.currency(summary.totalIncome);
       document.getElementById('stat-expense').textContent   = UI.currency(summary.totalExpense);
       document.getElementById('stat-balance').textContent   = UI.currency(summary.remainingBalance);
+      loadMonthToDate();
 
       // Populate popover breakdowns with 1-tap action links
       document.getElementById('pop-income').innerHTML = `
@@ -230,6 +231,25 @@ const Dashboard = (() => {
     }
   }
 
+  // Second line of the income and expense cards: this month's movement,
+  // from the same monthly series the Reports tab charts.
+  async function loadMonthToDate() {
+    const incomeEl = document.getElementById('stat-income-month');
+    const expenseEl = document.getElementById('stat-expense-month');
+    if (!incomeEl || !expenseEl) return;
+    try {
+      const rows = await Api.reports.monthly();
+      const key = new Date().toISOString().slice(0, 7);
+      const row = (rows || []).find(r => r.month === key) || { income: 0, expense: 0 };
+      incomeEl.textContent  = `${UI.currency(row.income)} this month`;
+      expenseEl.textContent = `${UI.currency(row.expense)} this month`;
+    } catch (err) {
+      console.error('Month-to-date load error:', err);
+      incomeEl.textContent = '';
+      expenseEl.textContent = '';
+    }
+  }
+
   // Next upcoming event, in the slot the donations card used to hold.
   // Donations stay available as the breakdown inside Total Income.
   async function loadNextEvent() {
@@ -243,7 +263,13 @@ const Dashboard = (() => {
         .filter(ev => ev.event_date && ev.event_date >= today && ev.status !== 'archived')
         .sort((a, b) => a.event_date.localeCompare(b.event_date))[0];
       nameEl.textContent = next ? next.event_name : 'Nothing scheduled';
-      dateEl.textContent = next ? UI.dateStr(next.event_date) : 'See all events';
+      if (next) {
+        const days = Math.round((new Date(next.event_date + 'T00:00:00') - new Date(today + 'T00:00:00')) / 86400000);
+        const when = days === 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`;
+        dateEl.textContent = `${UI.dateStr(next.event_date)} · ${when}`;
+      } else {
+        dateEl.textContent = 'See all events';
+      }
     } catch (err) {
       console.error('Next event load error:', err);
       nameEl.textContent = 'Nothing scheduled';
