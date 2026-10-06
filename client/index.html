@@ -17,7 +17,7 @@
   <meta name="description" content="Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=8.0" />
+  <link rel="stylesheet" href="styles/main.css?v=8.1" />
   <link rel="stylesheet" href="styles/ai.css?v=6.8" />
   <script src="vendor/supabase.min.js"></script>
   <script src="vendor/chart.umd.min.js"></script>
@@ -276,32 +276,17 @@
         <a href="#" class="nav-item active" data-view="dashboard" id="nav-dashboard">
           <span class="nav-icon"><iconify-icon icon="solar:widget-2-linear"></iconify-icon></span><span>Dashboard</span>
         </a>
-        <a href="#" class="nav-item" data-view="announcements" id="nav-announcements">
-          <span class="nav-icon"><iconify-icon icon="solar:bell-linear"></iconify-icon></span><span>Announcements</span>
-        </a>
-        <a href="#" class="nav-item" data-view="notifications" id="nav-notifications">
-          <span class="nav-icon"><iconify-icon icon="solar:letter-bold"></iconify-icon></span><span>Notifications</span>
+        <a href="#" class="nav-item" data-view="transactions" data-group="money" id="nav-money">
+          <span class="nav-icon"><iconify-icon icon="solar:wallet-money-linear"></iconify-icon></span><span>Money</span>
         </a>
         <a href="#" class="nav-item" data-view="events" id="nav-events">
           <span class="nav-icon"><iconify-icon icon="solar:calendar-date-linear"></iconify-icon></span><span>Events</span>
         </a>
-        <a href="#" class="nav-item" data-view="transactions" id="nav-transactions">
-          <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><span>Transactions</span>
+        <a href="#" class="nav-item" data-view="announcements" data-group="updates" id="nav-updates">
+          <span class="nav-icon"><iconify-icon icon="solar:bell-linear"></iconify-icon></span><span>Updates</span>
         </a>
-        <a href="#" class="nav-item" data-view="income" id="nav-income">
-          <span class="nav-icon"><iconify-icon icon="solar:wallet-money-linear"></iconify-icon></span><span>Total Income</span>
-        </a>
-        <a href="#" class="nav-item" data-view="reports" id="nav-reports">
-          <span class="nav-icon"><iconify-icon icon="solar:document-text-linear"></iconify-icon></span><span>Reports</span>
-        </a>
-        <a href="#" class="nav-item" data-view="units" id="nav-units">
-          <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span><span>Academic Progress</span>
-        </a>
-        <a href="#" class="nav-item" data-view="enrollment" id="nav-enrollment">
-          <span class="nav-icon"><iconify-icon icon="solar:clipboard-check-linear"></iconify-icon></span><span>Enrollment Verification</span>
-        </a>
-        <a href="/cv-builder" class="nav-item" id="nav-cv">
-          <span class="nav-icon"><iconify-icon icon="solar:diploma-linear"></iconify-icon></span><span>Career Passport</span>
+        <a href="#" class="nav-item" data-view="units" data-group="academics" id="nav-academics">
+          <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span><span>Academics</span>
         </a>
         <a href="/officer.html" class="nav-item officer-only hidden" id="nav-executive-portal">
           <span class="nav-icon"><iconify-icon icon="solar:shield-user-linear"></iconify-icon></span><span>Executive Portal</span>
@@ -426,6 +411,10 @@
 
       <!-- ANNOUNCEMENTS -->
       <section class="view" id="view-announcements">
+        <div class="view-tabs" role="tablist" aria-label="Updates">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="announcements">Announcements</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="notifications">For you</button>
+        </div>
         <div class="view-header">
           <div>
             <h2>Announcements</h2>
@@ -441,6 +430,10 @@
 
       <!-- NOTIFICATIONS -->
       <section class="view" id="view-notifications">
+        <div class="view-tabs" role="tablist" aria-label="Updates">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="announcements">Announcements</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="notifications">For you</button>
+        </div>
         <div class="view-header">
           <div>
             <h2>Notifications</h2>
@@ -496,6 +489,11 @@
 
       <!-- TRANSACTIONS -->
       <section id="view-transactions" class="view ledger-view">
+        <div class="view-tabs" role="tablist" aria-label="Money">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="transactions">Ledger</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="income">Income</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="reports">Reports</button>
+        </div>
         <div class="view-header ledger-header">
           <div class="ledger-title-row">
             <h2>Transactions</h2>
@@ -546,6 +544,11 @@
 
       <!-- TOTAL INCOME -->
       <section id="view-income" class="view">
+        <div class="view-tabs" role="tablist" aria-label="Money">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="transactions">Ledger</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="income">Income</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="reports">Reports</button>
+        </div>
         <div class="view-header">
           <div>
             <h2>Total Income Tracker</h2>
@@ -613,6 +616,11 @@
 
       <!-- REPORTS -->
       <section class="view reports-view" id="view-reports">
+        <div class="view-tabs" role="tablist" aria-label="Money">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="transactions">Ledger</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="income">Income</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="reports">Reports</button>
+        </div>
         <div class="view-header">
           <div>
             <h2>Financial Reports</h2>
@@ -634,6 +642,11 @@
 
       <!-- Student Dashboard -->
       <section class="view" id="view-units">
+        <div class="view-tabs" role="tablist" aria-label="Academics">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="units">Progress</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="enrollment">Enrollment</button>
+          <a href="/cv-builder" class="view-tab" role="tab">Career Passport</a>
+        </div>
         <div class="view-header">
           <div>
             <h2>Academic Progress</h2>
@@ -703,6 +716,11 @@
 
       <!-- Enrollment Verification (Phase B) -->
       <section class="view" id="view-enrollment">
+        <div class="view-tabs" role="tablist" aria-label="Academics">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="units">Progress</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-view="enrollment">Enrollment</button>
+          <a href="/cv-builder" class="view-tab" role="tab">Career Passport</a>
+        </div>
         <div class="view-header">
           <div>
             <h2>Enrollment Verification</h2>
@@ -1198,17 +1216,17 @@
       <span class="nav-icon"><iconify-icon icon="solar:widget-2-linear"></iconify-icon></span>
       <span>Home</span>
     </a>
+    <a href="#" class="bottom-nav-item" data-view="transactions" data-group="money" title="Money">
+      <span class="nav-icon"><iconify-icon icon="solar:wallet-money-linear"></iconify-icon></span>
+      <span>Money</span>
+    </a>
     <a href="#" class="bottom-nav-item" data-view="events" title="Events">
       <span class="nav-icon"><iconify-icon icon="solar:calendar-date-linear"></iconify-icon></span>
       <span>Events</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="units" title="Academic Progress">
+    <a href="#" class="bottom-nav-item" data-view="units" data-group="academics" title="Academics">
       <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span>
-      <span>Academic</span>
-    </a>
-    <a href="#" class="bottom-nav-item" data-view="reports" title="Financial Reports">
-      <span class="nav-icon"><iconify-icon icon="solar:document-text-linear"></iconify-icon></span>
-      <span>Reports</span>
+      <span>Academics</span>
     </a>
     <button type="button" class="bottom-nav-item bottom-nav-more-trigger" id="bottom-nav-more-btn" title="More Views & Services" aria-haspopup="dialog" aria-expanded="false">
       <span class="nav-icon">
@@ -1228,7 +1246,7 @@
       <div class="mobile-sheet-title-row">
         <div>
           <h3>More Services & Views</h3>
-          <p class="mobile-sheet-sub">Academic, financial & administrative tools</p>
+          <p class="mobile-sheet-sub">Updates, account and staff tools</p>
         </div>
         <button type="button" class="btn-icon mobile-sheet-close-btn" id="mobile-sheet-close-btn" aria-label="Close menu">
           <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
@@ -1257,60 +1275,6 @@
             <div class="mobile-sheet-row-content">
               <span class="mobile-sheet-row-title">Notifications</span>
               <span class="mobile-sheet-row-desc">Enrollment, subjects and council updates</span>
-            </div>
-            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
-          </button>
-        </div>
-      </div>
-
-      <!-- Section: ACADEMIC -->
-      <div class="mobile-sheet-section">
-        <span class="mobile-sheet-section-label">Academic</span>
-        <div class="mobile-sheet-group">
-          <button type="button" class="mobile-sheet-row" id="bottom-nav-enrollment" data-view="enrollment" data-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(var(--primary-rgb),0.12);">
-              <iconify-icon icon="solar:clipboard-check-linear"></iconify-icon>
-            </div>
-            <div class="mobile-sheet-row-content">
-              <span class="mobile-sheet-row-title">Enrollment</span>
-              <span class="mobile-sheet-row-desc">Build &amp; track your proposed load</span>
-            </div>
-            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
-          </button>
-          <a href="/cv-builder" class="mobile-sheet-row">
-            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(255,94,20,0.12);">
-              <iconify-icon icon="solar:diploma-linear"></iconify-icon>
-            </div>
-            <div class="mobile-sheet-row-content">
-              <span class="mobile-sheet-row-title">Career Passport (CV Builder)</span>
-              <span class="mobile-sheet-row-desc">Harvard-style resume & achievement locker</span>
-            </div>
-            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
-          </a>
-        </div>
-      </div>
-
-      <!-- Section: FINANCE -->
-      <div class="mobile-sheet-section">
-        <span class="mobile-sheet-section-label">Finance</span>
-        <div class="mobile-sheet-group">
-          <button type="button" class="mobile-sheet-row" data-view="transactions" data-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(var(--primary-rgb),0.12);">
-              <iconify-icon icon="solar:card-transfer-linear"></iconify-icon>
-            </div>
-            <div class="mobile-sheet-row-content">
-              <span class="mobile-sheet-row-title">Transactions</span>
-              <span class="mobile-sheet-row-desc">Every recorded expense and income, with receipts</span>
-            </div>
-            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
-          </button>
-          <button type="button" class="mobile-sheet-row" data-view="income" data-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:var(--status-positive); background:rgba(var(--success-rgb),0.12);">
-              <iconify-icon icon="solar:wallet-money-linear"></iconify-icon>
-            </div>
-            <div class="mobile-sheet-row-content">
-              <span class="mobile-sheet-row-title">Total Income Tracker</span>
-              <span class="mobile-sheet-row-desc">Breakdown & incoming collections</span>
             </div>
             <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
           </button>
@@ -1748,7 +1712,7 @@
   <script src="js/roster.js?v=5.5"></script>
   <script src="js/auth.js?v=5.5"></script>
   <script src="js/api.js?v=5.4"></script>
-  <script src="js/ui.js?v=5.10"></script>
+  <script src="js/ui.js?v=5.11"></script>
   <script src="js/dashboard.js?v=5.6"></script>
   <script src="js/updates.js?v=1.0"></script>
   <script src="js/events.js?v=5.6"></script>
@@ -1763,10 +1727,10 @@
   <script src="js/grizz-recommend.js?v=1.6"></script>
   <script src="js/ai-assistant.js?v=6.3"></script>
   <script src="js/profile.js?v=5.5"></script>
-  <script src="js/notifications.js?v=5.4"></script>
+  <script src="js/notifications.js?v=5.5"></script>
   <script src="js/enrollment-journey.js?v=1.2"></script>
   <script src="js/enrollment.js?v=1.8"></script>
-  <script src="js/app.js?v=6.7"></script>
+  <script src="js/app.js?v=6.8"></script>
   <script src="js/sw-register.js"></script>
 </body>
 </html>

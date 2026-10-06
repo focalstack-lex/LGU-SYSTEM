@@ -191,11 +191,31 @@ The `inset 0 1px 0 rgba(255,255,255,N)` highlight simulates a top-edge light ref
 - **Nav item active:** `background: var(--bg-surface-raised)`, left `3px solid var(--accent)` via `::before`, weight 600
 - **Nav item hover:** `background: var(--surface-hover)`, `color: var(--text-primary)`
 
+### View Groups (pill tabs inside a view)
+
+Related views share one sidebar entry and switch through a pill track at the
+top of the view, so the sidebar stays short and the user never leaves the
+area they are in. The groups are defined once in `UI.VIEW_GROUPS`
+(`client/js/ui.js`) and the officer equivalent in `switchSection`
+(`client/js/officer/officer-app.js`).
+
+| Portal | Entry | Views inside |
+| --- | --- | --- |
+| Student | Money | Ledger (`transactions`), Income (`income`), Reports (`reports`) |
+| Student | Updates | Announcements (`announcements`), For you (`notifications`) |
+| Student | Academics | Progress (`units`), Enrollment (`enrollment`), Career Passport (link to `/cv-builder`) |
+| Officer | Finance | Record (`record`), Reports (`reports`) |
+| Officer | People | Accounts (`people`), Enrolled roster (`roster`) |
+
+- Markup: `.view-tabs[role="tablist"]` holding `.view-tab[role="tab"]` buttons, placed as the first child of every view in the group. Student tabs carry `data-view`, officer tabs carry `data-of`; the sidebar and bottom-nav entry carries `data-group` / `data-of-group` and stays active for every view in its group.
+- Geometry: pill track (`--radius-pill`), 40px tall tabs, active tab `--primary` with `--accent-text-on` text. On phones the track spans the content width and the tabs share it equally.
+- Each view keeps its own id, heading, loader and markup; the tabs only change which view is shown. Unread dots use the same `.has-unread` class as the sidebar.
+
 ### Mobile Shell (≤ 768px)
 
 Sidebar replaced by:
 - Sticky top header (`.app-mobile-header`) — brand name + action buttons
-- Fixed bottom navigation bar (`.bottom-nav`) — 4 tabs with icons + labels
+- Fixed bottom navigation bar (`.bottom-nav`) — Home, Money, Events, Academics, More; the More sheet holds Updates, account rows and the staff-only rows
 
 ---
 

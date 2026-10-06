@@ -17,7 +17,7 @@
   <link rel="icon" type="image/png" href="assets/coe-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=8.0" />
+  <link rel="stylesheet" href="styles/main.css?v=8.1" />
   <link rel="stylesheet" href="styles/officer.css?v=6.7" />
   <script src="vendor/iconify-icon.min.js"></script>
   <script src="vendor/icons-bundle.js?v=2"></script>
@@ -71,23 +71,17 @@
         <button type="button" class="nav-item active" data-of="overview">
           <span class="nav-icon"><iconify-icon icon="solar:chart-2-linear"></iconify-icon></span><span>Fund Overview</span>
         </button>
-        <button type="button" class="nav-item" data-of="record">
-          <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><span>Record Transaction</span>
+        <button type="button" class="nav-item" data-of="record" data-of-group="finance">
+          <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><span>Finance</span>
         </button>
         <button type="button" class="nav-item" data-of="events">
           <span class="nav-icon"><iconify-icon icon="solar:calendar-mark-linear"></iconify-icon></span><span>Events &amp; Budgets</span>
         </button>
-        <button type="button" class="nav-item" data-of="reports">
-          <span class="nav-icon"><iconify-icon icon="solar:document-text-linear"></iconify-icon></span><span>Reports &amp; Paper Trail</span>
-        </button>
-        <button type="button" class="nav-item" data-of="people">
-          <span class="nav-icon"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon></span><span>People &amp; Access</span>
+        <button type="button" class="nav-item" data-of="people" data-of-group="people">
+          <span class="nav-icon"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon></span><span>People</span>
         </button>
         <button type="button" class="nav-item" data-of="announcements">
           <span class="nav-icon"><iconify-icon icon="solar:bell-linear"></iconify-icon></span><span>Announcements</span>
-        </button>
-        <button type="button" class="nav-item" data-of="roster">
-          <span class="nav-icon"><iconify-icon icon="solar:user-plus-linear"></iconify-icon></span><span>Enrolled Roster</span>
         </button>
         <button type="button" class="nav-item" data-of="curriculum">
           <span class="nav-icon"><iconify-icon icon="solar:book-bookmark-linear"></iconify-icon></span><span>Curriculum</span>
@@ -163,6 +157,10 @@
 
       <!-- 2. Record Transaction -->
       <section class="of-view" id="of-view-record">
+        <div class="view-tabs" role="tablist" aria-label="Finance">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="record">Record</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="reports">Reports</button>
+        </div>
         <div class="view-header of-view-head">
           <div>
             <h2>Record Transaction</h2>
@@ -300,6 +298,10 @@
 
       <!-- 4. Reports & Paper Trail -->
       <section class="of-view" id="of-view-reports">
+        <div class="view-tabs" role="tablist" aria-label="Finance">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="record">Record</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="reports">Reports</button>
+        </div>
         <div class="view-header of-view-head">
           <div>
             <h2>Reports &amp; Paper Trail</h2>
@@ -348,6 +350,10 @@
 
       <!-- 5. People & Access -->
       <section class="of-view" id="of-view-people">
+        <div class="view-tabs" role="tablist" aria-label="People">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="people">Accounts</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster">Enrolled roster</button>
+        </div>
         <div class="view-header of-view-head">
           <div>
             <h2>People &amp; Access</h2>
@@ -455,6 +461,10 @@
 
       <!-- 7. Enrolled Roster Management (Executive / Admin Only) -->
       <section class="of-view" id="of-view-roster">
+        <div class="view-tabs" role="tablist" aria-label="People">
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="people">Accounts</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster">Enrolled roster</button>
+        </div>
         <div class="view-header of-view-head">
           <div>
             <h2>Official Enrolled Roster</h2>
@@ -641,17 +651,17 @@
       <iconify-icon icon="solar:chart-2-linear"></iconify-icon>
       <span>Overview</span>
     </button>
-    <button data-of="record" title="Record Transaction">
+    <button data-of="record" data-of-group="finance" title="Finance">
       <iconify-icon icon="solar:card-transfer-linear"></iconify-icon>
-      <span>Record</span>
+      <span>Finance</span>
     </button>
     <button data-of="events" title="Events & Budgets">
       <iconify-icon icon="solar:calendar-mark-linear"></iconify-icon>
       <span>Events</span>
     </button>
-    <button data-of="reports" title="Reports & Paper Trail">
-      <iconify-icon icon="solar:document-text-linear"></iconify-icon>
-      <span>Reports</span>
+    <button data-of="people" data-of-group="people" title="People">
+      <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon>
+      <span>People</span>
     </button>
     <button type="button" id="of-bottom-nav-more-btn" title="More Executive Controls" aria-haspopup="dialog" aria-expanded="false">
       <span>
@@ -671,7 +681,7 @@
       <div class="mobile-sheet-title-row">
         <div>
           <h3>Executive Controls</h3>
-          <p class="mobile-sheet-sub">Roster verification, communication & access</p>
+          <p class="mobile-sheet-sub">Curriculum, announcements and account</p>
         </div>
         <button type="button" class="btn-icon mobile-sheet-close-btn" id="of-mobile-sheet-close-btn" aria-label="Close menu">
           <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
@@ -681,18 +691,8 @@
     <div class="mobile-sheet-body">
       <!-- Section: ROSTER & DIRECTORY -->
       <div class="mobile-sheet-section">
-        <span class="mobile-sheet-section-label">Directory & Roster</span>
+        <span class="mobile-sheet-section-label">Admin Tools</span>
         <div class="mobile-sheet-group">
-          <button type="button" class="mobile-sheet-row" data-of="roster" data-of-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(var(--primary-rgb),0.12);">
-              <iconify-icon icon="solar:user-plus-linear"></iconify-icon>
-            </div>
-            <div class="mobile-sheet-row-content">
-              <span class="mobile-sheet-row-title">Enrolled Roster</span>
-              <span class="mobile-sheet-row-desc">Student database verification & approvals</span>
-            </div>
-            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
-          </button>
 
           <button type="button" class="mobile-sheet-row" data-of="curriculum" data-of-sheet-action="nav">
             <div class="mobile-sheet-row-icon" style="color:#A78BFA; background:rgba(167,139,250,0.12);">
@@ -701,17 +701,6 @@
             <div class="mobile-sheet-row-content">
               <span class="mobile-sheet-row-title">Curriculum Manager</span>
               <span class="mobile-sheet-row-desc">Lec/lab components &amp; prerequisites</span>
-            </div>
-            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
-          </button>
-
-          <button type="button" class="mobile-sheet-row" data-of="people" data-of-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:#38BDF8; background:rgba(56,189,248,0.12);">
-              <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon>
-            </div>
-            <div class="mobile-sheet-row-content">
-              <span class="mobile-sheet-row-title">People & Access</span>
-              <span class="mobile-sheet-row-desc">Officer roles and privileges</span>
             </div>
             <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
           </button>
@@ -1161,14 +1150,14 @@
   <script src="js/roster.js?v=5.5"></script>
   <script src="js/auth.js?v=5.5"></script>
   <script src="js/api.js?v=5.4"></script>
-  <script src="js/ui.js?v=5.10"></script>
+  <script src="js/ui.js?v=5.11"></script>
   <script src="js/receipt-capture.js?v=5.3"></script>
   <script src="js/receipt-modal.js?v=5.4"></script>
   <script src="js/dropdown.js?v=5.4"></script>
   <script src="js/profile.js?v=5.5"></script>
-  <script src="js/notifications.js?v=5.4"></script>
+  <script src="js/notifications.js?v=5.5"></script>
   <script src="js/officer/curriculum.js?v=1.1"></script>
-  <script src="js/officer/officer-app.js?v=6.6"></script>
+  <script src="js/officer/officer-app.js?v=6.7"></script>
   <script src="js/sw-register.js"></script>
 </body>
 </html>

@@ -520,14 +520,21 @@ const OfficerApp = (() => {
       window.SWRCache.saveScroll(prevActive.id, mainEl.scrollTop);
     }
 
-    const moreSections = ['roster', 'people', 'announcements', 'curriculum'];
+    const moreSections = ['announcements', 'curriculum'];
     const isMoreActive = moreSections.includes(section);
     const moreBtn = $('of-bottom-nav-more-btn');
     if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
 
+    // A nav entry with data-of-group stays active for every section in
+    // that group; the sections switch through pill tabs inside the view.
+    const OF_GROUPS = { finance: ['record', 'reports'], people: ['people', 'roster'] };
     document.querySelectorAll('.of-view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('[data-of]').forEach(b => {
-      if (b !== moreBtn) b.classList.toggle('active', b.dataset.of === section);
+      if (b === moreBtn) return;
+      const inGroup = !!b.dataset.ofGroup && (OF_GROUPS[b.dataset.ofGroup] || []).includes(section);
+      const isActive = b.dataset.of === section || inGroup;
+      b.classList.toggle('active', isActive);
+      if (b.classList.contains('view-tab')) b.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
     $(`of-view-${section}`).classList.add('active');
 

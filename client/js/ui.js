@@ -5,6 +5,19 @@
 const UI = (() => {
 
   // ---- Navigation ----
+  // Related views share one sidebar entry and switch through pill tabs
+  // inside the view. The nav entry carries data-group; the tabs carry
+  // data-view. Every view keeps its own id, loader and markup.
+  const VIEW_GROUPS = {
+    money:     ['transactions', 'income', 'reports'],
+    updates:   ['announcements', 'notifications'],
+    academics: ['units', 'enrollment']
+  };
+
+  function groupOf(viewId) {
+    return Object.keys(VIEW_GROUPS).find(g => VIEW_GROUPS[g].includes(viewId)) || null;
+  }
+
   function showView(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -15,10 +28,15 @@ const UI = (() => {
     if (view) view.classList.add('active');
     if (nav)  nav.classList.add('active');
 
+    const group = groupOf(viewId);
+    if (group) {
+      document.querySelectorAll(`.nav-item[data-group="${group}"]`).forEach(n => n.classList.add('active'));
+    }
+
     // Remember the last navigable view so a page refresh returns the user
     // here instead of resetting to the dashboard. Sub-views that need their
     // own state (e.g. event-detail) are not stored.
-    const NAV_VIEWS = ['dashboard', 'events', 'transactions', 'income', 'reports', 'units', 'enrollment', 'admin'];
+    const NAV_VIEWS = ['dashboard', 'events', 'transactions', 'income', 'reports', 'units', 'enrollment', 'admin', 'announcements', 'notifications'];
     if (NAV_VIEWS.includes(viewId)) {
       try { sessionStorage.setItem('lastView', viewId); } catch { /* storage unavailable */ }
     }
@@ -446,5 +464,5 @@ const UI = (() => {
     document.body.classList.remove('modal-open');
   }
 
-  return { showView, showScreen, setSplashView, toast, currency, dateStr, esc, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators, lockScrollbar, unlockScrollbar, trapDialog, confirmDialog };
+  return { VIEW_GROUPS, groupOf, showView, showScreen, setSplashView, toast, currency, dateStr, esc, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators, lockScrollbar, unlockScrollbar, trapDialog, confirmDialog };
 })();

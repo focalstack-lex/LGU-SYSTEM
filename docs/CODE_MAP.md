@@ -1,7 +1,7 @@
 <!-- code-map
-generated: 2026-10-06T07:26:18.911Z
-commit: f9a0ec5
-fingerprint: 4897e0134adf1793
+generated: 2026-10-06T08:02:53.603Z
+commit: 4f27cc3
+fingerprint: 43edb0e02d41aa00
 -->
 # Code Map (Agent Navigation)
 
@@ -14,8 +14,8 @@ disagree, the code wins and the map is regenerated.
 
 ## Summary
 
-- Files indexed: 184
-- Total lines indexed: 52,892
+- Files indexed: 185
+- Total lines indexed: 53,158
 - Anchor index emitted for files over 300 lines: 37
 
 ### Areas
@@ -23,14 +23,14 @@ disagree, the code wins and the map is regenerated.
 | Area | Files | Lines |
 |---|---:|---:|
 | `.` | 4 | 2,309 |
-| `client` | 6 | 3,491 |
+| `client` | 6 | 3,444 |
 | `client/feedback` | 2 | 227 |
-| `client/js` | 30 | 12,275 |
+| `client/js` | 30 | 12,313 |
 | `client/js/faculty` | 1 | 489 |
-| `client/js/officer` | 2 | 3,316 |
-| `client/styles` | 6 | 14,342 |
+| `client/js/officer` | 2 | 3,323 |
+| `client/styles` | 6 | 14,405 |
 | `electron` | 3 | 351 |
-| `scripts` | 64 | 7,160 |
+| `scripts` | 65 | 7,365 |
 | `server` | 1 | 227 |
 | `server/lib` | 8 | 713 |
 | `server/middleware` | 2 | 122 |
@@ -53,8 +53,8 @@ disagree, the code wins and the map is regenerated.
 
 | File | Lines | Purpose |
 |---|---:|---|
-| `index.html` | 1773 | Index |
-| `officer.html` | 1175 | Officer |
+| `index.html` | 1737 | Index |
+| `officer.html` | 1164 | Officer |
 | `cv-builder.html` | 220 | Cv Builder |
 | `sw.js` | 113 | PWA Service Worker (app shell only) |
 | `faculty.html` | 107 | Faculty |
@@ -72,7 +72,7 @@ disagree, the code wins and the map is regenerated.
 | File | Lines | Purpose |
 |---|---:|---|
 | `ai-assistant.js` | 1445 | Grizz: COE Mascot AI Assistant |
-| `app.js` | 959 | Main Application Router |
+| `app.js` | 962 | Main Application Router |
 | `units.js` | 939 | Credit Unit Tracker View Module |
 | `admin.js` | 901 | Admin View Module (Phase 4) |
 | `cv-builder.js` | 853 | College of Engineering CV Builder |
@@ -81,11 +81,11 @@ disagree, the code wins and the map is regenerated.
 | `profile.js` | 614 | User Account Profile & Settings Controller |
 | `reports.js` | 526 | client/js/reports.js - Phase 3 Reporting |
 | `grizz-recommend.js` | 522 | Pure "next load" recommendation engine. |
-| `ui.js` | 451 | Shared UI Utilities |
+| `ui.js` | 469 | Shared UI Utilities |
 | `dashboard.js` | 445 | Dashboard View Module |
 | `receipt-modal.js` | 413 | In-System Receipt Lightbox & Preview Modal |
 | `transactions.js` | 389 | Transactions View Module |
-| `notifications.js` | 274 | Real-time Contextual Notification System |
+| `notifications.js` | 291 | Real-time Contextual Notification System |
 | `events.js` | 260 | Events View Module |
 | `receipt-capture.js` | 256 | In-System Camera Receipt Capture |
 | `dropdown.js` | 249 | Custom animated dropdowns |
@@ -112,14 +112,14 @@ disagree, the code wins and the map is regenerated.
 
 | File | Lines | Purpose |
 |---|---:|---|
-| `officer-app.js` | 3127 | Executive Portal Application |
+| `officer-app.js` | 3134 | Executive Portal Application |
 | `curriculum.js` | 189 | officer/curriculum.js - Curriculum Manager (admin-only, Phase A). |
 
 ## client/styles
 
 | File | Lines | Purpose |
 |---|---:|---|
-| `main.css` | 9455 | College of Engineering · Official Student Portal · Design System |
+| `main.css` | 9518 | College of Engineering · Official Student Portal · Design System |
 | `officer.css` | 2285 | EXECUTIVE PORTAL - Cohesive Portal Theme |
 | `ai.css` | 1622 | Grizz - COE Bear AI Assistant Styles |
 | `cv-builder.css` | 559 | College of Engineering CV Builder |
@@ -147,6 +147,7 @@ disagree, the code wins and the map is regenerated.
 | `lib-capture-mocks.mjs` | 253 | lib-capture-mocks.mjs |
 | `audit-mobile-responsive.mjs` | 249 | Audit Mobile Responsive |
 | `verify-student-experience.mjs` | 220 | Verify Student Experience |
+| `verify-nav-consolidation.mjs` | 205 | Verify Nav Consolidation |
 | `seed-phase-b-demo.js` | 189 | Seed Phase B Demo |
 | `lint-sql-invariants.mjs` | 188 | scripts/lint-sql-invariants.mjs |
 | `verify-dropdown-sweep.mjs` | 175 | Verify Dropdown Sweep |
@@ -314,7 +315,7 @@ disagree, the code wins and the map is regenerated.
 Files over 300 lines. Each entry is a line number to jump to, so a target
 resolves to a window instead of a full read.
 
-### `client/styles/main.css` (9455 lines)
+### `client/styles/main.css` (9518 lines)
 
 - 1: `College of Engineering · Official Student Portal · Design System` | 562: `AUTHENTICATION SCREEN - Permanently Dark Charcoal & Coral-Orange` | 1273: `FORM ELEMENTS`
 - 1440: `BUTTONS` | 1789: `APP LAYOUT` | 2071: `DASHBOARD STATS & FINANCIAL SUMMARY HIERARCHY`
@@ -327,9 +328,9 @@ resolves to a window instead of a full read.
 - 6422: `Avatar Picker Section` | 7091: `LIGHT MODE DESIGN ENHANCEMENTS & ELEVATIONS (IN-APP)` | 7350: `RECEIPT CAPTURE MODAL + ATTACHMENT CHIP`
 - 7472: `IN-SYSTEM RECEIPT VIEWER LIGHTBOX MODAL` | 7943: `iOS Slide-Up Bottom Sheet Drawer ("More" Menu)` | 8283: `Load Verification (Phase B student portal)`
 - 8814: `Enrollment Verification — Journey UI (2026-09-10)` | 9044: `Faculty Portal (Phase B, /faculty)` | 9232: `Faculty review queue — year-level groups (2026-09-10)`
-- 9288: `Student experience (2026-09-28): skip link, status strip, updates pages,`
+- 9288: `Student experience (2026-09-28): skip link, status strip, updates pages,` | 9456: `VIEW GROUP TABS`
 
-### `client/js/officer/officer-app.js` (3127 lines)
+### `client/js/officer/officer-app.js` (3134 lines)
 
 - 9: `OfficerApp()` | 13: `isExecutive()` | 15: `applyRolePermissionsUI()`
 - 42: `$()` | 44: `esc()` | 50: `toast()`
@@ -341,33 +342,33 @@ resolves to a window instead of a full read.
 - 326: `bindOfficerMobileMoreSheet()` | 333: `preventScrollOutsideSheet()` | 340: `openSheet()`
 - 354: `closeSheet()` | 452: `bindAutoHideBottomNav()` | 466: `handleScroll()`
 - 467: `target()` | 471: `isAtBottom()` | 512: `switchSection()`
-- 566: `activeEvents()` | 570: `renderChartInstance()` | 589: `drawMonthlyChart()`
-- 666: `net()` | 701: `drawBreakdownChart()` | 770: `reloadCharts()`
-- 783: `loadOverview()` | 886: `recent()` | 899: `bindStatPopovers()`
-- 910: `adjustPosition()` | 923: `showCard()` | 933: `hideAll()`
-- 1023: `bindRecordForm()` | 1030: `updateAllocVisibility()` | 1058: `invalid()`
-- 1121: `clearReceiptChip()` | 1126: `updateEventBalance()` | 1146: `loadRecord()`
-- 1151: `populateEventSelects()` | 1160: `bindEventFilters()` | 1178: `getAvailableGeneralFundSync()`
-- 1201: `updateCreateEventBudgetUI()` | 1209: `bindEventForms()` | 1248: `bindTransferForm()`
-- 1253: `updatePreview()` | 1260: `fmt()` | 1309: `boxHide()`
-- 1313: `loadEvents()` | 1325: `renderEventsGrid()` | 1328: `searchVal()`
-- 1399: `renderEventDetail()` | 1495: `closeModal()` | 1509: `onKey()`
-- 1566: `renderList()` | 1601: `completeEvent()` | 1613: `archiveEvent()`
-- 1632: `loadReports()` | 1669: `loadAudit()` | 1675: `bindAuditSearch()`
-- 1682: `renderAuditTable()` | 1683: `q()` | 1694: `startIdx()`
-- 1710: `renderAuditPagination()` | 1721: `start()` | 1786: `humanizeAction()`
-- 1792: `auditActionCell()` | 1800: `auditDetails()` | 1834: `summarizeDetails()`
-- 1864: `canAssignRoles()` | 1865: `assignableRoles()` | 1869: `bindPeopleSearch()`
-- 1885: `updatePeopleStats()` | 1926: `loadPeople()` | 1940: `renderPeopleTable()`
-- 2032: `bindAnnouncementForm()` | 2058: `loadAnnouncements()` | 2076: `loadCurriculum()`
-- 2126: `formatStudentName()` | 2161: `bindRosterForm()` | 2170: `bindRosterViewTabs()`
-- 2198: `bindRequestsStatusTabs()` | 2214: `bindRequestsBulkActions()` | 2257: `updateBulkBar()`
-- 2299: `bindRosterControls()` | 2390: `updateRequestsBadge()` | 2406: `updateRosterStats()`
-- 2423: `loadRoster()` | 2440: `loadRosterRequests()` | 2456: `renderRosterRequestsTable()`
-- 2644: `getFilteredRoster()` | 2654: `renderRosterTable()` | 2672: `startIndex()`
-- 2808: `bindRosterModal()` | 2877: `openRosterModal()` | 2916: `bindRosterImportModal()`
-- 2990: `openRosterImportModal()` | 3001: `handleRosterCSVFile()` | 3034: `course()`
-- 3043: `year()` | 3095: `exportRosterCSV()`
+- 573: `activeEvents()` | 577: `renderChartInstance()` | 596: `drawMonthlyChart()`
+- 673: `net()` | 708: `drawBreakdownChart()` | 777: `reloadCharts()`
+- 790: `loadOverview()` | 893: `recent()` | 906: `bindStatPopovers()`
+- 917: `adjustPosition()` | 930: `showCard()` | 940: `hideAll()`
+- 1030: `bindRecordForm()` | 1037: `updateAllocVisibility()` | 1065: `invalid()`
+- 1128: `clearReceiptChip()` | 1133: `updateEventBalance()` | 1153: `loadRecord()`
+- 1158: `populateEventSelects()` | 1167: `bindEventFilters()` | 1185: `getAvailableGeneralFundSync()`
+- 1208: `updateCreateEventBudgetUI()` | 1216: `bindEventForms()` | 1255: `bindTransferForm()`
+- 1260: `updatePreview()` | 1267: `fmt()` | 1316: `boxHide()`
+- 1320: `loadEvents()` | 1332: `renderEventsGrid()` | 1335: `searchVal()`
+- 1406: `renderEventDetail()` | 1502: `closeModal()` | 1516: `onKey()`
+- 1573: `renderList()` | 1608: `completeEvent()` | 1620: `archiveEvent()`
+- 1639: `loadReports()` | 1676: `loadAudit()` | 1682: `bindAuditSearch()`
+- 1689: `renderAuditTable()` | 1690: `q()` | 1701: `startIdx()`
+- 1717: `renderAuditPagination()` | 1728: `start()` | 1793: `humanizeAction()`
+- 1799: `auditActionCell()` | 1807: `auditDetails()` | 1841: `summarizeDetails()`
+- 1871: `canAssignRoles()` | 1872: `assignableRoles()` | 1876: `bindPeopleSearch()`
+- 1892: `updatePeopleStats()` | 1933: `loadPeople()` | 1947: `renderPeopleTable()`
+- 2039: `bindAnnouncementForm()` | 2065: `loadAnnouncements()` | 2083: `loadCurriculum()`
+- 2133: `formatStudentName()` | 2168: `bindRosterForm()` | 2177: `bindRosterViewTabs()`
+- 2205: `bindRequestsStatusTabs()` | 2221: `bindRequestsBulkActions()` | 2264: `updateBulkBar()`
+- 2306: `bindRosterControls()` | 2397: `updateRequestsBadge()` | 2413: `updateRosterStats()`
+- 2430: `loadRoster()` | 2447: `loadRosterRequests()` | 2463: `renderRosterRequestsTable()`
+- 2651: `getFilteredRoster()` | 2661: `renderRosterTable()` | 2679: `startIndex()`
+- 2815: `bindRosterModal()` | 2884: `openRosterModal()` | 2923: `bindRosterImportModal()`
+- 2997: `openRosterImportModal()` | 3008: `handleRosterCSVFile()` | 3041: `course()`
+- 3050: `year()` | 3102: `exportRosterCSV()`
 
 ### `client/styles/officer.css` (2285 lines)
 
@@ -377,7 +378,7 @@ resolves to a window instead of a full read.
 
 - 2140: `main()` | 2160: `stale()`
 
-### `client/index.html` (1773 lines)
+### `client/index.html` (1737 lines)
 
 - 32: `#auth-screen` | 54: `#login-form` | 60: `#google-login-btn`
 - 77: `#login-email` | 83: `#login-password` | 85: `#login-password-notice`
@@ -391,89 +392,87 @@ resolves to a window instead of a full read.
 - 216: `#onboarding-pending-state` | 225: `#onboarding-pending-name` | 226: `#onboarding-pending-course`
 - 230: `#onboarding-refresh-btn` | 234: `#onboarding-pending-logout-btn` | 244: `#app-screen`
 - 252: `#mobile-user-role-badge` | 257: `#app-mobile-theme-icon` | 259: `#app-mobile-logout-btn`
-- 276: `#nav-dashboard` | 279: `#nav-announcements` | 282: `#nav-notifications`
-- 285: `#nav-events` | 288: `#nav-transactions` | 291: `#nav-income`
-- 294: `#nav-reports` | 297: `#nav-units` | 300: `#nav-enrollment`
-- 303: `#nav-cv` | 306: `#nav-executive-portal` | 309: `#nav-admin`
-- 315: `#user-pill` | 316: `#user-avatar` | 318: `#user-name`
-- 319: `#user-role` | 323: `#sidebar-feedback-link` | 324: `#theme-toggle-btn`
-- 325: `#theme-icon` | 327: `#profile-settings-btn` | 328: `#logout-btn`
-- 334: `#main-content` | 335: `#offline-banner` | 341: `#view-dashboard`
-- 350: `#student-status` | 362: `#stat-balance` | 365: `#pop-balance`
-- 376: `#stat-income` | 379: `#pop-income` | 388: `#stat-expense`
-- 391: `#pop-expense` | 400: `#stat-donations` | 403: `#pop-donations`
-- 411: `#recent-tx-list` | 418: `#announcements-view-all` | 420: `#announcement-list`
-- 428: `#view-announcements` | 436: `#announcements-full-list` | 443: `#view-notifications`
-- 451: `#notifications-full-list` | 458: `#view-events` | 462: `#create-event-btn`
-- 467: `#events-search` | 469: `#events-sort` | 478: `#events-filter-tabs`
-- 484: `#events-grid` | 490: `#view-event-detail` | 492: `#back-to-events`
-- 494: `#event-detail-content` | 498: `#view-transactions` | 502: `#tx-overbudget-alert`
-- 508: `#tx-search` | 511: `#filter-type` | 518: `#filter-event`
-- 532: `#tx-table-body` | 537: `#tx-mobile-cards` | 538: `#tx-pagination`
-- 539: `#tx-page-info` | 541: `#tx-prev-btn` | 542: `#tx-next-btn`
-- 548: `#view-income` | 567: `#income-table-body` | 572: `#income-mobile-cards`
-- 576: `#add-income-panel` | 578: `#add-income-form` | 581: `#inc-type`
-- 589: `#inc-desc` | 594: `#inc-amount` | 598: `#inc-date`
-- 603: `#inc-receipt` | 605: `#inc-error` | 606: `#inc-submit`
-- 615: `#view-reports` | 622: `#reports-range-filter` | 630: `#reports-content`
-- 636: `#view-units` | 645: `#units-program` | 650: `#units-program-lock`
-- 657: `#units-progress-card` | 660: `#units-progress-pct` | 663: `#units-progress-progress`
-- 664: `#units-progress-fill` | 666: `#units-progress-caption` | 669: `#units-completed`
-- 673: `#units-total` | 677: `#units-cohort` | 679: `#units-cohort-year`
-- 683: `#units-filter-tabs-wrapper` | 684: `#units-tab-slider` | 691: `#units-download-pdf`
-- 698: `#units-checklist` | 705: `#view-enrollment` | 716: `#enrollment-journey-card`
-- 718: `#enrollment-journey-track` | 719: `#enrollment-status-body` | 720: `#enrollment-action-area`
-- 726: `#enrollment-draft-card` | 728: `#enrollment-term-line` | 729: `#enrollment-items`
-- 730: `#enrollment-locked-note` | 731: `#enrollment-error` | 734: `#enrollment-eligible-card`
-- 742: `#enrollment-sem-select` | 746: `#enrollment-year-select` | 749: `#enrollment-eligible-list`
-- 758: `#view-admin` | 776: `#admin-tab-create` | 782: `#add-event-form`
-- 786: `#ev-name` | 790: `#ev-status` | 801: `#ev-funding-source`
-- 807: `#ev-budget` | 808: `#ev-budget-hint` | 809: `#ev-avail-bal`
-- 814: `#ev-date` | 819: `#ev-description` | 821: `#ev-error`
-- 822: `#submit-ev-btn` | 829: `#add-tx-form` | 833: `#tx-event-id`
-- 839: `#tx-type` | 849: `#tx-balance-indicator` | 850: `#tx-amount`
-- 854: `#tx-date` | 859: `#tx-desc` | 863: `#tx-donor`
-- 868: `#tx-add-receipt` | 871: `#tx-receipt-chip` | 873: `#tx-receipt-chip-text`
-- 874: `#tx-receipt-remove` | 879: `#fund-source-group` | 881: `#tx-use-allocation`
-- 886: `#tx-error` | 887: `#submit-tx-btn` | 894: `#add-announce-form`
-- 897: `#announce-title` | 901: `#announce-body` | 903: `#announce-error`
-- 912: `#bulk-import-form` | 915: `#bulk-event-id` | 921: `#bulk-csv-file`
-- 923: `#bulk-error` | 925: `#download-csv-template` | 926: `#submit-bulk-btn`
-- 935: `#admin-tab-transfer` | 941: `#transfer-form` | 944: `#transfer-from`
-- 948: `#transfer-to` | 952: `#transfer-amount` | 956: `#transfer-reason`
-- 958: `#transfer-error` | 960: `#transfer-preview` | 962: `#tp-from`
-- 964: `#tp-from-val` | 967: `#tp-to` | 969: `#tp-to-val`
-- 974: `#submit-transfer-btn` | 980: `#admin-tab-events` | 986: `#edit-event-form`
-- 989: `#me-select` | 996: `#me-name` | 1000: `#me-status`
-- 1011: `#me-budget` | 1015: `#me-date` | 1020: `#me-description`
-- 1022: `#me-error` | 1024: `#me-save-btn` | 1025: `#me-complete-btn`
-- 1026: `#me-archive-btn` | 1033: `#admin-tab-users` | 1038: `#admin-tab-audit`
-- 1047: `#units-modal` | 1049: `#units-modal-title` | 1050: `#units-modal-subject`
-- 1054: `#units-sy` | 1058: `#units-sem` | 1067: `#units-status`
-- 1077: `#units-grade` | 1082: `#units-schedule` | 1086: `#units-instructor`
-- 1089: `#units-modal-error` | 1091: `#units-modal-cancel` | 1092: `#units-modal-save`
-- 1098: `#units-current-modal` | 1103: `#units-current-modal-term` | 1105: `#units-current-modal-units`
-- 1107: `#units-current-modal-body` | 1109: `#units-current-modal-close` | 1115: `#ursa-launcher-btn`
-- 1126: `#ursa-overlay` | 1127: `#ursa-drawer` | 1142: `#ursa-theme-btn`
-- 1143: `#ursa-theme-icon` | 1145: `#ursa-clear-btn` | 1148: `#ursa-close-btn`
-- 1155: `#ursa-body` | 1156: `#ursa-chat-stream` | 1175: `#ursa-tab-academic`
-- 1179: `#ursa-tab-financial` | 1183: `#ursa-tab-guide` | 1188: `#ursa-prompts-list`
-- 1196: `#bottom-nav` | 1213: `#bottom-nav-more-btn` | 1222: `#mobile-more-sheet-backdrop`
-- 1223: `#mobile-more-sheet` | 1224: `#mobile-sheet-drag-handle` | 1233: `#mobile-sheet-close-btn`
-- 1243: `#bottom-nav-announcements` | 1253: `#bottom-nav-notifications` | 1270: `#bottom-nav-enrollment`
-- 1324: `#bottom-nav-executive-portal` | 1335: `#bottom-nav-admin` | 1346: `#mobile-sheet-profile-trigger`
-- 1356: `#bottom-nav-feedback` | 1372: `#toast` | 1373: `#toast-icon`
-- 1374: `#toast-message` | 1381: `#splash-screen` | 1598: `#profile-modal-overlay`
-- 1599: `#profile-modal` | 1604: `#avatar-hero-wrap` | 1605: `#profile-modal-avatar`
-- 1612: `#profile-modal-title` | 1613: `#profile-role-display` | 1615: `#profile-modal-email`
-- 1618: `#profile-modal-close` | 1624: `#avatar-picker-section` | 1630: `#avatar-picker-toggle`
-- 1632: `#avatar-cat-tabs` | 1641: `#avatar-gallery-track` | 1653: `#profile-tab-general`
-- 1654: `#profile-general-form` | 1657: `#profile-name-input` | 1664: `#profile-course-select`
-- 1674: `#profile-year-select` | 1684: `#profile-lock-note` | 1692: `#profile-enrollment-year`
-- 1696: `#profile-reset-avatar-btn` | 1702: `#profile-general-feedback` | 1705: `#profile-cancel-btn`
-- 1706: `#profile-save-general-btn` | 1714: `#profile-tab-security` | 1715: `#profile-security-form`
-- 1720: `#profile-security-email` | 1726: `#profile-new-password` | 1731: `#profile-confirm-password`
-- 1734: `#profile-security-feedback` | 1737: `#profile-save-security-btn`
+- 276: `#nav-dashboard` | 279: `#nav-money` | 282: `#nav-events`
+- 285: `#nav-updates` | 288: `#nav-academics` | 291: `#nav-executive-portal`
+- 294: `#nav-admin` | 300: `#user-pill` | 301: `#user-avatar`
+- 303: `#user-name` | 304: `#user-role` | 308: `#sidebar-feedback-link`
+- 309: `#theme-toggle-btn` | 310: `#theme-icon` | 312: `#profile-settings-btn`
+- 313: `#logout-btn` | 319: `#main-content` | 320: `#offline-banner`
+- 326: `#view-dashboard` | 335: `#student-status` | 347: `#stat-balance`
+- 350: `#pop-balance` | 361: `#stat-income` | 364: `#pop-income`
+- 373: `#stat-expense` | 376: `#pop-expense` | 385: `#stat-donations`
+- 388: `#pop-donations` | 396: `#recent-tx-list` | 403: `#announcements-view-all`
+- 405: `#announcement-list` | 413: `#view-announcements` | 425: `#announcements-full-list`
+- 432: `#view-notifications` | 444: `#notifications-full-list` | 451: `#view-events`
+- 455: `#create-event-btn` | 460: `#events-search` | 462: `#events-sort`
+- 471: `#events-filter-tabs` | 477: `#events-grid` | 483: `#view-event-detail`
+- 485: `#back-to-events` | 487: `#event-detail-content` | 491: `#view-transactions`
+- 500: `#tx-overbudget-alert` | 506: `#tx-search` | 509: `#filter-type`
+- 516: `#filter-event` | 530: `#tx-table-body` | 535: `#tx-mobile-cards`
+- 536: `#tx-pagination` | 537: `#tx-page-info` | 539: `#tx-prev-btn`
+- 540: `#tx-next-btn` | 546: `#view-income` | 570: `#income-table-body`
+- 575: `#income-mobile-cards` | 579: `#add-income-panel` | 581: `#add-income-form`
+- 584: `#inc-type` | 592: `#inc-desc` | 597: `#inc-amount`
+- 601: `#inc-date` | 606: `#inc-receipt` | 608: `#inc-error`
+- 609: `#inc-submit` | 618: `#view-reports` | 630: `#reports-range-filter`
+- 638: `#reports-content` | 644: `#view-units` | 658: `#units-program`
+- 663: `#units-program-lock` | 670: `#units-progress-card` | 673: `#units-progress-pct`
+- 676: `#units-progress-progress` | 677: `#units-progress-fill` | 679: `#units-progress-caption`
+- 682: `#units-completed` | 686: `#units-total` | 690: `#units-cohort`
+- 692: `#units-cohort-year` | 696: `#units-filter-tabs-wrapper` | 697: `#units-tab-slider`
+- 704: `#units-download-pdf` | 711: `#units-checklist` | 718: `#view-enrollment`
+- 734: `#enrollment-journey-card` | 736: `#enrollment-journey-track` | 737: `#enrollment-status-body`
+- 738: `#enrollment-action-area` | 744: `#enrollment-draft-card` | 746: `#enrollment-term-line`
+- 747: `#enrollment-items` | 748: `#enrollment-locked-note` | 749: `#enrollment-error`
+- 752: `#enrollment-eligible-card` | 760: `#enrollment-sem-select` | 764: `#enrollment-year-select`
+- 767: `#enrollment-eligible-list` | 776: `#view-admin` | 794: `#admin-tab-create`
+- 800: `#add-event-form` | 804: `#ev-name` | 808: `#ev-status`
+- 819: `#ev-funding-source` | 825: `#ev-budget` | 826: `#ev-budget-hint`
+- 827: `#ev-avail-bal` | 832: `#ev-date` | 837: `#ev-description`
+- 839: `#ev-error` | 840: `#submit-ev-btn` | 847: `#add-tx-form`
+- 851: `#tx-event-id` | 857: `#tx-type` | 867: `#tx-balance-indicator`
+- 868: `#tx-amount` | 872: `#tx-date` | 877: `#tx-desc`
+- 881: `#tx-donor` | 886: `#tx-add-receipt` | 889: `#tx-receipt-chip`
+- 891: `#tx-receipt-chip-text` | 892: `#tx-receipt-remove` | 897: `#fund-source-group`
+- 899: `#tx-use-allocation` | 904: `#tx-error` | 905: `#submit-tx-btn`
+- 912: `#add-announce-form` | 915: `#announce-title` | 919: `#announce-body`
+- 921: `#announce-error` | 930: `#bulk-import-form` | 933: `#bulk-event-id`
+- 939: `#bulk-csv-file` | 941: `#bulk-error` | 943: `#download-csv-template`
+- 944: `#submit-bulk-btn` | 953: `#admin-tab-transfer` | 959: `#transfer-form`
+- 962: `#transfer-from` | 966: `#transfer-to` | 970: `#transfer-amount`
+- 974: `#transfer-reason` | 976: `#transfer-error` | 978: `#transfer-preview`
+- 980: `#tp-from` | 982: `#tp-from-val` | 985: `#tp-to`
+- 987: `#tp-to-val` | 992: `#submit-transfer-btn` | 998: `#admin-tab-events`
+- 1004: `#edit-event-form` | 1007: `#me-select` | 1014: `#me-name`
+- 1018: `#me-status` | 1029: `#me-budget` | 1033: `#me-date`
+- 1038: `#me-description` | 1040: `#me-error` | 1042: `#me-save-btn`
+- 1043: `#me-complete-btn` | 1044: `#me-archive-btn` | 1051: `#admin-tab-users`
+- 1056: `#admin-tab-audit` | 1065: `#units-modal` | 1067: `#units-modal-title`
+- 1068: `#units-modal-subject` | 1072: `#units-sy` | 1076: `#units-sem`
+- 1085: `#units-status` | 1095: `#units-grade` | 1100: `#units-schedule`
+- 1104: `#units-instructor` | 1107: `#units-modal-error` | 1109: `#units-modal-cancel`
+- 1110: `#units-modal-save` | 1116: `#units-current-modal` | 1121: `#units-current-modal-term`
+- 1123: `#units-current-modal-units` | 1125: `#units-current-modal-body` | 1127: `#units-current-modal-close`
+- 1133: `#ursa-launcher-btn` | 1144: `#ursa-overlay` | 1145: `#ursa-drawer`
+- 1160: `#ursa-theme-btn` | 1161: `#ursa-theme-icon` | 1163: `#ursa-clear-btn`
+- 1166: `#ursa-close-btn` | 1173: `#ursa-body` | 1174: `#ursa-chat-stream`
+- 1193: `#ursa-tab-academic` | 1197: `#ursa-tab-financial` | 1201: `#ursa-tab-guide`
+- 1206: `#ursa-prompts-list` | 1214: `#bottom-nav` | 1231: `#bottom-nav-more-btn`
+- 1240: `#mobile-more-sheet-backdrop` | 1241: `#mobile-more-sheet` | 1242: `#mobile-sheet-drag-handle`
+- 1251: `#mobile-sheet-close-btn` | 1261: `#bottom-nav-announcements` | 1271: `#bottom-nav-notifications`
+- 1288: `#bottom-nav-executive-portal` | 1299: `#bottom-nav-admin` | 1310: `#mobile-sheet-profile-trigger`
+- 1320: `#bottom-nav-feedback` | 1336: `#toast` | 1337: `#toast-icon`
+- 1338: `#toast-message` | 1345: `#splash-screen` | 1562: `#profile-modal-overlay`
+- 1563: `#profile-modal` | 1568: `#avatar-hero-wrap` | 1569: `#profile-modal-avatar`
+- 1576: `#profile-modal-title` | 1577: `#profile-role-display` | 1579: `#profile-modal-email`
+- 1582: `#profile-modal-close` | 1588: `#avatar-picker-section` | 1594: `#avatar-picker-toggle`
+- 1596: `#avatar-cat-tabs` | 1605: `#avatar-gallery-track` | 1617: `#profile-tab-general`
+- 1618: `#profile-general-form` | 1621: `#profile-name-input` | 1628: `#profile-course-select`
+- 1638: `#profile-year-select` | 1648: `#profile-lock-note` | 1656: `#profile-enrollment-year`
+- 1660: `#profile-reset-avatar-btn` | 1666: `#profile-general-feedback` | 1669: `#profile-cancel-btn`
+- 1670: `#profile-save-general-btn` | 1678: `#profile-tab-security` | 1679: `#profile-security-form`
+- 1684: `#profile-security-email` | 1690: `#profile-new-password` | 1695: `#profile-confirm-password`
+- 1698: `#profile-security-feedback` | 1701: `#profile-save-security-btn`
 
 ### `client/styles/ai.css` (1622 lines)
 
@@ -500,81 +499,81 @@ resolves to a window instead of a full read.
 - 1351: `inflows()` | 1389: `handleGuideCurriculum()` | 1409: `handleGuideReports()`
 - 1425: `esc()`
 
-### `client/officer.html` (1175 lines)
+### `client/officer.html` (1164 lines)
 
 - 30: `#of-gate` | 33: `#of-gate-message` | 37: `#of-shell`
 - 45: `#of-mobile-user-role` | 50: `#of-mobile-theme-icon` | 52: `#of-mobile-logout-btn`
-- 66: `#of-brand-sub` | 101: `#user-pill` | 102: `#of-avatar`
-- 104: `#of-user-name` | 105: `#of-user-role` | 109: `#theme-toggle-btn`
-- 110: `#theme-icon` | 112: `#profile-settings-btn` | 115: `#of-logout-btn`
-- 123: `#main-content` | 126: `#of-view-overview` | 133: `#of-overview-stats`
-- 140: `#of-monthly-chart` | 146: `#of-breakdown-chart` | 155: `#of-overview-alerts`
-- 159: `#of-overview-recent` | 165: `#of-view-record` | 175: `#of-tx-form`
-- 177: `#of-tx-event` | 179: `#of-tx-type` | 188: `#of-tx-amount`
-- 189: `#of-tx-date` | 191: `#of-tx-desc` | 192: `#of-tx-donor`
-- 193: `#of-tx-alloc-field` | 194: `#of-tx-alloc` | 199: `#of-tx-receipt-btn`
-- 200: `#of-tx-receipt-chip` | 202: `#of-tx-receipt-chip-text` | 203: `#of-tx-receipt-remove`
-- 207: `#of-tx-error` | 208: `#of-tx-submit` | 213: `#of-record-event-info`
-- 219: `#of-view-events` | 226: `#of-exec-event-actions` | 229: `#of-event-form`
-- 231: `#of-ev-name` | 233: `#of-ev-status` | 244: `#of-ev-funding-source`
-- 250: `#of-ev-budget` | 251: `#of-ev-budget-hint` | 252: `#of-ev-avail-bal`
-- 255: `#of-ev-date` | 257: `#of-ev-desc` | 258: `#of-ev-error`
-- 259: `#of-ev-submit` | 264: `#of-transfer-form` | 266: `#of-transfer-from`
-- 267: `#of-transfer-to` | 270: `#of-transfer-amount` | 271: `#of-transfer-reason`
-- 273: `#of-transfer-preview` | 274: `#of-transfer-error` | 275: `#of-transfer-submit`
-- 281: `#of-events-filter-tabs` | 288: `#of-events-search` | 289: `#of-events-sort`
-- 298: `#of-events-grid` | 302: `#of-view-reports` | 315: `#of-reports-monthly-chart`
-- 321: `#of-reports-breakdown-chart` | 331: `#of-events-summary-table` | 339: `#of-audit-search`
-- 341: `#of-audit-table` | 345: `#of-audit-pagination` | 350: `#of-view-people`
-- 354: `#of-people-sub` | 359: `#of-people-stats` | 365: `#of-stat-val-users-total`
-- 366: `#of-stat-sub-users-total` | 373: `#of-stat-val-users-students` | 374: `#of-stat-sub-users-students`
-- 381: `#of-stat-val-users-officers` | 382: `#of-stat-sub-users-officers` | 389: `#of-stat-val-users-breakdown`
-- 390: `#of-users-bscoe-count` | 391: `#of-users-bsce-count` | 392: `#of-users-bsece-count`
-- 402: `#of-people-search` | 406: `#of-people-role-tabs` | 414: `#of-people-table`
-- 422: `#of-people-action-col` | 432: `#of-view-announcements` | 440: `#of-exec-announce-card`
-- 442: `#of-announce-form` | 443: `#of-announce-title` | 444: `#of-announce-body`
-- 445: `#of-announce-error` | 446: `#of-announce-submit` | 451: `#of-announce-list`
-- 457: `#of-view-roster` | 464: `#of-roster-export-btn` | 467: `#of-roster-import-btn`
-- 470: `#of-roster-add-btn` | 477: `#of-roster-view-tabs` | 478: `#of-tab-roster-master`
-- 481: `#of-tab-roster-requests` | 483: `#of-roster-pending-badge` | 488: `#of-roster-master-pane`
-- 490: `#of-roster-stats` | 491: `#of-stat-total-roster` | 496: `#of-stat-val-total`
-- 499: `#of-stat-bsce` | 504: `#of-stat-val-bsce` | 505: `#of-stat-sub-bsce`
-- 507: `#of-stat-bscoe` | 512: `#of-stat-val-bscoe` | 513: `#of-stat-sub-bscoe`
-- 515: `#of-stat-bsece` | 520: `#of-stat-val-bsece` | 521: `#of-stat-sub-bsece`
-- 531: `#of-roster-search` | 537: `#of-roster-prog-tabs` | 544: `#of-roster-year-filter`
-- 556: `#of-roster-table-container` | 560: `#of-roster-pagination` | 565: `#of-roster-requests-pane`
-- 576: `#of-requests-bulk-bar` | 577: `#of-requests-selected-count` | 578: `#of-requests-bulk-approve-btn`
-- 580: `#of-requests-bulk-btn-text` | 582: `#of-requests-bulk-clear-btn` | 587: `#of-requests-status-tabs`
-- 596: `#of-roster-requests-table-container` | 604: `#of-view-curriculum` | 611: `#curriculum-section`
-- 613: `#curriculum-program` | 614: `#curriculum-year` | 621: `#curriculum-sem`
-- 629: `#curriculum-grid` | 631: `#curriculum-prereq-editor` | 639: `#of-bottom-nav`
-- 656: `#of-bottom-nav-more-btn` | 665: `#of-mobile-more-sheet-backdrop` | 666: `#of-mobile-more-sheet`
-- 667: `#of-mobile-sheet-drag-handle` | 676: `#of-mobile-sheet-close-btn` | 769: `#of-roster-modal`
-- 772: `#of-roster-modal-title` | 775: `#of-roster-modal-close` | 779: `#of-roster-modal-form`
-- 780: `#of-roster-edit-id` | 783: `#of-modal-roster-name` | 788: `#of-modal-roster-sex`
-- 795: `#of-modal-roster-course` | 804: `#of-modal-roster-year` | 812: `#of-modal-roster-error`
-- 814: `#of-roster-modal-cancel` | 815: `#of-roster-modal-submit` | 822: `#of-roster-import-modal`
-- 828: `#of-import-modal-close` | 836: `#of-import-dropzone` | 840: `#of-import-file-input`
-- 843: `#of-import-preview-area` | 844: `#of-import-summary` | 846: `#of-import-preview-table`
-- 853: `#of-import-error` | 856: `#of-import-cancel-btn` | 857: `#of-import-confirm-btn`
-- 863: `#of-event-modal` | 865: `#of-event-modal-content` | 869: `#of-toast-holder`
-- 872: `#splash-screen` | 1015: `#profile-modal-overlay` | 1016: `#profile-modal`
-- 1021: `#avatar-hero-wrap` | 1022: `#profile-modal-avatar` | 1029: `#profile-modal-title`
-- 1030: `#profile-role-display` | 1032: `#profile-modal-email` | 1035: `#profile-modal-close`
-- 1041: `#avatar-picker-section` | 1048: `#avatar-cat-tabs` | 1057: `#avatar-gallery-track`
-- 1069: `#profile-tab-general` | 1070: `#profile-general-form` | 1073: `#profile-name-input`
-- 1080: `#profile-course-select` | 1090: `#profile-year-select` | 1103: `#profile-enrollment-year`
-- 1107: `#profile-reset-avatar-btn` | 1113: `#profile-general-feedback` | 1116: `#profile-cancel-btn`
-- 1117: `#profile-save-general-btn` | 1125: `#profile-tab-security` | 1126: `#profile-security-form`
-- 1131: `#profile-security-email` | 1137: `#profile-new-password` | 1142: `#profile-confirm-password`
-- 1145: `#profile-security-feedback` | 1148: `#profile-save-security-btn`
+- 66: `#of-brand-sub` | 95: `#user-pill` | 96: `#of-avatar`
+- 98: `#of-user-name` | 99: `#of-user-role` | 103: `#theme-toggle-btn`
+- 104: `#theme-icon` | 106: `#profile-settings-btn` | 109: `#of-logout-btn`
+- 117: `#main-content` | 120: `#of-view-overview` | 127: `#of-overview-stats`
+- 134: `#of-monthly-chart` | 140: `#of-breakdown-chart` | 149: `#of-overview-alerts`
+- 153: `#of-overview-recent` | 159: `#of-view-record` | 173: `#of-tx-form`
+- 175: `#of-tx-event` | 177: `#of-tx-type` | 186: `#of-tx-amount`
+- 187: `#of-tx-date` | 189: `#of-tx-desc` | 190: `#of-tx-donor`
+- 191: `#of-tx-alloc-field` | 192: `#of-tx-alloc` | 197: `#of-tx-receipt-btn`
+- 198: `#of-tx-receipt-chip` | 200: `#of-tx-receipt-chip-text` | 201: `#of-tx-receipt-remove`
+- 205: `#of-tx-error` | 206: `#of-tx-submit` | 211: `#of-record-event-info`
+- 217: `#of-view-events` | 224: `#of-exec-event-actions` | 227: `#of-event-form`
+- 229: `#of-ev-name` | 231: `#of-ev-status` | 242: `#of-ev-funding-source`
+- 248: `#of-ev-budget` | 249: `#of-ev-budget-hint` | 250: `#of-ev-avail-bal`
+- 253: `#of-ev-date` | 255: `#of-ev-desc` | 256: `#of-ev-error`
+- 257: `#of-ev-submit` | 262: `#of-transfer-form` | 264: `#of-transfer-from`
+- 265: `#of-transfer-to` | 268: `#of-transfer-amount` | 269: `#of-transfer-reason`
+- 271: `#of-transfer-preview` | 272: `#of-transfer-error` | 273: `#of-transfer-submit`
+- 279: `#of-events-filter-tabs` | 286: `#of-events-search` | 287: `#of-events-sort`
+- 296: `#of-events-grid` | 300: `#of-view-reports` | 317: `#of-reports-monthly-chart`
+- 323: `#of-reports-breakdown-chart` | 333: `#of-events-summary-table` | 341: `#of-audit-search`
+- 343: `#of-audit-table` | 347: `#of-audit-pagination` | 352: `#of-view-people`
+- 360: `#of-people-sub` | 365: `#of-people-stats` | 371: `#of-stat-val-users-total`
+- 372: `#of-stat-sub-users-total` | 379: `#of-stat-val-users-students` | 380: `#of-stat-sub-users-students`
+- 387: `#of-stat-val-users-officers` | 388: `#of-stat-sub-users-officers` | 395: `#of-stat-val-users-breakdown`
+- 396: `#of-users-bscoe-count` | 397: `#of-users-bsce-count` | 398: `#of-users-bsece-count`
+- 408: `#of-people-search` | 412: `#of-people-role-tabs` | 420: `#of-people-table`
+- 428: `#of-people-action-col` | 438: `#of-view-announcements` | 446: `#of-exec-announce-card`
+- 448: `#of-announce-form` | 449: `#of-announce-title` | 450: `#of-announce-body`
+- 451: `#of-announce-error` | 452: `#of-announce-submit` | 457: `#of-announce-list`
+- 463: `#of-view-roster` | 474: `#of-roster-export-btn` | 477: `#of-roster-import-btn`
+- 480: `#of-roster-add-btn` | 487: `#of-roster-view-tabs` | 488: `#of-tab-roster-master`
+- 491: `#of-tab-roster-requests` | 493: `#of-roster-pending-badge` | 498: `#of-roster-master-pane`
+- 500: `#of-roster-stats` | 501: `#of-stat-total-roster` | 506: `#of-stat-val-total`
+- 509: `#of-stat-bsce` | 514: `#of-stat-val-bsce` | 515: `#of-stat-sub-bsce`
+- 517: `#of-stat-bscoe` | 522: `#of-stat-val-bscoe` | 523: `#of-stat-sub-bscoe`
+- 525: `#of-stat-bsece` | 530: `#of-stat-val-bsece` | 531: `#of-stat-sub-bsece`
+- 541: `#of-roster-search` | 547: `#of-roster-prog-tabs` | 554: `#of-roster-year-filter`
+- 566: `#of-roster-table-container` | 570: `#of-roster-pagination` | 575: `#of-roster-requests-pane`
+- 586: `#of-requests-bulk-bar` | 587: `#of-requests-selected-count` | 588: `#of-requests-bulk-approve-btn`
+- 590: `#of-requests-bulk-btn-text` | 592: `#of-requests-bulk-clear-btn` | 597: `#of-requests-status-tabs`
+- 606: `#of-roster-requests-table-container` | 614: `#of-view-curriculum` | 621: `#curriculum-section`
+- 623: `#curriculum-program` | 624: `#curriculum-year` | 631: `#curriculum-sem`
+- 639: `#curriculum-grid` | 641: `#curriculum-prereq-editor` | 649: `#of-bottom-nav`
+- 666: `#of-bottom-nav-more-btn` | 675: `#of-mobile-more-sheet-backdrop` | 676: `#of-mobile-more-sheet`
+- 677: `#of-mobile-sheet-drag-handle` | 686: `#of-mobile-sheet-close-btn` | 758: `#of-roster-modal`
+- 761: `#of-roster-modal-title` | 764: `#of-roster-modal-close` | 768: `#of-roster-modal-form`
+- 769: `#of-roster-edit-id` | 772: `#of-modal-roster-name` | 777: `#of-modal-roster-sex`
+- 784: `#of-modal-roster-course` | 793: `#of-modal-roster-year` | 801: `#of-modal-roster-error`
+- 803: `#of-roster-modal-cancel` | 804: `#of-roster-modal-submit` | 811: `#of-roster-import-modal`
+- 817: `#of-import-modal-close` | 825: `#of-import-dropzone` | 829: `#of-import-file-input`
+- 832: `#of-import-preview-area` | 833: `#of-import-summary` | 835: `#of-import-preview-table`
+- 842: `#of-import-error` | 845: `#of-import-cancel-btn` | 846: `#of-import-confirm-btn`
+- 852: `#of-event-modal` | 854: `#of-event-modal-content` | 858: `#of-toast-holder`
+- 861: `#splash-screen` | 1004: `#profile-modal-overlay` | 1005: `#profile-modal`
+- 1010: `#avatar-hero-wrap` | 1011: `#profile-modal-avatar` | 1018: `#profile-modal-title`
+- 1019: `#profile-role-display` | 1021: `#profile-modal-email` | 1024: `#profile-modal-close`
+- 1030: `#avatar-picker-section` | 1037: `#avatar-cat-tabs` | 1046: `#avatar-gallery-track`
+- 1058: `#profile-tab-general` | 1059: `#profile-general-form` | 1062: `#profile-name-input`
+- 1069: `#profile-course-select` | 1079: `#profile-year-select` | 1092: `#profile-enrollment-year`
+- 1096: `#profile-reset-avatar-btn` | 1102: `#profile-general-feedback` | 1105: `#profile-cancel-btn`
+- 1106: `#profile-save-general-btn` | 1114: `#profile-tab-security` | 1115: `#profile-security-form`
+- 1120: `#profile-security-email` | 1126: `#profile-new-password` | 1131: `#profile-confirm-password`
+- 1134: `#profile-security-feedback` | 1137: `#profile-save-security-btn`
 
-### `client/js/app.js` (959 lines)
+### `client/js/app.js` (962 lines)
 
 - 24: `friendlyLoginError()` | 88: `handleGoogleAuth()` | 149: `checkRosterVerification()`
 - 170: `applyOnboardingState()` | 195: `showOnboardingModal()` | 590: `navigateTo()`
-- 638: `bindMobileMoreSheet()` | 645: `preventScrollOutsideSheet()` | 652: `openSheet()`
-- 666: `closeSheet()` | 792: `bootApp()` | 818: `isOffline()`
+- 641: `bindMobileMoreSheet()` | 648: `preventScrollOutsideSheet()` | 655: `openSheet()`
+- 669: `closeSheet()` | 795: `bootApp()` | 821: `isOffline()`
 
 ### `client/js/units.js` (939 lines)
 
@@ -714,22 +713,23 @@ resolves to a window instead of a full read.
 - 11: `signReceipt()` | 24: `fmtDate()` | 51: `summary()`
 - 126: `firstMonthStr()` | 141: `month()`
 
+### `client/js/ui.js` (469 lines)
+
+- 5: `UI()` | 17: `groupOf()` | 21: `showView()`
+- 45: `showScreen()` | 67: `setSplashView()` | 80: `toast()`
+- 103: `currency()` | 110: `dateStr()` | 128: `esc()`
+- 137: `capitalize()` | 141: `renderStatusBadge()` | 147: `setAdminVisibility()`
+- 164: `setOfficerVisibility()` | 175: `setLoading()` | 186: `setEmpty()`
+- 200: `initAutoHideBottomNav()` | 215: `handleScroll()` | 216: `target()`
+- 220: `isAtBottom()` | 268: `moveNavIndicator()` | 275: `initNavIndicators()`
+- 286: `syncThemeColor()` | 295: `kickViewportRelayout()` | 330: `trapDialog()`
+- 332: `focusable()` | 336: `onKey()` | 351: `release()`
+- 357: `close()` | 371: `confirmDialog()` | 446: `lockScrollbar()`
+- 458: `unlockScrollbar()`
+
 ### `server/routes/transactions.js` (454 lines)
 
 - 35: `parseReceiptWhenMultipart()` | 51: `signReceipt()` | 142: `cleanEventId()`
-
-### `client/js/ui.js` (451 lines)
-
-- 5: `UI()` | 8: `showView()` | 27: `showScreen()`
-- 49: `setSplashView()` | 62: `toast()` | 85: `currency()`
-- 92: `dateStr()` | 110: `esc()` | 119: `capitalize()`
-- 123: `renderStatusBadge()` | 129: `setAdminVisibility()` | 146: `setOfficerVisibility()`
-- 157: `setLoading()` | 168: `setEmpty()` | 182: `initAutoHideBottomNav()`
-- 197: `handleScroll()` | 198: `target()` | 202: `isAtBottom()`
-- 250: `moveNavIndicator()` | 257: `initNavIndicators()` | 268: `syncThemeColor()`
-- 277: `kickViewportRelayout()` | 312: `trapDialog()` | 314: `focusable()`
-- 318: `onKey()` | 333: `release()` | 339: `close()`
-- 353: `confirmDialog()` | 428: `lockScrollbar()` | 440: `unlockScrollbar()`
 
 ### `server/lib/email.js` (447 lines)
 

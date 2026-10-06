@@ -9452,3 +9452,66 @@ html body .bottom-nav .bottom-nav-item span:not(.nav-icon) { font-size: 0.72rem 
   #tx-prev-btn,
   #tx-next-btn { min-height: 40px; }
 }
+
+/* =============================================
+   VIEW GROUP TABS
+   One sidebar entry (Money, Updates, Academics; Finance, People) opens a
+   group of views; this pill track switches between them inside the view.
+   Pill geometry per UI_DESIGN.md segmented toggles.
+   ============================================= */
+.view-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
+  margin-bottom: 1rem;
+  padding: 3px;
+  overflow-x: auto;
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  scrollbar-width: none;
+}
+.view-tabs::-webkit-scrollbar { display: none; }
+
+.view-tab {
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 1rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 40px;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+.view-tab:hover { color: var(--text-primary); }
+.view-tab.active {
+  background: var(--primary);
+  color: var(--accent-text-on);
+}
+
+/* Unread dot, same signal as the sidebar entries */
+.view-tab.has-unread::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.view-tab.active.has-unread::after { background: var(--accent-text-on); }
+
+@media (max-width: 480px) {
+  .view-tabs { display: flex; width: 100%; }
+  .view-tab { flex: 1 1 0; padding: 0 0.5rem; text-align: center; }
+}
