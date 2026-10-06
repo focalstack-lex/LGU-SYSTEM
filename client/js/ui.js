@@ -304,8 +304,42 @@ const UI = (() => {
     }, 30);
   }
 
+  // Keyboard model for the pill tab tracks (WAI-ARIA tabs): arrow keys move
+  // between the tabs of the focused track and activate the target, Home and
+  // End jump to the ends. Activation reuses each tab's own click handler, so
+  // the student and officer portals need no extra wiring.
+  function initTabKeys() {
+    if (_tabKeysBound) return;
+    _tabKeysBound = true;
+    document.addEventListener('keydown', e => {
+      const tab = e.target.closest && e.target.closest('.view-tabs .view-tab');
+      if (!tab) return;
+      const tabs = Array.from(tab.parentElement.querySelectorAll('.view-tab'));
+      const i = tabs.indexOf(tab);
+      let next = null;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = tabs[(i + 1) % tabs.length];
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = tabs[(i - 1 + tabs.length) % tabs.length];
+      else if (e.key === 'Home') next = tabs[0];
+      else if (e.key === 'End') next = tabs[tabs.length - 1];
+      if (!next) return;
+      e.preventDefault();
+      // A link tab (Career Passport) only takes focus; Enter follows it.
+      if (next.tagName === 'A') { next.focus(); return; }
+      next.click();
+      // The track lives inside the view it belongs to, so after the switch
+      // the pressed tab is hidden: focus its twin in the view now showing.
+      const key = next.dataset.view ? `[data-view="${next.dataset.view}"]` : `[data-of="${next.dataset.of}"]`;
+      requestAnimationFrame(() => {
+        const twin = document.querySelector(`.view.active .view-tabs .view-tab${key}, .of-view.active .view-tabs .view-tab${key}`);
+        (twin || next).focus();
+      });
+    });
+  }
+  let _tabKeysBound = false;
+
   // Auto-bind scroll on DOM ready
   if (typeof document !== 'undefined') {
+    initTabKeys();
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initAutoHideBottomNav);
       document.addEventListener('DOMContentLoaded', initNavIndicators);

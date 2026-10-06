@@ -8,7 +8,9 @@ import { routeMocks, seedSession, receiptPng, PROFILE, EVENTS } from './lib-capt
 import fs from 'fs';
 
 const BASE = 'http://127.0.0.1:3000';
-const OUT = `reports/ui-verification/${new Date().toISOString().slice(0, 10)}-nav-consolidation`;
+// THEME=light runs the same drive in the light theme and suffixes the evidence
+const THEME = process.env.THEME === 'light' ? 'light' : 'dark';
+const OUT = `reports/ui-verification/${new Date().toISOString().slice(0, 10)}-nav-consolidation${THEME === 'light' ? '-light' : ''}`;
 fs.mkdirSync(OUT, { recursive: true });
 const json = (body, status = 200) => ({ status, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify(body) });
 
@@ -23,6 +25,7 @@ async function newPage(browser, viewport) {
   const errors = [];
   page.on('pageerror', e => errors.push(String(e)));
   await page.route(/\/sw\.js/, r => r.fulfill({ status: 404, body: '' }));
+  await page.addInitScript((t) => { try { localStorage.setItem('theme', t); } catch {} }, THEME);
   await seedSession(page);
   await routeMocks(page, await receiptPng());
   await page.route(/\/api\/notifications\/read/, r => r.fulfill(json({ ok: true })));
@@ -109,6 +112,16 @@ async function student(browser, viewport, label) {
     });
     check('tabs sit in the sticky header as a content-width first row; title left, filters right beneath', placement.inHeader && placement.sameLeft && placement.sticky && placement.gap >= 8 && placement.gap <= 24 && placement.trackWidth < 420 && placement.filtersBesideTitle, JSON.stringify(placement));
     await shot(page, `${label}-student-money-ledger`);
+    await page.focus('#view-transactions .view-tab[data-view="transactions"]');
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(400);
+    check('keyboard: ArrowRight on the Ledger tab opens Income and moves focus to it', (await activeView()) === 'view-income' && (await page.evaluate(() => document.activeElement?.dataset.view === 'income')), await activeView());
+    await page.keyboard.press('End');
+    await page.waitForTimeout(400);
+    check('keyboard: End jumps to the Reports tab', (await activeView()) === 'view-reports', await activeView());
+    await page.keyboard.press('Home');
+    await page.waitForTimeout(400);
+    check('keyboard: Home returns to the Ledger tab', (await activeView()) === 'view-transactions', await activeView());
     await click('#view-transactions .view-tab[data-view="income"]');
     check('Income tab opens the income view', (await activeView()) === 'view-income', await activeView());
     check('Money entry stays active on Income', (await activeNav()) === 'Money', await activeNav());
@@ -179,8 +192,26 @@ async function student(browser, viewport, label) {
     check('phone: notifications view shows the Updates tabs', (await activeTabs()) === 'Announcements For you*!', await activeTabs());
     await shot(page, `${label}-student-updates`);
   }
+  check(`student ${label}: no visible text under 11px`, (await tinyText(page)).length === 0, JSON.stringify((await tinyText(page)).slice(0, 4)));
   check(`student ${label}: no page errors`, errors.length === 0, errors[0]);
   await page.close();
+}
+
+// Visible text nodes rendered below the 11px functional-text floor on the current view
+async function tinyText(page) {
+  return page.evaluate(() => {
+    const out = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let n;
+    while ((n = walker.nextNode())) {
+      if (!n.textContent.trim()) continue;
+      const el = n.parentElement;
+      if (!el || !el.offsetParent || el.closest('.sr-only, .skip-link, [aria-hidden="true"], script, style, sup, sub')) continue;
+      const px = parseFloat(getComputedStyle(el).fontSize);
+      if (px < 11) out.push({ text: n.textContent.trim().slice(0, 30), px: Math.round(px * 10) / 10, cls: el.className.toString().slice(0, 40) });
+    }
+    return out;
+  });
 }
 
 // ---------------- Officer portal ----------------
@@ -255,6 +286,7 @@ async function officer(browser, viewport, label) {
     check('phone officer More sheet is Curriculum, Announcements, Student Portal, Account Settings', rows.join('|') === 'Curriculum Manager|Announcements|Student Portal|Account Settings', rows.join('|'));
     await shot(page, `${label}-officer-more-sheet`);
   }
+  check(`officer ${label}: no visible text under 11px`, (await tinyText(page)).length === 0, JSON.stringify((await tinyText(page)).slice(0, 4)));
   check(`officer ${label}: no page errors`, errors.length === 0, errors[0]);
   await page.close();
 }

@@ -769,7 +769,7 @@ const Units = (() => {
     }
   }
 
-  // ---- Download standing (PDF transcript of Yr 1–4) ----
+  // ---- Download standing (PDF transcript of Yr 1-4) ----
   async function downloadStanding() {
     const btn = document.getElementById('units-download-pdf');
     const token = window._authToken;

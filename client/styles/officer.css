@@ -291,7 +291,7 @@ html, body {
 }
 
 .of-stat .of-stat-value {
-  font-family: var(--font-proxima);
+  font-family: var(--font-display);
   font-size: var(--font-size-kpi-value, 1.5625rem);
   font-weight: 600;
   color: var(--text-primary);
@@ -677,7 +677,7 @@ html, body {
   border-bottom: 2px solid #FFFFFF;
   transform: rotate(-45deg) scale(0) translate(0.5px, -0.5px);
   transform-origin: center;
-  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .of-check input[type="checkbox"]:checked {
@@ -905,7 +905,7 @@ html, body {
 }
 
 .of-table .num {
-  font-family: var(--font-proxima);
+  font-family: var(--font-display);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
   white-space: nowrap;
@@ -1220,7 +1220,6 @@ html, body {
   height: 100%;
   background: var(--accent);
   border-radius: 999px;
-  transition: width 0.5s ease;
 }
 
 .of-budget-fill.over {
@@ -1488,9 +1487,9 @@ html, body {
   max-width: 360px;
 }
 
-.of-toast.success { border-left: 4px solid var(--status-positive); }
-.of-toast.error   { border-left: 4px solid var(--status-negative); }
-.of-toast.warning { border-left: 4px solid var(--status-warning); }
+.of-toast.success { border-color: var(--status-positive); }
+.of-toast.error   { border-color: var(--status-negative); }
+.of-toast.warning { border-color: var(--status-warning); }
 
 @keyframes ofToastIn {
   from { opacity: 0; transform: translateX(16px); }
@@ -1574,7 +1573,7 @@ html, body {
   }
   .of-mobile-role {
     display: inline-block;
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: var(--primary-hover);
     background: rgba(70, 110, 153, 0.15);
@@ -1903,7 +1902,7 @@ html, body {
     -webkit-tap-highlight-color: transparent !important;
   }
   .of-stat .of-stat-label {
-    font-size: clamp(0.56rem, 2.3vw, 0.62rem) !important;
+    font-size: 0.72rem !important;
     letter-spacing: 0.03em !important;
     min-width: 0 !important;
     max-width: 100% !important;
@@ -1925,7 +1924,7 @@ html, body {
     white-space: nowrap !important;
   }
   .of-stat .of-stat-sub {
-    font-size: 0.6rem !important;
+    font-size: 0.72rem !important;
     margin-top: 0.15rem !important;
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -2283,5 +2282,15 @@ html, body {
   #cur-prereq-add button {
     width: 100%;
     box-sizing: border-box;
+  }
+}
+
+/* Motion is optional: when the OS asks for reduced motion, animations and
+   transitions collapse to an instant change. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

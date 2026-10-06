@@ -50,7 +50,7 @@ const Auth = (() => {
 
   // Validates the stored session against GoTrue. A session restored from
   // localStorage can carry a token that no longer verifies (e.g. signed with a
-  // pre-rotation JWT secret) — the app still works because data flows through
+  // pre-rotation JWT secret), the app still works because data flows through
   // the backend with the service key, but every realtime join it attempts then
   // fails with JwtSignatureError on the Supabase logs. Purge such sessions so
   // the user re-authenticates with a fresh token.
@@ -81,7 +81,7 @@ const Auth = (() => {
       console.debug('[Auth] Session validation skipped (non-rejection error):', error.message);
       return session;
     } catch (err) {
-      // Network-level failure — keep the session, offline usage must survive.
+      // Network-level failure, keep the session, offline usage must survive.
       console.debug('[Auth] Session validation unreachable:', err?.message);
       return session;
     }

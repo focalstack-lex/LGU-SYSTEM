@@ -551,7 +551,7 @@
 
   // ---- Boot on existing session ----
   // validateSession() (not plain getSession()) drops localStorage sessions whose
-  // token the server no longer accepts — those are what produce the recurring
+  // token the server no longer accepts, those are what produce the recurring
   // JwtSignatureError noise in the Supabase realtime logs.
   const session = await (Auth.validateSession ? Auth.validateSession() : Auth.getSession());
   if (session) {
