@@ -7,7 +7,7 @@ const Dashboard = (() => {
   let realtimeChannel = null;
 
   async function load() {
-    await Promise.all([loadStats(), loadRecentTransactions(), loadAnnouncements(), loadStudentStatus()]);
+    await Promise.all([loadStats(), loadRecentTransactions(), loadAnnouncements()]);
     subscribeRealtime();
     bindPopovers();
     bindViewAll();
@@ -327,77 +327,6 @@ const Dashboard = (() => {
     if (!link || _viewAllBound) return;
     _viewAllBound = true;
     link.addEventListener('click', e => { e.preventDefault(); if (window.navigateTo) window.navigateTo('announcements'); });
-  }
-
-  // ---- Student status strip (students only) ----
-  // Reads data the page already fetches elsewhere; officers and admins keep
-  // the plain fund dashboard.
-  async function loadStudentStatus() {
-    const el = document.getElementById('student-status');
-    if (!el) return;
-    let profile = null;
-    try { profile = await Auth.getProfile(); } catch { profile = null; }
-    if (!profile || profile.role !== 'student') { el.classList.add('hidden'); return; }
-
-    const EJ = window.EnrollmentJourney;
-    const [mine, units, events, notifs] = await Promise.all([
-      Api.enrollment.my().catch(() => ({ submissions: [] })),
-      Api.units.my().catch(() => []),
-      Api.events.list().catch(() => []),
-      Api.notifications.list().catch(() => null),
-    ]);
-
-    const now = new Date();
-    const sy = now.getMonth() >= 5 ? `${now.getFullYear()}-${now.getFullYear() + 1}` : `${now.getFullYear() - 1}-${now.getFullYear()}`;
-    const terms = mine.submissions || [];
-    const sub = terms.find(s => s.school_year === sy) || terms[0] || null;
-    const step = EJ ? EJ.stepOf(sub) : null;
-    const stepLabel = step && EJ ? EJ.STEPS[step.stepIndex].label : 'Not started';
-    const action = EJ ? EJ.actionFor(sub) : { kind: 'none' };
-    const enrollmentCta = !sub || sub.status === 'draft'
-      ? (action.kind === 'submit' ? 'Submit your load' : 'Build your load')
-      : 'View status';
-
-    const inProgress = (Array.isArray(units) ? units : []).filter(u => u.status === 'enrolled');
-    const unitsNow = inProgress.reduce((s, u) => s + (Number(u.subjects?.units) || 0), 0);
-
-    const today = now.toISOString().slice(0, 10);
-    const next = (events || []).filter(ev => ev.event_date && ev.event_date >= today && ev.status !== 'archived')
-      .sort((a, b) => a.event_date.localeCompare(b.event_date))[0];
-
-    const unread = notifs && typeof notifs.total_unread === 'number' ? notifs.total_unread : 0;
-
-    el.innerHTML = `
-      <a href="#" class="status-tile" data-view="enrollment">
-        <span class="status-tile-label">Enrollment</span>
-        <span class="status-tile-value">${UI.esc(stepLabel)}</span>
-        <span class="status-tile-cta">${UI.esc(enrollmentCta)}</span>
-      </a>
-      <a href="#" class="status-tile" data-view="units">
-        <span class="status-tile-label">This term</span>
-        <span class="status-tile-value">${inProgress.length} subject${inProgress.length === 1 ? '' : 's'} · ${unitsNow} units</span>
-        <span class="status-tile-cta">Academic Progress</span>
-      </a>
-      <a href="#" class="status-tile" data-view="events">
-        <span class="status-tile-label">Next event</span>
-        <span class="status-tile-value">${next ? UI.esc(next.event_name) : 'Nothing scheduled'}</span>
-        <span class="status-tile-cta">${next ? UI.esc(UI.dateStr(next.event_date)) : 'See all events'}</span>
-      </a>
-      <a href="#" class="status-tile" data-view="notifications">
-        <span class="status-tile-label">Notifications</span>
-        <span class="status-tile-value">${unread ? `${unread} unread` : 'All caught up'}</span>
-        <span class="status-tile-cta">Open inbox</span>
-      </a>
-      <a href="/feedback/" class="status-tile status-tile--quiet">
-        <span class="status-tile-label">Have a concern?</span>
-        <span class="status-tile-value">Send feedback</span>
-        <span class="status-tile-cta">Eight questions, two minutes</span>
-      </a>`;
-    el.querySelectorAll('[data-view]').forEach(a => a.addEventListener('click', e => {
-      e.preventDefault();
-      if (window.navigateTo) window.navigateTo(a.dataset.view);
-    }));
-    el.classList.remove('hidden');
   }
 
   async function subscribeRealtime() {

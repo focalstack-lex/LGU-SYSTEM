@@ -104,7 +104,11 @@ async function student(browser, viewport, label) {
     check('refresh returns to the last grouped view with its entry active', (await activeView()) === 'view-income' && (await activeNav()) === 'Money', `${await activeView()} / ${await activeNav()}`);
   } else {
     const bottom = await page.evaluate(() => [...document.querySelectorAll('#bottom-nav .bottom-nav-item')].filter(n => n.offsetParent).map(n => n.textContent.trim()));
-    check('phone bottom nav is Home, Money, Events, Academics, More', bottom.join('|') === 'Home|Money|Events|Academics|More', bottom.join('|'));
+    check('phone bottom nav is Home, Money, Events, Academic, More', bottom.join('|') === 'Home|Money|Events|Academic|More', bottom.join('|'));
+    const labels = await page.evaluate(() => [...document.querySelectorAll('#bottom-nav .bottom-nav-item span:not(.nav-icon)')].map(s => ({ t: s.textContent.trim(), clipped: s.scrollWidth > s.clientWidth })));
+    check('phone: no bottom nav label is truncated', labels.every(l => !l.clipped), JSON.stringify(labels.filter(l => l.clipped)));
+    check('phone: no status strip; the fund hero is the first block under the heading', await page.evaluate(() => !document.getElementById('student-status') && document.querySelector('#view-dashboard .view-header').nextElementSibling.classList.contains('stats-summary-wrapper')));
+    await shot(page, `${label}-student-dashboard`);
     await click('#bottom-nav .bottom-nav-item[data-group="money"]');
     check('phone: Money opens the ledger', (await activeView()) === 'view-transactions', await activeView());
     const tabW = await page.evaluate(() => { const bar = document.querySelector('#view-transactions .view-tabs'); const main = document.querySelector('.main-content'); return { bar: bar.getBoundingClientRect().width, main: main.clientWidth, tabH: bar.querySelector('.view-tab').getBoundingClientRect().height }; });

@@ -10,17 +10,7 @@
     "detail": ""
   },
   {
-    "name": "student status strip shows for a student",
-    "pass": true,
-    "detail": "[\"Enrollment\",\"This term\",\"Next event\",\"Notifications\",\"Have a concern?\"]"
-  },
-  {
-    "name": "strip: enrollment step and unread count are real data",
-    "pass": true,
-    "detail": "Build your load / 2 unread"
-  },
-  {
-    "name": "strip: feedback link present",
+    "name": "student home has no status strip",
     "pass": true,
     "detail": ""
   },
