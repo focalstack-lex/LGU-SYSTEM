@@ -64,6 +64,16 @@ async function student(browser, viewport, label) {
     check('Money entry is active while on the ledger', (await activeNav()) === 'Money', await activeNav());
     check('ledger shows Money tabs with Ledger selected', (await activeTabs()) === 'Ledger*! Income Reports', await activeTabs());
     check('opening the ledger clears the Money badge', await page.evaluate(() => !document.getElementById('nav-money').classList.contains('has-unread')));
+    const placement = await page.evaluate(() => {
+      const header = document.querySelector('#view-transactions .view-header');
+      const tabs = header.querySelector(':scope > .view-tabs');
+      const title = header.querySelector('h2');
+      if (!tabs) return { inHeader: false };
+      const t = tabs.getBoundingClientRect(), h = title.getBoundingClientRect();
+      const filters = header.querySelector('.tx-filter-bar').getBoundingClientRect();
+      return { inHeader: tabs === header.firstElementChild, sameLeft: Math.abs(t.left - h.left) < 1, gap: Math.round(h.top - t.bottom), sticky: getComputedStyle(header).position === 'sticky', trackWidth: Math.round(t.width), filtersBesideTitle: Math.abs(filters.top + filters.height / 2 - (h.top + h.height / 2)) < 24 };
+    });
+    check('tabs sit in the sticky header as a content-width first row; title left, filters right beneath', placement.inHeader && placement.sameLeft && placement.sticky && placement.gap >= 8 && placement.gap <= 24 && placement.trackWidth < 420 && placement.filtersBesideTitle, JSON.stringify(placement));
     await shot(page, `${label}-student-money-ledger`);
     await click('#view-transactions .view-tab[data-view="income"]');
     check('Income tab opens the income view', (await activeView()) === 'view-income', await activeView());
