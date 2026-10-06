@@ -502,11 +502,13 @@ html, body {
   flex-shrink: 0;
 }
 
+/* Segmented filter control: pill track geometry per UI_DESIGN.md, and a
+   40px minimum height so each option is a full touch target. */
 .of-filter-tabs {
   display: flex;
   background: var(--bg-surface-raised);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm, 6px);
+  border-radius: var(--radius-pill, 9999px);
   padding: 3px;
   gap: 2px;
 }
@@ -517,8 +519,9 @@ html, body {
   color: var(--text-secondary);
   font-size: 0.8rem;
   font-weight: 600;
-  padding: 0.4rem 0.85rem;
-  border-radius: 4px;
+  min-height: 40px;
+  padding: 0 0.85rem;
+  border-radius: var(--radius-pill, 9999px);
   cursor: pointer;
   transition: all var(--transition);
 }
@@ -1751,7 +1754,7 @@ html, body {
 
   .of-bottom-nav > button span,
   .of-bottom-nav > a span {
-    font-size: 0.68rem !important;
+    font-size: 0.72rem !important; /* 11.5px: functional text stays above the 11px floor */
     font-weight: 500 !important;
     letter-spacing: 0.01em !important;
     line-height: 1.2 !important;
@@ -2044,7 +2047,7 @@ html, body {
     flex: 1;
     text-align: center;
     white-space: nowrap;
-    padding: 0.35rem 0.4rem;
+    padding: 0 0.4rem;
     font-size: 0.75rem;
   }
   #of-roster-year-filter {

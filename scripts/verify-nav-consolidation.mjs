@@ -141,6 +141,10 @@ async function student(browser, viewport, label) {
     check('phone bottom nav is Home, Money, Events, Academic, More', bottom.join('|') === 'Home|Money|Events|Academic|More', bottom.join('|'));
     const labels = await page.evaluate(() => [...document.querySelectorAll('#bottom-nav .bottom-nav-item span:not(.nav-icon)')].map(s => ({ t: s.textContent.trim(), clipped: s.scrollWidth > s.clientWidth })));
     check('phone: no bottom nav label is truncated', labels.every(l => !l.clipped), JSON.stringify(labels.filter(l => l.clipped)));
+    const labelPx = await page.evaluate(() => parseFloat(getComputedStyle(document.querySelector('#bottom-nav .bottom-nav-item span:not(.nav-icon)')).fontSize));
+    check('phone: bottom nav labels are at least 11px', labelPx >= 11, String(labelPx));
+    const sheetHues = await page.evaluate(() => [...document.querySelectorAll('#mobile-more-sheet .mobile-sheet-row-icon')].filter(i => i.getAttribute('style')).length);
+    check('phone: More sheet icons use token classes, no inline colors', sheetHues === 0, String(sheetHues));
     check('phone: no status strip; the fund hero is the first block under the heading', await page.evaluate(() => !document.getElementById('student-status') && document.querySelector('#view-dashboard .view-header').nextElementSibling.classList.contains('stats-summary-wrapper')));
     const eventCard = await page.evaluate(() => { const c = document.querySelector('.stats-secondary-grid .stat-event').getBoundingClientRect(); const g = document.querySelector('.stats-secondary-grid').getBoundingClientRect(); return { card: Math.round(c.width), grid: Math.round(g.width) }; });
     check('phone: Next Event spans the full row', eventCard.card >= eventCard.grid - 2, JSON.stringify(eventCard));
@@ -221,6 +225,10 @@ async function officer(browser, viewport, label) {
     await click('#of-view-people .view-tab[data-of="roster"]');
     check('phone: roster tab keeps People active', (await activeNav()).includes('People'), await activeNav());
     check('phone: no horizontal overflow', await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1));
+    const ofLabels = await page.evaluate(() => [...document.querySelectorAll('#of-bottom-nav > button span:last-child')].map(s => ({ t: s.textContent.trim(), px: parseFloat(getComputedStyle(s).fontSize), clipped: s.scrollWidth > s.clientWidth })));
+    check('phone: officer bottom nav labels are at least 11px and none is truncated', ofLabels.every(l => l.px >= 11 && !l.clipped), JSON.stringify(ofLabels));
+    const seg = await page.evaluate(() => [...document.querySelectorAll('#of-view-roster .of-filter-tabs')].filter(t => t.offsetParent).map(t => { const b = t.querySelector('.of-filter-btn'); return { radius: getComputedStyle(t).borderRadius, btnH: Math.round(b.getBoundingClientRect().height) }; }));
+    check('phone: roster segmented controls are pill tracks with 40px options', seg.length > 0 && seg.every(s => s.radius === '9999px' && s.btnH >= 40), JSON.stringify(seg));
     await shot(page, `${label}-officer-people-roster`);
     await click('#of-bottom-nav-more-btn');
     const rows = await page.evaluate(() => [...document.querySelectorAll('#of-mobile-more-sheet .mobile-sheet-row')].filter(r => r.offsetParent).map(r => r.querySelector('.mobile-sheet-row-title').textContent.trim()));
