@@ -194,7 +194,7 @@
               <div class="of-field">
                 <label>Receipt <small>(optional)</small></label>
                 <div class="receipt-attach-row">
-                  <button type="button" class="of-btn of-btn-ghost" id="of-tx-receipt-btn"><iconify-icon icon="solar:camera-minimalistic-linear"></iconify-icon> Add Receipt</button>
+                  <button type="button" class="btn btn-secondary" id="of-tx-receipt-btn"><iconify-icon icon="solar:camera-minimalistic-linear"></iconify-icon> Add Receipt</button>
                   <span class="receipt-chip hidden" id="of-tx-receipt-chip">
                     <iconify-icon icon="solar:paperclip-linear"></iconify-icon>
                     <span id="of-tx-receipt-chip-text"></span>
@@ -203,7 +203,7 @@
                 </div>
               </div>
               <div class="of-error hidden" id="of-tx-error" role="alert"></div>
-              <button class="of-btn of-btn-primary" type="submit" id="of-tx-submit">Record Transaction</button>
+              <button class="btn btn-primary" type="submit" id="of-tx-submit">Record Transaction</button>
             </form>
           </div>
           <div class="of-card">
@@ -254,7 +254,7 @@
               </div>
               <div class="of-field"><label for="of-ev-desc">Description</label><textarea id="of-ev-desc" rows="2" placeholder="Brief description"></textarea></div>
               <div class="of-error hidden" id="of-ev-error" role="alert"></div>
-              <button class="of-btn of-btn-primary" type="submit" id="of-ev-submit">Create Event</button>
+              <button class="btn btn-primary" type="submit" id="of-ev-submit">Create Event</button>
             </form>
           </div>
           <div class="of-card">
@@ -270,7 +270,7 @@
               </div>
               <div id="of-transfer-preview" class="of-transfer-preview hidden"></div>
               <div class="of-error hidden" id="of-transfer-error" role="alert"></div>
-              <button class="of-btn of-btn-primary" type="submit" id="of-transfer-submit">Confirm Transfer</button>
+              <button class="btn btn-primary" type="submit" id="of-transfer-submit">Confirm Transfer</button>
             </form>
           </div>
         </div>
@@ -328,7 +328,7 @@
         <div class="of-card" style="margin-bottom:1.5rem;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
             <h3 style="margin:0;"><iconify-icon icon="solar:document-text-linear"></iconify-icon> Per-Event Financial Summary</h3>
-            <span style="font-size:0.8rem;color:var(--text-secondary);">Allocated vs spent for every event</span>
+            <span class="text-secondary-sm">Allocated vs spent for every event</span>
           </div>
           <div class="of-table-wrap"><table class="of-table" id="of-events-summary-table">
             <thead><tr><th>Event</th><th>Allocated</th><th>Spent</th><th>Remaining</th><th>Status</th></tr></thead>
@@ -353,7 +353,8 @@
         <div class="view-header of-view-head">
           <div class="view-tabs" role="tablist" aria-label="People">
             <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="people">Accounts</button>
-            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster">Enrolled roster</button>
+            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster" data-of-sub="masterlist">Enrolled roster</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster" data-of-sub="requests">Verification requests</button>
           </div>
           <div>
             <h2>People &amp; Access</h2>
@@ -374,7 +375,7 @@
           <div class="of-stat">
             <div class="of-stat-label">
               <span>Student Accounts</span>
-              <span class="badge" style="background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.62rem;padding:1px 5px;border-radius:4px;white-space:nowrap;">Students</span>
+              <span class="badge" style="background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.72rem;padding:1px 5px;border-radius:4px;white-space:nowrap;">Students</span>
             </div>
             <div class="of-stat-value" id="of-stat-val-users-students">0</div>
             <div class="of-stat-sub" id="of-stat-sub-users-students">Regular accounts</div>
@@ -382,7 +383,7 @@
           <div class="of-stat">
             <div class="of-stat-label">
               <span>Officers &amp; Leaders</span>
-              <span class="badge" style="background:rgba(var(--primary-rgb),0.12);color:var(--primary);border:1px solid rgba(var(--primary-rgb),0.25);font-size:0.62rem;padding:1px 5px;border-radius:4px;white-space:nowrap;">Leaders</span>
+              <span class="badge" style="background:rgba(var(--primary-rgb),0.12);color:var(--primary);border:1px solid rgba(var(--primary-rgb),0.25);font-size:0.72rem;padding:1px 5px;border-radius:4px;white-space:nowrap;">Leaders</span>
             </div>
             <div class="of-stat-value" id="of-stat-val-users-officers">0</div>
             <div class="of-stat-sub" id="of-stat-sub-users-officers">Admin, Governor, Officer, Cashier</div>
@@ -406,7 +407,7 @@
             <div class="of-filter-tools">
               <div style="position:relative; flex:1;">
                 <input type="text" id="of-people-search" class="of-search" style="padding-left:2.2rem; width:100%;" placeholder="Search accounts by name or email…" />
-                <iconify-icon icon="solar:magnifer-linear" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); color:var(--text-tertiary); font-size:1.1rem; pointer-events:none;"></iconify-icon>
+                <iconify-icon class="input-icon" icon="solar:magnifer-linear"></iconify-icon>
               </div>
             </div>
             <div class="of-filter-tabs" id="of-people-role-tabs">
@@ -449,7 +450,7 @@
               <div class="of-field"><label for="of-announce-title">Title</label><input type="text" id="of-announce-title" required placeholder="Announcement title" /></div>
               <div class="of-field"><label for="of-announce-body">Message</label><textarea id="of-announce-body" required rows="4" placeholder="Write the announcement here…"></textarea></div>
               <div class="of-error hidden" id="of-announce-error" role="alert"></div>
-              <button class="of-btn of-btn-primary" type="submit" id="of-announce-submit">Post Announcement</button>
+              <button class="btn btn-primary" type="submit" id="of-announce-submit">Post Announcement</button>
             </form>
           </div>
           <div class="of-card">
@@ -464,27 +465,28 @@
         <div class="view-header of-view-head">
           <div class="view-tabs" role="tablist" aria-label="People">
             <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="people">Accounts</button>
-            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster">Enrolled roster</button>
+            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster" data-of-sub="masterlist">Enrolled roster</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster" data-of-sub="requests">Verification requests</button>
           </div>
           <div>
             <h2>Official Enrolled Roster</h2>
             <p class="view-sub">Manage officially enrolled engineering students database for student portal verification</p>
           </div>
           <div class="of-header-actions" style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
-            <button type="button" class="of-btn of-btn-secondary" id="of-roster-export-btn" title="Export Enrolled Roster as CSV">
+            <button type="button" class="btn btn-secondary" id="of-roster-export-btn" title="Export Enrolled Roster as CSV">
               <iconify-icon icon="solar:file-download-linear"></iconify-icon> Export CSV
             </button>
-            <button type="button" class="of-btn of-btn-secondary" id="of-roster-import-btn" title="Bulk Import Roster from CSV">
+            <button type="button" class="btn btn-secondary" id="of-roster-import-btn" title="Bulk Import Roster from CSV">
               <iconify-icon icon="solar:upload-minimalistic-linear"></iconify-icon> Bulk Import CSV
             </button>
-            <button type="button" class="of-btn of-btn-primary" id="of-roster-add-btn" title="Add Single Enrolled Student">
+            <button type="button" class="btn btn-primary" id="of-roster-add-btn" title="Add Single Enrolled Student">
               <iconify-icon icon="solar:user-plus-linear"></iconify-icon> Add Student
             </button>
           </div>
         </div>
 
         <!-- View Switcher Tabs: Official Masterlist vs Pending Verification Requests -->
-        <div class="of-filter-tabs" id="of-roster-view-tabs" style="margin-bottom:1.25rem; display:inline-flex; width:auto;">
+        <div class="of-filter-tabs hidden" id="of-roster-view-tabs">
           <button type="button" class="of-filter-btn active" data-roster-view="masterlist" id="of-tab-roster-master">
             <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon> Enrolled Database
           </button>
@@ -504,31 +506,31 @@
                 <iconify-icon icon="solar:users-group-rounded-linear" style="color:var(--accent); font-size:1.15rem;"></iconify-icon>
               </div>
               <div class="of-stat-value" id="of-stat-val-total">0</div>
-              <div class="of-stat-sub" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">Officially Registered</div>
+              <div class="of-stat-sub stat-note">Officially Registered</div>
             </div>
             <div class="of-stat" id="of-stat-bsce">
               <div class="of-stat-label">
                 <span>Civil Eng (BSCE)</span>
-                <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSCE</span>
+                <span class="badge tag">BSCE</span>
               </div>
               <div class="of-stat-value" id="of-stat-val-bsce">0</div>
-              <div class="of-stat-sub" id="of-stat-sub-bsce" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+              <div class="of-stat-sub stat-note" id="of-stat-sub-bsce">0% of CoE</div>
             </div>
             <div class="of-stat" id="of-stat-bscoe">
               <div class="of-stat-label">
                 <span>Comp Eng (BSCoE)</span>
-                <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSCoE</span>
+                <span class="badge tag">BSCoE</span>
               </div>
               <div class="of-stat-value" id="of-stat-val-bscoe">0</div>
-              <div class="of-stat-sub" id="of-stat-sub-bscoe" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+              <div class="of-stat-sub stat-note" id="of-stat-sub-bscoe">0% of CoE</div>
             </div>
             <div class="of-stat" id="of-stat-bsece">
               <div class="of-stat-label">
                 <span>Electronics Eng (BSECE)</span>
-                <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSECE</span>
+                <span class="badge tag">BSECE</span>
               </div>
               <div class="of-stat-value" id="of-stat-val-bsece">0</div>
-              <div class="of-stat-sub" id="of-stat-sub-bsece" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+              <div class="of-stat-sub stat-note" id="of-stat-sub-bsece">0% of CoE</div>
             </div>
           </div>
 
@@ -539,7 +541,7 @@
               <div class="of-filter-tools">
                 <div style="position:relative; flex:1;">
                   <input type="text" id="of-roster-search" class="of-search" style="padding-left:2.2rem; width:100%;" placeholder="Search by student name or surname…" />
-                  <iconify-icon icon="solar:magnifer-linear" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); color:var(--text-tertiary); font-size:1.1rem; pointer-events:none;"></iconify-icon>
+                  <iconify-icon class="input-icon" icon="solar:magnifer-linear"></iconify-icon>
                 </div>
               </div>
               <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
@@ -576,8 +578,8 @@
           <div class="of-card">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:1.25rem;">
               <div>
-                <h3 style="margin:0; font-size:1.05rem; display:flex; align-items:center; gap:0.45rem;">
-                  <iconify-icon icon="solar:user-hand-up-bold" style="color:var(--accent);"></iconify-icon> Student Enrollment Verification Requests
+                <h3 class="modal-title">
+                  <iconify-icon class="icon-accent" icon="solar:user-hand-up-bold"></iconify-icon> Student Enrollment Verification Requests
                 </h3>
                 <p style="font-size:0.8rem; color:var(--text-secondary); margin:0.25rem 0 0;">Students who signed in with Google but were not yet listed in the S.Y. 2026-2027 masterlist</p>
               </div>
@@ -585,11 +587,11 @@
                 <!-- Bulk Action Controls -->
                 <div id="of-requests-bulk-bar" class="hidden" style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-surface-raised); border:1px solid var(--border-default); padding:0.25rem 0.65rem; border-radius:var(--radius-sm);">
                   <span id="of-requests-selected-count" style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">0 selected</span>
-                  <button type="button" class="of-btn of-btn-primary" id="of-requests-bulk-approve-btn" style="padding:0.28rem 0.75rem; font-size:0.8rem;">
+                  <button type="button" class="btn btn-primary" id="of-requests-bulk-approve-btn" style="padding:0.28rem 0.75rem; font-size:0.8rem;">
                     <iconify-icon icon="solar:check-circle-linear"></iconify-icon>
                     <span id="of-requests-bulk-btn-text">Approve Selected</span>
                   </button>
-                  <button type="button" class="of-btn of-btn-ghost" id="of-requests-bulk-clear-btn" title="Deselect All" style="padding:0.28rem 0.5rem; font-size:0.78rem; color:var(--text-tertiary);">
+                  <button type="button" class="btn btn-secondary" id="of-requests-bulk-clear-btn" title="Deselect All" style="padding:0.28rem 0.5rem; font-size:0.78rem; color:var(--text-tertiary);">
                     Cancel
                   </button>
                 </div>
@@ -758,8 +760,8 @@
   <div id="of-roster-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-card of-modal-card" style="max-width:500px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
-        <h3 id="of-roster-modal-title" style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
-          <iconify-icon icon="solar:user-plus-bold" style="color:var(--accent);"></iconify-icon> Add Enrolled Student
+        <h3 class="modal-title" id="of-roster-modal-title">
+          <iconify-icon class="icon-accent" icon="solar:user-plus-bold"></iconify-icon> Add Enrolled Student
         </h3>
         <button type="button" class="btn-icon" id="of-roster-modal-close" title="Close" aria-label="Close add student dialog">
           <iconify-icon icon="solar:close-circle-linear" style="font-size:1.3rem;"></iconify-icon>
@@ -800,8 +802,8 @@
         </div>
         <div class="of-error hidden" id="of-modal-roster-error" role="alert"></div>
         <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1.25rem;">
-          <button type="button" class="of-btn of-btn-ghost" id="of-roster-modal-cancel">Cancel</button>
-          <button type="submit" class="of-btn of-btn-primary" id="of-roster-modal-submit">Save Student</button>
+          <button type="button" class="btn btn-secondary" id="of-roster-modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="of-roster-modal-submit">Save Student</button>
         </div>
       </form>
     </div>
@@ -811,8 +813,8 @@
   <div id="of-roster-import-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-card of-modal-card" style="max-width:580px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
-        <h3 style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
-          <iconify-icon icon="solar:upload-minimalistic-bold" style="color:var(--accent);"></iconify-icon> Bulk Import Semester Roster
+        <h3 class="modal-title">
+          <iconify-icon class="icon-accent" icon="solar:upload-minimalistic-bold"></iconify-icon> Bulk Import Semester Roster
         </h3>
         <button type="button" class="btn-icon" id="of-import-modal-close" title="Close" aria-label="Close roster import dialog">
           <iconify-icon icon="solar:close-circle-linear" style="font-size:1.3rem;"></iconify-icon>
@@ -842,8 +844,8 @@
       <div class="of-error hidden" id="of-import-error" role="alert" style="margin-top:0.75rem;"></div>
 
       <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1.25rem;">
-        <button type="button" class="of-btn of-btn-ghost" id="of-import-cancel-btn">Cancel</button>
-        <button type="button" class="of-btn of-btn-primary" id="of-import-confirm-btn" disabled>Import Students</button>
+        <button type="button" class="btn btn-secondary" id="of-import-cancel-btn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="of-import-confirm-btn" disabled>Import Students</button>
       </div>
     </div>
   </div>

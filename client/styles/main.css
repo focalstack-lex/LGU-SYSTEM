@@ -1488,7 +1488,6 @@ input[type="checkbox"]:checked::before {
   border-color: var(--primary-active);
 }
 
-.btn-secondary,
 .btn-danger {
   background: var(--danger-fill);
   border-color: var(--danger-fill);
@@ -1499,6 +1498,7 @@ input[type="checkbox"]:checked::before {
   border-color: var(--danger-fill-hover);
 }
 
+.btn-secondary,
 .btn-ghost {
   background: var(--surface-secondary);
   color: var(--text-primary);
@@ -9493,3 +9493,23 @@ html body .bottom-nav .bottom-nav-item span:not(.nav-icon) { font-size: 0.72rem 
   .view-header > .view-tabs { justify-self: stretch; }
   .view-tab { flex: 1 1 0; padding: 0 0.5rem; text-align: center; }
 }
+
+/* =============================================
+   SHARED TEXT AND ICON UTILITIES
+   Declarations lifted verbatim from repeated inline styles so markup
+   carries no style attributes for these cases. Keep this list short:
+   a new entry needs three or more uses.
+   ============================================= */
+.icon-lead { color: var(--primary); margin-right: 0.4rem; vertical-align: middle; }
+.icon-accent { color: var(--accent); }
+.icon-md { font-size: 16px; }
+.text-muted { font-weight: 400; color: var(--col-text-muted, var(--text-secondary)); }
+.text-secondary { color: var(--text-secondary); }
+.text-secondary-sm { font-size: 0.85rem; color: var(--text-secondary); }
+.text-hint { font-size: 0.85rem; color: var(--text-tertiary); }
+.strong { font-weight: 700; }
+.stat-note { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.35rem; }
+.tag { background: var(--bg-surface-raised); color: var(--text-secondary); border: 1px solid var(--border-default); font-size: 0.72rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+.modal-title { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+.input-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 1.1rem; pointer-events: none; }
+.field-label-sm { color: var(--col-text-muted, var(--text-secondary)); font-size: 0.72rem; text-transform: uppercase; margin-bottom: 0.25rem; }

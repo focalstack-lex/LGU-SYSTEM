@@ -261,8 +261,16 @@ async function officer(browser, viewport, label) {
     await click('#of-view-people .view-tab[data-of="roster"]');
     check('Enrolled roster tab opens the roster', (await activeView()) === 'of-view-roster', await activeView());
     check('People entry stays active on the roster', (await activeNav()) === 'People', await activeNav());
-    check('roster view tabs mark Enrolled roster selected', (await activeTabs()) === 'Accounts Enrolled roster*', await activeTabs());
+    check('roster view tabs mark Enrolled roster selected', (await activeTabs()) === 'Accounts Enrolled roster* Verification requests', await activeTabs());
+    check('the old inner pane switcher is hidden', await page.evaluate(() => document.getElementById('of-roster-view-tabs').offsetParent === null));
     await shot(page, `${label}-officer-people-roster`);
+    await click('#of-view-roster .view-tab[data-of-sub="requests"]');
+    const panes = await page.evaluate(() => ({ master: document.getElementById('of-roster-master-pane')?.classList.contains('hidden'), requests: !document.getElementById('of-roster-requests-pane')?.classList.contains('hidden') }));
+    check('Verification requests tab shows the requests pane and hides the masterlist', panes.master === true && panes.requests === true, JSON.stringify(panes));
+    check('Verification requests tab is the selected one, People still active', (await activeTabs()) === 'Accounts Enrolled roster Verification requests*' && (await activeNav()) === 'People', `${await activeTabs()} / ${await activeNav()}`);
+    await shot(page, `${label}-officer-people-requests`);
+    await click('#of-view-roster .view-tab[data-of-sub="masterlist"]');
+    check('Enrolled roster tab brings the masterlist back', await page.evaluate(() => !document.getElementById('of-roster-master-pane').classList.contains('hidden')) && (await activeTabs()) === 'Accounts Enrolled roster* Verification requests', await activeTabs());
     await click('.of-nav .nav-item[data-of="announcements"]');
     check('Announcements entry opens announcements with no group active', (await activeView()) === 'of-view-announcements' && (await activeNav()) === 'Announcements', await activeNav());
     await page.goto(BASE + '/officer.html#roster', { waitUntil: 'networkidle' });

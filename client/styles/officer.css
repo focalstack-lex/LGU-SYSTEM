@@ -711,88 +711,6 @@ html, body {
 }
 
 /* ---------- Buttons ---------- */
-.of-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  border: none;
-  border-radius: var(--radius-sm, 6px);
-  padding: 0.65rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all var(--transition, 0.25s ease);
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.of-btn:disabled {
-  opacity: 0.38 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-.of-btn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.of-btn-primary {
-  background: var(--primary);
-  color: var(--accent-text-on);
-  border: 1px solid var(--primary);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  box-shadow: none;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.of-btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
-}
-
-.of-btn-primary:active:not(:disabled) {
-  background: var(--primary-active);
-  border-color: var(--primary-active);
-}
-
-.of-btn-secondary {
-  background: var(--bg-surface-raised);
-  color: var(--text-primary);
-  border: 1px solid var(--border-default);
-}
-
-.of-btn-secondary:hover:not(:disabled) {
-  background: var(--surface-hover);
-  border-color: var(--border-hover);
-  color: var(--text-primary);
-}
-
-.of-btn-ghost {
-  background: var(--bg-surface-raised);
-  color: var(--text-primary);
-  border: 1px solid var(--border-default);
-}
-
-.of-btn-ghost:hover:not(:disabled) {
-  background: var(--surface-hover);
-  border-color: var(--border-hover);
-  color: var(--text-primary);
-}
-
-.of-btn-danger {
-  background: var(--danger-fill);
-  color: #FFFFFF;
-}
-
-.of-btn-danger:hover:not(:disabled) {
-  background: var(--danger-fill-hover);
-}
-
 /* ---------- Scrollables & Tables ---------- */
 .of-table-wrap {
   overflow-x: auto;
@@ -1251,7 +1169,7 @@ html, body {
   border-top: 1px solid var(--border-default);
 }
 
-.of-event-actions .of-btn {
+.of-event-actions .btn {
   padding: 0.4rem 0.75rem;
   font-size: 0.76rem;
 }
@@ -1991,7 +1909,7 @@ html, body {
     font-size: 0.8rem;
   }
   /* Full-width action buttons inside event cards = comfortable tap targets */
-  .of-event-actions .of-btn {
+  .of-event-actions .btn {
     flex: 1 1 auto;
   }
   .of-transfer-preview {
@@ -2026,7 +1944,7 @@ html, body {
     grid-column: 1 / -1;
     justify-content: center;
   }
-  .of-header-actions .of-btn {
+  .of-header-actions .btn {
     justify-content: center;
     padding: 0.5rem 0.6rem;
     font-size: 0.8rem;

@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/main.css?v=8.1" />
-  <link rel="stylesheet" href="styles/ai.css?v=6.8" />
+  <link rel="stylesheet" href="styles/ai.css?v=6.9" />
   <script src="vendor/supabase.min.js"></script>
   <script src="vendor/chart.umd.min.js"></script>
   <script src="vendor/iconify-icon.min.js"></script>
@@ -205,7 +205,7 @@
             <iconify-icon icon="solar:check-circle-linear"></iconify-icon>
             <span id="onboarding-submit-text">Complete Registration &amp; Enter Portal</span>
           </button>
-          <button type="button" class="btn btn-ghost btn-full" id="onboarding-logout-btn" style="font-size:0.85rem;color:var(--text-tertiary);">
+          <button type="button" class="btn btn-ghost btn-full text-hint" id="onboarding-logout-btn">
             <iconify-icon icon="solar:logout-2-linear"></iconify-icon>
             <span>Cancel &amp; Sign Out</span>
           </button>
@@ -222,16 +222,16 @@
           Your enrollment verification request has been submitted and is currently awaiting confirmation from the Executive Officers.
         </p>
         <div style="background:var(--bg-surface-raised);border:1px solid var(--border-default);border-radius:8px;padding:0.75rem 1rem;font-size:0.8rem;text-align:left;margin-bottom:1.25rem;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span style="color:var(--text-secondary);">Student Name:</span> <strong id="onboarding-pending-name">-</strong></div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span style="color:var(--text-secondary);">Program &amp; Year:</span> <strong id="onboarding-pending-course">-</strong></div>
-          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Review Status:</span> <span class="badge" style="background:rgba(var(--warning-rgb),0.15);color:var(--warning);border:1px solid rgba(var(--warning-rgb),0.3);font-size:0.72rem;">Pending Confirmation</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span class="text-secondary">Student Name:</span> <strong id="onboarding-pending-name">-</strong></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span class="text-secondary">Program &amp; Year:</span> <strong id="onboarding-pending-course">-</strong></div>
+          <div style="display:flex;justify-content:space-between;"><span class="text-secondary">Review Status:</span> <span class="badge" style="background:rgba(var(--warning-rgb),0.15);color:var(--warning);border:1px solid rgba(var(--warning-rgb),0.3);font-size:0.72rem;">Pending Confirmation</span></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:0.5rem;">
           <button type="button" class="btn btn-primary btn-full" id="onboarding-refresh-btn">
             <iconify-icon icon="solar:refresh-linear"></iconify-icon>
             <span>Check Approval Status</span>
           </button>
-          <button type="button" class="btn btn-ghost btn-full" id="onboarding-pending-logout-btn" style="font-size:0.85rem;color:var(--text-tertiary);">
+          <button type="button" class="btn btn-ghost btn-full text-hint" id="onboarding-pending-logout-btn">
             <iconify-icon icon="solar:logout-2-linear"></iconify-icon>
             <span>Sign Out</span>
           </button>
@@ -533,7 +533,7 @@
         </div>
         <div id="tx-mobile-cards" class="mobile-cards-container"></div>
         <div id="tx-pagination" class="pagination-bar" style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0;margin-top:0.5rem;flex-wrap:wrap;gap:0.5rem;">
-          <span id="tx-page-info" style="font-size:0.85rem;color:var(--text-secondary);">Page 1 of 1 (0 transactions)</span>
+          <span class="text-secondary-sm" id="tx-page-info">Page 1 of 1 (0 transactions)</span>
           <div style="display:flex;gap:0.5rem;">
             <button type="button" id="tx-prev-btn" class="btn btn-ghost" style="padding:0.4rem 0.8rem;" disabled><iconify-icon icon="solar:arrow-left-linear"></iconify-icon> Previous</button>
             <button type="button" id="tx-next-btn" class="btn btn-ghost" style="padding:0.4rem 0.8rem;" disabled>Next <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></button>
@@ -731,7 +731,7 @@
           <!-- Left: Journey & status (persistent anchor) -->
           <div class="enrollment-column-left">
             <div class="enrollment-card" id="enrollment-journey-card">
-              <h3><iconify-icon icon="solar:route-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Enrollment Status</h3>
+              <h3><iconify-icon class="icon-lead" icon="solar:route-linear"></iconify-icon>Enrollment Status</h3>
               <ol class="ev-track" id="enrollment-journey-track" aria-label="Enrollment steps"></ol>
               <div id="enrollment-status-body"></div>
               <div class="ev-action-area" id="enrollment-action-area"></div>
@@ -741,7 +741,7 @@
           <!-- Right: Workspace (editable states) / read-only summary (locked states) -->
           <div class="enrollment-column-right">
             <div class="enrollment-card" id="enrollment-draft-card">
-              <h3><iconify-icon icon="solar:document-text-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Proposed Load</h3>
+              <h3><iconify-icon class="icon-lead" icon="solar:document-text-linear"></iconify-icon>Proposed Load</h3>
               <p class="enrollment-note" id="enrollment-term-line"></p>
               <div id="enrollment-items"></div>
               <div class="ev-locked-note hidden" id="enrollment-locked-note"></div>
@@ -750,7 +750,7 @@
 
             <div class="enrollment-card" id="enrollment-eligible-card">
               <div class="enrollment-eligible-header">
-                <h3><iconify-icon icon="solar:book-bookmark-linear" style="color:var(--primary);margin-right:0.4rem;vertical-align:middle;"></iconify-icon>Eligible Courses for this Semester</h3>
+                <h3><iconify-icon class="icon-lead" icon="solar:book-bookmark-linear"></iconify-icon>Eligible Courses for this Semester</h3>
                 <p class="enrollment-note" style="margin:0.25rem 0 0.85rem;">Pick the subjects you need. Grizz's recommendations are a great starting point.</p>
               </div>
               <div class="enrollment-filter-toolbar">
@@ -782,11 +782,11 @@
 
         <!-- Tab Navigation -->
         <div class="admin-tabs">
-          <button class="admin-tab-btn active" data-tab="create" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:pen-new-square-linear" style="font-size:16px" ></iconify-icon> Create Records</button>
-          <button class="admin-tab-btn" data-tab="transfer" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:card-transfer-linear" style="font-size:16px" ></iconify-icon> Budget Transfer</button>
-          <button class="admin-tab-btn" data-tab="events" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:pen-new-square-linear" style="font-size:16px" ></iconify-icon> Manage Events</button>
-          <button class="admin-tab-btn" data-tab="users" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:users-group-rounded-linear" style="font-size:16px" ></iconify-icon> User Management</button>
-          <button class="admin-tab-btn" data-tab="audit" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:history-linear" style="font-size:16px" ></iconify-icon> Audit Log</button>
+          <button class="admin-tab-btn active" data-tab="create" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon class="icon-md" icon="solar:pen-new-square-linear" ></iconify-icon> Create Records</button>
+          <button class="admin-tab-btn" data-tab="transfer" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon class="icon-md" icon="solar:card-transfer-linear" ></iconify-icon> Budget Transfer</button>
+          <button class="admin-tab-btn" data-tab="events" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon class="icon-md" icon="solar:pen-new-square-linear" ></iconify-icon> Manage Events</button>
+          <button class="admin-tab-btn" data-tab="users" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon class="icon-md" icon="solar:users-group-rounded-linear" ></iconify-icon> User Management</button>
+          <button class="admin-tab-btn" data-tab="audit" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon class="icon-md" icon="solar:history-linear" ></iconify-icon> Audit Log</button>
         </div>
 
         <!-- Tab: Create Records -->
@@ -876,11 +876,11 @@
                   <input type="text" id="tx-desc" name="description" required placeholder="e.g. Sound system rental" />
                 </div>
                 <div class="form-group">
-                  <label for="tx-donor">Donor Name <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+                  <label for="tx-donor">Donor Name <span class="text-muted">(optional)</span></label>
                   <input type="text" id="tx-donor" name="donor_name" placeholder="Donor or sponsor name" />
                 </div>
                 <div class="form-group">
-                  <label>Receipt <span style="font-weight:400;color:var(--col-text-muted)">(optional - photo or PDF)</span></label>
+                  <label>Receipt <span class="text-muted">(optional - photo or PDF)</span></label>
                   <div class="receipt-attach-row">
                     <button type="button" class="btn btn-ghost" id="tx-add-receipt" style="font-size:0.85rem;">
                       <iconify-icon icon="solar:camera-minimalistic-linear"></iconify-icon> Add Receipt
@@ -977,13 +977,13 @@
               <div id="transfer-preview" class="hidden" style="margin-bottom:1.5rem;padding:1rem;background:var(--col-surface);border-radius:var(--radius-sm);border:1px dashed var(--col-border);font-size:0.87rem;">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
                   <div id="tp-from" style="flex:1;">
-                    <div style="color:var(--col-text-muted);font-size:0.7rem;text-transform:uppercase;margin-bottom:0.25rem;">Source Balance</div>
-                    <div id="tp-from-val" style="font-weight:700;">₱0.00</div>
+                    <div class="field-label-sm">Source Balance</div>
+                    <div class="strong" id="tp-from-val">₱0.00</div>
                   </div>
-                  <div style="color:var(--col-text-muted);"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div>
+                  <div class="text-muted"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></div>
                   <div id="tp-to" style="flex:1;text-align:right;">
-                    <div style="color:var(--col-text-muted);font-size:0.7rem;text-transform:uppercase;margin-bottom:0.25rem;">Target Balance</div>
-                    <div id="tp-to-val" style="font-weight:700;">₱0.00</div>
+                    <div class="field-label-sm">Target Balance</div>
+                    <div class="strong" id="tp-to-val">₱0.00</div>
                   </div>
                 </div>
               </div>
@@ -1095,11 +1095,11 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label for="units-schedule">Schedule <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+            <label for="units-schedule">Schedule <span class="text-muted">(optional)</span></label>
             <input type="text" id="units-schedule" maxlength="120" placeholder="e.g. MWF 9:00-10:00 AM" />
           </div>
           <div class="form-group">
-            <label for="units-instructor">Instructor <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+            <label for="units-instructor">Instructor <span class="text-muted">(optional)</span></label>
             <input type="text" id="units-instructor" maxlength="120" placeholder="e.g. Engr. Juan Dela Cruz" />
           </div>
         </div>
@@ -1134,7 +1134,7 @@
         <img src="assets/grizz.png" alt="Grizz" class="grizz-mascot-img" />
       </div>
       <div class="ursa-launcher-text">
-        <span class="ursa-launcher-title">Ask Grizz <iconify-icon icon="solar:stars-minimalistic-linear" style="color:var(--primary);"></iconify-icon></span>
+        <span class="ursa-launcher-title">Ask Grizz <iconify-icon class="icon-accent" icon="solar:stars-minimalistic-linear"></iconify-icon></span>
         <span class="ursa-launcher-sub">Your personal portal guide</span>
       </div>
     </button>
