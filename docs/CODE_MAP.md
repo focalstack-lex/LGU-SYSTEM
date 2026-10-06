@@ -1,7 +1,7 @@
 <!-- code-map
-generated: 2026-09-28T09:38:50.512Z
-commit: 20e81ad
-fingerprint: ca211e3970260c8f
+generated: 2026-10-06T07:26:18.911Z
+commit: f9a0ec5
+fingerprint: 4897e0134adf1793
 -->
 # Code Map (Agent Navigation)
 
@@ -14,8 +14,8 @@ disagree, the code wins and the map is regenerated.
 
 ## Summary
 
-- Files indexed: 183
-- Total lines indexed: 52,766
+- Files indexed: 184
+- Total lines indexed: 52,892
 - Anchor index emitted for files over 300 lines: 37
 
 ### Areas
@@ -25,17 +25,17 @@ disagree, the code wins and the map is regenerated.
 | `.` | 4 | 2,309 |
 | `client` | 6 | 3,491 |
 | `client/feedback` | 2 | 227 |
-| `client/js` | 30 | 12,267 |
+| `client/js` | 30 | 12,275 |
 | `client/js/faculty` | 1 | 489 |
 | `client/js/officer` | 2 | 3,316 |
 | `client/styles` | 6 | 14,342 |
 | `electron` | 3 | 351 |
-| `scripts` | 64 | 7,094 |
+| `scripts` | 64 | 7,160 |
 | `server` | 1 | 227 |
 | `server/lib` | 8 | 713 |
 | `server/middleware` | 2 | 122 |
 | `server/routes` | 13 | 4,396 |
-| `supabase/migrations` | 36 | 2,775 |
+| `supabase/migrations` | 37 | 2,827 |
 | `supabase/policies` | 1 | 90 |
 | `tests` | 3 | 432 |
 | `tests/electron` | 1 | 125 |
@@ -94,8 +94,8 @@ disagree, the code wins and the map is regenerated.
 | `feedback-view.js` | 194 | developer-only feedback viewer (/feedback/view) |
 | `enrollment-journey.js` | 175 | Pure journey-state model for Enrollment Verification. |
 | `swr-cache.js` | 139 | Swr Cache |
+| `roster.js` | 129 | Official CoE Student Roster Validation (Supabase DB-backed) |
 | `income.js` | 127 | General Income Tracker Module |
-| `roster.js` | 121 | Official CoE Student Roster Validation (Supabase DB-backed) |
 | `updates.js` | 92 | Announcements and Notifications pages (student portal) |
 | `cv-verify.js` | 81 | Public Credential Verification View |
 | `config.js` | 57 | Supabase Client Configuration |
@@ -144,10 +144,11 @@ disagree, the code wins and the map is regenerated.
 | `generate-code-map.mjs` | 310 | Agent Navigation Map Generator |
 | `student-walkthrough.mjs` | 297 | Student Walkthrough |
 | `verify-ui-audit-fixes.mjs` | 291 | Verify Ui Audit Fixes |
+| `lib-capture-mocks.mjs` | 253 | lib-capture-mocks.mjs |
 | `audit-mobile-responsive.mjs` | 249 | Audit Mobile Responsive |
-| `lib-capture-mocks.mjs` | 240 | lib-capture-mocks.mjs |
 | `verify-student-experience.mjs` | 220 | Verify Student Experience |
 | `seed-phase-b-demo.js` | 189 | Seed Phase B Demo |
+| `lint-sql-invariants.mjs` | 188 | scripts/lint-sql-invariants.mjs |
 | `verify-dropdown-sweep.mjs` | 175 | Verify Dropdown Sweep |
 | `verify-skeleton.mjs` | 173 | Verify Skeleton |
 | `smoke-test-cache.js` | 170 | scripts/smoke-test-cache.js |
@@ -157,7 +158,6 @@ disagree, the code wins and the map is regenerated.
 | `deep-qa-security-suite.js` | 152 | Deep Qa Security Suite |
 | `test-staging-security-controls.mjs` | 142 | scripts/test-staging-security-controls.mjs |
 | `verify-contrast.mjs` | 139 | Verify Contrast |
-| `lint-sql-invariants.mjs` | 135 | scripts/lint-sql-invariants.mjs |
 | `smoke-test-component-outcomes.js` | 130 | Smoke Test Component Outcomes |
 | `smoke-test-component-outcomes-client.js` | 125 | Smoke Test Component Outcomes Client |
 | `capture-presentation-shots.mjs` | 124 | capture-presentation-shots.mjs |
@@ -266,6 +266,7 @@ disagree, the code wins and the map is regenerated.
 | `028_recalculate_enrollment_year.sql` | 64 | Migration 028: Auto Recalculate Enrollment Year |
 | `023_allow_transfer_tx_type.sql` | 56 | Migration 023: Allow 'transfer' transaction type and add direction |
 | `036_signup_domain_and_anon_grants.sql` | 56 | Migration 036: Signup domain hardening + anon grant revocation |
+| `041_restrict_function_execute.sql` | 52 | Migration 041: Restrict EXECUTE on SECURITY DEFINER functions and pin |
 | `018_enrollment_requests.sql` | 50 | Enrollment Requests |
 | `006_enrollment_year.sql` | 43 | Migration: 006_enrollment_year.sql |
 | `025_feedback_table.sql` | 38 | Feedback Table |
