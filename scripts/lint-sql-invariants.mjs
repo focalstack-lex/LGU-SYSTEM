@@ -20,10 +20,17 @@ if (fs.existsSync(migrationsDir)) {
   // Track function definitions across forward migrations
   // A forward migration with SET search_path patches an earlier definition
   const functionDefinitions = new Map();
+  // Functions whose EXECUTE is revoked from PUBLIC in some migration
+  const publicRevoked = new Set();
 
   for (const file of files) {
     const fullPath = path.join(migrationsDir, file);
     const content = fs.readFileSync(fullPath, 'utf8');
+
+    const revokeRegex = /REVOKE\s+EXECUTE\s+ON\s+FUNCTION\s+([a-zA-Z0-9_\.]+)\s*\([^)]*\)\s+FROM\s+([^;]+);/gi;
+    for (const m of content.matchAll(revokeRegex)) {
+      if (/\bPUBLIC\b/i.test(m[2])) publicRevoked.add(m[1]);
+    }
 
     // Regex to find CREATE [OR REPLACE] FUNCTION definitions
     const funcRegex = /CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+([a-zA-Z0-9_\.]+)\s*\(([\s\S]*?)\)\s*RETURNS\s+([\s\S]*?)(?:LANGUAGE\s+[a-zA-Z0-9]+|\$\$)/gi;
@@ -55,6 +62,14 @@ if (fs.existsSync(migrationsDir)) {
       failures++;
     } else {
       console.log(`[PASS] SECURITY DEFINER function "${funcName}" has pinned search_path (${info.file})`);
+    }
+
+    // PUBLIC holds EXECUTE on every new function, and anon inherits it
+    if (!publicRevoked.has(funcName)) {
+      console.error(`[FAIL] SECURITY DEFINER function "${funcName}" has no REVOKE EXECUTE ... FROM PUBLIC`);
+      failures++;
+    } else {
+      console.log(`[PASS] SECURITY DEFINER function "${funcName}" has EXECUTE revoked from PUBLIC`);
     }
   }
 } else {
@@ -117,6 +132,44 @@ if (process.env.DATABASE_URL || process.env.SUPABASE_DB_URL) {
       failures += secDefRes.rows.length;
     } else {
       console.log('[PASS] All public SECURITY DEFINER functions have search_path pinned (0 violations).');
+    }
+
+    // Invariant 4: SECURITY DEFINER functions callable by anon
+    const anonExecRes = await client.query(`
+      SELECT p.proname AS function_name
+      FROM pg_proc p
+      JOIN pg_namespace n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'public'
+        AND p.prosecdef
+        AND has_function_privilege('anon', p.oid, 'EXECUTE');
+    `);
+    if (anonExecRes.rows.length > 0) {
+      console.error('[FAIL] SECURITY DEFINER functions executable by anon:', anonExecRes.rows);
+      failures += anonExecRes.rows.length;
+    } else {
+      console.log('[PASS] No public SECURITY DEFINER function is executable by anon (0 violations).');
+    }
+
+    // Invariant 5: any public function (outside extensions) without pinned search_path
+    const mutablePathRes = await client.query(`
+      SELECT p.proname AS function_name
+      FROM pg_proc p
+      JOIN pg_namespace n ON n.oid = p.pronamespace
+      LEFT JOIN pg_depend d ON d.objid = p.oid AND d.deptype = 'e'
+      WHERE n.nspname = 'public'
+        AND d.objid IS NULL
+        AND (
+          p.proconfig IS NULL
+          OR NOT EXISTS (
+            SELECT 1 FROM unnest(p.proconfig) AS cfg WHERE cfg LIKE 'search_path=%'
+          )
+        );
+    `);
+    if (mutablePathRes.rows.length > 0) {
+      console.error('[FAIL] Public functions with role-mutable search_path:', mutablePathRes.rows);
+      failures += mutablePathRes.rows.length;
+    } else {
+      console.log('[PASS] All public functions have search_path pinned (0 violations).');
     }
 
     await client.end();
