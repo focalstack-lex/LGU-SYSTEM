@@ -1767,7 +1767,7 @@ html, body {
 
   /* Executive More Button Micro-interaction */
   #of-bottom-nav-more-btn {
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, color 0.2s ease !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, color 0.2s ease !important;
   }
   #of-bottom-nav-more-btn:active {
     transform: scale(0.88) !important;
@@ -1775,7 +1775,7 @@ html, body {
   #of-bottom-nav-more-btn[aria-expanded="true"] iconify-icon {
     transform: rotate(90deg) scale(1.12) !important;
     color: var(--primary) !important;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease !important;
   }
   #of-bottom-nav-more-btn:not([aria-expanded="true"]) iconify-icon {
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease !important;
