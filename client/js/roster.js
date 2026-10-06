@@ -26,6 +26,15 @@ const Roster = (() => {
     _fetchPromise = (async () => {
       if (window.supabaseClient) {
         try {
+          // The roster is not readable by anon (migration 039 revoked the
+          // grant), so querying without a session only produces a 401.
+          // Skip the request and leave the cache unpinned for after login.
+          const { data: { session } } = await window.supabaseClient.auth.getSession();
+          if (!session) {
+            _fetchPromise = null;
+            return [];
+          }
+
           const { data, error } = await window.supabaseClient
             .from("enrolled_students")
             .select("full_name, sex, course, year_level");
@@ -39,9 +48,8 @@ const Roster = (() => {
             }));
             return _cachedRoster;
           }
-          // Empty result: the pre-load fetch runs before login and RLS hides
-          // the roster from anon users. Don't pin that empty promise — allow
-          // a re-fetch once the user is authenticated.
+          // Empty or failed result: don't pin that empty promise, allow a
+          // re-fetch on the next call.
           _fetchPromise = null;
         } catch (e) {
           console.warn("[Roster] DB fetch fallback:", e);
