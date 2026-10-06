@@ -7,7 +7,7 @@ const Dashboard = (() => {
   let realtimeChannel = null;
 
   async function load() {
-    await Promise.all([loadStats(), loadRecentTransactions(), loadAnnouncements()]);
+    await Promise.all([loadStats(), loadNextEvent(), loadRecentTransactions(), loadAnnouncements()]);
     subscribeRealtime();
     bindPopovers();
     bindViewAll();
@@ -196,7 +196,6 @@ const Dashboard = (() => {
       document.getElementById('stat-income').textContent    = UI.currency(summary.totalIncome);
       document.getElementById('stat-expense').textContent   = UI.currency(summary.totalExpense);
       document.getElementById('stat-balance').textContent   = UI.currency(summary.remainingBalance);
-      document.getElementById('stat-donations').textContent = UI.currency(summary.breakdown.donation);
 
       // Populate popover breakdowns with 1-tap action links
       document.getElementById('pop-income').innerHTML = `
@@ -226,19 +225,37 @@ const Dashboard = (() => {
         <a class="stat-pop-action" data-nav="reports"><span>View Financial Reports & Trends</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
       `;
 
-      document.getElementById('pop-donations').innerHTML = `
-        <div class="stat-pop-row" style="color:var(--col-text);line-height:1.4;">Total value of sponsorships and community contributions.</div>
-        <a class="stat-pop-action" data-nav="income"><span>View Donations in Income Tracker</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
-      `;
     } catch (err) {
       console.error('Stats load error:', err);
+    }
+  }
+
+  // Next upcoming event, in the slot the donations card used to hold.
+  // Donations stay available as the breakdown inside Total Income.
+  async function loadNextEvent() {
+    const nameEl = document.getElementById('stat-next-event');
+    const dateEl = document.getElementById('stat-next-event-date');
+    if (!nameEl || !dateEl) return;
+    try {
+      const events = await Api.events.list();
+      const today = new Date().toISOString().slice(0, 10);
+      const next = (events || [])
+        .filter(ev => ev.event_date && ev.event_date >= today && ev.status !== 'archived')
+        .sort((a, b) => a.event_date.localeCompare(b.event_date))[0];
+      nameEl.textContent = next ? next.event_name : 'Nothing scheduled';
+      dateEl.textContent = next ? UI.dateStr(next.event_date) : 'See all events';
+    } catch (err) {
+      console.error('Next event load error:', err);
+      nameEl.textContent = 'Nothing scheduled';
+      dateEl.textContent = 'See all events';
     }
   }
 
   async function loadRecentTransactions() {
     const container = document.getElementById('recent-tx-list');
     try {
-      const txs = await Api.transactions.list({ limit: 8 });
+      // Three rows; the ledger is one tap away under Money
+      const txs = (await Api.transactions.list({ limit: 8 })).slice(0, 3);
       if (!txs.length) { UI.setEmpty('recent-tx-list', 'solar:card-transfer-linear', 'No transactions yet.'); return; }
 
       container.innerHTML = txs.map(tx => `
@@ -276,7 +293,7 @@ const Dashboard = (() => {
     const container = document.getElementById('announcement-list');
     try {
       const list = await Api.announcements.list();
-      const data = (list || []).slice(0, 5);
+      const data = (list || []).slice(0, 2);
 
       if (!data.length) { UI.setEmpty('announcement-list', 'solar:bell-linear', 'No announcements yet.'); return; }
 

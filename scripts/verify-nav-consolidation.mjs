@@ -4,7 +4,7 @@
 // on desktop and phone, with a mocked backend. Evidence lands in
 // reports/ui-verification/<date>-nav-consolidation/.
 import { chromium } from 'playwright';
-import { routeMocks, seedSession, receiptPng, PROFILE } from './lib-capture-mocks.mjs';
+import { routeMocks, seedSession, receiptPng, PROFILE, EVENTS } from './lib-capture-mocks.mjs';
 import fs from 'fs';
 
 const BASE = 'http://127.0.0.1:3000';
@@ -37,6 +37,8 @@ async function student(browser, viewport, label) {
     const single = /Accept.*vnd\.pgrst\.object/i.test(JSON.stringify(r.request().headers()));
     r.fulfill(json(single ? STUDENT : [STUDENT]));
   });
+  // One future event so the Next Event card has something to show
+  await page.route(/\/api\/events(\?.*)?$/, r => r.fulfill(json([...EVENTS, { id: 'ev9', event_name: 'Hackathon 2026', description: 'Overnight build sprint.', status: 'upcoming', event_date: '2026-12-05', allocated_budget: 20000, computed_expenses: 0, remaining_budget: 20000 }])));
   await page.goto(BASE + '/', { waitUntil: 'networkidle' });
   await page.waitForFunction(() => { const el = document.getElementById('app-screen'); return el && getComputedStyle(el).display !== 'none'; }, { timeout: 20000 });
   await page.waitForTimeout(800);
@@ -51,6 +53,26 @@ async function student(browser, viewport, label) {
     check('student sidebar is Dashboard, Money, Events, Updates, Academics', nav.join('|') === 'Dashboard|Money|Events|Updates|Academics', nav.join('|'));
     check('student sidebar has no staff entries for a student', !nav.includes('Admin') && !nav.includes('Executive Portal'));
     check('dashboard has no tab bar', (await page.evaluate(() => document.querySelectorAll('#view-dashboard .view-tabs').length)) === 0);
+    const home = await page.evaluate(() => {
+      const cards = [...document.querySelectorAll('#view-dashboard .dashboard-card h3')].map(h => h.textContent.trim());
+      return {
+        cards,
+        donations: !!document.getElementById('stat-donations'),
+        nextEvent: document.getElementById('stat-next-event')?.textContent.trim(),
+        nextDate: document.getElementById('stat-next-event-date')?.textContent.trim(),
+        sublabels: [...document.querySelectorAll('.stat-balance .stat-sublabel, .stat-income .stat-sublabel, .stat-expense .stat-sublabel')].length,
+        txRows: document.querySelectorAll('#recent-tx-list .tx-item').length,
+        announcements: document.querySelectorAll('#announcement-list .announce-item').length,
+        ledgerLink: !!document.querySelector('#recent-tx-view-all[data-nav="transactions"]'),
+      };
+    });
+    check('home: Next Event card replaces Total Donations and shows the mocked upcoming event', !home.donations && home.nextEvent === 'Hackathon 2026' && /Dec/.test(home.nextDate), JSON.stringify([home.nextEvent, home.nextDate]));
+    check('home: Announcements come before Recent Transactions', home.cards.join('|') === 'Announcements|Recent Transactions', home.cards.join('|'));
+    check('home: two announcements, three transactions, ledger link, no explanatory sublabels', home.announcements === 2 && home.txRows === 3 && home.ledgerLink && home.sublabels === 0, JSON.stringify(home));
+    await shot(page, `${label}-student-dashboard`);
+    await click('#view-dashboard .stat-event');
+    check('home: Next Event card opens Events', (await activeView()) === 'view-events', await activeView());
+    await click('#nav-dashboard');
 
     // Unread badges, before any click marks a category read
     const badged = await page.waitForFunction(() => document.getElementById('nav-money').classList.contains('has-unread')

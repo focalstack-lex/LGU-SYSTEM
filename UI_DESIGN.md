@@ -262,7 +262,7 @@ Sidebar replaced by:
 
 ### Dashboard Cards
 
-Two-column grid (`1.6fr 1fr`): Recent Transactions (wider) + Quick Summary (narrower).
+Two-column grid (`1fr 1.6fr`): Announcements (latest two, narrower) then Recent Transactions (three rows with an "Open ledger" link, wider). On phones they stack in that order so notices sit above the fold. The secondary stat row is Total Income, Total Expenses and Next Event; donations live in the Income tab's breakdown, and stat cards carry no explanatory sublabels.
 
 - Background: `var(--bg-surface)` | Padding: `1.35rem 1.5rem` | Shadow: `var(--shadow-card)`
 

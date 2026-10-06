@@ -2783,8 +2783,20 @@ html body .stats-secondary-grid .stat-income:hover .stat-icon {
    ============================================= */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1fr 1.6fr; /* announcements first, ledger wider */
   gap: 1.25rem;
+}
+
+/* Secondary stat card that carries a name instead of an amount (Next Event) */
+.stat-card .stat-value-text {
+  font-family: var(--font-ui);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dashboard-card {
