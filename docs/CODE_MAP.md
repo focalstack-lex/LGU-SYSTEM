@@ -1,7 +1,7 @@
 <!-- code-map
-generated: 2026-10-07T17:10:26.246Z
-commit: 306a12b
-fingerprint: 1256c10a8987a7d5
+generated: 2026-10-07T17:23:41.731Z
+commit: d2acca3
+fingerprint: 3149190dc9f90f64
 -->
 # Code Map (Agent Navigation)
 
@@ -14,8 +14,8 @@ disagree, the code wins and the map is regenerated.
 
 ## Summary
 
-- Files indexed: 187
-- Total lines indexed: 53,417
+- Files indexed: 188
+- Total lines indexed: 53,475
 - Anchor index emitted for files over 300 lines: 38
 
 ### Areas
@@ -25,13 +25,13 @@ disagree, the code wins and the map is regenerated.
 | `.` | 2 | 2,221 |
 | `client` | 6 | 3,445 |
 | `client/feedback` | 2 | 227 |
-| `client/js` | 30 | 12,359 |
+| `client/js` | 30 | 12,370 |
 | `client/js/faculty` | 1 | 489 |
 | `client/js/officer` | 2 | 3,342 |
 | `client/styles` | 6 | 14,363 |
 | `electron` | 3 | 351 |
 | `private` | 2 | 88 |
-| `scripts` | 67 | 7,600 |
+| `scripts` | 68 | 7,647 |
 | `server` | 1 | 227 |
 | `server/lib` | 8 | 713 |
 | `server/middleware` | 2 | 122 |
@@ -71,7 +71,7 @@ disagree, the code wins and the map is regenerated.
 | File | Lines | Purpose |
 |---|---:|---|
 | `ai-assistant.js` | 1445 | Grizz: COE Mascot AI Assistant |
-| `app.js` | 962 | Main Application Router |
+| `app.js` | 966 | Main Application Router |
 | `units.js` | 939 | Credit Unit Tracker View Module |
 | `admin.js` | 901 | Admin View Module (Phase 4) |
 | `cv-builder.js` | 853 | College of Engineering CV Builder |
@@ -93,7 +93,7 @@ disagree, the code wins and the map is regenerated.
 | `feedback-view.js` | 194 | developer-only feedback viewer (/feedback/view) |
 | `enrollment-journey.js` | 175 | Pure journey-state model for Enrollment Verification. |
 | `swr-cache.js` | 139 | Swr Cache |
-| `roster.js` | 129 | Official CoE Student Roster Validation (Supabase DB-backed) |
+| `roster.js` | 136 | Official CoE Student Roster Validation (Supabase DB-backed) |
 | `income.js` | 127 | General Income Tracker Module |
 | `updates.js` | 92 | Announcements and Notifications pages (student portal) |
 | `cv-verify.js` | 81 | Public Credential Verification View |
@@ -191,6 +191,7 @@ disagree, the code wins and the map is regenerated.
 | `check-event-budget-state.js` | 50 | Check Event Budget State |
 | `convert-avatars-to-webp.js` | 50 | Convert Avatars To Webp |
 | `shoot-mobile-audit.mjs` | 48 | Shoot Mobile Audit |
+| `verify-verification-gate.mjs` | 47 | Verify Verification Gate |
 | `capture-skeleton-shots.mjs` | 44 | Capture Skeleton Shots |
 | `preview-prereq-parse.js` | 44 | Preview Prereq Parse |
 | `smoke-test-enrollment-lib.js` | 41 | Smoke Test Enrollment Lib |
@@ -578,7 +579,7 @@ resolves to a window instead of a full read.
 - 1122: `#profile-security-email` | 1128: `#profile-new-password` | 1133: `#profile-confirm-password`
 - 1136: `#profile-security-feedback` | 1139: `#profile-save-security-btn`
 
-### `client/js/app.js` (962 lines)
+### `client/js/app.js` (966 lines)
 
 - 24: `friendlyLoginError()` | 88: `handleGoogleAuth()` | 149: `checkRosterVerification()`
 - 170: `applyOnboardingState()` | 195: `showOnboardingModal()` | 590: `navigateTo()`
