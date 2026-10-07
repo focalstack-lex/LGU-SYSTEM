@@ -182,7 +182,7 @@ html, body {
   width: 100%;
   min-height: 86px;
   border-radius: var(--radius-md, 8px);
-  border: 1px solid var(--border-default, #28313A);
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.08));
   background: var(--bg-surface);
 }
 
@@ -453,7 +453,7 @@ html, body {
 }
 
 .of-card h3 iconify-icon {
-  color: var(--accent);
+  color: var(--text-secondary);
   font-size: 1.15rem;
 }
 
@@ -645,8 +645,8 @@ html, body {
   min-width: 18px !important;
   min-height: 18px !important;
   border-radius: 4px;
-  background: var(--bg-surface-raised, #161D25) !important;
-  border: 1.5px solid var(--border-default, #28313A) !important;
+  background: var(--bg-surface-raised, #27272D) !important;
+  border: 1.5px solid var(--border-default, rgba(255, 255, 255, 0.08)) !important;
   display: inline-grid !important;
   place-content: center !important;
   margin: 0 !important;
@@ -661,7 +661,7 @@ html, body {
 
 .of-check input[type="checkbox"]:hover {
   border-color: var(--primary) !important;
-  background: var(--surface-hover, #1D2733) !important;
+  background: var(--surface-hover, #313137) !important;
 }
 
 .of-check input[type="checkbox"]:focus-visible {
@@ -690,8 +690,8 @@ html, body {
 }
 
 [data-theme="light"] .of-check input[type="checkbox"] {
-  background: #F8FAFC !important;
-  border-color: #CBD5E1 !important;
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
 }
 
 [data-theme="light"] .of-check input[type="checkbox"]:checked {
@@ -911,9 +911,9 @@ html, body {
 }
 
 .of-page-btn.active {
-  background: var(--primary);
+  background: var(--primary-fill);
   color: var(--accent-text-on);
-  border-color: var(--primary);
+  border-color: var(--primary-fill);
   font-weight: 700;
 }
 
@@ -1504,8 +1504,8 @@ html, body {
   }
   [data-theme="light"] .of-mobile-role {
     color: var(--primary-active);
-    background: #FFF7ED;
-    border-color: #FFEDD5;
+    background: rgba(var(--warning-rgb), 0.12);
+    border-color: rgba(var(--warning-rgb), 0.3);
   }
   .of-mobile-actions {
     display: flex;
@@ -1602,7 +1602,7 @@ html, body {
     z-index: 1000 !important;
     box-sizing: border-box !important;
     /* Flat Dark Charcoal Container - No Gradient, No Blur Glare */
-    background: #18181B !important;
+    background: var(--surface) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 20px !important;
     padding: 5px 6px !important;
@@ -1629,7 +1629,7 @@ html, body {
 
   [data-theme="light"] .of-bottom-nav {
     background: #FFFFFF !important;
-    border: 1px solid #D5DBE2 !important;
+    border: 1px solid var(--border) !important;
     box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.12) !important;
   }
 
@@ -1703,7 +1703,7 @@ html, body {
     height: 8px !important;
     border-radius: 50% !important;
     background: var(--primary) !important;
-    border: 1.5px solid #1C1C20 !important;
+    border: 1.5px solid var(--surface) !important;
   }
 
   .of-bottom-nav .of-bottom-nav-indicator {
@@ -1712,15 +1712,15 @@ html, body {
 
   .of-bottom-nav > button.active,
   .of-bottom-nav > a.active {
-    background: #26262E !important;
+    background: var(--surface-secondary) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
   }
 
   [data-theme="light"] .of-bottom-nav > button.active,
   [data-theme="light"] .of-bottom-nav > a.active {
-    background: #EAECEF !important;
-    border: 1px solid #D5DBE2 !important;
+    background: var(--surface-secondary) !important;
+    border: 1px solid var(--border) !important;
   }
 
   .of-bottom-nav > button.active iconify-icon,
@@ -1738,7 +1738,7 @@ html, body {
 
   [data-theme="light"] .of-bottom-nav > button.active span,
   [data-theme="light"] .of-bottom-nav > a.active span {
-    color: #121417 !important;
+    color: var(--text-primary) !important;
   }
 
   /* Main System Link Special Highlight */
@@ -1749,7 +1749,7 @@ html, body {
     color: var(--primary) !important;
   }
   .of-bottom-nav > a.of-nav-link-main:active {
-    background: #26262E !important;
+    background: var(--surface-secondary) !important;
   }
 
   /* Tap Interaction */
@@ -2163,7 +2163,7 @@ html, body {
   border-radius: 6px;
   font-size: 0.8rem;
   background: rgba(16, 185, 129, 0.12);
-  color: var(--status-positive, #10B981);
+  color: var(--status-positive, #5FBF86);
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
