@@ -809,6 +809,8 @@ html, body {
   color: var(--text-primary);
   vertical-align: middle;
 }
+.of-table .td-date { white-space: nowrap; }
+.of-table .td-date-muted { font-size: 0.78rem; color: var(--text-secondary); }
 
 .of-table tr:last-child td {
   border-bottom: none;

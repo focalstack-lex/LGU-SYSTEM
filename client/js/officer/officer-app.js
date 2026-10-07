@@ -1719,7 +1719,7 @@ const OfficerApp = (() => {
     const tbody = $('of-audit-table').querySelector('tbody');
     tbody.innerHTML = pageRows.length ? pageRows.map(log => `
       <tr>
-        <td style="white-space:nowrap">${UI.dateStr(log.created_at)}</td>
+        <td class="td-date">${UI.dateStr(log.created_at)}</td>
         <td><strong>${esc(log.profiles?.full_name || 'Unknown')}</strong></td>
         <td>${auditActionCell(log.action)}</td>
         <td style="font-size:0.78rem;color:var(--text-secondary)">${esc(auditDetails(log))}</td>
@@ -1990,7 +1990,7 @@ const OfficerApp = (() => {
           ${yrText}
         </td>
         <td>${UI.renderStatusBadge(u.role)}</td>
-        <td style="font-size:0.78rem;color:var(--text-secondary);white-space:nowrap;">${dateStr}</td>
+        <td class="td-date td-date-muted">${dateStr}</td>
         <td style="${canAssign ? '' : 'display:none'};white-space:nowrap;">
           ${canAssign && u.id !== _profile.id && !(_profile.role === 'governor' && u.role === 'admin')
             ? `<div style="display:flex;gap:0.4rem;align-items:center;">
@@ -2568,7 +2568,7 @@ const OfficerApp = (() => {
             <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-primary);border:1px solid var(--border-default);font-size:0.74rem;font-weight:600;padding:2px 6px;border-radius:4px;">${esc(req.course)}</span>
             <span style="font-size:0.8rem;color:var(--text-secondary);margin-left:0.25rem;">Year ${esc(req.year_level)}</span>
           </td>
-          <td><span style="font-size:0.8rem;color:var(--text-secondary);">${dateStr}</span></td>
+          <td class="td-date td-date-muted">${dateStr}</td>
           <td>${statusBadge}</td>
           <td style="text-align:right;white-space:nowrap;">
             ${actionsHtml}
