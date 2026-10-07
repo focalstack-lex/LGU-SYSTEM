@@ -1,7 +1,7 @@
 <!-- code-map
-generated: 2026-10-07T09:37:56.893Z
-commit: 1756619
-fingerprint: 485478b83a5343b9
+generated: 2026-10-07T09:44:15.119Z
+commit: 49724cb
+fingerprint: 96d1abab774f96c2
 -->
 # Code Map (Agent Navigation)
 
@@ -15,7 +15,7 @@ disagree, the code wins and the map is regenerated.
 ## Summary
 
 - Files indexed: 187
-- Total lines indexed: 53,363
+- Total lines indexed: 53,398
 - Anchor index emitted for files over 300 lines: 38
 
 ### Areas
@@ -25,13 +25,13 @@ disagree, the code wins and the map is regenerated.
 | `.` | 2 | 2,221 |
 | `client` | 6 | 3,445 |
 | `client/feedback` | 2 | 227 |
-| `client/js` | 30 | 12,324 |
+| `client/js` | 30 | 12,347 |
 | `client/js/faculty` | 1 | 489 |
 | `client/js/officer` | 2 | 3,342 |
-| `client/styles` | 6 | 14,361 |
+| `client/styles` | 6 | 14,363 |
 | `electron` | 3 | 351 |
 | `private` | 2 | 88 |
-| `scripts` | 67 | 7,583 |
+| `scripts` | 67 | 7,593 |
 | `server` | 1 | 227 |
 | `server/lib` | 8 | 713 |
 | `server/middleware` | 2 | 122 |
@@ -78,9 +78,9 @@ disagree, the code wins and the map is regenerated.
 | `api.js` | 676 | API Helper Module with SWR Pre-Caching |
 | `enrollment.js` | 649 | Student Enrollment Verification (Phase B). |
 | `profile.js` | 614 | User Account Profile & Settings Controller |
+| `ui.js` | 531 | Shared UI Utilities |
 | `reports.js` | 526 | client/js/reports.js - Phase 3 Reporting |
 | `grizz-recommend.js` | 522 | Pure "next load" recommendation engine. |
-| `ui.js` | 508 | Shared UI Utilities |
 | `dashboard.js` | 417 | Dashboard View Module |
 | `receipt-modal.js` | 413 | In-System Receipt Lightbox & Preview Modal |
 | `transactions.js` | 389 | Transactions View Module |
@@ -118,7 +118,7 @@ disagree, the code wins and the map is regenerated.
 
 | File | Lines | Purpose |
 |---|---:|---|
-| `main.css` | 9524 | College of Engineering · Official Student Portal · Design System |
+| `main.css` | 9526 | College of Engineering · Official Student Portal · Design System |
 | `officer.css` | 2217 | EXECUTIVE PORTAL - Cohesive Portal Theme |
 | `ai.css` | 1632 | Grizz - COE Bear AI Assistant Styles |
 | `cv-builder.css` | 567 | College of Engineering CV Builder |
@@ -180,10 +180,10 @@ disagree, the code wins and the map is regenerated.
 | `smoke-test-standing.js` | 82 | Smoke Test Standing |
 | `smoke-test-units-fields.js` | 81 | Smoke Test Units Fields |
 | `apply-014-event-budget-fix.js` | 70 | Apply 014 Event Budget Fix |
+| `verify-app-shell-fill.mjs` | 70 | Verify App Shell Fill |
 | `apply-tracker-schema.js` | 65 | Apply Tracker Schema |
 | `apply-fund-mgmt.js` | 64 | Apply Fund Mgmt |
 | `seed-lec-lab.js` | 62 | Seed Lec Lab |
-| `verify-app-shell-fill.mjs` | 60 | Verify App Shell Fill |
 | `format-roster-names.js` | 55 | Format Roster Names |
 | `smoke-test-pilot-gate.js` | 55 | Smoke Test Pilot Gate |
 | `generate-migration-017.js` | 54 | Generate Migration 017 |
@@ -323,20 +323,20 @@ disagree, the code wins and the map is regenerated.
 Files over 300 lines. Each entry is a line number to jump to, so a target
 resolves to a window instead of a full read.
 
-### `client/styles/main.css` (9524 lines)
+### `client/styles/main.css` (9526 lines)
 
 - 1: `College of Engineering · Official Student Portal · Design System` | 562: `AUTHENTICATION SCREEN - Permanently Dark Charcoal & Coral-Orange` | 1273: `FORM ELEMENTS`
 - 1440: `BUTTONS` | 1789: `APP LAYOUT` | 2078: `DASHBOARD STATS & FINANCIAL SUMMARY HIERARCHY`
 - 2774: `DASHBOARD CARDS` | 3150: `EVENTS GRID` | 3265: `DATA TABLE`
 - 3455: `REPORTS` | 3501: `ADMIN PANELS` | 3521: `LOADING & EMPTY STATES`
 - 3543: `Iconify - icon-park-outline global normalization` | 3619: `TOAST NOTIFICATION` | 3652: `MOBILE CARDS (Hidden on Desktop)`
-- 3664: `RESPONSIVE - Tablet (≤1024px)` | 3672: `RESPONSIVE - Small Tablet / Large Phone (≤768px)` | 3932: `RESPONSIVE - Phone (≤480px)`
-- 4571: `Phase 4 - Admin Tabs & Modals` | 4711: `Skeleton Loading Screen` | 5022: `SKELETON RESPONSIVE OVERRIDES`
-- 5109: `CREDIT UNIT TRACKER` | 6206: `Mobile Profile Header Trigger` | 6248: `Profile & Account Settings Modal`
-- 6425: `Avatar Picker Section` | 7093: `LIGHT MODE DESIGN ENHANCEMENTS & ELEVATIONS (IN-APP)` | 7352: `RECEIPT CAPTURE MODAL + ATTACHMENT CHIP`
-- 7474: `IN-SYSTEM RECEIPT VIEWER LIGHTBOX MODAL` | 7945: `iOS Slide-Up Bottom Sheet Drawer ("More" Menu)` | 8285: `Load Verification (Phase B student portal)`
-- 8816: `Enrollment Verification — Journey UI (2026-09-10)` | 9046: `Faculty Portal (Phase B, /faculty)` | 9234: `Faculty review queue — year-level groups (2026-09-10)`
-- 9290: `Student experience (2026-09-28): skip link, status strip, updates pages,` | 9418: `VIEW GROUP TABS` | 9501: `SHARED TEXT AND ICON UTILITIES`
+- 3664: `RESPONSIVE - Tablet (≤1024px)` | 3672: `RESPONSIVE - Small Tablet / Large Phone (≤768px)` | 3934: `RESPONSIVE - Phone (≤480px)`
+- 4573: `Phase 4 - Admin Tabs & Modals` | 4713: `Skeleton Loading Screen` | 5024: `SKELETON RESPONSIVE OVERRIDES`
+- 5111: `CREDIT UNIT TRACKER` | 6208: `Mobile Profile Header Trigger` | 6250: `Profile & Account Settings Modal`
+- 6427: `Avatar Picker Section` | 7095: `LIGHT MODE DESIGN ENHANCEMENTS & ELEVATIONS (IN-APP)` | 7354: `RECEIPT CAPTURE MODAL + ATTACHMENT CHIP`
+- 7476: `IN-SYSTEM RECEIPT VIEWER LIGHTBOX MODAL` | 7947: `iOS Slide-Up Bottom Sheet Drawer ("More" Menu)` | 8287: `Load Verification (Phase B student portal)`
+- 8818: `Enrollment Verification — Journey UI (2026-09-10)` | 9048: `Faculty Portal (Phase B, /faculty)` | 9236: `Faculty review queue — year-level groups (2026-09-10)`
+- 9292: `Student experience (2026-09-28): skip link, status strip, updates pages,` | 9420: `VIEW GROUP TABS` | 9503: `SHARED TEXT AND ICON UTILITIES`
 
 ### `client/js/officer/officer-app.js` (3153 lines)
 
@@ -682,6 +682,20 @@ resolves to a window instead of a full read.
 
 - 1: `cv-builder.css - College of Engineering CV Builder`
 
+### `client/js/ui.js` (531 lines)
+
+- 5: `UI()` | 17: `groupOf()` | 21: `showView()`
+- 45: `showScreen()` | 78: `setSplashView()` | 91: `toast()`
+- 114: `currency()` | 121: `dateStr()` | 139: `esc()`
+- 148: `capitalize()` | 152: `renderStatusBadge()` | 158: `setAdminVisibility()`
+- 175: `setOfficerVisibility()` | 186: `setLoading()` | 197: `setEmpty()`
+- 211: `initAutoHideBottomNav()` | 226: `handleScroll()` | 227: `target()`
+- 231: `isAtBottom()` | 279: `moveNavIndicator()` | 286: `initNavIndicators()`
+- 297: `syncThemeColor()` | 309: `syncViewportHeight()` | 315: `kickViewportRelayout()`
+- 331: `initTabKeys()` | 392: `trapDialog()` | 394: `focusable()`
+- 398: `onKey()` | 413: `release()` | 419: `close()`
+- 433: `confirmDialog()` | 508: `lockScrollbar()` | 520: `unlockScrollbar()`
+
 ### `client/js/reports.js` (526 lines)
 
 - 13: `reportsSkeleton()` | 52: `initReports()` | 123: `fmt()`
@@ -705,20 +719,6 @@ resolves to a window instead of a full read.
 - 387: `yearStandingByUnits()` | 402: `buildRecommendations()` | 403: `subjects()`
 - 404: `prereqRows()` | 405: `myUnits()` | 464: `sortKey()`
 - 486: `inRequiredSlot()`
-
-### `client/js/ui.js` (508 lines)
-
-- 5: `UI()` | 17: `groupOf()` | 21: `showView()`
-- 45: `showScreen()` | 72: `setSplashView()` | 85: `toast()`
-- 108: `currency()` | 115: `dateStr()` | 133: `esc()`
-- 142: `capitalize()` | 146: `renderStatusBadge()` | 152: `setAdminVisibility()`
-- 169: `setOfficerVisibility()` | 180: `setLoading()` | 191: `setEmpty()`
-- 205: `initAutoHideBottomNav()` | 220: `handleScroll()` | 221: `target()`
-- 225: `isAtBottom()` | 273: `moveNavIndicator()` | 280: `initNavIndicators()`
-- 291: `syncThemeColor()` | 300: `kickViewportRelayout()` | 316: `initTabKeys()`
-- 369: `trapDialog()` | 371: `focusable()` | 375: `onKey()`
-- 390: `release()` | 396: `close()` | 410: `confirmDialog()`
-- 485: `lockScrollbar()` | 497: `unlockScrollbar()`
 
 ### `client/js/faculty/faculty.js` (489 lines)
 
