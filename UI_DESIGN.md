@@ -490,6 +490,7 @@ Shadows are re-tuned for light surfaces. Auth screen is excluded — always dark
   - `.app-mobile-header` / `.of-mobile-header` padding
   - Bottom nav padding-bottom
   - `.main-content` / `.of-main` padding-bottom
+- `apple-mobile-web-app-status-bar-style` is `black` (opaque), not `black-translucent`. With the translucent bar, a cold standalone launch on notch iPhones sizes the web view short by the status bar height (48px on the iPhone 11) until the first touch scroll, which left a dead strip under the bottom nav. The opaque bar keeps the view frame stable; `env(safe-area-inset-top)` resolves to 0 and the headers pad gracefully.
 
 ---
 
