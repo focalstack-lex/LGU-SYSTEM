@@ -1,0 +1,19 @@
+{
+ "headings": [
+  "Total Income Tracker",
+  "Income Sources"
+ ],
+ "buttons": [
+  "Ledger",
+  "Income",
+  "Reports"
+ ],
+ "loaders": 0,
+ "empties": [],
+ "staffLeak": [],
+ "overflow": false,
+ "dashes": 11,
+ "tiny": 0,
+ "smallTargets": [],
+ "text": "Ledger\nIncome\nReports\nTotal Income Tracker\nTrack all external injections into the General Fund\nIncome Sources\nDATE\tTYPE\tSOURCE/DESCRIPTION\tAMOUNT\tADDED BY\nAug 26, 2026\nExpense\n\tStage & sounds rental — Engineering Week\t+₱18,500.00\tM. Santos\nAug 24, 2026\nIncome\n\tSponsorship — MegaSoft Corp.\t+₱25,000.00\tA. Reyes\nAug 22, 2026\nExpense\n\tPrinting — banners, tarpaulins & certificates\t+₱8,250.00\tJ. Cruz\nJul 16, 2026\nExpense\n\tMedals & trophies — Intramurals\t+₱12,750.00\tM. Santos\nJul 15, 2026\nExpense\n\tFirst aid & sports supplies\t+₱4,325.00\tJ. Cruz\nJul 10, 2026\nIncome\n\tCollection — local fees (2nd sem)\t+₱103,750.00\tA. Reyes\nJun 21, 2026\nExpense\n\tBooth materials — Tienda Eng'g\t+₱15,900.00\tL. Dizon\nJun 20, 2026\nIncome\n\tBooth sales — Tienda Eng'g (gross)\t+₱42,300.00\tL. Dizon\nJul 17, 2026\nExpense\n\tCoordinator honorarium — Intramurals\t+₱3,000.00\tA. Reyes\nJun 12, 2026\nExpense\n\tGeneral supplies — council office\t+₱2,740.00\tM. Santos\nMay 30, 2026\nIncome\n\tDonation — Eng'g Alumni Batch 2010\t+₱20,000.00\tA. Reyes\nMay 21, 2026\nExpense\n\tTransportation — outreach planning visit\t+₱1,850.00\tJ. Cruz"
+}

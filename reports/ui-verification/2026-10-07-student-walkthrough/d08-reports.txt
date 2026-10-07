@@ -1,0 +1,26 @@
+{
+ "headings": [
+  "Financial Reports",
+  "₱191,300.00",
+  "₱84,315.00",
+  "₱94,685.00",
+  "44%",
+  "Monthly Income vs Expenses",
+  "Breakdown by Type",
+  "Per-Event Budgets"
+ ],
+ "buttons": [
+  "Ledger",
+  "Income",
+  "Reports",
+  "All Time"
+ ],
+ "loaders": 0,
+ "empties": [],
+ "staffLeak": [],
+ "overflow": false,
+ "dashes": 1,
+ "tiny": 0,
+ "smallTargets": [],
+ "text": "Ledger\nIncome\nReports\nFinancial Reports\nMonthly summaries and breakdowns\nAll Time\nTOTAL INCOME\n₱191,300.00\nTOTAL EXPENSES\n₱84,315.00\nAVAILABLE GENERAL FUND\n₱94,685.00\nNet Cash: ₱106,985.00\nBUDGET UTILIZED\n44%\nMonthly Income vs Expenses\nBreakdown by Type\nPer-Event Budgets\nEVENT\tALLOCATED\tREMAINING\tSTATUS\nEngineering Week 2026\t₱85,000.00\t₱13,600.00\nOngoing\nIntramurals 2026\t₱60,000.00\t₱1,725.00\nCompleted\nTienda Eng'g Fund Raising\t₱40,000.00\t₱3,850.00\nCompleted\nResearch Colloquium\t₱30,000.00\t₱30,000.00\nUpcoming\nCommunity Outreach — Barrio Tipan\t₱25,000.00\t₱25,000.00\nUpcoming"
+}

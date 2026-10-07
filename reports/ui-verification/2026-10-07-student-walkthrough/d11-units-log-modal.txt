@@ -1,0 +1,51 @@
+{
+ "headings": [
+  "Academic Progress",
+  "Graduation Progress"
+ ],
+ "buttons": [
+  "Progress",
+  "Enrollment",
+  "Computer Engineering",
+  "All",
+  "Year 1",
+  "Year 2",
+  "Year 3",
+  "Year 4",
+  "Download Standing (PDF)",
+  "Enrolled This Semester 1st Sem, AY 2026-",
+  "Select Multiple",
+  "Mark as passed",
+  "Edit record",
+  "Remove record",
+  "Log",
+  "Log",
+  "Log",
+  "Log",
+  "Log",
+  "Cancel",
+  "Mark Passed (0)",
+  "Mark Enrolled (0)"
+ ],
+ "loaders": 0,
+ "empties": [],
+ "staffLeak": [],
+ "overflow": false,
+ "dashes": 0,
+ "tiny": 0,
+ "smallTargets": [
+  "All 46x31",
+  "Year 1 46x31",
+  "Year 2 46x31",
+  "Year 3 46x31",
+  "Year 4 46x31",
+  "Mark as passed 26x24",
+  "Edit record 26x24",
+  "Remove record 26x24",
+  "Log 69x28",
+  "Log 69x28",
+  "Log 69x28",
+  "Log 69x28"
+ ],
+ "text": "Progress\nEnrollment\nCareer Passport\nAcademic Progress\nLog your subjects, grades, and graduation progress. Self-reported: this record is unofficial unless it carries the Registrar's seal.\nPROGRAM\nComputer Engineering\nLocked to your enrolled program\nGraduation Progress\nn/a\n37 units completed. Required units are not set for BSCoE yet.\n37\nUNITS COMPLETED\n-\nREQUIRED UNITS\nEstimated Graduation\n2028\nAll\nYear 1\nYear 2\nYear 3\nYear 4\nDownload Standing (PDF)\nEnrolled This Semester\n1st Sem, AY 2026-2027\n3 units\nSelect Multiple\nYEAR 3\n1ST SEMESTER\nCPE 311\nCalculus 3.1 3 units\nEnrolled\nCPE 312\nPhysics 3.1 3 units\nNot taken\nLog\nCPE 313\nProgramming 3.1 3 lec / 1 lab\nNot taken\nLog\n2ND SEMESTER\nCPE 321\nCircuits 3.2 3 units\nNot taken\nLog\nCPE 322\nDigital Logic 3.2 3 units\nNot taken\nLog\nCPE 323\nData Structures 3.2 3 lec / 1 lab\nNot taken\nLog\n0\nselected\nCancel\nMark Passed (0)\nMark Enrolled (0)"
+}

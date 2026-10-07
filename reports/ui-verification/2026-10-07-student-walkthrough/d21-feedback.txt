@@ -1,0 +1,46 @@
+{
+ "headings": [
+  "Feedback"
+ ],
+ "buttons": [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "Not sure",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "Not sure",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "Haven't used it",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "Submit feedback"
+ ],
+ "loaders": 0,
+ "empties": [],
+ "staffLeak": [],
+ "overflow": false,
+ "dashes": 0,
+ "tiny": 0,
+ "smallTargets": [
+  "INPUT 24x48"
+ ],
+ "text": "COLLEGE OF ENGINEERING · STUDENT COUNCIL\nFeedback\nSigned in as alex.reyes@g.cjc.edu.ph. Eight questions, about two minutes, straight to the officers.\n01\nWhich program are you in? optional\nProgram…\nBS Computer Engineering\nBS Civil Engineering\nBS Electronics Engineering\nYear…\n1st\n2nd\n3rd\n4th\n5th\n02\nOverall, how easy is the portal to use?\n1\n2\n3\n4\n5\nHard\nEasy\n03\nHow reliable is your academic data (subjects, units, prerequisites)?\n1\n2\n3\n4\n5\nNot sure\nUnreliable\nReliable\n04\nHow clear is the financial ledger (transactions, balances, receipts)?\n1\n2\n3\n4\n5\nNot sure\nUnclear\nClear\n05\nHow helpful is Grizz, the built-in assistant?\n1\n2\n3\n4\n5\nHaven't used it\nNot helpful\nVery helpful\n06\nHow does the portal run on your device (speed and stability)?\n1\n2\n3\n4\n5\nPoor\nGood\n07\nWhat should the council improve or add first? optional\n08\nHit a bug? Describe what happened and where. optional\nWebsite\nSubmit feedback"
+}

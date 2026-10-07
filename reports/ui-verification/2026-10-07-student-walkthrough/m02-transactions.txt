@@ -1,0 +1,30 @@
+{
+ "headings": [
+  "Transactions"
+ ],
+ "buttons": [
+  "Ledger",
+  "Income",
+  "Reports",
+  "All Types",
+  "All Events",
+  "Receipt",
+  "Receipt",
+  "Receipt",
+  "Receipt",
+  "Receipt",
+  "Receipt",
+  "Receipt",
+  "Receipt",
+  "Previous",
+  "Next"
+ ],
+ "loaders": 0,
+ "empties": [],
+ "staffLeak": [],
+ "overflow": false,
+ "dashes": 10,
+ "tiny": 0,
+ "smallTargets": [],
+ "text": "Ledger\nIncome\nReports\nTransactions\nAll Types\nAll Events\nExpense\nAug 26, 2026\nStage & sounds rental — Engineering Week\n-₱18,500.00\nReceipt\nM. Santos\nIncome\nAug 24, 2026\nSponsorship — MegaSoft Corp.\n+₱25,000.00\nReceipt\nA. Reyes\nExpense\nAug 22, 2026\nPrinting — banners, tarpaulins & certificates\n-₱8,250.00\nReceipt\nJ. Cruz\nExpense\nJul 16, 2026\nMedals & trophies — Intramurals\n-₱12,750.00\nReceipt\nM. Santos\nExpense\nJul 15, 2026\nFirst aid & sports supplies\n-₱4,325.00\nReceipt\nJ. Cruz\nIncome\nJul 10, 2026\nCollection — local fees (2nd sem)\n+₱103,750.00\nA. Reyes\nExpense\nJun 21, 2026\nBooth materials — Tienda Eng'g\n-₱15,900.00\nReceipt\nL. Dizon\nIncome\nJun 20, 2026\nBooth sales — Tienda Eng'g (gross)\n+₱42,300.00\nL. Dizon\nExpense\nJul 17, 2026\nCoordinator honorarium — Intramurals\n-₱3,000.00\nReceipt\nA. Reyes\nExpense\nJun 12, 2026\nGeneral supplies — council office\n-₱2,740.00\nReceipt\nM. Santos\nIncome\nMay 30, 2026\nDonation — Eng'g Alumni Batch 2010\n+₱20,000.00\nA. Reyes\nPage 1 of 1 (12 transactions)\nPrevious\nNext"
+}
