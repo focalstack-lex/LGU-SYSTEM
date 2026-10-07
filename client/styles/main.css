@@ -3679,7 +3679,9 @@ iconify-icon:not(:defined) {
     position: fixed !important;
     inset: 0 !important;
     width: 100% !important;
-    height: 100% !important;
+    /* --vvh is the visual viewport height kept current by ui.js (iOS standalone
+       leaves 100% stale after the login keyboard closes); 100% when it is unset. */
+    height: var(--vvh, 100%) !important;
     max-height: none !important;
     min-height: 0 !important;
     overflow: hidden !important;

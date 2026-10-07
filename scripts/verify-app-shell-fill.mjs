@@ -51,6 +51,16 @@ for (const p of PHONES) {
   const ok = m.declaresDvh && m.scrollY === 0 && m.appTop === 0 && m.appBottom === m.innerH && m.docH <= m.innerH + 1;
   if (!ok) failures++;
   console.log(ok ? 'PASS ' : 'FAIL ', p.name, `scrolled ${before}px before switch ->`, JSON.stringify(m));
+  // Keyboard-style viewport change: the shell must follow the visual viewport both ways.
+  await page.setViewportSize({ width: p.width, height: p.height - 260 });
+  await page.waitForTimeout(150);
+  const shrunk = await page.evaluate(() => ({ vvh: getComputedStyle(document.documentElement).getPropertyValue('--vvh').trim(), appH: Math.round(document.getElementById('app-screen').getBoundingClientRect().height), innerH: window.innerHeight }));
+  await page.setViewportSize({ width: p.width, height: p.height });
+  await page.waitForTimeout(150);
+  const restored = await page.evaluate(() => ({ vvh: getComputedStyle(document.documentElement).getPropertyValue('--vvh').trim(), appH: Math.round(document.getElementById('app-screen').getBoundingClientRect().height), innerH: window.innerHeight }));
+  const follows = shrunk.vvh === shrunk.innerH + 'px' && shrunk.appH === shrunk.innerH && restored.vvh === restored.innerH + 'px' && restored.appH === restored.innerH;
+  if (!follows) failures++;
+  console.log(follows ? 'PASS ' : 'FAIL ', p.name, 'shell follows viewport changes', JSON.stringify({ shrunk, restored }));
   await page.screenshot({ path: `${OUT}/${p.name}-after-login.png`, fullPage: false });
   await page.close();
 }
