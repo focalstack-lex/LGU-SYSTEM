@@ -55,8 +55,7 @@ const UI = (() => {
     // viewport short until something forces a re-measure. Sync now and again once the
     // keyboard dismissal animation has finished.
     syncViewportHeight();
-    setTimeout(kickViewportRelayout, 50);
-    setTimeout(() => { syncViewportHeight(); kickViewportRelayout(); }, 450);
+    scheduleViewportKicks([50, 450, 1200]);
 
     // If switching to auth, strip all admin privileges and app state, lock theme-color to dark
     if (screenId === 'auth') {
@@ -312,16 +311,29 @@ const UI = (() => {
     if (h > 0) document.documentElement.style.setProperty('--vvh', Math.round(h) + 'px');
   }
 
+  // What actually makes iOS recompute the stale viewport is a real document scroll
+  // (the user's "slide" that fixes it by hand). So: make the document scrollable by a
+  // couple of pixels, scroll it, scroll back, then remove the extra height. A synthetic
+  // resize event alone is ignored by WebKit.
   function kickViewportRelayout() {
     const body = document.body;
     if (!body) return;
-    body.style.setProperty('min-height', 'calc(100dvh + 1px)', 'important');
+    const scroller = document.scrollingElement || document.documentElement;
+    body.style.setProperty('min-height', 'calc(100dvh + 2px)', 'important');
+    scroller.scrollTop = 1;
     // setTimeout instead of rAF: rAF is suspended in occluded tabs, and this
     // must also run when the PWA window is restored from the background
     setTimeout(() => {
+      scroller.scrollTop = 0;
       body.style.removeProperty('min-height');
+      syncViewportHeight();
       window.dispatchEvent(new Event('resize'));
-    }, 30);
+    }, 40);
+  }
+
+  // The stale layout can settle late on a cold launch, so nudge more than once.
+  function scheduleViewportKicks(delays) {
+    delays.forEach(ms => setTimeout(kickViewportRelayout, ms));
   }
 
   // Keyboard model for the pill tab tracks (WAI-ARIA tabs): arrow keys move
@@ -363,14 +375,14 @@ const UI = (() => {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initAutoHideBottomNav);
       document.addEventListener('DOMContentLoaded', initNavIndicators);
-      document.addEventListener('DOMContentLoaded', () => setTimeout(kickViewportRelayout, 350));
+      document.addEventListener('DOMContentLoaded', () => scheduleViewportKicks([350, 1200, 2500]));
     } else {
       setTimeout(initAutoHideBottomNav, 100);
       setTimeout(initNavIndicators, 100);
-      setTimeout(kickViewportRelayout, 350);
+      scheduleViewportKicks([350, 1200, 2500]);
     }
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) setTimeout(kickViewportRelayout, 150);
+      if (!document.hidden) scheduleViewportKicks([150, 800]);
     });
     window.addEventListener('pageshow', e => { if (e.persisted) kickViewportRelayout(); });
     syncViewportHeight();

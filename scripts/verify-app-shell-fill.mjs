@@ -51,6 +51,13 @@ for (const p of PHONES) {
   const ok = m.declaresDvh && m.scrollY === 0 && m.appTop === 0 && m.appBottom === m.innerH && m.docH <= m.innerH + 1;
   if (!ok) failures++;
   console.log(ok ? 'PASS ' : 'FAIL ', p.name, `scrolled ${before}px before switch ->`, JSON.stringify(m));
+  // The relayout kicks scroll the document by a pixel at 50, 450 and 1200ms after the
+  // switch; once they are done the page must be back at 0 with no leftover body height.
+  await page.waitForTimeout(1500);
+  const settled = await page.evaluate(() => ({ scrollY: window.scrollY, bodyMinHeight: document.body.style.minHeight || '', docH: document.documentElement.scrollHeight, innerH: window.innerHeight }));
+  const clean = settled.scrollY === 0 && settled.bodyMinHeight === '' && settled.docH <= settled.innerH + 1;
+  if (!clean) failures++;
+  console.log(clean ? 'PASS ' : 'FAIL ', p.name, 'kicks leave no scroll or extra height', JSON.stringify(settled));
   // Keyboard-style viewport change: the shell must follow the visual viewport both ways.
   await page.setViewportSize({ width: p.width, height: p.height - 260 });
   await page.waitForTimeout(150);
