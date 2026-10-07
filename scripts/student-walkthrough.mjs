@@ -224,7 +224,7 @@ const browser = await chromium.launch({ headless: true });
   } else note('enrollment', 'flow', 'no submit button (state: ' + await page.evaluate(() => document.getElementById('enrollment-action-area')?.innerText.trim().slice(0, 100)) + ')');
 
   // Notifications
-  const bell = page.locator('#notif-bell, [id*="notif"] button, button[aria-label*="otification"]').first();
+  const bell = page.locator('#notif-bell, [id*="notif"] button:visible, button[aria-label*="otification"]').first();
   if (await bell.count()) { await bell.click(); await page.waitForTimeout(700); await snapshot(page, 'd15-notifications', 'notifications'); note('notifications', 'info', 'panel text: ' + await page.evaluate(() => (document.querySelector('[id*="notif"][class*="panel"], .notif-panel, #notif-dropdown')?.innerText || 'NOT FOUND').replace(/\s+/g, ' ').slice(0, 220))); await page.keyboard.press('Escape'); }
   else note('notifications', 'flow', 'no notification bell found');
 
@@ -257,7 +257,7 @@ const browser = await chromium.launch({ headless: true });
   } catch (e) { note('theme', 'flow', 'theme toggle click failed: ' + e.message.split('\n')[0]); }
 
   // Career passport link target
-  const cvHref = await page.evaluate(() => document.getElementById('nav-cv')?.getAttribute('href'));
+  const cvHref = await page.evaluate(() => document.querySelector('.view-tab[href="/cv-builder"]')?.getAttribute('href'));
   note('career', 'info', 'Career Passport nav href: ' + cvHref);
   await page.goto(BASE + '/cv-builder', { waitUntil: 'networkidle' }); await page.waitForTimeout(1500);
   await snapshot(page, 'd20-cv-builder', 'cv-builder');

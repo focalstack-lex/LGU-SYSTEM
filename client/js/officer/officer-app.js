@@ -317,7 +317,15 @@ const OfficerApp = (() => {
 
   function bindNav() {
     document.querySelectorAll('[data-of]').forEach(btn => {
-      btn.addEventListener('click', () => switchSection(btn.dataset.of));
+      btn.addEventListener('click', async () => {
+        await switchSection(btn.dataset.of);
+        // People tabs that name a roster pane drive the pane switcher too
+        if (btn.dataset.ofSub) {
+          const inner = $(btn.dataset.ofSub === 'requests' ? 'of-tab-roster-requests' : 'of-tab-roster-master');
+          if (inner && !inner.classList.contains('active')) inner.click();
+          syncOfNav('roster');
+        }
+      });
     });
     bindAutoHideBottomNav();
     bindOfficerMobileMoreSheet();
@@ -509,6 +517,22 @@ const OfficerApp = (() => {
     });
   }
 
+  // Active state for every nav control. A nav entry with data-of-group stays
+  // active for every section in its group; a tab with data-of-sub is active
+  // only for its roster pane, so the pane switcher lives in the tab track.
+  function syncOfNav(section) {
+    const OF_GROUPS = { finance: ['record', 'reports'], people: ['people', 'roster'] };
+    const moreBtn = $('of-bottom-nav-more-btn');
+    document.querySelectorAll('[data-of]').forEach(b => {
+      if (b === moreBtn) return;
+      const inGroup = !!b.dataset.ofGroup && (OF_GROUPS[b.dataset.ofGroup] || []).includes(section);
+      const subOk = !b.dataset.ofSub || b.dataset.ofSub === _rosterCurrentView;
+      const isActive = (b.dataset.of === section && subOk) || inGroup;
+      b.classList.toggle('active', isActive);
+      if (b.classList.contains('view-tab')) b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+  }
+
   async function switchSection(section) {
     if (!section || !$(`of-view-${section}`)) section = 'overview';
     // Curriculum Manager is admin-only: fall back for non-admin deep links
@@ -520,15 +544,13 @@ const OfficerApp = (() => {
       window.SWRCache.saveScroll(prevActive.id, mainEl.scrollTop);
     }
 
-    const moreSections = ['roster', 'people', 'announcements', 'curriculum'];
+    const moreSections = ['announcements', 'curriculum'];
     const isMoreActive = moreSections.includes(section);
     const moreBtn = $('of-bottom-nav-more-btn');
     if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
 
     document.querySelectorAll('.of-view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('[data-of]').forEach(b => {
-      if (b !== moreBtn) b.classList.toggle('active', b.dataset.of === section);
-    });
+    syncOfNav(section);
     $(`of-view-${section}`).classList.add('active');
 
     if (mainEl && window.SWRCache) {
@@ -1374,11 +1396,11 @@ const OfficerApp = (() => {
           <div class="of-budget-labels"><span>Spent ₱${fmtNum(spent)}</span><span>Alloc ₱${fmtNum(budget)}</span></div>
           ${over ? `<div class="of-over-note">Over budget by ₱${fmtNum(spent - budget)}</div>` : ''}
           <div class="of-event-actions">
-            <button class="of-btn of-btn-ghost" data-act="detail">${isExecutive() ? 'Manage' : 'View'}</button>
-            ${isExecutive() && ev.status !== 'completed' && ev.status !== 'archived' ? '<button class="of-btn of-btn-ghost" data-act="complete">Complete</button>' : ''}
+            <button class="btn btn-secondary" data-act="detail">${isExecutive() ? 'Manage' : 'View'}</button>
+            ${isExecutive() && ev.status !== 'completed' && ev.status !== 'archived' ? '<button class="btn btn-secondary" data-act="complete">Complete</button>' : ''}
             ${isExecutive() && ev.status !== 'archived'
-              ? '<button class="of-btn of-btn-ghost" data-act="archive">Archive</button>'
-              : (isExecutive() ? '<button class="of-btn of-btn-ghost" data-act="restore">Restore</button>' : '')}
+              ? '<button class="btn btn-secondary" data-act="archive">Archive</button>'
+              : (isExecutive() ? '<button class="btn btn-secondary" data-act="restore">Restore</button>' : '')}
           </div>
         </div>`;
     }).join('') : '<p style="color:var(--text-secondary);font-size:0.85rem">No matching events found.</p>';
@@ -1465,12 +1487,12 @@ const OfficerApp = (() => {
         </div>
         <div class="of-error hidden" id="of-me-error"></div>
         <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:center;margin-top:0.65rem;flex-wrap:wrap;">
-          <button class="of-btn of-btn-ghost" type="button" id="of-detail-receipts">
+          <button class="btn btn-secondary" type="button" id="of-detail-receipts">
             <iconify-icon icon="solar:history-linear"></iconify-icon> Transaction History <span style="font-size:0.75rem;background:var(--bg-surface);padding:0.15rem 0.45rem;border-radius:999px;border:1px solid var(--border-default);margin-left:0.3rem;" id="of-detail-tx-count">…</span>
           </button>
           <div style="display:flex;gap:0.6rem;">
-            <button class="of-btn of-btn-ghost" type="button" id="of-detail-cancel">Cancel</button>
-            <button class="of-btn of-btn-primary" type="submit" id="of-detail-save">Save Changes</button>
+            <button class="btn btn-secondary" type="button" id="of-detail-cancel">Cancel</button>
+            <button class="btn btn-primary" type="submit" id="of-detail-save">Save Changes</button>
           </div>
         </div>
       </form>
@@ -1697,7 +1719,7 @@ const OfficerApp = (() => {
     const tbody = $('of-audit-table').querySelector('tbody');
     tbody.innerHTML = pageRows.length ? pageRows.map(log => `
       <tr>
-        <td style="white-space:nowrap">${UI.dateStr(log.created_at)}</td>
+        <td class="td-date">${UI.dateStr(log.created_at)}</td>
         <td><strong>${esc(log.profiles?.full_name || 'Unknown')}</strong></td>
         <td>${auditActionCell(log.action)}</td>
         <td style="font-size:0.78rem;color:var(--text-secondary)">${esc(auditDetails(log))}</td>
@@ -1968,14 +1990,14 @@ const OfficerApp = (() => {
           ${yrText}
         </td>
         <td>${UI.renderStatusBadge(u.role)}</td>
-        <td style="font-size:0.78rem;color:var(--text-secondary);white-space:nowrap;">${dateStr}</td>
+        <td class="td-date td-date-muted">${dateStr}</td>
         <td style="${canAssign ? '' : 'display:none'};white-space:nowrap;">
           ${canAssign && u.id !== _profile.id && !(_profile.role === 'governor' && u.role === 'admin')
             ? `<div style="display:flex;gap:0.4rem;align-items:center;">
                  <select data-role-for="${u.id}" data-original-role="${u.role}" style="padding:0.35rem;border:1px solid var(--border-default);border-radius:6px;font-size:0.78rem;background:var(--bg-surface-raised);color:var(--text-primary);min-width:96px;">
                    ${assignableRoles().map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${ROLE_LABELS[r]}</option>`).join('')}
                  </select>
-                 <button type="button" class="of-btn of-btn-primary" data-apply="${u.id}" disabled style="padding:0.32rem 0.75rem;font-size:0.76rem;">Save</button>
+                 <button type="button" class="btn btn-primary" data-apply="${u.id}" disabled style="padding:0.32rem 0.75rem;font-size:0.76rem;">Save</button>
                </div>`
             : (u.id === _profile.id ? '<span style="color:var(--text-tertiary);font-size:0.75rem">You</span>' : '<span style="color:var(--text-tertiary);font-size:0.75rem">Protected</span>')}
         </td>
@@ -2178,6 +2200,7 @@ const OfficerApp = (() => {
         masterTab.classList.add('active');
         reqTab.classList.remove('active');
         _rosterCurrentView = 'masterlist';
+        syncOfNav('roster');
         if (masterPane) masterPane.classList.remove('hidden');
         if (reqPane) reqPane.classList.add('hidden');
       });
@@ -2186,6 +2209,7 @@ const OfficerApp = (() => {
         reqTab.classList.add('active');
         masterTab.classList.remove('active');
         _rosterCurrentView = 'requests';
+        syncOfNav('roster');
         if (masterPane) masterPane.classList.add('hidden');
         if (reqPane) reqPane.classList.remove('hidden');
         _selectedRequestIds.clear();
@@ -2392,6 +2416,8 @@ const OfficerApp = (() => {
     if (!badge || !Api.rosterRequests) return;
     try {
       const count = await Api.rosterRequests.countPending();
+      // The Verification requests tab carries the pending signal as an unread dot
+      document.querySelectorAll('.view-tab[data-of-sub="requests"]').forEach(t => t.classList.toggle('has-unread', count > 0));
       if (count > 0) {
         badge.textContent = count;
         badge.style.display = 'inline-block';
@@ -2516,10 +2542,10 @@ const OfficerApp = (() => {
           <input type="checkbox" class="of-check-input of-request-checkbox" data-id="${req.id}" data-name="${esc(displayName)}" ${isChecked ? 'checked' : ''} aria-label="Select ${esc(displayName)}" />
         `;
         actionsHtml = `
-          <button type="button" class="of-btn of-btn-primary approve-req-btn" data-id="${req.id}" data-name="${esc(displayName)}" style="padding:0.25rem 0.6rem;font-size:0.8rem;margin-right:0.35rem;">
+          <button type="button" class="btn btn-primary approve-req-btn" data-id="${req.id}" data-name="${esc(displayName)}" style="padding:0.25rem 0.6rem;font-size:0.8rem;margin-right:0.35rem;">
             <iconify-icon icon="solar:check-circle-linear"></iconify-icon> Approve
           </button>
-          <button type="button" class="of-btn of-btn-ghost reject-req-btn" data-id="${req.id}" data-name="${esc(displayName)}" style="color:var(--col-danger);padding:0.25rem 0.5rem;font-size:0.8rem;">
+          <button type="button" class="btn btn-secondary reject-req-btn" data-id="${req.id}" data-name="${esc(displayName)}" style="color:var(--col-danger);padding:0.25rem 0.5rem;font-size:0.8rem;">
             <iconify-icon icon="solar:close-circle-linear"></iconify-icon> Reject
           </button>
         `;
@@ -2542,7 +2568,7 @@ const OfficerApp = (() => {
             <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-primary);border:1px solid var(--border-default);font-size:0.74rem;font-weight:600;padding:2px 6px;border-radius:4px;">${esc(req.course)}</span>
             <span style="font-size:0.8rem;color:var(--text-secondary);margin-left:0.25rem;">Year ${esc(req.year_level)}</span>
           </td>
-          <td><span style="font-size:0.8rem;color:var(--text-secondary);">${dateStr}</span></td>
+          <td class="td-date td-date-muted">${dateStr}</td>
           <td>${statusBadge}</td>
           <td style="text-align:right;white-space:nowrap;">
             ${actionsHtml}
@@ -2702,10 +2728,10 @@ const OfficerApp = (() => {
           <td><span class="badge" style="background:var(--bg-surface-raised); color:var(--text-primary); border:1px solid var(--border-default); font-size:0.75rem; font-weight:600; padding:2px 8px; border-radius:4px; letter-spacing:0.02em;">${esc(student.course)}</span></td>
           <td><span style="font-size:0.82rem; color:var(--text-secondary); font-weight:500;">${yrLabel}</span></td>
           <td style="text-align:right; white-space:nowrap;">
-            <button type="button" class="of-btn of-btn-ghost edit-roster-btn" data-id="${student.id}" style="padding:0.25rem 0.55rem; font-size:0.8rem; margin-right:0.25rem;" title="Edit Student">
+            <button type="button" class="btn btn-secondary edit-roster-btn" data-id="${student.id}" style="padding:0.25rem 0.55rem; font-size:0.8rem; margin-right:0.25rem;" title="Edit Student">
               <iconify-icon icon="solar:pen-2-linear"></iconify-icon> Edit
             </button>
-            <button type="button" class="of-btn of-btn-ghost delete-roster-btn" data-id="${student.id}" data-name="${esc(student.full_name)}" style="color:var(--text-secondary); padding:0.25rem 0.45rem; font-size:0.85rem;" title="Remove from roster" aria-label="Remove ${esc(student.full_name)} from roster">
+            <button type="button" class="btn btn-secondary delete-roster-btn" data-id="${student.id}" data-name="${esc(student.full_name)}" style="color:var(--text-secondary); padding:0.25rem 0.45rem; font-size:0.85rem;" title="Remove from roster" aria-label="Remove ${esc(student.full_name)} from roster">
               <iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon>
             </button>
           </td>
@@ -2758,7 +2784,7 @@ const OfficerApp = (() => {
       for (let i = 1; i <= totalPages; i++) {
         if (totalPages <= 7 || i === 1 || i === totalPages || Math.abs(i - _rosterPage) <= 1) {
           pageButtons += `
-            <button type="button" class="of-btn ${i === _rosterPage ? 'of-btn-primary' : 'of-btn-ghost'} roster-page-btn" data-page="${i}" style="padding:0.25rem 0.65rem; min-width:30px; font-size:0.8rem;">
+            <button type="button" class="btn ${i === _rosterPage ? 'btn-primary' : 'btn-secondary'} roster-page-btn" data-page="${i}" style="padding:0.25rem 0.65rem; min-width:30px; font-size:0.8rem;">
               ${i}
             </button>
           `;
@@ -2772,11 +2798,11 @@ const OfficerApp = (() => {
           Showing <strong style="color:var(--text-primary);">${startIndex + 1}-${endIndex}</strong> of <strong style="color:var(--text-primary);">${filtered.length}</strong> students
         </div>
         <div style="display:flex; gap:0.35rem; align-items:center;">
-          <button type="button" class="of-btn of-btn-ghost" id="of-roster-prev-btn" style="padding:0.25rem 0.6rem; font-size:0.8rem;" ${_rosterPage <= 1 ? 'disabled' : ''}>
+          <button type="button" class="btn btn-secondary" id="of-roster-prev-btn" style="padding:0.25rem 0.6rem; font-size:0.8rem;" ${_rosterPage <= 1 ? 'disabled' : ''}>
             <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon> Prev
           </button>
           ${pageButtons}
-          <button type="button" class="of-btn of-btn-ghost" id="of-roster-next-btn" style="padding:0.25rem 0.6rem; font-size:0.8rem;" ${_rosterPage >= totalPages ? 'disabled' : ''}>
+          <button type="button" class="btn btn-secondary" id="of-roster-next-btn" style="padding:0.25rem 0.6rem; font-size:0.8rem;" ${_rosterPage >= totalPages ? 'disabled' : ''}>
             Next <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
           </button>
         </div>

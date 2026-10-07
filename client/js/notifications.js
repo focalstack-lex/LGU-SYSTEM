@@ -58,14 +58,26 @@ const Notifications = (() => {
     // Mapping of category to student nav item IDs
     const studentCategoryMap = {
       events: ['nav-events'],
-      transactions: ['nav-transactions'],
-      reports: ['nav-reports'],
-      announcements: ['nav-announcements', 'bottom-nav-more-btn'],
-      units: ['nav-units']
+      transactions: [],
+      reports: [],
+      announcements: ['bottom-nav-more-btn'],
+      units: []
     };
 
-    // The Notifications entry carries the total, in the sidebar and the More sheet.
-    ['nav-notifications', 'bottom-nav-notifications'].forEach(id => {
+    // Grouped sidebar entries light up when any view inside them has unread items
+    const groupNavMap = {
+      'nav-money': ['transactions', 'reports'],
+      'nav-academics': ['units']
+    };
+    Object.keys(groupNavMap).forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const count = groupNavMap[id].reduce((n, cat) => n + (state.unread_by_category[cat] || 0), 0);
+      el.classList.toggle('has-unread', count > 0);
+    });
+
+    // The Updates entry carries the total, in the sidebar and the More sheet.
+    ['nav-updates', 'bottom-nav-notifications'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       el.classList.toggle('has-unread', state.total_unread > 0);
@@ -96,6 +108,11 @@ const Notifications = (() => {
         if (sideEl) {
           sideEl.classList.toggle('has-unread', unreadCount > 0);
         }
+      });
+
+      // Pill tabs for this view (the same bar repeats in each grouped view)
+      document.querySelectorAll(`.view-tab[data-view="${cat}"]`).forEach(tab => {
+        tab.classList.toggle('has-unread', unreadCount > 0);
       });
     });
   }
@@ -135,7 +152,7 @@ const Notifications = (() => {
 
       let isUnread = false;
       if (ofTarget === 'overview') isUnread = (unread.transactions > 0 || unread.events > 0);
-      else if (ofTarget === 'record') isUnread = unread.transactions > 0;
+      else if (ofTarget === 'record') isUnread = unread.transactions > 0 || (btn.dataset.ofGroup === 'finance' && unread.reports > 0);
       else if (ofTarget === 'events') isUnread = unread.events > 0;
       else if (ofTarget === 'reports') isUnread = unread.reports > 0;
       else if (ofTarget === 'announcements') isUnread = unread.announcements > 0;
@@ -165,7 +182,7 @@ const Notifications = (() => {
   function setupViewClickListener() {
     // Student Portal View Switching Listener
     document.body.addEventListener('click', (e) => {
-      const navItem = e.target.closest('.nav-item, .bottom-nav-item');
+      const navItem = e.target.closest('.nav-item, .bottom-nav-item, .view-tab');
       if (!navItem) return;
 
       const view = navItem.getAttribute('data-view') || navItem.id?.replace('nav-', '');

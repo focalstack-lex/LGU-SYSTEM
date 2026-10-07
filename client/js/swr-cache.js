@@ -1,5 +1,5 @@
 /**
- * swr-cache.js — In-Memory Stale-While-Revalidate (SWR) Client Cache & Utilities
+ * swr-cache.js, In-Memory Stale-While-Revalidate (SWR) Client Cache & Utilities
  * Provides instant 0ms view navigation, background revalidation, scroll position memory,
  * and debounced filtering.
  */

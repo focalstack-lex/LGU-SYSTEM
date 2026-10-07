@@ -291,7 +291,7 @@ html, body {
 }
 
 .of-stat .of-stat-value {
-  font-family: var(--font-proxima);
+  font-family: var(--font-display);
   font-size: var(--font-size-kpi-value, 1.5625rem);
   font-weight: 600;
   color: var(--text-primary);
@@ -502,11 +502,13 @@ html, body {
   flex-shrink: 0;
 }
 
+/* Segmented filter control: pill track geometry per UI_DESIGN.md, and a
+   40px minimum height so each option is a full touch target. */
 .of-filter-tabs {
   display: flex;
   background: var(--bg-surface-raised);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm, 6px);
+  border-radius: var(--radius-pill, 9999px);
   padding: 3px;
   gap: 2px;
 }
@@ -517,8 +519,9 @@ html, body {
   color: var(--text-secondary);
   font-size: 0.8rem;
   font-weight: 600;
-  padding: 0.4rem 0.85rem;
-  border-radius: 4px;
+  min-height: 40px;
+  padding: 0 0.85rem;
+  border-radius: var(--radius-pill, 9999px);
   cursor: pointer;
   transition: all var(--transition);
 }
@@ -674,7 +677,7 @@ html, body {
   border-bottom: 2px solid #FFFFFF;
   transform: rotate(-45deg) scale(0) translate(0.5px, -0.5px);
   transform-origin: center;
-  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .of-check input[type="checkbox"]:checked {
@@ -708,88 +711,6 @@ html, body {
 }
 
 /* ---------- Buttons ---------- */
-.of-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  border: none;
-  border-radius: var(--radius-sm, 6px);
-  padding: 0.65rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all var(--transition, 0.25s ease);
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.of-btn:disabled {
-  opacity: 0.38 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-.of-btn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.of-btn-primary {
-  background: var(--primary);
-  color: var(--accent-text-on);
-  border: 1px solid var(--primary);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  box-shadow: none;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.of-btn-primary:hover:not(:disabled) {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
-}
-
-.of-btn-primary:active:not(:disabled) {
-  background: var(--primary-active);
-  border-color: var(--primary-active);
-}
-
-.of-btn-secondary {
-  background: var(--bg-surface-raised);
-  color: var(--text-primary);
-  border: 1px solid var(--border-default);
-}
-
-.of-btn-secondary:hover:not(:disabled) {
-  background: var(--surface-hover);
-  border-color: var(--border-hover);
-  color: var(--text-primary);
-}
-
-.of-btn-ghost {
-  background: var(--bg-surface-raised);
-  color: var(--text-primary);
-  border: 1px solid var(--border-default);
-}
-
-.of-btn-ghost:hover:not(:disabled) {
-  background: var(--surface-hover);
-  border-color: var(--border-hover);
-  color: var(--text-primary);
-}
-
-.of-btn-danger {
-  background: var(--danger-fill);
-  color: #FFFFFF;
-}
-
-.of-btn-danger:hover:not(:disabled) {
-  background: var(--danger-fill-hover);
-}
-
 /* ---------- Scrollables & Tables ---------- */
 .of-table-wrap {
   overflow-x: auto;
@@ -888,6 +809,8 @@ html, body {
   color: var(--text-primary);
   vertical-align: middle;
 }
+.of-table .td-date { white-space: nowrap; }
+.of-table .td-date-muted { font-size: 0.78rem; color: var(--text-secondary); }
 
 .of-table tr:last-child td {
   border-bottom: none;
@@ -902,7 +825,7 @@ html, body {
 }
 
 .of-table .num {
-  font-family: var(--font-proxima);
+  font-family: var(--font-display);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
   white-space: nowrap;
@@ -1217,7 +1140,6 @@ html, body {
   height: 100%;
   background: var(--accent);
   border-radius: 999px;
-  transition: width 0.5s ease;
 }
 
 .of-budget-fill.over {
@@ -1249,7 +1171,7 @@ html, body {
   border-top: 1px solid var(--border-default);
 }
 
-.of-event-actions .of-btn {
+.of-event-actions .btn {
   padding: 0.4rem 0.75rem;
   font-size: 0.76rem;
 }
@@ -1485,9 +1407,9 @@ html, body {
   max-width: 360px;
 }
 
-.of-toast.success { border-left: 4px solid var(--status-positive); }
-.of-toast.error   { border-left: 4px solid var(--status-negative); }
-.of-toast.warning { border-left: 4px solid var(--status-warning); }
+.of-toast.success { border-color: var(--status-positive); }
+.of-toast.error   { border-color: var(--status-negative); }
+.of-toast.warning { border-color: var(--status-warning); }
 
 @keyframes ofToastIn {
   from { opacity: 0; transform: translateX(16px); }
@@ -1571,7 +1493,7 @@ html, body {
   }
   .of-mobile-role {
     display: inline-block;
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: var(--primary-hover);
     background: rgba(70, 110, 153, 0.15);
@@ -1751,7 +1673,7 @@ html, body {
 
   .of-bottom-nav > button span,
   .of-bottom-nav > a span {
-    font-size: 0.68rem !important;
+    font-size: 0.72rem !important; /* 11.5px: functional text stays above the 11px floor */
     font-weight: 500 !important;
     letter-spacing: 0.01em !important;
     line-height: 1.2 !important;
@@ -1847,7 +1769,7 @@ html, body {
 
   /* Executive More Button Micro-interaction */
   #of-bottom-nav-more-btn {
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, color 0.2s ease !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, color 0.2s ease !important;
   }
   #of-bottom-nav-more-btn:active {
     transform: scale(0.88) !important;
@@ -1855,7 +1777,7 @@ html, body {
   #of-bottom-nav-more-btn[aria-expanded="true"] iconify-icon {
     transform: rotate(90deg) scale(1.12) !important;
     color: var(--primary) !important;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease !important;
   }
   #of-bottom-nav-more-btn:not([aria-expanded="true"]) iconify-icon {
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease !important;
@@ -1900,7 +1822,7 @@ html, body {
     -webkit-tap-highlight-color: transparent !important;
   }
   .of-stat .of-stat-label {
-    font-size: clamp(0.56rem, 2.3vw, 0.62rem) !important;
+    font-size: 0.72rem !important;
     letter-spacing: 0.03em !important;
     min-width: 0 !important;
     max-width: 100% !important;
@@ -1922,7 +1844,7 @@ html, body {
     white-space: nowrap !important;
   }
   .of-stat .of-stat-sub {
-    font-size: 0.6rem !important;
+    font-size: 0.72rem !important;
     margin-top: 0.15rem !important;
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -1989,7 +1911,7 @@ html, body {
     font-size: 0.8rem;
   }
   /* Full-width action buttons inside event cards = comfortable tap targets */
-  .of-event-actions .of-btn {
+  .of-event-actions .btn {
     flex: 1 1 auto;
   }
   .of-transfer-preview {
@@ -2024,7 +1946,7 @@ html, body {
     grid-column: 1 / -1;
     justify-content: center;
   }
-  .of-header-actions .of-btn {
+  .of-header-actions .btn {
     justify-content: center;
     padding: 0.5rem 0.6rem;
     font-size: 0.8rem;
@@ -2044,7 +1966,7 @@ html, body {
     flex: 1;
     text-align: center;
     white-space: nowrap;
-    padding: 0.35rem 0.4rem;
+    padding: 0 0.4rem;
     font-size: 0.75rem;
   }
   #of-roster-year-filter {
@@ -2280,5 +2202,15 @@ html, body {
   #cur-prereq-add button {
     width: 100%;
     box-sizing: border-box;
+  }
+}
+
+/* Motion is optional: when the OS asks for reduced motion, animations and
+   transitions collapse to an instant change. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

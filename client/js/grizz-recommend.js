@@ -4,7 +4,7 @@
 //   1. analyzing the student's ACTUAL records (passed / failed / incomplete /
 //      dropped / currently enrolled) and banked units,
 //   2. deriving year standing from completed units vs the program's cumulative
-//      catalog units (registrar method) — NOT from the highest stray subject,
+//      catalog units (registrar method), NOT from the highest stray subject,
 //   3. offering every OPEN subject (not passed, not currently enrolled) in
 //      curriculum order so the oldest unfinished work surfaces first, instead
 //      of blindly listing the nominal next-semester catalog row,
@@ -16,7 +16,7 @@
 //   6. always including the earliest open curriculum slot in FULL (a required
 //      row can be larger than any generic cap, e.g. a 26-unit first semester),
 //      then filling extra clear courses up to a 24-unit target (8-subject
-//      safety ceiling) — the cap never clips the required slot.
+//      safety ceiling), the cap never clips the required slot.
 // UMD: browsers get window.GrizzRecommend; Node tests require() it.
 // =============================================
 (function (root, factory) {
@@ -50,9 +50,9 @@
   //   "Co: ECE 211"                  corequisite
   //   "co-requisite: EMath 121"      corequisite
   //   "CE 211; co-requisite: CE 222"
-  //   "2nd/3rd/4th Yr Standing"      eligibility note — satisfied by year scoping
-  //   "3rd Year Standing"            eligibility note (full word) — never blocks
-  //   "*240 hours / 4th Yr Standing" descriptive (hours/standing) — informational
+  //   "2nd/3rd/4th Yr Standing"      eligibility note, satisfied by year scoping
+  //   "3rd Year Standing"            eligibility note (full word), never blocks
+  //   "*240 hours / 4th Yr Standing" descriptive (hours/standing), informational
   //   "Depends: CE 211"              "depends" phrasing still means prerequisite
 
   function normalizeCode(s) {
@@ -283,7 +283,7 @@
 
   // Structured prereq gate (migration 031 rows). A corequisite is satisfied if
   // the paired subject is passed, enrolled, OR also planned in the same load
-  // (candidateScope) — co-reqs travel together. Standing rows are eligibility
+  // (candidateScope), co-reqs travel together. Standing rows are eligibility
   // only and never block (term scoping already limits candidates by year).
   // Detail-only rows (no depends_code) fall back to free-text parsing so
   // "standing"-in-detail and code-in-detail rows are never silently skipped.
@@ -308,7 +308,7 @@
       } else if (row.kind === 'year_standing' && row.detail) {
         // Standing is an ELIGIBILITY window, not a prerequisite. Term scoping
         // only offers courses at/below the student's target year, so a standing
-        // requirement is satisfied by construction — it never blocks here.
+        // requirement is satisfied by construction, it never blocks here.
       } else if (row.detail) {
         // Detail-only rows (no depends_code) fall back to free-text parsing so
         // code-in-detail rows are honored and standing/hours text is ignored.
@@ -319,7 +319,7 @@
             missing.push(row.detail);
           }
         } else if (!standingRequirementOf(row.detail)) {
-          notes.push(row.detail); // descriptive-only (e.g. "240 hours") — informational
+          notes.push(row.detail); // descriptive-only (e.g. "240 hours"), informational
         }
       }
     });
@@ -340,7 +340,7 @@
 
     tokens.forEach(function (token) {
       // 1) Year-standing clause ("3rd Yr/Year Standing"). Standing is an
-      //    ELIGIBILITY window, satisfied by term scoping — it never blocks.
+      //    ELIGIBILITY window, satisfied by term scoping, it never blocks.
       if (standingRequirementOf(token)) return;
       // 2) Corequisite marker -> may be satisfied by a co-planned subject.
       var coreqMatch = token.match(COREQ_MARKER);
@@ -395,7 +395,7 @@
   // Standing comes from banked units (registrar method), NOT from the highest
   // stray subject on the transcript (an irregular student enrolled in one
   // Year-4 subject must not be treated as a Year-4). The pool is every OPEN
-  // subject — not passed and not currently enrolled — offered in curriculum
+  // subject, not passed and not currently enrolled, offered in curriculum
   // order, so the oldest unfinished work surfaces first instead of whatever
   // the nominal next-semester catalog row happens to be. Within one slot an
   // owed retake (failed/incomplete/dropped) comes before a fresh course.
@@ -459,7 +459,7 @@
       }
     });
 
-    // Curriculum order — oldest unfinished work first; inside a slot an owed
+    // Curriculum order, oldest unfinished work first; inside a slot an owed
     // retake precedes a fresh course; code breaks ties deterministically.
     function sortKey(c) {
       var s = c.subject;
@@ -470,7 +470,7 @@
     }
     eligible.sort(function (a, b) { return sortKey(a).localeCompare(sortKey(b)); });
 
-    // The earliest open curriculum slot is always included in full — it is the
+    // The earliest open curriculum slot is always included in full, it is the
     // student's required load (a fresh first-year's Semester-1 row is 26 units
     // across 10 subjects, larger than any generic ceiling). After that
     // mandatory slot, remaining clear courses fill up to MAX_UNITS with

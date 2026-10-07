@@ -16,9 +16,9 @@
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" href="assets/coe-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=8.0" />
-  <link rel="stylesheet" href="styles/officer.css?v=6.7" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css?v=8.2" />
+  <link rel="stylesheet" href="styles/officer.css?v=6.9" />
   <script src="vendor/iconify-icon.min.js"></script>
   <script src="vendor/icons-bundle.js?v=2"></script>
   <script src="js/init-theme.js"></script>
@@ -71,23 +71,17 @@
         <button type="button" class="nav-item active" data-of="overview">
           <span class="nav-icon"><iconify-icon icon="solar:chart-2-linear"></iconify-icon></span><span>Fund Overview</span>
         </button>
-        <button type="button" class="nav-item" data-of="record">
-          <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><span>Record Transaction</span>
+        <button type="button" class="nav-item" data-of="record" data-of-group="finance">
+          <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><span>Finance</span>
         </button>
         <button type="button" class="nav-item" data-of="events">
           <span class="nav-icon"><iconify-icon icon="solar:calendar-mark-linear"></iconify-icon></span><span>Events &amp; Budgets</span>
         </button>
-        <button type="button" class="nav-item" data-of="reports">
-          <span class="nav-icon"><iconify-icon icon="solar:document-text-linear"></iconify-icon></span><span>Reports &amp; Paper Trail</span>
-        </button>
-        <button type="button" class="nav-item" data-of="people">
-          <span class="nav-icon"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon></span><span>People &amp; Access</span>
+        <button type="button" class="nav-item" data-of="people" data-of-group="people">
+          <span class="nav-icon"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon></span><span>People</span>
         </button>
         <button type="button" class="nav-item" data-of="announcements">
           <span class="nav-icon"><iconify-icon icon="solar:bell-linear"></iconify-icon></span><span>Announcements</span>
-        </button>
-        <button type="button" class="nav-item" data-of="roster">
-          <span class="nav-icon"><iconify-icon icon="solar:user-plus-linear"></iconify-icon></span><span>Enrolled Roster</span>
         </button>
         <button type="button" class="nav-item" data-of="curriculum">
           <span class="nav-icon"><iconify-icon icon="solar:book-bookmark-linear"></iconify-icon></span><span>Curriculum</span>
@@ -164,6 +158,10 @@
       <!-- 2. Record Transaction -->
       <section class="of-view" id="of-view-record">
         <div class="view-header of-view-head">
+          <div class="view-tabs" role="tablist" aria-label="Finance">
+            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="record">Record</button>
+            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="reports">Reports</button>
+          </div>
           <div>
             <h2>Record Transaction</h2>
             <p class="view-sub">Log money in and out, attach receipt photos</p>
@@ -196,7 +194,7 @@
               <div class="of-field">
                 <label>Receipt <small>(optional)</small></label>
                 <div class="receipt-attach-row">
-                  <button type="button" class="of-btn of-btn-ghost" id="of-tx-receipt-btn"><iconify-icon icon="solar:camera-minimalistic-linear"></iconify-icon> Add Receipt</button>
+                  <button type="button" class="btn btn-secondary" id="of-tx-receipt-btn"><iconify-icon icon="solar:camera-minimalistic-linear"></iconify-icon> Add Receipt</button>
                   <span class="receipt-chip hidden" id="of-tx-receipt-chip">
                     <iconify-icon icon="solar:paperclip-linear"></iconify-icon>
                     <span id="of-tx-receipt-chip-text"></span>
@@ -205,7 +203,7 @@
                 </div>
               </div>
               <div class="of-error hidden" id="of-tx-error" role="alert"></div>
-              <button class="of-btn of-btn-primary" type="submit" id="of-tx-submit">Record Transaction</button>
+              <button class="btn btn-primary" type="submit" id="of-tx-submit">Record Transaction</button>
             </form>
           </div>
           <div class="of-card">
@@ -256,7 +254,7 @@
               </div>
               <div class="of-field"><label for="of-ev-desc">Description</label><textarea id="of-ev-desc" rows="2" placeholder="Brief description"></textarea></div>
               <div class="of-error hidden" id="of-ev-error" role="alert"></div>
-              <button class="of-btn of-btn-primary" type="submit" id="of-ev-submit">Create Event</button>
+              <button class="btn btn-primary" type="submit" id="of-ev-submit">Create Event</button>
             </form>
           </div>
           <div class="of-card">
@@ -272,7 +270,7 @@
               </div>
               <div id="of-transfer-preview" class="of-transfer-preview hidden"></div>
               <div class="of-error hidden" id="of-transfer-error" role="alert"></div>
-              <button class="of-btn of-btn-primary" type="submit" id="of-transfer-submit">Confirm Transfer</button>
+              <button class="btn btn-primary" type="submit" id="of-transfer-submit">Confirm Transfer</button>
             </form>
           </div>
         </div>
@@ -301,6 +299,10 @@
       <!-- 4. Reports & Paper Trail -->
       <section class="of-view" id="of-view-reports">
         <div class="view-header of-view-head">
+          <div class="view-tabs" role="tablist" aria-label="Finance">
+            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="record">Record</button>
+            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="reports">Reports</button>
+          </div>
           <div>
             <h2>Reports &amp; Paper Trail</h2>
             <p class="view-sub">Financial summaries, exportable audit sheets, and the immutable audit log</p>
@@ -326,7 +328,7 @@
         <div class="of-card" style="margin-bottom:1.5rem;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
             <h3 style="margin:0;"><iconify-icon icon="solar:document-text-linear"></iconify-icon> Per-Event Financial Summary</h3>
-            <span style="font-size:0.8rem;color:var(--text-secondary);">Allocated vs spent for every event</span>
+            <span class="text-secondary-sm">Allocated vs spent for every event</span>
           </div>
           <div class="of-table-wrap"><table class="of-table" id="of-events-summary-table">
             <thead><tr><th>Event</th><th>Allocated</th><th>Spent</th><th>Remaining</th><th>Status</th></tr></thead>
@@ -349,6 +351,11 @@
       <!-- 5. People & Access -->
       <section class="of-view" id="of-view-people">
         <div class="view-header of-view-head">
+          <div class="view-tabs" role="tablist" aria-label="People">
+            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="people">Accounts</button>
+            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster" data-of-sub="masterlist">Enrolled roster</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster" data-of-sub="requests">Verification requests</button>
+          </div>
           <div>
             <h2>People &amp; Access</h2>
             <p class="view-sub" id="of-people-sub">Registered accounts and access privileges</p>
@@ -368,7 +375,7 @@
           <div class="of-stat">
             <div class="of-stat-label">
               <span>Student Accounts</span>
-              <span class="badge" style="background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.62rem;padding:1px 5px;border-radius:4px;white-space:nowrap;">Students</span>
+              <span class="badge" style="background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.72rem;padding:1px 5px;border-radius:4px;white-space:nowrap;">Students</span>
             </div>
             <div class="of-stat-value" id="of-stat-val-users-students">0</div>
             <div class="of-stat-sub" id="of-stat-sub-users-students">Regular accounts</div>
@@ -376,7 +383,7 @@
           <div class="of-stat">
             <div class="of-stat-label">
               <span>Officers &amp; Leaders</span>
-              <span class="badge" style="background:rgba(var(--primary-rgb),0.12);color:var(--primary);border:1px solid rgba(var(--primary-rgb),0.25);font-size:0.62rem;padding:1px 5px;border-radius:4px;white-space:nowrap;">Leaders</span>
+              <span class="badge" style="background:rgba(var(--primary-rgb),0.12);color:var(--primary);border:1px solid rgba(var(--primary-rgb),0.25);font-size:0.72rem;padding:1px 5px;border-radius:4px;white-space:nowrap;">Leaders</span>
             </div>
             <div class="of-stat-value" id="of-stat-val-users-officers">0</div>
             <div class="of-stat-sub" id="of-stat-sub-users-officers">Admin, Governor, Officer, Cashier</div>
@@ -400,7 +407,7 @@
             <div class="of-filter-tools">
               <div style="position:relative; flex:1;">
                 <input type="text" id="of-people-search" class="of-search" style="padding-left:2.2rem; width:100%;" placeholder="Search accounts by name or email…" />
-                <iconify-icon icon="solar:magnifer-linear" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); color:var(--text-tertiary); font-size:1.1rem; pointer-events:none;"></iconify-icon>
+                <iconify-icon class="input-icon" icon="solar:magnifer-linear"></iconify-icon>
               </div>
             </div>
             <div class="of-filter-tabs" id="of-people-role-tabs">
@@ -443,7 +450,7 @@
               <div class="of-field"><label for="of-announce-title">Title</label><input type="text" id="of-announce-title" required placeholder="Announcement title" /></div>
               <div class="of-field"><label for="of-announce-body">Message</label><textarea id="of-announce-body" required rows="4" placeholder="Write the announcement here…"></textarea></div>
               <div class="of-error hidden" id="of-announce-error" role="alert"></div>
-              <button class="of-btn of-btn-primary" type="submit" id="of-announce-submit">Post Announcement</button>
+              <button class="btn btn-primary" type="submit" id="of-announce-submit">Post Announcement</button>
             </form>
           </div>
           <div class="of-card">
@@ -456,25 +463,30 @@
       <!-- 7. Enrolled Roster Management (Executive / Admin Only) -->
       <section class="of-view" id="of-view-roster">
         <div class="view-header of-view-head">
+          <div class="view-tabs" role="tablist" aria-label="People">
+            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="people">Accounts</button>
+            <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster" data-of-sub="masterlist">Enrolled roster</button>
+          <button type="button" class="view-tab" role="tab" aria-selected="false" data-of="roster" data-of-sub="requests">Verification requests</button>
+          </div>
           <div>
             <h2>Official Enrolled Roster</h2>
             <p class="view-sub">Manage officially enrolled engineering students database for student portal verification</p>
           </div>
           <div class="of-header-actions" style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
-            <button type="button" class="of-btn of-btn-secondary" id="of-roster-export-btn" title="Export Enrolled Roster as CSV">
+            <button type="button" class="btn btn-secondary" id="of-roster-export-btn" title="Export Enrolled Roster as CSV">
               <iconify-icon icon="solar:file-download-linear"></iconify-icon> Export CSV
             </button>
-            <button type="button" class="of-btn of-btn-secondary" id="of-roster-import-btn" title="Bulk Import Roster from CSV">
+            <button type="button" class="btn btn-secondary" id="of-roster-import-btn" title="Bulk Import Roster from CSV">
               <iconify-icon icon="solar:upload-minimalistic-linear"></iconify-icon> Bulk Import CSV
             </button>
-            <button type="button" class="of-btn of-btn-primary" id="of-roster-add-btn" title="Add Single Enrolled Student">
+            <button type="button" class="btn btn-primary" id="of-roster-add-btn" title="Add Single Enrolled Student">
               <iconify-icon icon="solar:user-plus-linear"></iconify-icon> Add Student
             </button>
           </div>
         </div>
 
         <!-- View Switcher Tabs: Official Masterlist vs Pending Verification Requests -->
-        <div class="of-filter-tabs" id="of-roster-view-tabs" style="margin-bottom:1.25rem; display:inline-flex; width:auto;">
+        <div class="of-filter-tabs hidden" id="of-roster-view-tabs">
           <button type="button" class="of-filter-btn active" data-roster-view="masterlist" id="of-tab-roster-master">
             <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon> Enrolled Database
           </button>
@@ -494,31 +506,31 @@
                 <iconify-icon icon="solar:users-group-rounded-linear" style="color:var(--accent); font-size:1.15rem;"></iconify-icon>
               </div>
               <div class="of-stat-value" id="of-stat-val-total">0</div>
-              <div class="of-stat-sub" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">Officially Registered</div>
+              <div class="of-stat-sub stat-note">Officially Registered</div>
             </div>
             <div class="of-stat" id="of-stat-bsce">
               <div class="of-stat-label">
                 <span>Civil Eng (BSCE)</span>
-                <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSCE</span>
+                <span class="badge tag">BSCE</span>
               </div>
               <div class="of-stat-value" id="of-stat-val-bsce">0</div>
-              <div class="of-stat-sub" id="of-stat-sub-bsce" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+              <div class="of-stat-sub stat-note" id="of-stat-sub-bsce">0% of CoE</div>
             </div>
             <div class="of-stat" id="of-stat-bscoe">
               <div class="of-stat-label">
                 <span>Comp Eng (BSCoE)</span>
-                <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSCoE</span>
+                <span class="badge tag">BSCoE</span>
               </div>
               <div class="of-stat-value" id="of-stat-val-bscoe">0</div>
-              <div class="of-stat-sub" id="of-stat-sub-bscoe" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+              <div class="of-stat-sub stat-note" id="of-stat-sub-bscoe">0% of CoE</div>
             </div>
             <div class="of-stat" id="of-stat-bsece">
               <div class="of-stat-label">
                 <span>Electronics Eng (BSECE)</span>
-                <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSECE</span>
+                <span class="badge tag">BSECE</span>
               </div>
               <div class="of-stat-value" id="of-stat-val-bsece">0</div>
-              <div class="of-stat-sub" id="of-stat-sub-bsece" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+              <div class="of-stat-sub stat-note" id="of-stat-sub-bsece">0% of CoE</div>
             </div>
           </div>
 
@@ -529,7 +541,7 @@
               <div class="of-filter-tools">
                 <div style="position:relative; flex:1;">
                   <input type="text" id="of-roster-search" class="of-search" style="padding-left:2.2rem; width:100%;" placeholder="Search by student name or surname…" />
-                  <iconify-icon icon="solar:magnifer-linear" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); color:var(--text-tertiary); font-size:1.1rem; pointer-events:none;"></iconify-icon>
+                  <iconify-icon class="input-icon" icon="solar:magnifer-linear"></iconify-icon>
                 </div>
               </div>
               <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
@@ -557,7 +569,7 @@
               <div class="loading-state">Loading enrolled student roster…</div>
             </div>
             <!-- Pagination Bar -->
-            <div class="of-pagination" id="of-roster-pagination" style="display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem; flex-wrap:wrap; gap:0.75rem;"></div>
+            <div class="of-pagination" id="of-roster-pagination"></div>
           </div>
         </div>
 
@@ -566,8 +578,8 @@
           <div class="of-card">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:1.25rem;">
               <div>
-                <h3 style="margin:0; font-size:1.05rem; display:flex; align-items:center; gap:0.45rem;">
-                  <iconify-icon icon="solar:user-hand-up-bold" style="color:var(--accent);"></iconify-icon> Student Enrollment Verification Requests
+                <h3 class="modal-title">
+                  <iconify-icon class="icon-accent" icon="solar:user-hand-up-bold"></iconify-icon> Student Enrollment Verification Requests
                 </h3>
                 <p style="font-size:0.8rem; color:var(--text-secondary); margin:0.25rem 0 0;">Students who signed in with Google but were not yet listed in the S.Y. 2026-2027 masterlist</p>
               </div>
@@ -575,11 +587,11 @@
                 <!-- Bulk Action Controls -->
                 <div id="of-requests-bulk-bar" class="hidden" style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-surface-raised); border:1px solid var(--border-default); padding:0.25rem 0.65rem; border-radius:var(--radius-sm);">
                   <span id="of-requests-selected-count" style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">0 selected</span>
-                  <button type="button" class="of-btn of-btn-primary" id="of-requests-bulk-approve-btn" style="padding:0.28rem 0.75rem; font-size:0.8rem;">
+                  <button type="button" class="btn btn-primary" id="of-requests-bulk-approve-btn" style="padding:0.28rem 0.75rem; font-size:0.8rem;">
                     <iconify-icon icon="solar:check-circle-linear"></iconify-icon>
                     <span id="of-requests-bulk-btn-text">Approve Selected</span>
                   </button>
-                  <button type="button" class="of-btn of-btn-ghost" id="of-requests-bulk-clear-btn" title="Deselect All" style="padding:0.28rem 0.5rem; font-size:0.78rem; color:var(--text-tertiary);">
+                  <button type="button" class="btn btn-secondary" id="of-requests-bulk-clear-btn" title="Deselect All" style="padding:0.28rem 0.5rem; font-size:0.78rem; color:var(--text-tertiary);">
                     Cancel
                   </button>
                 </div>
@@ -641,17 +653,17 @@
       <iconify-icon icon="solar:chart-2-linear"></iconify-icon>
       <span>Overview</span>
     </button>
-    <button data-of="record" title="Record Transaction">
+    <button data-of="record" data-of-group="finance" title="Finance">
       <iconify-icon icon="solar:card-transfer-linear"></iconify-icon>
-      <span>Record</span>
+      <span>Finance</span>
     </button>
     <button data-of="events" title="Events & Budgets">
       <iconify-icon icon="solar:calendar-mark-linear"></iconify-icon>
       <span>Events</span>
     </button>
-    <button data-of="reports" title="Reports & Paper Trail">
-      <iconify-icon icon="solar:document-text-linear"></iconify-icon>
-      <span>Reports</span>
+    <button data-of="people" data-of-group="people" title="People">
+      <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon>
+      <span>People</span>
     </button>
     <button type="button" id="of-bottom-nav-more-btn" title="More Executive Controls" aria-haspopup="dialog" aria-expanded="false">
       <span>
@@ -671,7 +683,7 @@
       <div class="mobile-sheet-title-row">
         <div>
           <h3>Executive Controls</h3>
-          <p class="mobile-sheet-sub">Roster verification, communication & access</p>
+          <p class="mobile-sheet-sub">Curriculum, announcements and account</p>
         </div>
         <button type="button" class="btn-icon mobile-sheet-close-btn" id="of-mobile-sheet-close-btn" aria-label="Close menu">
           <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
@@ -681,37 +693,16 @@
     <div class="mobile-sheet-body">
       <!-- Section: ROSTER & DIRECTORY -->
       <div class="mobile-sheet-section">
-        <span class="mobile-sheet-section-label">Directory & Roster</span>
+        <span class="mobile-sheet-section-label">Admin Tools</span>
         <div class="mobile-sheet-group">
-          <button type="button" class="mobile-sheet-row" data-of="roster" data-of-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(var(--primary-rgb),0.12);">
-              <iconify-icon icon="solar:user-plus-linear"></iconify-icon>
-            </div>
-            <div class="mobile-sheet-row-content">
-              <span class="mobile-sheet-row-title">Enrolled Roster</span>
-              <span class="mobile-sheet-row-desc">Student database verification & approvals</span>
-            </div>
-            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
-          </button>
 
           <button type="button" class="mobile-sheet-row" data-of="curriculum" data-of-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:#A78BFA; background:rgba(167,139,250,0.12);">
+            <div class="mobile-sheet-row-icon mobile-sheet-row-icon--accent">
               <iconify-icon icon="solar:book-bookmark-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
               <span class="mobile-sheet-row-title">Curriculum Manager</span>
               <span class="mobile-sheet-row-desc">Lec/lab components &amp; prerequisites</span>
-            </div>
-            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
-          </button>
-
-          <button type="button" class="mobile-sheet-row" data-of="people" data-of-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:#38BDF8; background:rgba(56,189,248,0.12);">
-              <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon>
-            </div>
-            <div class="mobile-sheet-row-content">
-              <span class="mobile-sheet-row-title">People & Access</span>
-              <span class="mobile-sheet-row-desc">Officer roles and privileges</span>
             </div>
             <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
           </button>
@@ -723,7 +714,7 @@
         <span class="mobile-sheet-section-label">Communication</span>
         <div class="mobile-sheet-group">
           <button type="button" class="mobile-sheet-row" data-of="announcements" data-of-sheet-action="nav">
-            <div class="mobile-sheet-row-icon" style="color:var(--warning); background:rgba(var(--warning-rgb),0.12);">
+            <div class="mobile-sheet-row-icon mobile-sheet-row-icon--accent">
               <iconify-icon icon="solar:bell-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
@@ -740,7 +731,7 @@
         <span class="mobile-sheet-section-label">Navigation & Account</span>
         <div class="mobile-sheet-group">
           <a href="/" class="mobile-sheet-row" title="Return to Student Portal">
-            <div class="mobile-sheet-row-icon" style="color:var(--text-secondary); background:rgba(255,255,255,0.06);">
+            <div class="mobile-sheet-row-icon mobile-sheet-row-icon--muted">
               <iconify-icon icon="solar:widget-2-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
@@ -751,7 +742,7 @@
           </a>
 
           <button type="button" class="mobile-sheet-row" data-action="open-profile">
-            <div class="mobile-sheet-row-icon" style="color:var(--text-secondary); background:rgba(255,255,255,0.06);">
+            <div class="mobile-sheet-row-icon mobile-sheet-row-icon--muted">
               <iconify-icon icon="solar:settings-minimalistic-linear"></iconify-icon>
             </div>
             <div class="mobile-sheet-row-content">
@@ -769,8 +760,8 @@
   <div id="of-roster-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-card of-modal-card" style="max-width:500px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
-        <h3 id="of-roster-modal-title" style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
-          <iconify-icon icon="solar:user-plus-bold" style="color:var(--accent);"></iconify-icon> Add Enrolled Student
+        <h3 class="modal-title" id="of-roster-modal-title">
+          <iconify-icon class="icon-accent" icon="solar:user-plus-bold"></iconify-icon> Add Enrolled Student
         </h3>
         <button type="button" class="btn-icon" id="of-roster-modal-close" title="Close" aria-label="Close add student dialog">
           <iconify-icon icon="solar:close-circle-linear" style="font-size:1.3rem;"></iconify-icon>
@@ -811,8 +802,8 @@
         </div>
         <div class="of-error hidden" id="of-modal-roster-error" role="alert"></div>
         <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1.25rem;">
-          <button type="button" class="of-btn of-btn-ghost" id="of-roster-modal-cancel">Cancel</button>
-          <button type="submit" class="of-btn of-btn-primary" id="of-roster-modal-submit">Save Student</button>
+          <button type="button" class="btn btn-secondary" id="of-roster-modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="of-roster-modal-submit">Save Student</button>
         </div>
       </form>
     </div>
@@ -822,8 +813,8 @@
   <div id="of-roster-import-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-card of-modal-card" style="max-width:580px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
-        <h3 style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
-          <iconify-icon icon="solar:upload-minimalistic-bold" style="color:var(--accent);"></iconify-icon> Bulk Import Semester Roster
+        <h3 class="modal-title">
+          <iconify-icon class="icon-accent" icon="solar:upload-minimalistic-bold"></iconify-icon> Bulk Import Semester Roster
         </h3>
         <button type="button" class="btn-icon" id="of-import-modal-close" title="Close" aria-label="Close roster import dialog">
           <iconify-icon icon="solar:close-circle-linear" style="font-size:1.3rem;"></iconify-icon>
@@ -853,8 +844,8 @@
       <div class="of-error hidden" id="of-import-error" role="alert" style="margin-top:0.75rem;"></div>
 
       <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1.25rem;">
-        <button type="button" class="of-btn of-btn-ghost" id="of-import-cancel-btn">Cancel</button>
-        <button type="button" class="of-btn of-btn-primary" id="of-import-confirm-btn" disabled>Import Students</button>
+        <button type="button" class="btn btn-secondary" id="of-import-cancel-btn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="of-import-confirm-btn" disabled>Import Students</button>
       </div>
     </div>
   </div>
@@ -1161,14 +1152,14 @@
   <script src="js/roster.js?v=5.5"></script>
   <script src="js/auth.js?v=5.5"></script>
   <script src="js/api.js?v=5.4"></script>
-  <script src="js/ui.js?v=5.10"></script>
+  <script src="js/ui.js?v=5.11"></script>
   <script src="js/receipt-capture.js?v=5.3"></script>
   <script src="js/receipt-modal.js?v=5.4"></script>
   <script src="js/dropdown.js?v=5.4"></script>
   <script src="js/profile.js?v=5.5"></script>
-  <script src="js/notifications.js?v=5.4"></script>
+  <script src="js/notifications.js?v=5.5"></script>
   <script src="js/officer/curriculum.js?v=1.1"></script>
-  <script src="js/officer/officer-app.js?v=6.6"></script>
+  <script src="js/officer/officer-app.js?v=6.8"></script>
   <script src="js/sw-register.js"></script>
 </body>
 </html>

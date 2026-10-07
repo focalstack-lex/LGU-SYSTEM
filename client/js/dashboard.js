@@ -7,7 +7,7 @@ const Dashboard = (() => {
   let realtimeChannel = null;
 
   async function load() {
-    await Promise.all([loadStats(), loadRecentTransactions(), loadAnnouncements(), loadStudentStatus()]);
+    await Promise.all([loadStats(), loadNextEvent(), loadRecentTransactions(), loadAnnouncements()]);
     subscribeRealtime();
     bindPopovers();
     bindViewAll();
@@ -196,7 +196,7 @@ const Dashboard = (() => {
       document.getElementById('stat-income').textContent    = UI.currency(summary.totalIncome);
       document.getElementById('stat-expense').textContent   = UI.currency(summary.totalExpense);
       document.getElementById('stat-balance').textContent   = UI.currency(summary.remainingBalance);
-      document.getElementById('stat-donations').textContent = UI.currency(summary.breakdown.donation);
+      loadMonthToDate();
 
       // Populate popover breakdowns with 1-tap action links
       document.getElementById('pop-income').innerHTML = `
@@ -226,19 +226,62 @@ const Dashboard = (() => {
         <a class="stat-pop-action" data-nav="reports"><span>View Financial Reports & Trends</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
       `;
 
-      document.getElementById('pop-donations').innerHTML = `
-        <div class="stat-pop-row" style="color:var(--col-text);line-height:1.4;">Total value of sponsorships and community contributions.</div>
-        <a class="stat-pop-action" data-nav="income"><span>View Donations in Income Tracker</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
-      `;
     } catch (err) {
       console.error('Stats load error:', err);
+    }
+  }
+
+  // Second line of the income and expense cards: this month's movement,
+  // from the same monthly series the Reports tab charts.
+  async function loadMonthToDate() {
+    const incomeEl = document.getElementById('stat-income-month');
+    const expenseEl = document.getElementById('stat-expense-month');
+    if (!incomeEl || !expenseEl) return;
+    try {
+      const rows = await Api.reports.monthly();
+      const key = new Date().toISOString().slice(0, 7);
+      const row = (rows || []).find(r => r.month === key) || { income: 0, expense: 0 };
+      incomeEl.textContent  = `${UI.currency(row.income)} this month`;
+      expenseEl.textContent = `${UI.currency(row.expense)} this month`;
+    } catch (err) {
+      console.error('Month-to-date load error:', err);
+      incomeEl.textContent = '';
+      expenseEl.textContent = '';
+    }
+  }
+
+  // Next upcoming event, in the slot the donations card used to hold.
+  // Donations stay available as the breakdown inside Total Income.
+  async function loadNextEvent() {
+    const nameEl = document.getElementById('stat-next-event');
+    const dateEl = document.getElementById('stat-next-event-date');
+    if (!nameEl || !dateEl) return;
+    try {
+      const events = await Api.events.list();
+      const today = new Date().toISOString().slice(0, 10);
+      const next = (events || [])
+        .filter(ev => ev.event_date && ev.event_date >= today && ev.status !== 'archived')
+        .sort((a, b) => a.event_date.localeCompare(b.event_date))[0];
+      nameEl.textContent = next ? next.event_name : 'Nothing scheduled';
+      if (next) {
+        const days = Math.round((new Date(next.event_date + 'T00:00:00') - new Date(today + 'T00:00:00')) / 86400000);
+        const when = days === 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`;
+        dateEl.textContent = `${UI.dateStr(next.event_date)} · ${when}`;
+      } else {
+        dateEl.textContent = 'See all events';
+      }
+    } catch (err) {
+      console.error('Next event load error:', err);
+      nameEl.textContent = 'Nothing scheduled';
+      dateEl.textContent = 'See all events';
     }
   }
 
   async function loadRecentTransactions() {
     const container = document.getElementById('recent-tx-list');
     try {
-      const txs = await Api.transactions.list({ limit: 8 });
+      // Three rows; the ledger is one tap away under Money
+      const txs = (await Api.transactions.list({ limit: 8 })).slice(0, 3);
       if (!txs.length) { UI.setEmpty('recent-tx-list', 'solar:card-transfer-linear', 'No transactions yet.'); return; }
 
       container.innerHTML = txs.map(tx => `
@@ -276,7 +319,7 @@ const Dashboard = (() => {
     const container = document.getElementById('announcement-list');
     try {
       const list = await Api.announcements.list();
-      const data = (list || []).slice(0, 5);
+      const data = (list || []).slice(0, 2);
 
       if (!data.length) { UI.setEmpty('announcement-list', 'solar:bell-linear', 'No announcements yet.'); return; }
 
@@ -327,77 +370,6 @@ const Dashboard = (() => {
     if (!link || _viewAllBound) return;
     _viewAllBound = true;
     link.addEventListener('click', e => { e.preventDefault(); if (window.navigateTo) window.navigateTo('announcements'); });
-  }
-
-  // ---- Student status strip (students only) ----
-  // Reads data the page already fetches elsewhere; officers and admins keep
-  // the plain fund dashboard.
-  async function loadStudentStatus() {
-    const el = document.getElementById('student-status');
-    if (!el) return;
-    let profile = null;
-    try { profile = await Auth.getProfile(); } catch { profile = null; }
-    if (!profile || profile.role !== 'student') { el.classList.add('hidden'); return; }
-
-    const EJ = window.EnrollmentJourney;
-    const [mine, units, events, notifs] = await Promise.all([
-      Api.enrollment.my().catch(() => ({ submissions: [] })),
-      Api.units.my().catch(() => []),
-      Api.events.list().catch(() => []),
-      Api.notifications.list().catch(() => null),
-    ]);
-
-    const now = new Date();
-    const sy = now.getMonth() >= 5 ? `${now.getFullYear()}-${now.getFullYear() + 1}` : `${now.getFullYear() - 1}-${now.getFullYear()}`;
-    const terms = mine.submissions || [];
-    const sub = terms.find(s => s.school_year === sy) || terms[0] || null;
-    const step = EJ ? EJ.stepOf(sub) : null;
-    const stepLabel = step && EJ ? EJ.STEPS[step.stepIndex].label : 'Not started';
-    const action = EJ ? EJ.actionFor(sub) : { kind: 'none' };
-    const enrollmentCta = !sub || sub.status === 'draft'
-      ? (action.kind === 'submit' ? 'Submit your load' : 'Build your load')
-      : 'View status';
-
-    const inProgress = (Array.isArray(units) ? units : []).filter(u => u.status === 'enrolled');
-    const unitsNow = inProgress.reduce((s, u) => s + (Number(u.subjects?.units) || 0), 0);
-
-    const today = now.toISOString().slice(0, 10);
-    const next = (events || []).filter(ev => ev.event_date && ev.event_date >= today && ev.status !== 'archived')
-      .sort((a, b) => a.event_date.localeCompare(b.event_date))[0];
-
-    const unread = notifs && typeof notifs.total_unread === 'number' ? notifs.total_unread : 0;
-
-    el.innerHTML = `
-      <a href="#" class="status-tile" data-view="enrollment">
-        <span class="status-tile-label">Enrollment</span>
-        <span class="status-tile-value">${UI.esc(stepLabel)}</span>
-        <span class="status-tile-cta">${UI.esc(enrollmentCta)}</span>
-      </a>
-      <a href="#" class="status-tile" data-view="units">
-        <span class="status-tile-label">This term</span>
-        <span class="status-tile-value">${inProgress.length} subject${inProgress.length === 1 ? '' : 's'} · ${unitsNow} units</span>
-        <span class="status-tile-cta">Academic Progress</span>
-      </a>
-      <a href="#" class="status-tile" data-view="events">
-        <span class="status-tile-label">Next event</span>
-        <span class="status-tile-value">${next ? UI.esc(next.event_name) : 'Nothing scheduled'}</span>
-        <span class="status-tile-cta">${next ? UI.esc(UI.dateStr(next.event_date)) : 'See all events'}</span>
-      </a>
-      <a href="#" class="status-tile" data-view="notifications">
-        <span class="status-tile-label">Notifications</span>
-        <span class="status-tile-value">${unread ? `${unread} unread` : 'All caught up'}</span>
-        <span class="status-tile-cta">Open inbox</span>
-      </a>
-      <a href="/feedback/" class="status-tile status-tile--quiet">
-        <span class="status-tile-label">Have a concern?</span>
-        <span class="status-tile-value">Send feedback</span>
-        <span class="status-tile-cta">Eight questions, two minutes</span>
-      </a>`;
-    el.querySelectorAll('[data-view]').forEach(a => a.addEventListener('click', e => {
-      e.preventDefault();
-      if (window.navigateTo) window.navigateTo(a.dataset.view);
-    }));
-    el.classList.remove('hidden');
   }
 
   async function subscribeRealtime() {

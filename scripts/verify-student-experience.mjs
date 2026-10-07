@@ -72,19 +72,16 @@ const browser = await chromium.launch({ headless: true });
   await page.waitForTimeout(200);
   check('skip link moves focus to main content', await page.evaluate(() => document.activeElement.id === 'main-content'));
 
-  // Student home strip
-  const strip = await page.evaluate(() => { const el = document.getElementById('student-status'); return { shown: el && !el.classList.contains('hidden'), tiles: el ? [...el.querySelectorAll('.status-tile-label')].map(l => l.textContent.trim()) : [], enrollment: el?.querySelector('[data-view="enrollment"] .status-tile-value')?.textContent.trim(), notif: el?.querySelector('[data-view="notifications"] .status-tile-value')?.textContent.trim(), feedback: !!el?.querySelector('a[href="/feedback/"]') }; });
-  check('student status strip shows for a student', strip.shown && strip.tiles.length === 5, JSON.stringify(strip.tiles));
-  check('strip: enrollment step and unread count are real data', strip.enrollment === 'Build your load' && strip.notif === '2 unread', `${strip.enrollment} / ${strip.notif}`);
-  check('strip: feedback link present', strip.feedback);
+  // Student home: the status strip was removed on 2026-10-06; the fund hero leads
+  check('student home has no status strip', await page.evaluate(() => !document.getElementById('student-status')));
   check('dashboard heading is no longer finance-first', await page.evaluate(() => document.querySelector('#view-dashboard h2').textContent.trim() === 'Dashboard'));
   await page.screenshot({ path: `${OUT}/01-dashboard-student.png` });
 
   // Nav entries
   const nav = await page.evaluate(() => [...document.querySelectorAll('.sidebar-nav .nav-item')].filter(n => n.offsetParent).map(n => n.textContent.trim()));
-  check('sidebar has Announcements and Notifications after Dashboard', nav[1] === 'Announcements' && nav[2] === 'Notifications', nav.join(' | '));
+  check('sidebar is Dashboard, Money, Events, Updates, Academics', nav.slice(0, 5).join(' | ') === 'Dashboard | Money | Events | Updates | Academics', nav.join(' | '));
   check('sidebar has a feedback link', await page.evaluate(() => !!document.querySelector('#sidebar-feedback-link[href="/feedback/"]')));
-  check('notifications nav carries the unread badge', await page.evaluate(() => document.getElementById('nav-notifications').classList.contains('has-unread')));
+  check('notifications nav carries the unread badge', await page.evaluate(() => document.getElementById('nav-updates').classList.contains('has-unread')));
 
   // Announcements page
   await show(page, 'announcements');
@@ -92,7 +89,7 @@ const browser = await chromium.launch({ headless: true });
   await page.screenshot({ path: `${OUT}/02-announcements.png` });
   // Notifications page
   await show(page, 'notifications');
-  const notif = await page.evaluate(() => ({ groups: [...document.querySelectorAll('.notif-group-title')].map(g => g.textContent.trim()), unreadFirst: document.querySelector('.notif-item')?.classList.contains('is-unread'), badgeCleared: !document.getElementById('nav-notifications').classList.contains('has-unread') }));
+  const notif = await page.evaluate(() => ({ groups: [...document.querySelectorAll('.notif-group-title')].map(g => g.textContent.trim()), unreadFirst: document.querySelector('.notif-item')?.classList.contains('is-unread'), badgeCleared: !document.getElementById('nav-updates').classList.contains('has-unread') }));
   check('notifications page groups by category, unread first', notif.groups.length === 3 && notif.unreadFirst, JSON.stringify(notif.groups));
   check('opening the inbox clears the unread badge', notif.badgeCleared);
   await page.screenshot({ path: `${OUT}/03-notifications.png` });

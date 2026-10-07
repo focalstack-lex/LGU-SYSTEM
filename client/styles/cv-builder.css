@@ -503,10 +503,18 @@ body[data-load-error="1"] .cv-form { display: none; }
 
 @media screen and (max-width: 640px) {
   .cv-header-inner { padding: 8px 12px; gap: 8px; }
-  .cv-brand-titles,
+  /* Phone header: back arrow, status, two icon buttons. The brand block and
+     button labels yield; the status pill is the only element allowed to shrink. */
+  .cv-brand-group,
   .cv-header-sep,
+  .cv-back-link span,
   .cv-btn-label { display: none; }
-  .cv-header-btn { padding: 9px 11px; }
+  .cv-header-left { flex-shrink: 0; }
+  .cv-header-right { flex: 1 1 auto; justify-content: flex-end; gap: 8px; }
+  .cv-back-link,
+  .cv-header-btn { min-width: 40px; min-height: 40px; padding: 0 11px; justify-content: center; }
+  .cv-status { min-height: 40px; min-width: 0; flex: 0 1 auto; }
+  .cv-status-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cv-form-row { grid-template-columns: 1fr; }
   .cv-editor { padding: 4px 14px 16px; }
   /* 16px+ inputs stop iOS Safari zooming the page on focus */

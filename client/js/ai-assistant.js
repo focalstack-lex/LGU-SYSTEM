@@ -634,7 +634,7 @@ const GrizzAI = (() => {
       `Late night session, ${displayName}? Don't forget to recharge your own batteries.`
     ];
 
-    // Midnight / Past Midnight: 12:00 AM - 4:59 AM — extra chaotic hours
+    // Midnight / Past Midnight: 12:00 AM - 4:59 AM, extra chaotic hours
     const midnightGreetings = [
       `Maayong kadlawon, ${displayName}! Ngano gising pa man ta?`,
       `12 AM na, ${displayName}. Dili na ni study session. Survival mission na ni.`,

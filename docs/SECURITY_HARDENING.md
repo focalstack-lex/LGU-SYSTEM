@@ -156,13 +156,13 @@ These were verified working. **Do not "fix" them, and do not regress them.** If 
 
 ```js
 window.ENROLLMENT_PILOT_EMAILS = [
-  'lexmatondo@g.cjc.edu.ph',   // admin / developer
+  'developer.account@g.cjc.edu.ph',   // admin / developer
   'test.newuser@g.cjc.edu.ph', // student: Alex Rivera (BSCoE, Yr 2)
   'bsce.test@g.cjc.edu.ph',    // student: Maria Santos (BSCE, seeded submitted load)
   'head.test@g.cjc.edu.ph',    // program head (BSCoE)
   'dean.test@g.cjc.edu.ph',    // dean
   'sa.test@g.cjc.edu.ph',      // student assistant (faculty role)
-  'klydemodina@g.cjc.edu.ph',  // real student account for live testing
+  '<consenting-student>@g.cjc.edu.ph', // one real student account for live testing, held in .env only
 ];
 ```
 

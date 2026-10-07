@@ -9,7 +9,7 @@ Status: Approved design (user selected: add-all + per-subject buttons; stay in c
 Two pieces ship together behind one merge to `main`:
 
 1. **Grizz recommendations become actionable** — students can push Grizz's "Next Sem Recommendations" straight into their Load Verification draft (Phase C's first user-facing step).
-2. **Pilot gate for live testing** — the enrollment feature set (student Load Verification + `/faculty` portal + their APIs) is usable only by `lexmatondo@g.cjc.edu.ph` (role: admin). Every other account sees a "still under development" message. Production (Render + Vercel) auto-deploys from `main`, so this merge is the production release.
+2. **Pilot gate for live testing** — the enrollment feature set (student Load Verification + `/faculty` portal + their APIs) is usable only by `developer.account@g.cjc.edu.ph` (role: admin). Every other account sees a "still under development" message. Production (Render + Vercel) auto-deploys from `main`, so this merge is the production release.
 
 ## Feature 1: Pilot gate
 
@@ -19,7 +19,7 @@ Two pieces ship together behind one merge to `main`:
 
 ```js
 window.ENROLLMENT_PILOT_EMAILS = [
-  'lexmatondo@g.cjc.edu.ph',   // admin / developer
+  'developer.account@g.cjc.edu.ph',   // admin / developer
   'test.newuser@g.cjc.edu.ph', // student: Alex Rivera (BSCoE, Yr 2)
   'bsce.test@g.cjc.edu.ph',    // student: Maria Santos (BSCE, seeded submitted load)
   'head.test@g.cjc.edu.ph',    // program head (BSCoE)

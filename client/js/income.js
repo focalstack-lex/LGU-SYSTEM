@@ -39,7 +39,7 @@ const Income = (() => {
     `).join('');
   }
 
-  // Mobile card layout (≤768px) — table-wrapper is hidden via CSS on phones.
+  // Mobile card layout (≤768px), table-wrapper is hidden via CSS on phones.
   function renderMobileCards(txs) {
     const container = document.getElementById('income-mobile-cards');
     if (!container) return;

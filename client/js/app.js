@@ -551,7 +551,7 @@
 
   // ---- Boot on existing session ----
   // validateSession() (not plain getSession()) drops localStorage sessions whose
-  // token the server no longer accepts — those are what produce the recurring
+  // token the server no longer accepts, those are what produce the recurring
   // JwtSignatureError noise in the Supabase realtime logs.
   const session = await (Auth.validateSession ? Auth.validateSession() : Auth.getSession());
   if (session) {
@@ -601,16 +601,19 @@
       mainContainer.scrollTop = savedTop;
     }
 
-    // Sync active class on both sidebar and bottom nav
-    const moreViews = ['income', 'transactions', 'enrollment', 'admin', 'announcements', 'notifications'];
+    // Sync active class on sidebar, bottom nav and the in-view group tabs.
+    // A nav entry with data-group is active for every view in that group.
+    const moreViews = ['admin', 'announcements', 'notifications'];
     const isMoreActive = moreViews.includes(view);
     const moreBtn = document.getElementById('bottom-nav-more-btn');
     if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
 
-    document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(el => {
-      if (el !== moreBtn) {
-        el.classList.toggle('active', el.dataset.view === view);
-      }
+    const group = UI.groupOf(view);
+    document.querySelectorAll('.nav-item, .bottom-nav-item, .view-tab').forEach(el => {
+      if (el === moreBtn) return;
+      const isActive = el.dataset.view === view || (!!el.dataset.group && el.dataset.group === group);
+      el.classList.toggle('active', isActive);
+      if (el.classList.contains('view-tab')) el.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
 
     // Glide the liquid pill to the newly active icon
@@ -755,7 +758,7 @@
   }
   bindMobileMoreSheet();
 
-  document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
+  document.querySelectorAll('.nav-item, .bottom-nav-item, .view-tab').forEach(item => {
     item.addEventListener('click', async e => {
       if (item.dataset.view) {
         e.preventDefault();

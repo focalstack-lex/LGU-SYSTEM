@@ -650,7 +650,7 @@ const Api = (() => {
     // Load submission flows (Phase B): student enrollment + faculty evaluation.
     enrollment,
     faculty,
-    // Curriculum management (Phase A): contract paths are full /api/... —
+    // Curriculum management (Phase A): contract paths are full /api/... ,
     // `request` (above) strips the prefix before delegating to _request.
     curriculum: {
       subjects: (program) =>
