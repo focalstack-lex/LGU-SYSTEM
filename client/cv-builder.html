@@ -15,8 +15,8 @@
   <script src="/vendor/icons-bundle.js?v=2"></script>
 
   <!-- Global Styles -->
-  <link rel="stylesheet" href="styles/main.css?v=8.1" />
-  <link rel="stylesheet" href="styles/cv-builder.css?v=3.0" />
+  <link rel="stylesheet" href="styles/main.css?v=8.2" />
+  <link rel="stylesheet" href="styles/cv-builder.css?v=3.1" />
 
   <!-- Supabase (vendored) -->
   <script src="vendor/supabase.min.js"></script>
@@ -28,7 +28,7 @@
   <header class="cv-app-header">
     <div class="cv-header-inner">
       <div class="cv-header-left">
-        <a href="/index.html" class="cv-back-link" title="Return to Student Portal">
+        <a href="/index.html" class="cv-back-link" title="Return to Student Portal" aria-label="Return to Student Portal">
           <iconify-icon icon="solar:arrow-left-linear"></iconify-icon>
           <span>Portal</span>
         </a>
@@ -45,7 +45,7 @@
       <div class="cv-header-right">
         <button type="button" class="cv-status" id="cv-status" data-state="loading" aria-live="polite">
           <span class="cv-status-dot" aria-hidden="true"></span>
-          <span id="cv-status-text">Loading…</span>
+          <span id="cv-status-text" class="cv-status-text">Loading…</span>
         </button>
         <button type="button" class="btn btn-secondary cv-header-btn" id="cv-reset-btn" title="Clear every field and start over" aria-label="Reset CV">
           <iconify-icon icon="solar:restart-linear"></iconify-icon>
