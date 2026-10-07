@@ -13,7 +13,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.55rem 1rem 0.55rem 0.65rem;
-  background: var(--surface-secondary, #26262C);
+  background: var(--surface-secondary, ##27272D);
   color: var(--text-primary);
   border: 1px solid var(--border-default);
   border-radius: 999px;
@@ -47,7 +47,7 @@
   transform: translateY(-2px);
   border-color: var(--primary);
   box-shadow: 0 8px 24px -2px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.3);
-  background: var(--surface-hover, #192332);
+  background: var(--surface-hover, #313137);
 }
 
 .ursa-launcher:active,
@@ -80,7 +80,7 @@
   justify-content: center;
   width: 34px;
   height: 34px;
-  background: var(--bg-surface, #0E1520);
+  background: var(--bg-surface, #1D1D21);
   border: 1px solid var(--border-default);
   border-radius: 50%;
   position: relative;
@@ -106,7 +106,7 @@
   width: 9px;
   height: 9px;
   background: var(--status-positive, var(--success));
-  border: 2px solid var(--bg-surface-raised, #131B27);
+  border: 2px solid var(--bg-surface-raised, #27272D);
   border-radius: 50%;
 }
 
@@ -230,7 +230,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #1E293B;
+  background: var(--surface);
   border: 1px solid rgba(70, 110, 153, 0.45);
   display: flex;
   align-items: center;
@@ -252,7 +252,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
   width: 9px;
   height: 9px;
   background: var(--success);
-  border: 1.5px solid #0F172A;
+  border: 1.5px solid var(--surface);
   border-radius: 50%;
 }
 
@@ -396,12 +396,12 @@ body:has(#ursa-drawer.active) .grizz-launcher {
 }
 
 .ursa-msg.bot .ursa-msg-avatar {
-  background: #1E293B;
+  background: var(--surface);
   border-color: rgba(70, 110, 153, 0.4);
 }
 
 .ursa-msg.user .ursa-msg-avatar {
-  background: var(--bg-surface-raised, #161D25);
+  background: var(--bg-surface-raised, #27272D);
   border: 1.5px solid rgba(70, 110, 153, 0.45);
 }
 
@@ -539,7 +539,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
 }
 
 .ursa-subject-item {
-  background: var(--surface-raised, #26262C);
+  background: var(--surface-raised, ##27272D);
   border: 1px solid var(--border-default, rgba(255, 255, 255, 0.08));
   border-radius: var(--radius-md, 12px);
   padding: 0.75rem 0.85rem;
@@ -592,7 +592,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
   font-family: var(--font-ui, 'Inter', sans-serif);
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--text-secondary, #9A9AA6);
+  color: var(--text-secondary, #A3A2AB);
   background: rgba(255, 255, 255, 0.06);
   padding: 0.18rem 0.45rem;
   border-radius: 6px;
@@ -617,7 +617,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
   gap: 0.3rem;
   font-family: var(--font-ui, 'Inter', sans-serif);
   font-size: 0.7rem;
-  color: #FBBF24;
+  color: var(--warning);
   background: rgba(var(--warning-rgb), 0.12);
   border: 1px solid rgba(var(--warning-rgb), 0.25);
   padding: 0.2rem 0.5rem;
@@ -642,7 +642,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
   font-weight: 600;
   padding: 0.2rem 0.55rem;
   background: rgba(255, 255, 255, 0.06);
-  color: var(--text-secondary, #9A9AA6);
+  color: var(--text-secondary, #A3A2AB);
   border-radius: 9999px;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -767,9 +767,9 @@ body:has(#ursa-drawer.active) .grizz-launcher {
 }
 
 .ursa-chip-action:hover {
-  background: var(--primary);
+  background: var(--primary-fill);
   color: var(--accent-text-on);
-  border-color: var(--primary);
+  border-color: var(--primary-fill);
 }
 
 /* =============================================
@@ -1085,7 +1085,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #1E293B;
+  background: var(--surface);
   border: 1px solid rgba(70, 110, 153, 0.4);
   display: flex;
   align-items: center;
@@ -1110,7 +1110,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
   width: 7px;
   height: 7px;
   background: var(--success);
-  border: 1.5px solid #0F172A;
+  border: 1.5px solid var(--surface);
   border-radius: 50%;
 }
 
@@ -1315,7 +1315,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
     max-width: 100%;
     box-sizing: border-box;
     overflow: hidden;
-    background: var(--surface-secondary, #1C1C20);
+    background: var(--surface-secondary, ##1D1D21);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-md, 12px);
   }
@@ -1343,7 +1343,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
 
   .grizz-role {
     font-size: 0.72rem;
-    color: var(--text-tertiary, #8C8C98);
+    color: var(--text-tertiary, #8E8D97);
   }
 
   .grizz-bar-divider {
@@ -1434,27 +1434,27 @@ body:has(#ursa-drawer.active) .grizz-launcher {
 
 /* Chat Messages */
 [data-theme="light"] .ursa-msg.user .ursa-bubble {
-  background: #FFF7ED;
+  background: rgba(var(--warning-rgb), 0.12);
   border: 1px solid rgba(70, 110, 153, 0.3);
-  color: #0F172A;
+  color: var(--text-primary);
 }
 
 [data-theme="light"] .ursa-msg.bot .ursa-bubble {
   background: #FFFFFF;
   border: 1px solid var(--border);
-  color: #0F172A;
+  color: var(--text-primary);
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
 }
 
 /* Data summary & cards */
 [data-theme="light"] .ursa-summary-bar,
 [data-theme="light"] .ursa-data-box {
-  background: #F8FAFC;
+  background: var(--surface);
   border-color: var(--border);
 }
 
 [data-theme="light"] .ursa-progress-track {
-  background: #E2E8F0;
+  background: var(--surface-secondary);
 }
 
 [data-theme="light"] .ursa-subject-item {
@@ -1463,7 +1463,7 @@ body:has(#ursa-drawer.active) .grizz-launcher {
 }
 
 [data-theme="light"] .ursa-subject-tag {
-  background: #F1F5F9;
+  background: var(--surface-secondary);
   border-color: var(--border);
   color: var(--text-secondary);
 }
@@ -1473,8 +1473,8 @@ body:has(#ursa-drawer.active) .grizz-launcher {
 }
 
 [data-theme="light"] .ursa-alert-box {
-  background: #FEF2F2;
-  border-color: #FECACA;
+  background: rgba(var(--error-rgb), 0.12);
+  border-color: rgba(var(--error-rgb), 0.3);
   color: var(--error);
 }
 

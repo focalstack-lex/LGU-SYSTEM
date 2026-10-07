@@ -34,6 +34,7 @@ The system follows a **Flat Dark Charcoal & Soft Coral Pill** aesthetic, tuned t
 - **Soft Action Accent**: `--primary` and `--brand-accent` (`#F2845C`) mark CTAs, active pill tabs, active switches, and circular action icons. Intensity is lowered (85% saturation, not 100%) so the accent guides the eye without glare; text on coral fills is charcoal `#1A1A1C` (6.8:1).
 - **Modern Pill & Card Geometry** — Segmented control tracks use full rounded pills (`border-radius: 9999px`), while surface cards and modals use rounded 16px corners (`--radius-lg: 16px`).
 - **Comfortable Contrast Typography**: Headings and monetary metrics use warm off-white (`#ECEBE8`, 14:1) against secondary labels (`#A3A2AB`). Pure white at 18.7:1 caused halation on dark screens; every pair still passes WCAG AA, checked by `node scripts/verify-contrast.mjs` in both themes.
+- **Color discipline (2026-10-08 audit)**: the accent marks the primary action and the active navigation state, nothing else. Links, card actions, the sidebar tagline, More-sheet icon tiles and card-title icons are neutral greys. Status hue appears once per row (the dot and the amount); type pills are neutral. Stat-card icon tiles carry their status token at 12% at rest. Every color in a rule is a token or an `rgba(var(--x-rgb), a)` tint; the only literals are token values used as `var()` fallbacks and print black in the CV sheet.
 - **Restrained Motion** — State changes use swift 0.25s linear/ease transitions without spring bounce.
 
 ---
@@ -64,6 +65,8 @@ The system follows a **Flat Dark Charcoal & Soft Coral Pill** aesthetic, tuned t
 | `--accent-text-on` | `#1A1A1C` | Text on coral fills |
 | `--danger-fill` | `#BD4C45` | Destructive button fill (white text, 4.9:1) |
 | `--primary-rgb` etc. | `242, 132, 92` | Channels for `rgba(var(--primary-rgb), a)` tints |
+| `--primary-fill` / `-hover` / `-active` | `#F2845C` / `#F59470` / `#E0724A` | Fills that carry text (buttons, active pill tabs, count badges): the same peach in both themes with `--accent-text-on` charcoal, so the brand does not change identity in light mode. `--primary` in light stays the deep `#A84A28` for coral used as text or thin marks |
+| `--info-rgb` | `141, 179, 221` (light `45, 106, 159`) | Channels for info tints |
 
 ### Light Theme (`[data-theme="light"]`)
 
@@ -75,7 +78,7 @@ Flat paper slate surfaces with deeper soft coral accents (a lighter coral cannot
 | `--surface` | `#FFFFFF` |
 | `--surface-secondary` | `#EAECEF` |
 | `--border` | `#D5DBE2` |
-| `--primary / --brand-accent` | `#A84A28` (white text on fills) |
+| `--primary / --brand-accent` | `#A84A28` for coral text and thin marks; fills use `--primary-fill` `#F2845C` with charcoal text |
 | `--text-primary / --text-secondary / --text-tertiary` | `#1F2124 / #4E5766 / #5C6574` |
 | `--success / --warning / --error / --info` | `#26744C / #A8590F / #B83E36 / #2D6A9F` |
 
