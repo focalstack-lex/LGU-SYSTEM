@@ -1,7 +1,7 @@
 <!-- code-map
-generated: 2026-10-07T09:44:15.119Z
-commit: 49724cb
-fingerprint: 96d1abab774f96c2
+generated: 2026-10-07T17:03:34.388Z
+commit: 0e3bedf
+fingerprint: 1256c10a8987a7d5
 -->
 # Code Map (Agent Navigation)
 
@@ -15,7 +15,7 @@ disagree, the code wins and the map is regenerated.
 ## Summary
 
 - Files indexed: 187
-- Total lines indexed: 53,398
+- Total lines indexed: 53,417
 - Anchor index emitted for files over 300 lines: 38
 
 ### Areas
@@ -25,13 +25,13 @@ disagree, the code wins and the map is regenerated.
 | `.` | 2 | 2,221 |
 | `client` | 6 | 3,445 |
 | `client/feedback` | 2 | 227 |
-| `client/js` | 30 | 12,347 |
+| `client/js` | 30 | 12,359 |
 | `client/js/faculty` | 1 | 489 |
 | `client/js/officer` | 2 | 3,342 |
 | `client/styles` | 6 | 14,363 |
 | `electron` | 3 | 351 |
 | `private` | 2 | 88 |
-| `scripts` | 67 | 7,593 |
+| `scripts` | 67 | 7,600 |
 | `server` | 1 | 227 |
 | `server/lib` | 8 | 713 |
 | `server/middleware` | 2 | 122 |
@@ -78,7 +78,7 @@ disagree, the code wins and the map is regenerated.
 | `api.js` | 676 | API Helper Module with SWR Pre-Caching |
 | `enrollment.js` | 649 | Student Enrollment Verification (Phase B). |
 | `profile.js` | 614 | User Account Profile & Settings Controller |
-| `ui.js` | 531 | Shared UI Utilities |
+| `ui.js` | 543 | Shared UI Utilities |
 | `reports.js` | 526 | client/js/reports.js - Phase 3 Reporting |
 | `grizz-recommend.js` | 522 | Pure "next load" recommendation engine. |
 | `dashboard.js` | 417 | Dashboard View Module |
@@ -179,8 +179,8 @@ disagree, the code wins and the map is regenerated.
 | `recalculate-enrollment-years.js` | 87 | scripts/recalculate-enrollment-years.js |
 | `smoke-test-standing.js` | 82 | Smoke Test Standing |
 | `smoke-test-units-fields.js` | 81 | Smoke Test Units Fields |
+| `verify-app-shell-fill.mjs` | 77 | Verify App Shell Fill |
 | `apply-014-event-budget-fix.js` | 70 | Apply 014 Event Budget Fix |
-| `verify-app-shell-fill.mjs` | 70 | Verify App Shell Fill |
 | `apply-tracker-schema.js` | 65 | Apply Tracker Schema |
 | `apply-fund-mgmt.js` | 64 | Apply Fund Mgmt |
 | `seed-lec-lab.js` | 62 | Seed Lec Lab |
@@ -682,19 +682,20 @@ resolves to a window instead of a full read.
 
 - 1: `cv-builder.css - College of Engineering CV Builder`
 
-### `client/js/ui.js` (531 lines)
+### `client/js/ui.js` (543 lines)
 
 - 5: `UI()` | 17: `groupOf()` | 21: `showView()`
-- 45: `showScreen()` | 78: `setSplashView()` | 91: `toast()`
-- 114: `currency()` | 121: `dateStr()` | 139: `esc()`
-- 148: `capitalize()` | 152: `renderStatusBadge()` | 158: `setAdminVisibility()`
-- 175: `setOfficerVisibility()` | 186: `setLoading()` | 197: `setEmpty()`
-- 211: `initAutoHideBottomNav()` | 226: `handleScroll()` | 227: `target()`
-- 231: `isAtBottom()` | 279: `moveNavIndicator()` | 286: `initNavIndicators()`
-- 297: `syncThemeColor()` | 309: `syncViewportHeight()` | 315: `kickViewportRelayout()`
-- 331: `initTabKeys()` | 392: `trapDialog()` | 394: `focusable()`
-- 398: `onKey()` | 413: `release()` | 419: `close()`
-- 433: `confirmDialog()` | 508: `lockScrollbar()` | 520: `unlockScrollbar()`
+- 45: `showScreen()` | 77: `setSplashView()` | 90: `toast()`
+- 113: `currency()` | 120: `dateStr()` | 138: `esc()`
+- 147: `capitalize()` | 151: `renderStatusBadge()` | 157: `setAdminVisibility()`
+- 174: `setOfficerVisibility()` | 185: `setLoading()` | 196: `setEmpty()`
+- 210: `initAutoHideBottomNav()` | 225: `handleScroll()` | 226: `target()`
+- 230: `isAtBottom()` | 278: `moveNavIndicator()` | 285: `initNavIndicators()`
+- 296: `syncThemeColor()` | 308: `syncViewportHeight()` | 318: `kickViewportRelayout()`
+- 335: `scheduleViewportKicks()` | 343: `initTabKeys()` | 404: `trapDialog()`
+- 406: `focusable()` | 410: `onKey()` | 425: `release()`
+- 431: `close()` | 445: `confirmDialog()` | 520: `lockScrollbar()`
+- 532: `unlockScrollbar()`
 
 ### `client/js/reports.js` (526 lines)
 
