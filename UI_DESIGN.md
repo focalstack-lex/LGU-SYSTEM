@@ -305,6 +305,7 @@ Amount font: JetBrains Mono, weight 700, `letter-spacing: -0.02em`, tabular nums
 - `border-collapse: collapse`, full-width
 - Header: uppercase, `letter-spacing: 0.06em`, `font-size: 11px`
 - Row hover: `var(--surface-hover)` | Mobile: horizontally scrollable in `.table-wrapper`
+- Date cells carry `.td-date` and never wrap
 
 ---
 

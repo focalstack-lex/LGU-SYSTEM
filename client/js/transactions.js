@@ -96,7 +96,7 @@ const Transactions = (() => {
 
     tbody.innerHTML = txs.map(tx => `
       <tr>
-        <td>${UI.dateStr(tx.transaction_date)}</td>
+        <td class="td-date">${UI.dateStr(tx.transaction_date)}</td>
         <td style="color:var(--text-secondary);font-size:0.82rem">${UI.esc(tx.events?.event_name || '-')}</td>
         <td>${UI.renderStatusBadge(tx.type)}</td>
         <td>${UI.esc(tx.description)}</td>

@@ -1,0 +1,187 @@
+[
+  {
+    "name": "skip link is the first Tab stop and becomes visible",
+    "pass": true,
+    "detail": "{\"cls\":\"skip-link\",\"text\":\"Skip to content\",\"visible\":true}"
+  },
+  {
+    "name": "skip link moves focus to main content",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "student home has no status strip",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "dashboard heading is no longer finance-first",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "sidebar is Dashboard, Money, Events, Updates, Academics",
+    "pass": true,
+    "detail": "Dashboard | Money | Events | Updates | Academics"
+  },
+  {
+    "name": "sidebar has a feedback link",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "notifications nav carries the unread badge",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "announcements page lists every announcement",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "notifications page groups by category, unread first",
+    "pass": true,
+    "detail": "[\"System\",\"Announcements\",\"Events\"]"
+  },
+  {
+    "name": "opening the inbox clears the unread badge",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "transactions page heading matches its nav name",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "academic progress heading and self-reported notice",
+    "pass": true,
+    "detail": "Academic Progress"
+  },
+  {
+    "name": "reports: per-event table without export column for students",
+    "pass": true,
+    "detail": "[\"₱191,300.00\",\"₱84,315.00\",\"₱94,685.00\",\"44%\",\"Monthly Income vs Expenses\",\"Breakdown by Type\",\"Per-Event Budgets\"]"
+  },
+  {
+    "name": "event detail shows utilization as a percentage, not a duplicate amount",
+    "pass": true,
+    "detail": "₱85,000.00 | ₱71,400.00 | 84%"
+  },
+  {
+    "name": "semester filter defaults to the load semester",
+    "pass": true,
+    "detail": "1"
+  },
+  {
+    "name": "failed year-1 subject is offered as a retake",
+    "pass": true,
+    "detail": "CPE 111,CPE 312,CPE 313,CPE 314,CPE 315,CPE 316"
+  },
+  {
+    "name": "unmet prerequisite greys the card and names the subject",
+    "pass": true,
+    "detail": "Needs CPE 221"
+  },
+  {
+    "name": "load header shows units against the cap",
+    "pass": true,
+    "detail": "2026-2027 · Semester 1 · 0 subjects · 0 of 12 units"
+  },
+  {
+    "name": "other-semester subjects are hidden by the default filter",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "adding a Semester 2 subject to a Semester 1 load is refused inline",
+    "pass": true,
+    "detail": "CPE 321 is a Semester 2 subject; this load is for Semester 1."
+  },
+  {
+    "name": "no item was added for the refused subject",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "over-cap load is flagged in the header",
+    "pass": true,
+    "detail": "2026-2027 · Semester 1 · 3 subjects · 14 of 12 units (limit is 12)"
+  },
+  {
+    "name": "submit is refused over the cap, before any request",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "remove asks for confirmation in the in-app dialog",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "submit uses the in-app dialog, not window.confirm",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "after submit every Add to Load button is disabled",
+    "pass": true,
+    "detail": "0 of 5 enabled"
+  },
+  {
+    "name": "post-submit copy says \"notified\" once",
+    "pass": true,
+    "detail": "1"
+  },
+  {
+    "name": "submit request carried 9 units",
+    "pass": true,
+    "detail": "9"
+  },
+  {
+    "name": "verified student: program and enrollment year locked, year level editable",
+    "pass": true,
+    "detail": "{\"course\":true,\"enroll\":true,\"year\":false,\"note\":true,\"gallery\":\"none\"}"
+  },
+  {
+    "name": "avatar gallery starts collapsed",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "Grizz greeting has no filler",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "no dashboard text under 12px",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "desktop: no page errors",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "phone More sheet hides the officer and admin rows for a student",
+    "pass": true,
+    "detail": "Announcements | Notifications | Profile & Settings | Send Feedback"
+  },
+  {
+    "name": "phone More sheet has Updates and Account groups with the new rows",
+    "pass": true,
+    "detail": "Updates | Account"
+  },
+  {
+    "name": "phone: tap targets in transactions, units and enrollment are at least 40px tall",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "name": "phone: no page errors",
+    "pass": true,
+    "detail": ""
+  }
+]

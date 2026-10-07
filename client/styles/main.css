@@ -3303,6 +3303,7 @@ html[data-theme="light"] .announce-expand-btn:hover {
   color: var(--text-primary);
   vertical-align: middle;
 }
+.data-table .td-date { white-space: nowrap; }
 
 .data-table tbody tr {
   background: var(--bg-surface);
@@ -9513,3 +9514,7 @@ html body .bottom-nav .bottom-nav-item span:not(.nav-icon) { font-size: 0.72rem 
 .modal-title { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
 .input-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 1.1rem; pointer-events: none; }
 .field-label-sm { color: var(--col-text-muted, var(--text-secondary)); font-size: 0.72rem; text-transform: uppercase; margin-bottom: 0.25rem; }
+.pagination-bar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; margin-top: 0.5rem; flex-wrap: wrap; gap: 0.5rem; }
+.pagination-bar-controls { display: flex; gap: 0.5rem; }
+.pagination-bar .btn { padding: 0.4rem 0.8rem; }
+.th-center { text-align: center; }
