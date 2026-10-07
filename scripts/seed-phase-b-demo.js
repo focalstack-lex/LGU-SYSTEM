@@ -7,7 +7,8 @@ const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVIC
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-const PASSWORD = 'Coetest2026!';
+const PASSWORD = process.env.SEED_DEMO_PASSWORD;
+if (!PASSWORD) { console.error('SEED_DEMO_PASSWORD is not set. Add it to .env before seeding demo accounts.'); process.exit(1); }
 const ALEX_ID = 'a8e399d9-2f2a-4e19-8e46-61b2a4f78d8a'; // test.newuser@g.cjc.edu.ph
 const BSCE_EMAIL = 'bsce.test@g.cjc.edu.ph';
 const BSCE_NAME = 'Maria Santos (Test)';

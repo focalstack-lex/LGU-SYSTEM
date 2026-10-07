@@ -13,7 +13,7 @@ console.log('=================================================================\n
 
 // 1. Mock student roster data for realistic simulation
 const SAMPLE_STUDENTS = [
-  { name: 'MATONDO, LEX EDRICK', email: 'l.matondo@g.cjc.edu.ph', course: 'BSCoE', year: '4' },
+  { name: 'RAMOS, DANIEL JOSE', email: 'd.ramos@g.cjc.edu.ph', course: 'BSCoE', year: '4' },
   { name: 'DELA CRUZ, JUAN MIGUEL', email: 'j.delacruz@g.cjc.edu.ph', course: 'BSCE', year: '3' },
   { name: 'SAN JUAN, MARIA CLARA', email: 'm.sanjuan@g.cjc.edu.ph', course: 'BSECE', year: '2' },
   { name: 'DE CASTRO, ANTHONY', email: 'a.decastro@g.cjc.edu.ph', course: 'BSCE', year: '1' },

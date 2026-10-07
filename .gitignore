@@ -44,3 +44,17 @@ Thumbs.db
 .playwright-mcp/
 gui-test-screenshots/
 t0_login_page.png
+
+# Private material: proposals, letters, design sources, presentation decks,
+# internal reports and AI tooling state. Kept on disk, never published.
+private/
+reports/
+presentation/
+.zcode/
+.omo/
+.superpowers/
+.claude/
+*.docx
+*.pdf
+proposal_page_*.png
+extracted_*.txt
