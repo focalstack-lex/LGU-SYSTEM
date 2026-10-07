@@ -835,7 +835,11 @@
     if (offlineBanner) offlineBanner.classList.toggle('hidden', !isOffline);
 
     // ---- Strict Student Masterlist & Verification Gate ----
-    if (!officerRole && !isOffline) {
+    // profiles.is_verified is set server-side when an officer verifies the account
+    // (Accounts tab) or approves a verification request. It is the authoritative
+    // flag: a verified profile never goes through the roster and request lookups,
+    // which depend on RLS, a name-token match and a local cache that a reinstall wipes.
+    if (!officerRole && !isOffline && profile?.is_verified !== true) {
       // 1. Check if student is found in the official enrolled masterlist
       let rosterMatch = null;
       if (window.Roster && window.Roster.findStudentAsync) {

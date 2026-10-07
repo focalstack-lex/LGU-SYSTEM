@@ -21,7 +21,14 @@ const Roster = (() => {
   // Fetch roster dynamically from Supabase table `enrolled_students` (cached in memory)
   async function getRoster() {
     if (_cachedRoster) return _cachedRoster;
-    if (_fetchPromise) return _fetchPromise;
+    if (_fetchPromise) {
+      const shared = await _fetchPromise;
+      if (_cachedRoster) return _cachedRoster;
+      if (shared.length > 0) return shared;
+      // The shared fetch was the page-load pre-fetch that ran without a session and
+      // came back empty. The caller (the login gate) may have a session now, so fetch
+      // again instead of handing it the empty list.
+    }
 
     _fetchPromise = (async () => {
       if (window.supabaseClient) {
