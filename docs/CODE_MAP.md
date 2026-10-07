@@ -1,6 +1,6 @@
 <!-- code-map
-generated: 2026-10-07T09:23:11.172Z
-commit: 5202675
+generated: 2026-10-07T09:37:56.893Z
+commit: 1756619
 fingerprint: 485478b83a5343b9
 -->
 # Code Map (Agent Navigation)
