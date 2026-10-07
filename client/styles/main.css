@@ -1792,6 +1792,9 @@ html[data-theme="light"] .auth-divider span {
 #app-screen {
   flex-direction: row;
   height: 100vh;
+  /* iOS Safari: 100vh is the toolbar-hidden height, so the shell ran behind the toolbar
+     and the document stayed scrollable by the difference. dvh tracks the visible viewport. */
+  height: 100dvh;
   overflow: hidden;
 }
 
