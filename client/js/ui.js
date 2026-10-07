@@ -290,7 +290,7 @@ const UI = (() => {
   // Keeps the browser/OS chrome color (PWA theme-color meta) in step with the theme
   function syncThemeColor(theme) {
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'dark' ? '#0B0F14' : '#F8FAFC');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#141416' : '#F4F5F7');
   }
 
   // iOS standalone PWA quirk (iPhone home-indicator devices): the first layout

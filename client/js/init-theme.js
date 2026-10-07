@@ -8,6 +8,6 @@
   document.documentElement.setAttribute('data-theme', savedTheme);
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    meta.setAttribute('content', savedTheme === 'dark' ? '#0B0F14' : '#F5F6F8');
+    meta.setAttribute('content', savedTheme === 'dark' ? '#141416' : '#F4F5F7');
   }
 })();
