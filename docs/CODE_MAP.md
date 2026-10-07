@@ -1,7 +1,7 @@
 <!-- code-map
-generated: 2026-10-07T17:23:41.731Z
-commit: d2acca3
-fingerprint: 3149190dc9f90f64
+generated: 2026-10-07T18:00:56.972Z
+commit: ae8c88c
+fingerprint: d4804b08abbc4cd3
 -->
 # Code Map (Agent Navigation)
 
@@ -15,7 +15,7 @@ disagree, the code wins and the map is regenerated.
 ## Summary
 
 - Files indexed: 188
-- Total lines indexed: 53,475
+- Total lines indexed: 53,477
 - Anchor index emitted for files over 300 lines: 38
 
 ### Areas
@@ -28,7 +28,7 @@ disagree, the code wins and the map is regenerated.
 | `client/js` | 30 | 12,370 |
 | `client/js/faculty` | 1 | 489 |
 | `client/js/officer` | 2 | 3,342 |
-| `client/styles` | 6 | 14,363 |
+| `client/styles` | 6 | 14,365 |
 | `electron` | 3 | 351 |
 | `private` | 2 | 88 |
 | `scripts` | 68 | 7,647 |
@@ -118,7 +118,7 @@ disagree, the code wins and the map is regenerated.
 
 | File | Lines | Purpose |
 |---|---:|---|
-| `main.css` | 9526 | College of Engineering · Official Student Portal · Design System |
+| `main.css` | 9528 | College of Engineering · Official Student Portal · Design System |
 | `officer.css` | 2217 | EXECUTIVE PORTAL - Cohesive Portal Theme |
 | `ai.css` | 1632 | Grizz - COE Bear AI Assistant Styles |
 | `cv-builder.css` | 567 | College of Engineering CV Builder |
@@ -324,20 +324,20 @@ disagree, the code wins and the map is regenerated.
 Files over 300 lines. Each entry is a line number to jump to, so a target
 resolves to a window instead of a full read.
 
-### `client/styles/main.css` (9526 lines)
+### `client/styles/main.css` (9528 lines)
 
-- 1: `College of Engineering · Official Student Portal · Design System` | 562: `AUTHENTICATION SCREEN - Permanently Dark Charcoal & Coral-Orange` | 1273: `FORM ELEMENTS`
-- 1440: `BUTTONS` | 1789: `APP LAYOUT` | 2078: `DASHBOARD STATS & FINANCIAL SUMMARY HIERARCHY`
-- 2774: `DASHBOARD CARDS` | 3150: `EVENTS GRID` | 3265: `DATA TABLE`
-- 3455: `REPORTS` | 3501: `ADMIN PANELS` | 3521: `LOADING & EMPTY STATES`
-- 3543: `Iconify - icon-park-outline global normalization` | 3619: `TOAST NOTIFICATION` | 3652: `MOBILE CARDS (Hidden on Desktop)`
-- 3664: `RESPONSIVE - Tablet (≤1024px)` | 3672: `RESPONSIVE - Small Tablet / Large Phone (≤768px)` | 3934: `RESPONSIVE - Phone (≤480px)`
-- 4573: `Phase 4 - Admin Tabs & Modals` | 4713: `Skeleton Loading Screen` | 5024: `SKELETON RESPONSIVE OVERRIDES`
-- 5111: `CREDIT UNIT TRACKER` | 6208: `Mobile Profile Header Trigger` | 6250: `Profile & Account Settings Modal`
-- 6427: `Avatar Picker Section` | 7095: `LIGHT MODE DESIGN ENHANCEMENTS & ELEVATIONS (IN-APP)` | 7354: `RECEIPT CAPTURE MODAL + ATTACHMENT CHIP`
-- 7476: `IN-SYSTEM RECEIPT VIEWER LIGHTBOX MODAL` | 7947: `iOS Slide-Up Bottom Sheet Drawer ("More" Menu)` | 8287: `Load Verification (Phase B student portal)`
-- 8818: `Enrollment Verification — Journey UI (2026-09-10)` | 9048: `Faculty Portal (Phase B, /faculty)` | 9236: `Faculty review queue — year-level groups (2026-09-10)`
-- 9292: `Student experience (2026-09-28): skip link, status strip, updates pages,` | 9420: `VIEW GROUP TABS` | 9503: `SHARED TEXT AND ICON UTILITIES`
+- 1: `College of Engineering · Official Student Portal · Design System` | 576: `AUTHENTICATION SCREEN - Permanently Dark Charcoal & Coral-Orange` | 1287: `FORM ELEMENTS`
+- 1454: `BUTTONS` | 1803: `APP LAYOUT` | 2092: `DASHBOARD STATS & FINANCIAL SUMMARY HIERARCHY`
+- 2771: `DASHBOARD CARDS` | 3147: `EVENTS GRID` | 3262: `DATA TABLE`
+- 3452: `REPORTS` | 3498: `ADMIN PANELS` | 3518: `LOADING & EMPTY STATES`
+- 3540: `Iconify - icon-park-outline global normalization` | 3616: `TOAST NOTIFICATION` | 3649: `MOBILE CARDS (Hidden on Desktop)`
+- 3661: `RESPONSIVE - Tablet (≤1024px)` | 3669: `RESPONSIVE - Small Tablet / Large Phone (≤768px)` | 3931: `RESPONSIVE - Phone (≤480px)`
+- 4570: `Phase 4 - Admin Tabs & Modals` | 4710: `Skeleton Loading Screen` | 5021: `SKELETON RESPONSIVE OVERRIDES`
+- 5108: `CREDIT UNIT TRACKER` | 6205: `Mobile Profile Header Trigger` | 6247: `Profile & Account Settings Modal`
+- 6424: `Avatar Picker Section` | 7092: `LIGHT MODE DESIGN ENHANCEMENTS & ELEVATIONS (IN-APP)` | 7351: `RECEIPT CAPTURE MODAL + ATTACHMENT CHIP`
+- 7473: `IN-SYSTEM RECEIPT VIEWER LIGHTBOX MODAL` | 7944: `iOS Slide-Up Bottom Sheet Drawer ("More" Menu)` | 8284: `Load Verification (Phase B student portal)`
+- 8814: `Enrollment Verification — Journey UI (2026-09-10)` | 9044: `Faculty Portal (Phase B, /faculty)` | 9232: `Faculty review queue — year-level groups (2026-09-10)`
+- 9288: `Student experience (2026-09-28): skip link, status strip, updates pages,` | 9416: `VIEW GROUP TABS` | 9499: `SHARED TEXT AND ICON UTILITIES`
 
 ### `client/js/officer/officer-app.js` (3153 lines)
 
