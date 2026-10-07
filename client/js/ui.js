@@ -47,6 +47,11 @@ const UI = (() => {
     const screen = document.getElementById(`${screenId}-screen`);
     if (screen) screen.classList.add('active');
 
+    // The auth screen is a scrolling document, the app screen a fixed-height shell. A leftover
+    // scroll offset or an open keyboard from the login form would show as a band under the shell.
+    if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
+    window.scrollTo(0, 0);
+
     // If switching to auth, strip all admin privileges and app state, lock theme-color to dark
     if (screenId === 'auth') {
       setAdminVisibility(false);
