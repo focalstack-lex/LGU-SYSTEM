@@ -51,6 +51,12 @@ const UI = (() => {
     // scroll offset or an open keyboard from the login form would show as a band under the shell.
     if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
     window.scrollTo(0, 0);
+    // Installed iOS PWA: the keyboard that was open on the login form leaves the layout
+    // viewport short until something forces a re-measure. Sync now and again once the
+    // keyboard dismissal animation has finished.
+    syncViewportHeight();
+    setTimeout(kickViewportRelayout, 50);
+    setTimeout(() => { syncViewportHeight(); kickViewportRelayout(); }, 450);
 
     // If switching to auth, strip all admin privileges and app state, lock theme-color to dark
     if (screenId === 'auth') {
@@ -297,6 +303,15 @@ const UI = (() => {
   // can be computed against a stale viewport height, leaving a phantom gap at
   // the very bottom of the screen until the user interacts. Nudge WebKit to
   // re-measure shortly after launch and whenever the app becomes visible again.
+  // The shell's height on phones is var(--vvh), the visual viewport height measured by
+  // the browser itself, which is the only value iOS standalone keeps correct across
+  // keyboard open and close, rotation and the stale first layout. Falls back to 100%.
+  function syncViewportHeight() {
+    const vv = window.visualViewport;
+    const h = vv && vv.height ? vv.height : window.innerHeight;
+    if (h > 0) document.documentElement.style.setProperty('--vvh', Math.round(h) + 'px');
+  }
+
   function kickViewportRelayout() {
     const body = document.body;
     if (!body) return;
@@ -358,6 +373,14 @@ const UI = (() => {
       if (!document.hidden) setTimeout(kickViewportRelayout, 150);
     });
     window.addEventListener('pageshow', e => { if (e.persisted) kickViewportRelayout(); });
+    syncViewportHeight();
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', syncViewportHeight);
+      window.visualViewport.addEventListener('scroll', syncViewportHeight);
+    }
+    window.addEventListener('resize', syncViewportHeight);
+    window.addEventListener('orientationchange', () => setTimeout(syncViewportHeight, 100));
+    window.addEventListener('pageshow', syncViewportHeight);
   }
 
   // ---- Accessible dialog behaviour ----
