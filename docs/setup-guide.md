@@ -77,6 +77,6 @@ Visit: **http://localhost:3000**
 
 | Layer    | Service  | Notes                     |
 | -------- | -------- | ------------------------- |
-| Frontend | Vercel   | Point to `client/` folder |
+| Frontend | Vercel   | Root directory `client/`; `client/vercel.json` runs `npm run build` (Vite) and serves `dist/` |
 | Backend  | Render   | Set env vars from `.env`  |
 | Database | Supabase | Already cloud-hosted      |

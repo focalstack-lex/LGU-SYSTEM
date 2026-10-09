@@ -523,3 +523,9 @@ async function downloadReport(type, eventId, eventName) {
 
 // Export global namespace for app.js navigation
 window.Reports = { load: initReports, reloadCharts };
+
+// Module build (Vite): the page scripts are ES modules, so this namespace is
+// published on window for the other scripts and the HTML to reach it.
+window.fmt = fmt;
+window.getThemeColor = getThemeColor;
+window.reloadCharts = reloadCharts;

@@ -18,10 +18,13 @@
 //      then filling extra clear courses up to a 24-unit target (8-subject
 //      safety ceiling), the cap never clips the required slot.
 // UMD: browsers get window.GrizzRecommend; Node tests require() it.
+// The browser branch is tested first: the Vite bundle wraps this file with a
+// CommonJS shim, so a module.exports check would win there and the window
+// global would never be set.
 // =============================================
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.GrizzRecommend = factory();
+  if (root && root.document) root.GrizzRecommend = factory();
+  else if (typeof module === 'object' && module.exports) module.exports = factory();
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 

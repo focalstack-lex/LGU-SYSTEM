@@ -6,7 +6,7 @@
   <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
   <title>College of Engineering · Official Student Portal</title>
   <!-- PWA: installable app with home-screen icon and offline shell -->
-  <link rel="manifest" href="manifest.json" />
+  <link rel="manifest" href="manifest.json" vite-ignore />
   <meta name="theme-color" content="#141416" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -17,8 +17,8 @@
   <meta name="description" content="Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/main.css?v=8.5" />
-  <link rel="stylesheet" href="styles/ai.css?v=7.0" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/ai.css" />
   <script src="vendor/supabase.min.js"></script>
   <script src="vendor/chart.umd.min.js"></script>
   <script src="vendor/iconify-icon.min.js"></script>
@@ -1706,30 +1706,6 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=5.5"></script>
-  <script src="js/swr-cache.js"></script>
-  <script src="js/roster.js?v=5.6"></script>
-  <script src="js/auth.js?v=5.5"></script>
-  <script src="js/api.js?v=5.4"></script>
-  <script src="js/ui.js?v=5.15"></script>
-  <script src="js/dashboard.js?v=5.7"></script>
-  <script src="js/updates.js?v=1.0"></script>
-  <script src="js/events.js?v=5.6"></script>
-  <script src="js/transactions.js?v=5.5"></script>
-  <script src="js/reports.js?v=5.6"></script>
-  <script src="js/income.js?v=5.3"></script>
-  <script src="js/units.js?v=5.6"></script>
-  <script src="js/receipt-capture.js?v=5.3"></script>
-  <script src="js/receipt-modal.js?v=5.4"></script>
-  <script src="js/dropdown.js?v=5.4"></script>
-  <script src="js/admin.js?v=5.5"></script>
-  <script src="js/grizz-recommend.js?v=1.6"></script>
-  <script src="js/ai-assistant.js?v=6.3"></script>
-  <script src="js/profile.js?v=5.5"></script>
-  <script src="js/notifications.js?v=5.5"></script>
-  <script src="js/enrollment-journey.js?v=1.2"></script>
-  <script src="js/enrollment.js?v=1.8"></script>
-  <script src="js/app.js?v=6.9"></script>
-  <script src="js/sw-register.js"></script>
+  <script type="module" src="js/entry/index.js"></script>
 </body>
 </html>

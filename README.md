@@ -4,7 +4,7 @@ A centralized web application designed for the College of Engineering (COE) and 
 
 ## Project Structure
 
-- **`/client`**: Frontend application built with Vanilla JS and CSS.
+- **`/client`**: Frontend application built with Vanilla JS and CSS, bundled by Vite (`client/vite.config.mjs`, output in `client/dist`).
 - **`/server`**: Node.js/Express API for business logic and report generation.
 - **`/supabase`**: Database migrations, RLS policies, and SQL setup.
 - **`/docs`**: System documentation, requirements, and architecture diagrams.
@@ -13,7 +13,7 @@ A centralized web application designed for the College of Engineering (COE) and 
 
 ## Technical Stack
 
-- **Frontend**: HTML5, CSS3, JavaScript
+- **Frontend**: HTML5, CSS3, JavaScript (ES modules), built with Vite
 - **Backend**: Node.js, Express
 - **Database**: Supabase (PostgreSQL)
 - **Auth/Storage**: Supabase Auth & Storage
@@ -40,11 +40,19 @@ Prerequisites: Node.js (LTS recommended) and a Supabase project.
    | `NODE_ENV` | `development` or `production` |
    | `BREVO_API_KEY`, `BREVO_SENDER_EMAIL` | Outbound notification email (optional locally) |
    | `APP_URL`, `RENDER_EXTERNAL_URL` | Public base URL used when generating links in emails |
-3. Start the server:
+3. Install the frontend tooling and build the frontend once:
+   ```bash
+   npm run client:install
+   npm run client:build
+   ```
+   `client/` is its own npm package (Vite). `client:build` writes the deployable pages to `client/dist`; rerun it after changing anything under `client/`.
+4. Start the server:
    ```bash
    npm start        # or: npm run dev (auto-reload via nodemon)
    ```
-   The Express server serves the API and the `/client` frontend from a single origin — open [http://localhost:3000](http://localhost:3000).
+   The Express server serves the API and the frontend from a single origin: `client/dist` when it exists, otherwise the raw `client/` source. Open [http://localhost:3000](http://localhost:3000).
+
+   For frontend work with instant reload, run `npm run client:dev` in a second terminal and open [http://localhost:5173](http://localhost:5173); the Vite dev server proxies `/api` to the Express server on port 3000.
 
 ## Core Features
 

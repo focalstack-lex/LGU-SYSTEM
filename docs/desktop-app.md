@@ -45,13 +45,19 @@ The LGU System Admin Desktop App is a native Electron-based application that wra
 ## Building from Source
 
 ```bash
+# Build the frontend first (repo root). The shell loads client/dist, which is
+# also what electron-builder copies into the package as extraResources.
+npm run client:install
+npm run client:build
+
 # Install dependencies
+cd electron
 npm install
 
 # Package for distribution
 npm run package
 
-# Output will be in electron/dist/
+# Output will be in electron/dist-build/
 ```
 
 ## Configuration
@@ -132,7 +138,7 @@ electron/
 **App won't start**
 - Ensure Node.js version >= 18.0.0
 - Run `npm install` in electron directory
-- Check that client files exist at `../client/`
+- Check that the built client exists at `../client/dist/` (run `npm run client:build` at the repo root)
 
 **Can't login**
 - Same as web app: check internet connection

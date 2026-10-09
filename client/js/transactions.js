@@ -386,3 +386,7 @@ const Transactions = (() => {
 
   return { load, editModal, deleteModal };
 })();
+
+// Module build (Vite): the page scripts are ES modules, so this namespace is
+// published on window for the other scripts and the HTML to reach it.
+window.Transactions = Transactions;

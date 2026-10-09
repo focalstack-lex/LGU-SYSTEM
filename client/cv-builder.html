@@ -15,8 +15,8 @@
   <script src="/vendor/icons-bundle.js?v=2"></script>
 
   <!-- Global Styles -->
-  <link rel="stylesheet" href="styles/main.css?v=8.5" />
-  <link rel="stylesheet" href="styles/cv-builder.css?v=3.2" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/cv-builder.css" />
 
   <!-- Supabase (vendored) -->
   <script src="vendor/supabase.min.js"></script>
@@ -211,9 +211,6 @@
     <span id="cv-toast-message"></span>
   </div>
 
-  <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/cv-builder.js"></script>
+  <script type="module" src="js/entry/cv-builder.js"></script>
 </body>
 </html>

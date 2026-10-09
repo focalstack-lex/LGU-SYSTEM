@@ -2,10 +2,13 @@
 // enrollment-journey.js - Pure journey-state model for Enrollment Verification.
 // Maps server submission states to student-visible journey steps + actions.
 // UMD: browsers get window.EnrollmentJourney; Node tests require() it.
+// The browser branch is tested first: the Vite bundle wraps this file with a
+// CommonJS shim, so a module.exports check would win there and the window
+// global would never be set.
 // =============================================
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.EnrollmentJourney = factory();
+  if (root && root.document) root.EnrollmentJourney = factory();
+  else if (typeof module === 'object' && module.exports) module.exports = factory();
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 

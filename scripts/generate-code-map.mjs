@@ -34,7 +34,7 @@ const EXCLUDE_DIRS = new Set([
   'node_modules', '.git', '.kilo', '.github', '.qodo', '.superpowers', '.zcode',
   'vendor', 'dist', 'build', 'scratch', 'logs', 'tmp', 'temp', 'coverage',
   '.playwright-mcp', 'gui-test-screenshots', 'reports', 'assets', 'Icons',
-  'bg elements', 'presentation', 'electron-builder', 'node_modules2',
+  'bg elements', 'presentation', 'electron-builder', 'node_modules2', 'private',
 ]);
 const EXCLUDE_RE = /(^|[\\/])(dist[-_].*|dist-build.*|build-.*|\.next|cache)$/;
 const KEEP_EXT = new Set(['.js', '.mjs', '.cjs', '.css', '.html', '.sql']);

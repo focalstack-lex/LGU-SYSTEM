@@ -10,7 +10,14 @@ function normalizePath(p) {
 }
 
 function getClientIndexPath() {
-  // Try dev layout: electron/../client
+  // Dev layout, built frontend: electron/../client/dist (npm run client:build at
+  // the repo root). The build is what ships, so it is preferred over the raw
+  // source, whose pages now load their scripts as ES modules.
+  const builtPath = path.join(__dirname, '../client/dist/index.html');
+  if (fs.existsSync(builtPath)) {
+    return normalizePath(builtPath);
+  }
+  // Legacy dev layout: electron/../client
   const devPath = path.join(__dirname, '../client/index.html');
   if (fs.existsSync(devPath)) {
     return normalizePath(devPath);

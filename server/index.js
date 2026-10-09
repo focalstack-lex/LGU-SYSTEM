@@ -158,17 +158,25 @@ function onlyWrites(limiter) {
 
 // =============================================
 // Serve static frontend files
+// The Vite build in client/dist (npm run client:build) is served when it
+// exists; otherwise the raw client/ source, so the server still runs
+// without a build step. Decided once at startup.
 // =============================================
-app.use(express.static(path.join(__dirname, "../client")));
+const builtClientDir = path.join(__dirname, "../client/dist");
+const clientDir = require("fs").existsSync(path.join(builtClientDir, "index.html"))
+  ? builtClientDir
+  : path.join(__dirname, "../client");
+console.log(`Serving frontend from ${path.relative(path.join(__dirname, ".."), clientDir)}`);
+app.use(express.static(clientDir));
 
 // Standalone portal pages - static handler can't resolve extensionless
 // directory paths to their .html files, so route them explicitly.
-const feedbackDir = path.join(__dirname, "../client/feedback");
+const feedbackDir = path.join(clientDir, "feedback");
 app.get(["/feedback", "/feedback/"],        (req, res) => res.sendFile(path.join(feedbackDir, "index.html")));
 app.get(["/feedback/view", "/feedback/view/"], (req, res) => res.sendFile(path.join(feedbackDir, "view", "index.html")));
-app.get(["/faculty", "/faculty/"],           (req, res) => res.sendFile(path.join(__dirname, "../client", "faculty.html")));
-app.get(["/cv-builder", "/cv-builder/"],     (req, res) => res.sendFile(path.join(__dirname, "../client", "cv-builder.html")));
-app.get(["/cv-verify", "/cv-verify/"],       (req, res) => res.sendFile(path.join(__dirname, "../client", "cv-verify.html")));
+app.get(["/faculty", "/faculty/"],           (req, res) => res.sendFile(path.join(clientDir, "faculty.html")));
+app.get(["/cv-builder", "/cv-builder/"],     (req, res) => res.sendFile(path.join(clientDir, "cv-builder.html")));
+app.get(["/cv-verify", "/cv-verify/"],       (req, res) => res.sendFile(path.join(clientDir, "cv-verify.html")));
 
 // =============================================
 // Public Routes
@@ -201,7 +209,7 @@ app.use("/api/cv",            cvRouter);
 // SPA Fallback
 // =============================================
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/index.html"));
+  res.sendFile(path.join(clientDir, "index.html"));
 });
 
 // =============================================

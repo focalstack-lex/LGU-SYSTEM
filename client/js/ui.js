@@ -540,3 +540,7 @@ const UI = (() => {
 
   return { VIEW_GROUPS, groupOf, showView, showScreen, setSplashView, toast, currency, dateStr, esc, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators, lockScrollbar, unlockScrollbar, trapDialog, confirmDialog };
 })();
+
+// Module build (Vite): the page scripts are ES modules, so this namespace is
+// published on window for the other scripts and the HTML to reach it.
+window.UI = UI;
