@@ -1,7 +1,7 @@
 <!-- code-map
-generated: 2026-10-09T07:08:59.892Z
-commit: 47ab1ff
-fingerprint: 151d3e1a06460b81
+generated: 2026-10-09T07:34:55.541Z
+commit: 65262ab
+fingerprint: 8f1b4da3fe3ab73b
 -->
 # Code Map (Agent Navigation)
 
@@ -14,15 +14,15 @@ disagree, the code wins and the map is regenerated.
 
 ## Summary
 
-- Files indexed: 196
-- Total lines indexed: 53,726
+- Files indexed: 194
+- Total lines indexed: 53,639
 - Anchor index emitted for files over 300 lines: 38
 
 ### Areas
 
 | Area | Files | Lines |
 |---|---:|---:|
-| `.` | 4 | 2,309 |
+| `.` | 2 | 2,221 |
 | `client` | 7 | 3,521 |
 | `client/feedback` | 2 | 225 |
 | `client/js` | 30 | 12,446 |
@@ -31,7 +31,7 @@ disagree, the code wins and the map is regenerated.
 | `client/js/officer` | 2 | 3,346 |
 | `client/styles` | 6 | 14,365 |
 | `electron` | 3 | 358 |
-| `scripts` | 68 | 7,646 |
+| `scripts` | 68 | 7,647 |
 | `server` | 1 | 235 |
 | `server/lib` | 8 | 713 |
 | `server/middleware` | 2 | 122 |
@@ -46,9 +46,7 @@ disagree, the code wins and the map is regenerated.
 | File | Lines | Purpose |
 |---|---:|---|
 | `seed-subjects.js` | 2184 | Seed the Credit Unit Tracker curriculum |
-| `debug_summary.js` | 51 | Debug Summary |
 | `check_txs.js` | 37 | Check Txs |
-| `read_docx.js` | 37 | Read Docx |
 
 ## client
 
@@ -162,7 +160,7 @@ disagree, the code wins and the map is regenerated.
 | `lib-capture-mocks.mjs` | 253 | lib-capture-mocks.mjs |
 | `audit-mobile-responsive.mjs` | 249 | Audit Mobile Responsive |
 | `verify-student-experience.mjs` | 217 | Verify Student Experience |
-| `seed-phase-b-demo.js` | 189 | Seed Phase B Demo |
+| `seed-phase-b-demo.js` | 190 | Seed Phase B Demo |
 | `lint-sql-invariants.mjs` | 188 | scripts/lint-sql-invariants.mjs |
 | `verify-dropdown-sweep.mjs` | 175 | Verify Dropdown Sweep |
 | `verify-skeleton.mjs` | 173 | Verify Skeleton |

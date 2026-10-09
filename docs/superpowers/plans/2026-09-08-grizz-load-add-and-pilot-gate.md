@@ -17,8 +17,8 @@
 - All dynamic strings inserted into HTML go through the module's `esc()` helper.
 - Program casing is exact (`'BSCoE' | 'BSCE' | 'BSECE'`) wherever the checklists API is called — never `.toUpperCase()` the value passed to an API.
 - QA constraint: emails fire only to fake test addresses; never touch the real admin account's password.
-- Test password for all seeded accounts: `Coetest2026!`.
-- Pilot list (verbatim, client and server default): `lexmatondo@g.cjc.edu.ph`, `test.newuser@g.cjc.edu.ph`, `bsce.test@g.cjc.edu.ph`, `head.test@g.cjc.edu.ph`, `dean.test@g.cjc.edu.ph`, `sa.test@g.cjc.edu.ph`, `student.pilot@g.cjc.edu.ph`.
+- Test password for all seeded accounts: the value of `SEED_DEMO_PASSWORD` in `.env` (never written into docs).
+- Pilot list (verbatim, client and server default): `developer.account@g.cjc.edu.ph`, `test.newuser@g.cjc.edu.ph`, `bsce.test@g.cjc.edu.ph`, `head.test@g.cjc.edu.ph`, `dean.test@g.cjc.edu.ph`, `sa.test@g.cjc.edu.ph`, `student.pilot@g.cjc.edu.ph`.
 - Subject IDs are UUIDs; `subjects.id` is shared by Grizz and the enrollment module (both read `Api.units.checklists`).
 
 ---
@@ -55,7 +55,7 @@ const roles = read('server/middleware/roles.js');
 check('pilotGate middleware defined', /function pilotGate\(/.test(roles));
 check('pilotGate checks req.user.email', /req\.user\?\.email/.test(roles));
 check('pilotGate default includes admin + test accounts',
-  ['lexmatondo', 'test.newuser', 'bsce.test', 'head.test', 'dean.test', 'sa.test', 'student.pilot']
+  ['developer.account', 'test.newuser', 'bsce.test', 'head.test', 'dean.test', 'sa.test', 'student.pilot']
     .every(e => roles.includes(e + '@g.cjc.edu.ph')));
 check('pilotGate reads ENROLLMENT_PILOT_EMAILS env', /ENROLLMENT_PILOT_EMAILS/.test(roles));
 check('pilotGate exported', /pilotGate/.test((roles.match(/module\.exports[^;]+/) || [''])[0]));
@@ -84,7 +84,7 @@ In `server/middleware/roles.js`, before `module.exports`, add:
 // Client mirror: client/js/config.js window.ENROLLMENT_PILOT_EMAILS.
 // Override with ENROLLMENT_PILOT_EMAILS="a@x.com, b@x.com" on the server.
 const PILOT_DEFAULT = [
-  'lexmatondo@g.cjc.edu.ph',
+  'developer.account@g.cjc.edu.ph',
   'test.newuser@g.cjc.edu.ph',
   'bsce.test@g.cjc.edu.ph',
   'head.test@g.cjc.edu.ph',
@@ -177,7 +177,7 @@ Append to `client/js/config.js`:
 // Server mirror: server/middleware/roles.js PILOT_DEFAULT.
 // =============================================
 window.ENROLLMENT_PILOT_EMAILS = [
-  'lexmatondo@g.cjc.edu.ph',   // admin / developer
+  'developer.account@g.cjc.edu.ph',   // admin / developer
   'test.newuser@g.cjc.edu.ph', // student: Alex Rivera (BSCoE, Yr 2)
   'bsce.test@g.cjc.edu.ph',    // student: Maria Santos (BSCE, seeded submitted load)
   'head.test@g.cjc.edu.ph',    // program head (BSCoE)
@@ -831,7 +831,7 @@ git commit -m "test: seed non-pilot gated.test account for gate QA"
 
 **Files:** none (screenshots land in `gui-test-screenshots/`, which is gitignored).
 
-Start the server: `node server/index.js` (background). All accounts use password `Coetest2026!`.
+Start the server: `node server/index.js` (background). All accounts use the `SEED_DEMO_PASSWORD` value from `.env`.
 
 - [ ] **Step 1: Non-pilot student sees the gate** — log in as `gated.test@g.cjc.edu.ph`, click Load Verification: expect the 🚧 under-development panel, no draft UI, no Grizz add buttons on recommendations.
 - [ ] **Step 2: Pilot student full flow** — log in as `test.newuser@g.cjc.edu.ph`: Grizz → "Next Sem Recommendations" shows Add buttons + "Add all recommended" + jump link; add one subject (button flips to "✓ Added", result line appears), add-all for the rest; open Load Verification via the jump link: all subjects present with Grizz badges; server 403/duplicate errors (if any) show inline in chat.
